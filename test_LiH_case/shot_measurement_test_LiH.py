@@ -8,12 +8,9 @@ import cirq
 import numpy as np
 
 from main_cursor_lib_test_LiH import (
-    DEFAULT_AMP_DAMP_GAMMA,
-    DEFAULT_DEPOL_PROB,
-    DEFAULT_HIGH_CZ_MULTIPLIER,
-    DEFAULT_LEAKAGE_APPROX_PROB,
-    DEFAULT_PHASE_DAMP_GAMMA,
-    LocationAwareDecomposedNoise,
+    GateArityDepolarizingNoise,
+    ONE_QUBIT_GATE_DEPOL_PROB,
+    TWO_QUBIT_GATE_DEPOL_PROB,
     count_non_clifford_ops,
     generate_near_clifford_param_sets,
     generate_random_clifford_analogue_param_sets,
@@ -376,11 +373,8 @@ def run_shot_zne(
     noise_scales: list[float] | tuple[float, ...] = (1.0, 2.0, 3.0),
     fit_order: int = 1,
     simulator_seed: int = 1234,
-    amp_damp_gamma: float = DEFAULT_AMP_DAMP_GAMMA,
-    phase_damp_gamma: float = DEFAULT_PHASE_DAMP_GAMMA,
-    depol_prob: float = DEFAULT_DEPOL_PROB,
-    high_cz_multiplier: float = DEFAULT_HIGH_CZ_MULTIPLIER,
-    leakage_approx_prob: float = DEFAULT_LEAKAGE_APPROX_PROB,
+    two_qubit_depol_prob: float = TWO_QUBIT_GATE_DEPOL_PROB,
+    one_qubit_depol_prob: float = ONE_QUBIT_GATE_DEPOL_PROB,
     num_shots: int = 8192,
     measurement_scheme: str = "ogm",
     p_0_success: Iterable[float] | None = None,
@@ -404,13 +398,10 @@ def run_shot_zne(
     for scale in scales:
         scaled = scale_noise_params_for_zne(
             scale,
-            amp_damp_gamma=amp_damp_gamma,
-            phase_damp_gamma=phase_damp_gamma,
-            depol_prob=depol_prob,
-            leakage_approx_prob=leakage_approx_prob,
-            high_cz_multiplier=high_cz_multiplier,
+            two_qubit_depol_prob=two_qubit_depol_prob,
+            one_qubit_depol_prob=one_qubit_depol_prob,
         )
-        noise_model = LocationAwareDecomposedNoise(**scaled)
+        noise_model = GateArityDepolarizingNoise(**scaled)
         noisy_circuit = ansatz_circuit.with_noise(noise_model)
         resolved_noisy = cirq.resolve_parameters(noisy_circuit, resolver)
         rho_noisy = cirq.DensityMatrixSimulator(seed=simulator_seed).simulate(
@@ -524,7 +515,7 @@ def _simulate_noisy_rho_for_resolver(
     *,
     simulator_seed: int,
 ) -> np.ndarray:
-    noise_model = LocationAwareDecomposedNoise(**noise_params)
+    noise_model = GateArityDepolarizingNoise(**noise_params)
     noisy_circuit = ansatz_circuit.with_noise(noise_model)
     resolved_noisy = cirq.resolve_parameters(noisy_circuit, resolver)
     rho = cirq.DensityMatrixSimulator(seed=simulator_seed).simulate(
@@ -786,6 +777,78 @@ def apply_cf_models_per_pauli(
 VALID_MITIGATION_MODES: tuple[str, ...] = ("none", "zne", "cdr", "both")
 
 
+def _generate_near_clifford_resolvers_fallback(
+    target_params: dict,
+    symbols: list,
+    *,
+    num_circuits: int,
+    t_max: int,
+    circuit: cirq.Circuit,
+    min_snap_fraction: float,
+    seed: int,
+) -> list[dict]:
+    """Fallback near-Clifford generator for symbol names outside th_*/ph_*.
+
+    Uses nearest pi/2 snapping for all symbols and the same greedy t_max loop.
+    """
+    if num_circuits <= 0:
+        raise ValueError(f"num_circuits must be > 0, got {num_circuits}.")
+    if t_max < 0:
+        raise ValueError(f"t_max must be >= 0, got {t_max}.")
+    if not (0.0 <= float(min_snap_fraction) <= 1.0):
+        raise ValueError(
+            f"min_snap_fraction must be in [0, 1], got {min_snap_fraction}."
+        )
+
+    def snap_pi_over_2(value: float) -> float:
+        step = float(np.pi) / 2.0
+        return float(round(float(value) / step) * step)
+
+    target_by_symbol: dict = {}
+    for sym in symbols:
+        if sym in target_params:
+            target_by_symbol[sym] = float(target_params[sym])
+        elif str(sym) in target_params:
+            target_by_symbol[sym] = float(target_params[str(sym)])
+        else:
+            raise KeyError(f"Target parameter missing for symbol {sym!s}.")
+
+    resolvers: list[dict] = []
+    for circ_idx in range(num_circuits):
+        local_rng = np.random.default_rng(int(seed) + 1000 * (circ_idx + 1))
+        resolver = dict(target_by_symbol)
+        snapped: set = set()
+
+        if min_snap_fraction > 0.0:
+            n_min_snap = int(np.ceil(min_snap_fraction * len(symbols)))
+            n_min_snap = min(n_min_snap, len(symbols))
+            order = list(symbols)
+            local_rng.shuffle(order)
+            for sym in order[:n_min_snap]:
+                resolver[sym] = snap_pi_over_2(target_by_symbol[sym])
+                snapped.add(sym)
+
+        guard = 0
+        max_iterations = 4 * len(symbols) + 8
+        while True:
+            t_remaining = count_non_clifford_ops(circuit, resolver)
+            if t_remaining <= t_max:
+                break
+            unsnapped = [s for s in symbols if s not in snapped]
+            if not unsnapped:
+                break
+            pick = unsnapped[int(local_rng.integers(0, len(unsnapped)))]
+            resolver[pick] = snap_pi_over_2(target_by_symbol[pick])
+            snapped.add(pick)
+            guard += 1
+            if guard > max_iterations:
+                break
+
+        resolvers.append(resolver)
+
+    return resolvers
+
+
 def _baseline_target_energies(
     ansatz_circuit: cirq.Circuit,
     target_resolver: dict,
@@ -852,8 +915,7 @@ def run_mitigation(
 ) -> dict[str, object]:
     """Single dispatcher for `none | zne | cdr | both` mitigation pipelines.
 
-    `base_noise_cfg`: dict of `amp_damp_gamma`, `phase_damp_gamma`, `depol_prob`,
-                     `leakage_approx_prob`, `high_cz_multiplier`.
+    `base_noise_cfg`: dict of `two_qubit_depol_prob`, `one_qubit_depol_prob`.
     `shot_cfg`:      dict of `num_shots`, `measurement_scheme`, `apply_readout_noise`,
                      `sampling_seed`, `epsilon`, `ogm_file`, `shadowgrouping_root`.
     `readout_cal`:   dict with `p_0_success`, `p_1_success` (or None).
@@ -977,15 +1039,28 @@ def run_mitigation(
 
         cdr_training = str(cdr_cfg.get("cdr_training", "snap_greedy"))
         if cdr_training == "snap_greedy":
-            resolvers = generate_near_clifford_param_sets(
-                cdr_target_params,
-                list(cdr_symbols),
-                num_circuits=int(cdr_cfg["num_circuits"]),
-                t_max=int(cdr_cfg["t_max"]),
-                circuit=ansatz_circuit,
-                min_snap_fraction=float(cdr_cfg.get("min_snap_fraction", 0.0)),
-                seed=int(cdr_cfg.get("seed", 0)),
-            )
+            try:
+                resolvers = generate_near_clifford_param_sets(
+                    cdr_target_params,
+                    list(cdr_symbols),
+                    num_circuits=int(cdr_cfg["num_circuits"]),
+                    t_max=int(cdr_cfg["t_max"]),
+                    circuit=ansatz_circuit,
+                    min_snap_fraction=float(cdr_cfg.get("min_snap_fraction", 0.0)),
+                    seed=int(cdr_cfg.get("seed", 0)),
+                )
+            except ValueError as err:
+                if "Unrecognized symbol naming convention" not in str(err):
+                    raise
+                resolvers = _generate_near_clifford_resolvers_fallback(
+                    cdr_target_params,
+                    list(cdr_symbols),
+                    num_circuits=int(cdr_cfg["num_circuits"]),
+                    t_max=int(cdr_cfg["t_max"]),
+                    circuit=ansatz_circuit,
+                    min_snap_fraction=float(cdr_cfg.get("min_snap_fraction", 0.0)),
+                    seed=int(cdr_cfg.get("seed", 0)),
+                )
         elif cdr_training == "random_clifford":
             resolvers = generate_random_clifford_analogue_param_sets(
                 cdr_target_params,
