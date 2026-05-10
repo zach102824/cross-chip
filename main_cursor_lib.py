@@ -16,11 +16,11 @@ PAULI_CHAR_TO_GATE = {"I": None, "X": cirq.X, "Y": cirq.Y, "Z": cirq.Z}
 
 # Heuristic defaults loosely scaled to Google Weber/Sycamore typical medians (~0.1% 1Q RB,
 # ~0.9% isolated 2Q XEB); see docs/noise_model.md. Not a certified hardware calibration.
-DEFAULT_AMP_DAMP_GAMMA = 2e-3
-DEFAULT_PHASE_DAMP_GAMMA = 3e-3
-DEFAULT_DEPOL_PROB = 7e-3
-DEFAULT_LEAKAGE_APPROX_PROB = 6e-3
-DEFAULT_HIGH_CZ_MULTIPLIER = 5.0
+DEFAULT_AMP_DAMP_GAMMA = 0
+DEFAULT_PHASE_DAMP_GAMMA = 0
+DEFAULT_DEPOL_PROB = 1.5e-2
+DEFAULT_LEAKAGE_APPROX_PROB = 1.5e-3
+DEFAULT_HIGH_CZ_MULTIPLIER = 1.0
 
 
 def params_per_layer(num_spatial_orbitals: int) -> int:
