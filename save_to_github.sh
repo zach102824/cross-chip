@@ -9,9 +9,9 @@ if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
   exit 1
 fi
 
-if [[ -z "$(git status --porcelain)" ]]; then
-  echo "No changes to commit. Working tree is clean."
-  exit 0
+HAS_CHANGES=0
+if [[ -n "$(git status --porcelain)" ]]; then
+  HAS_CHANGES=1
 fi
 
 BRANCH="$(git branch --show-current)"
@@ -26,14 +26,23 @@ else
   COMMIT_MESSAGE="Update project files ($(date '+%Y-%m-%d %H:%M:%S'))"
 fi
 
-echo "Staging all changes..."
-git add -A
+if [[ "$HAS_CHANGES" -eq 1 ]]; then
+  echo "Staging all changes..."
+  git add -A
 
-echo "Creating commit..."
-git commit -m "$COMMIT_MESSAGE"
+  echo "Creating commit..."
+  git commit -m "$COMMIT_MESSAGE"
+else
+  echo "No new file changes to commit."
+fi
 
 echo "Pushing branch '$BRANCH'..."
 if git rev-parse --abbrev-ref --symbolic-full-name "@{u}" >/dev/null 2>&1; then
+  AHEAD_COUNT="$(git rev-list --count "@{u}..HEAD")"
+  if [[ "$AHEAD_COUNT" -eq 0 ]]; then
+    echo "No local commits ahead of upstream. Nothing to push."
+    exit 0
+  fi
   git push
 else
   git push -u origin "$BRANCH"
