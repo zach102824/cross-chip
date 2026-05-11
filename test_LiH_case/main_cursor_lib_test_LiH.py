@@ -11,8 +11,8 @@ import sympy
 PAULI_CHAR_TO_GATE = {"I": None, "X": cirq.X, "Y": cirq.Y, "Z": cirq.Z}
 
 # LiH simplified gate-only noise: depolarizing strength depends only on gate arity (2Q vs 1Q).
-TWO_QUBIT_GATE_DEPOL_PROB = 0.015
-ONE_QUBIT_GATE_DEPOL_PROB = 0.0015
+TWO_QUBIT_GATE_DEPOL_PROB = 0.05
+ONE_QUBIT_GATE_DEPOL_PROB = 0.005
 
 # Legacy notebooks referred to a single “depol_prob”; that matched the two-qubit channel strength.
 DEFAULT_DEPOL_PROB = TWO_QUBIT_GATE_DEPOL_PROB

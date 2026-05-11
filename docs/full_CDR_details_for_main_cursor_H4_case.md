@@ -1,0 +1,6662 @@
+# full CDR details for main_cursor.ipynb (H4 testing case)
+
+## Configuration used
+- bond_length: `2.0`
+- num_spatial: `4` | ansatz_layers: `3`
+- target params count: `21`
+- measurement_scheme: `ogm`
+- num_shots: `8192`
+- sampling_seed: `1234`
+- epsilon: `0.1`
+- apply_readout_noise: `True`
+- apply_rem in CDR training/target estimation: `True`
+- readout p_0_success: `[0.93, 0.87, 0.87, 0.88, 0.9, 0.89, 0.87, 0.91]`
+- readout p_1_success: `[0.95, 0.91, 0.95, 0.96, 0.94, 0.94, 0.92, 0.95]`
+- base_noise_cfg: `{'amp_damp_gamma': 0, 'phase_damp_gamma': 0, 'depol_prob': 0.015, 'leakage_approx_prob': 0.0015, 'high_cz_multiplier': 1.0}`
+- cdr_cfg: `{"num_circuits": 24, "t_max": 32, "min_snap_fraction": 0.0, "seed": 7, "cdr_fit_scope": "per_pauli"}`
+- training resolvers count: `24`
+- training non-Clifford counts (t_remaining): `[31, 29, 30, 31, 30, 31, 31, 31, 30, 32, 30, 29, 30, 29, 32, 32, 31, 32, 30, 32, 31, 31, 30, 30]`
+- OGM file: `/Users/zacharyhe/shadowgrouping/haozhaowu/H4/hamil_class/ogm_outputs/OGM_H4_bond_2.0.txt`
+
+## Constant term (offset)
+- Hamiltonian identity term: `(-2.2188175260558247) * I`
+- offset: `-2.2188175260558247`
+- E_cdr_unmit: `-2.5711973389693910`
+- E_cdr_rem: `-2.5694760826335168`
+- delta (unmit - rem): `-1.7212563358741662e-03`
+- exact noiseless reference: `-2.9717074736497273`
+
+## Int encoding map
+- `I=0, X=1, Y=2, Z=3`
+
+## Per-term full details (Pauli term, training pairs, fits, shots, target contribution)
+### term 0
+- pauli term from int row: `(8.4009482161116728e-02)*Z(q(0, 0))`
+- int observable row: `[3, 0, 0, 0, 0, 0, 0, 0]`
+- Hamiltonian weight w_0: `8.4009482161116728e-02`
+- OGM effective shots used for this term: `2703`
+- fitted unmit coeffs: `a_u=1.4627543513215870e+00`, `b_u=-5.5581722828735386e-02`
+- fitted rem coeffs: `a_r=1.2872238291629963e+00`, `b_r=-8.4836809855167852e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-3.2642487046632124e-01`, `x_rem=-3.4821008007536519e-01`, `y_exact=-4.8454134969393015e-01`
+  - train[1] t_remaining=29: `x_unmit=-6.3676470588235290e-01`, `x_rem=-7.0086898395721919e-01`, `y_exact=-1.0000001107322860e+00`
+  - train[2] t_remaining=30: `x_unmit=-6.4187939326674071e-01`, `x_rem=-7.0668112871220534e-01`, `y_exact=-9.9999996124262025e-01`
+  - train[3] t_remaining=31: `x_unmit=-3.0049964311206279e-01`, `x_rem=-3.1874959444552597e-01`, `y_exact=-4.8454152723764526e-01`
+  - train[4] t_remaining=30: `x_unmit=-5.8472376714868368e-01`, `x_rem=-6.4173155357804990e-01`, `y_exact=-8.8292660196857664e-01`
+  - train[5] t_remaining=31: `x_unmit=-6.5619357168652948e-01`, `x_rem=-7.2294724055287429e-01`, `y_exact=-1.0000001650413788e+00`
+  - train[6] t_remaining=31: `x_unmit=-6.3523844193665813e-01`, `x_rem=-6.9913459310983894e-01`, `y_exact=-1.0000000836160887e+00`
+  - train[7] t_remaining=31: `x_unmit=-6.2463126843657812e-01`, `x_rem=-6.8708098685974783e-01`, `y_exact=-1.0000000139511305e+00`
+  - train[8] t_remaining=30: `x_unmit=-5.8817005545286505e-01`, `x_rem=-6.4564779028734665e-01`, `y_exact=-8.8700134608055126e-01`
+  - train[9] t_remaining=32: `x_unmit=-5.7476808905380339e-01`, `x_rem=-6.3041828301568559e-01`, `y_exact=-9.3733917613095297e-01`
+  - train[10] t_remaining=30: `x_unmit=-5.6729006233956725e-01`, `x_rem=-6.2192052538587206e-01`, `y_exact=-8.8292656940537639e-01`
+  - train[11] t_remaining=29: `x_unmit=-4.1609527246481415e-01`, `x_rem=-4.5010826416456162e-01`, `y_exact=-7.9255551731772311e-01`
+  - train[12] t_remaining=30: `x_unmit=-6.3998468019915744e-01`, `x_rem=-7.0452804568086069e-01`, `y_exact=-1.0000000007338383e+00`
+  - train[13] t_remaining=29: `x_unmit=-5.6950672645739908e-01`, `x_rem=-6.2443946188340826e-01`, `y_exact=-8.8292653098944907e-01`
+  - train[14] t_remaining=32: `x_unmit=-6.4536970567121321e-01`, `x_rem=-7.1064739280819678e-01`, `y_exact=-9.9480439397924192e-01`
+  - train[15] t_remaining=32: `x_unmit=-3.8361131254532271e-01`, `x_rem=-4.1319467334695775e-01`, `y_exact=-6.9407017679186811e-01`
+  - train[16] t_remaining=31: `x_unmit=-5.8262789841737206e-01`, `x_rem=-6.3934988456519559e-01`, `y_exact=-8.9276660501773963e-01`
+  - train[17] t_remaining=32: `x_unmit=-5.5426497277676956e-01`, `x_rem=-6.0711928724632902e-01`, `y_exact=-8.1193355842422454e-01`
+  - train[18] t_remaining=30: `x_unmit=-6.3669064748201443e-01`, `x_rem=-7.0078482668410724e-01`, `y_exact=-1.0000000814863250e+00`
+  - train[19] t_remaining=32: `x_unmit=-5.7198999642729542e-01`, `x_rem=-6.2726135957647211e-01`, `y_exact=-8.3457121342602258e-01`
+  - train[20] t_remaining=31: `x_unmit=-6.3798643341663697e-01`, `x_rem=-7.0225731070072384e-01`, `y_exact=-1.0000000384921006e+00`
+  - train[21] t_remaining=31: `x_unmit=-6.2847849656667876e-01`, `x_rem=-6.9145283700758942e-01`, `y_exact=-9.5151772943277402e-01`
+  - train[22] t_remaining=30: `x_unmit=-6.0203340595497457e-01`, `x_rem=-6.6140159767610751e-01`, `y_exact=-9.5151773595104960e-01`
+  - train[23] t_remaining=30: `x_unmit=-3.1896236755571794e-01`, `x_rem=-3.3972996313149767e-01`, `y_exact=-4.5803159515955882e-01`
+- target x values: `x_u_target=-4.1607396870554764e-01`, `x_r_target=-4.5008405534721330e-01`
+- target contribution to E_cdr_unmit: `-5.5798739416985654e-02`
+- target contribution to E_cdr_rem: `-5.5798739416985696e-02`
+
+### term 1
+- pauli term from int row: `(5.1918283643748219e-03)*Y(q(0, 0))*Z(q(0, 1))*Y(q(0, 2))`
+- int observable row: `[2, 3, 2, 0, 0, 0, 0, 0]`
+- Hamiltonian weight w_1: `5.1918283643748219e-03`
+- OGM effective shots used for this term: `741`
+- fitted unmit coeffs: `a_u=3.3583668916335943e+00`, `b_u=-5.4024348938355192e-02`
+- fitted rem coeffs: `a_r=1.9161530218328673e+00`, `b_r=-5.6025247870962497e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-3.6935704514363885e-02`, `x_rem=-5.6047808141498776e-02`, `y_exact=-4.5481025052145763e-01`
+  - train[1] t_remaining=29: `x_unmit=-2.5510204081632651e-03`, `x_rem=-5.6079228553096846e-03`, `y_exact=2.1500231666108035e-08`
+  - train[2] t_remaining=30: `x_unmit=2.2516556291390728e-02`, `x_rem=4.6089913962632359e-02`, `y_exact=-1.0102590790131643e-07`
+  - train[3] t_remaining=31: `x_unmit=-6.2663185378590072e-02`, `x_rem=-1.0256811052837296e-01`, `y_exact=-7.3929121227851569e-01`
+  - train[4] t_remaining=30: `x_unmit=5.3846153846153849e-02`, `x_rem=8.6859357028212528e-02`, `y_exact=1.9509045580984838e-01`
+  - train[5] t_remaining=31: `x_unmit=0.0000000000000000e+00`, `x_rem=-1.3358506973468532e-03`, `y_exact=-2.2800049468022134e-08`
+  - train[6] t_remaining=31: `x_unmit=-1.4416775884665793e-02`, `x_rem=-2.8812389967010712e-02`, `y_exact=-3.5051576474121053e-08`
+  - train[7] t_remaining=31: `x_unmit=-4.8010973936899862e-02`, `x_rem=-7.6864975389516255e-02`, `y_exact=-4.2972317737137170e-09`
+  - train[8] t_remaining=30: `x_unmit=1.5816993464052287e-01`, `x_rem=2.7995661281170597e-01`, `y_exact=3.9781690151806420e-01`
+  - train[9] t_remaining=32: `x_unmit=-2.3684757858670005e-18`, `x_rem=5.5451323744006124e-03`, `y_exact=1.3923885071297676e-01`
+  - train[10] t_remaining=30: `x_unmit=5.7256990679094538e-02`, `x_rem=9.7662116174018959e-02`, `y_exact=1.7327568083327205e-01`
+  - train[11] t_remaining=29: `x_unmit=-8.8348271446862997e-02`, `x_rem=-1.4678508254598949e-01`, `y_exact=-5.3971309804453171e-01`
+  - train[12] t_remaining=30: `x_unmit=-1.3664596273291925e-02`, `x_rem=-1.8658612508029325e-02`, `y_exact=-1.3905031017075296e-09`
+  - train[13] t_remaining=29: `x_unmit=8.3447332421340628e-02`, `x_rem=1.4904555367002395e-01`, `y_exact=1.7327569849493085e-01`
+  - train[14] t_remaining=32: `x_unmit=8.2767978290366348e-02`, `x_rem=1.3492335509742925e-01`, `y_exact=2.8470036363372302e-02`
+  - train[15] t_remaining=32: `x_unmit=-1.0091743119266056e-01`, `x_rem=-1.7304423032773902e-01`, `y_exact=-3.1515957337937500e-01`
+  - train[16] t_remaining=31: `x_unmit=1.2965340179717585e-01`, `x_rem=2.2871819102133126e-01`, `y_exact=3.8305507702973302e-01`
+  - train[17] t_remaining=32: `x_unmit=1.3404825737265416e-02`, `x_rem=2.4329884461970961e-02`, `y_exact=2.3819346293957264e-01`
+  - train[18] t_remaining=30: `x_unmit=-3.3557046979865772e-02`, `x_rem=-6.4279802698529218e-02`, `y_exact=-6.6314084147822212e-08`
+  - train[19] t_remaining=32: `x_unmit=9.4629156010230184e-02`, `x_rem=1.7059124519669699e-01`, `y_exact=3.2335938094301203e-01`
+  - train[20] t_remaining=31: `x_unmit=4.2640990371389270e-02`, `x_rem=7.6889684163143360e-02`, `y_exact=-2.9474667090599611e-08`
+  - train[21] t_remaining=31: `x_unmit=-5.3191489361702126e-03`, `x_rem=-2.1100591157674747e-02`, `y_exact=9.3864869913417248e-02`
+  - train[22] t_remaining=30: `x_unmit=7.9622132253711203e-02`, `x_rem=1.3802424822470241e-01`, `y_exact=1.7506341047773363e-01`
+  - train[23] t_remaining=30: `x_unmit=2.5510204081632654e-02`, `x_rem=4.7587284956622879e-02`, `y_exact=-1.0043378300067644e-01`
+- target x values: `x_u_target=1.6393442622950821e-02`, `x_r_target=3.6892970980874233e-02`
+- target contribution to E_cdr_unmit: `5.3519755356302684e-06`
+- target contribution to E_cdr_rem: `7.6150259707831583e-05`
+
+### term 2
+- pauli term from int row: `(5.1918283643748219e-03)*X(q(0, 0))*Z(q(0, 1))*X(q(0, 2))`
+- int observable row: `[1, 3, 1, 0, 0, 0, 0, 0]`
+- Hamiltonian weight w_2: `5.1918283643748219e-03`
+- OGM effective shots used for this term: `798`
+- fitted unmit coeffs: `a_u=3.2904182331309348e+00`, `b_u=-6.3025158150636397e-03`
+- fitted rem coeffs: `a_r=1.9065828827931861e+00`, `b_r=-9.5389815501452108e-03`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-1.1599511599511600e-01`, `x_rem=-1.9139445781096817e-01`, `y_exact=-4.5481024380304025e-01`
+  - train[1] t_remaining=29: `x_unmit=3.8216560509554140e-03`, `x_rem=2.5689188342597974e-03`, `y_exact=-9.2851399074414227e-09`
+  - train[2] t_remaining=30: `x_unmit=3.8910505836575854e-03`, `x_rem=1.2493069340368881e-03`, `y_exact=-8.7199959059439171e-08`
+  - train[3] t_remaining=31: `x_unmit=-9.0673575129533682e-02`, `x_rem=-1.5936391002737524e-01`, `y_exact=-7.3929119121624420e-01`
+  - train[4] t_remaining=30: `x_unmit=1.1219512195121951e-01`, `x_rem=2.0051612080166509e-01`, `y_exact=1.9509045580984649e-01`
+  - train[5] t_remaining=31: `x_unmit=-4.5340050377833750e-02`, `x_rem=-7.3395139193505043e-02`, `y_exact=-2.6374528842488749e-08`
+  - train[6] t_remaining=31: `x_unmit=5.0322580645161291e-02`, `x_rem=8.8900870962239906e-02`, `y_exact=-3.8511894042561202e-08`
+  - train[7] t_remaining=31: `x_unmit=-4.0840140023337225e-02`, `x_rem=-7.0044573445546862e-02`, `y_exact=-4.3445453433939113e-08`
+  - train[8] t_remaining=30: `x_unmit=1.1931119311193111e-01`, `x_rem=1.9569957937341609e-01`, `y_exact=3.9781689116161967e-01`
+  - train[9] t_remaining=32: `x_unmit=-5.1546391752577319e-03`, `x_rem=-3.1062935890696104e-03`, `y_exact=1.3923891257554630e-01`
+  - train[10] t_remaining=30: `x_unmit=-3.8659793814432991e-02`, `x_rem=-5.8685196288917760e-02`, `y_exact=1.7327568083327852e-01`
+  - train[11] t_remaining=29: `x_unmit=-8.7855297157622733e-02`, `x_rem=-1.4703751742889581e-01`, `y_exact=-5.3971309804446643e-01`
+  - train[12] t_remaining=30: `x_unmit=2.3543990086741014e-02`, `x_rem=2.6050132859453755e-02`, `y_exact=-9.0153425519193188e-10`
+  - train[13] t_remaining=29: `x_unmit=4.1237113402061855e-02`, `x_rem=7.8595279500484352e-02`, `y_exact=1.7327569849494037e-01`
+  - train[14] t_remaining=32: `x_unmit=-4.0391676866585069e-02`, `x_rem=-7.4850386699209015e-02`, `y_exact=2.8470042063241205e-02`
+  - train[15] t_remaining=32: `x_unmit=-7.1618037135278520e-02`, `x_rem=-1.2660824758903302e-01`, `y_exact=-3.1515958453936088e-01`
+  - train[16] t_remaining=31: `x_unmit=1.4032869785082175e-01`, `x_rem=2.4927816984799497e-01`, `y_exact=3.8305506046611792e-01`
+  - train[17] t_remaining=32: `x_unmit=5.7766367137355584e-02`, `x_rem=1.0774165876078889e-01`, `y_exact=2.3819345382814960e-01`
+  - train[18] t_remaining=30: `x_unmit=-2.6615969581749048e-02`, `x_rem=-3.7961708554308082e-02`, `y_exact=-3.8199606847603892e-08`
+  - train[19] t_remaining=32: `x_unmit=1.0406091370558376e-01`, `x_rem=1.9200581928079755e-01`, `y_exact=3.2335942511493321e-01`
+  - train[20] t_remaining=31: `x_unmit=3.9092055485498108e-02`, `x_rem=6.6151484537976063e-02`, `y_exact=-1.7855548627682641e-08`
+  - train[21] t_remaining=31: `x_unmit=-1.0152284263959394e-02`, `x_rem=-2.0798791815258379e-02`, `y_exact=9.3864848553778246e-02`
+  - train[22] t_remaining=30: `x_unmit=1.2886597938144327e-02`, `x_rem=2.4217924393936406e-02`, `y_exact=1.7506334515945873e-01`
+  - train[23] t_remaining=30: `x_unmit=-3.7131882202304740e-02`, `x_rem=-5.9808361485386007e-02`, `y_exact=-1.0043381253790025e-01`
+- target x values: `x_u_target=-1.2211668928086838e-02`, `x_r_target=-1.9048386060333027e-02`
+- target contribution to E_cdr_unmit: `-2.4133702192350243e-04`
+- target contribution to E_cdr_rem: `-2.3807808241657074e-04`
+
+### term 3
+- pauli term from int row: `(5.8307795842772521e-02)*Z(q(0, 1))`
+- int observable row: `[0, 3, 0, 0, 0, 0, 0, 0]`
+- Hamiltonian weight w_3: `5.8307795842772521e-02`
+- OGM effective shots used for this term: `3978`
+- fitted unmit coeffs: `a_u=2.0801587227463578e+00`, `b_u=3.8864113073766325e-02`
+- fitted rem coeffs: `a_r=1.6225238037421601e+00`, `b_r=-4.4342235836088012e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-2.8447204968944101e-01`, `x_rem=-3.1342570473005260e-01`, `y_exact=-5.8936094575004305e-01`
+  - train[1] t_remaining=29: `x_unmit=-1.9519519519519520e-02`, `x_rem=2.6257026257026157e-02`, `y_exact=4.4736583041384823e-02`
+  - train[2] t_remaining=30: `x_unmit=-1.5455680399500624e-01`, `x_rem=-1.4686769742949529e-01`, `y_exact=-2.2964952385218285e-01`
+  - train[3] t_remaining=31: `x_unmit=-3.0106436898124683e-01`, `x_rem=-3.3469790895031654e-01`, `y_exact=-5.3237889192521193e-01`
+  - train[4] t_remaining=30: `x_unmit=-4.8845294263719891e-01`, `x_rem=-5.7493967004769098e-01`, `y_exact=-1.0000001970204662e+00`
+  - train[5] t_remaining=31: `x_unmit=-5.4391217564870260e-02`, `x_rem=-1.8450278929320954e-02`, `y_exact=-1.0548470037887556e-01`
+  - train[6] t_remaining=31: `x_unmit=-1.9221168247628556e-01`, `x_rem=-1.9514318266190472e-01`, `y_exact=-2.7128688418060309e-01`
+  - train[7] t_remaining=31: `x_unmit=-4.9655850540806290e-02`, `x_rem=-1.2379295565136372e-02`, `y_exact=-1.5585533191057593e-01`
+  - train[8] t_remaining=30: `x_unmit=-2.0079621796466782e-01`, `x_rem=-2.0614899739059989e-01`, `y_exact=-5.2975041470224360e-01`
+  - train[9] t_remaining=32: `x_unmit=1.6334864726901481e-02`, `x_rem=7.2224185547309500e-02`, `y_exact=1.3181705306102048e-01`
+  - train[10] t_remaining=30: `x_unmit=-3.1036242981112810e-01`, `x_rem=-3.4661849975785658e-01`, `y_exact=-6.1808011835420651e-01`
+  - train[11] t_remaining=29: `x_unmit=-4.6848209783156836e-01`, `x_rem=-5.4933602286098537e-01`, `y_exact=-1.0000001705799009e+00`
+  - train[12] t_remaining=30: `x_unmit=-2.9235382308845576e-01`, `x_rem=-3.2353054242109730e-01`, `y_exact=-4.0599771298410597e-01`
+  - train[13] t_remaining=29: `x_unmit=-4.7920892494929007e-01`, `x_rem=-5.6308836531960271e-01`, `y_exact=-8.9378322749734573e-01`
+  - train[14] t_remaining=32: `x_unmit=-6.2177439174244287e-02`, `x_rem=-2.8432614325954314e-02`, `y_exact=-6.8339579641639031e-02`
+  - train[15] t_remaining=32: `x_unmit=2.3625963690624224e-02`, `x_rem=8.1571748321313017e-02`, `y_exact=8.0324109523776180e-02`
+  - train[16] t_remaining=31: `x_unmit=-3.8087042045733954e-01`, `x_rem=-4.3701335956069182e-01`, `y_exact=-7.5002374923312454e-01`
+  - train[17] t_remaining=32: `x_unmit=-7.4291549655348482e-02`, `x_rem=-4.3963525199164827e-02`, `y_exact=-2.4541973732890038e-01`
+  - train[18] t_remaining=30: `x_unmit=-7.4608306391445048e-04`, `x_rem=5.0325534533442913e-02`, `y_exact=1.6354887201869975e-01`
+  - train[19] t_remaining=32: `x_unmit=4.7871000251952633e-03`, `x_rem=5.7419359006660481e-02`, `y_exact=-1.0254483999698930e-02`
+  - train[20] t_remaining=31: `x_unmit=2.8571428571428571e-02`, `x_rem=8.7912087912087822e-02`, `y_exact=1.2820777961196905e-01`
+  - train[21] t_remaining=31: `x_unmit=-2.0765574180635477e-02`, `x_rem=2.4659520281236469e-02`, `y_exact=-9.2359097632095516e-03`
+  - train[22] t_remaining=30: `x_unmit=-7.1104387291981846e-02`, `x_rem=-3.9877419605105026e-02`, `y_exact=-8.8252526859763675e-02`
+  - train[23] t_remaining=30: `x_unmit=-1.8527791687531298e-01`, `x_rem=-1.8625373958373465e-01`, `y_exact=-4.6965847782980202e-01`
+- target x values: `x_u_target=-7.1374527112232036e-02`, `x_r_target=-4.0223752707989870e-02`
+- target contribution to E_cdr_unmit: `-6.3908978032534746e-03`
+- target contribution to E_cdr_rem: `-6.3908978032534858e-03`
+
+### term 4
+- pauli term from int row: `(-6.6196238813543340e-03)*Y(q(0, 1))*Z(q(0, 2))*Y(q(0, 3))`
+- int observable row: `[0, 2, 3, 2, 0, 0, 0, 0]`
+- Hamiltonian weight w_4: `-6.6196238813543340e-03`
+- OGM effective shots used for this term: `792`
+- fitted unmit coeffs: `a_u=2.2839357437889931e+00`, `b_u=1.1792831205553287e-03`
+- fitted rem coeffs: `a_r=1.1969095133373928e+00`, `b_r=4.5990063944742650e-03`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=3.3288948069241014e-02`, `x_rem=5.5175883697204900e-02`, `y_exact=4.1130851745861494e-02`
+  - train[1] t_remaining=29: `x_unmit=3.6363636363636362e-02`, `x_rem=6.1484005734876869e-02`, `y_exact=2.3594581375616272e-01`
+  - train[2] t_remaining=30: `x_unmit=-3.1746031746031744e-02`, `x_rem=-5.6098616687079689e-02`, `y_exact=-1.0720544778007501e-01`
+  - train[3] t_remaining=31: `x_unmit=1.3398294762484775e-02`, `x_rem=8.4276325623879392e-03`, `y_exact=3.0561747479998663e-02`
+  - train[4] t_remaining=30: `x_unmit=-5.9132720105124839e-02`, `x_rem=-1.1916214294343197e-01`, `y_exact=5.4387336945063184e-08`
+  - train[5] t_remaining=31: `x_unmit=7.5757575757575760e-02`, `x_rem=1.5163517602541995e-01`, `y_exact=1.3151977094193060e-01`
+  - train[6] t_remaining=31: `x_unmit=5.6865464632454926e-02`, `x_rem=9.4345010146234795e-02`, `y_exact=2.3477333984792464e-01`
+  - train[7] t_remaining=31: `x_unmit=5.3594771241830062e-02`, `x_rem=1.0211175012705384e-01`, `y_exact=-3.8647137684386729e-01`
+  - train[8] t_remaining=30: `x_unmit=8.0000000000000002e-03`, `x_rem=-4.8998878267170649e-03`, `y_exact=-5.0078271308990162e-09`
+  - train[9] t_remaining=32: `x_unmit=8.3870967741935490e-02`, `x_rem=1.5515841794362648e-01`, `y_exact=2.7655584574608361e-03`
+  - train[10] t_remaining=30: `x_unmit=9.9621689785624218e-02`, `x_rem=1.8658782377910116e-01`, `y_exact=4.8588217541018430e-01`
+  - train[11] t_remaining=29: `x_unmit=4.8811013767209012e-02`, `x_rem=1.0098480332614468e-01`, `y_exact=-2.7480833257367652e-08`
+  - train[12] t_remaining=30: `x_unmit=6.2162162162162166e-02`, `x_rem=1.1253977107635649e-01`, `y_exact=3.2781921153947741e-01`
+  - train[13] t_remaining=29: `x_unmit=9.5115681233933158e-02`, `x_rem=1.7682461747920405e-01`, `y_exact=4.0378964537920681e-01`
+  - train[14] t_remaining=32: `x_unmit=6.3553826199740593e-02`, `x_rem=1.2380877446835503e-01`, `y_exact=3.4872321868129086e-01`
+  - train[15] t_remaining=32: `x_unmit=4.9095607235142120e-02`, `x_rem=8.1437941903058225e-02`, `y_exact=-1.5367645205054598e-01`
+  - train[16] t_remaining=31: `x_unmit=6.4900662251655625e-02`, `x_rem=1.2149977842111588e-01`, `y_exact=1.0039502598992750e-01`
+  - train[17] t_remaining=32: `x_unmit=5.2760736196319019e-02`, `x_rem=1.0425885152804204e-01`, `y_exact=8.5011857984996931e-03`
+  - train[18] t_remaining=30: `x_unmit=-5.4263565891472867e-02`, `x_rem=-9.6129356102886046e-02`, `y_exact=-5.9363122049760984e-02`
+  - train[19] t_remaining=32: `x_unmit=-3.4659820282413351e-02`, `x_rem=-6.3457963079115901e-02`, `y_exact=-1.6915410603170880e-01`
+  - train[20] t_remaining=31: `x_unmit=1.8050541516245487e-02`, `x_rem=3.3969715399670537e-02`, `y_exact=2.9587034281217062e-01`
+  - train[21] t_remaining=31: `x_unmit=-6.4184852374839542e-03`, `x_rem=-1.6772509837414781e-02`, `y_exact=-1.7156955576576080e-01`
+  - train[22] t_remaining=30: `x_unmit=-2.3959646910466582e-02`, `x_rem=-3.9699044773937889e-02`, `y_exact=-1.7000246454749076e-08`
+  - train[23] t_remaining=30: `x_unmit=-1.6774193548387096e-02`, `x_rem=-2.9273288124586287e-02`, `y_exact=-1.1010672382139961e-08`
+- target x values: `x_u_target=-8.8495575221238954e-03`, `x_r_target=-2.3295216906268040e-02`
+- target contribution to E_cdr_unmit: `1.2598824055835048e-04`
+- target contribution to E_cdr_rem: `1.5412642615528742e-04`
+
+### term 5
+- pauli term from int row: `(-6.6196238813543340e-03)*X(q(0, 1))*Z(q(0, 2))*X(q(0, 3))`
+- int observable row: `[0, 1, 3, 1, 0, 0, 0, 0]`
+- Hamiltonian weight w_5: `-6.6196238813543340e-03`
+- OGM effective shots used for this term: `761`
+- fitted unmit coeffs: `a_u=2.8229998235434484e+00`, `b_u=1.3902443852669265e-02`
+- fitted rem coeffs: `a_r=1.5423816843135212e+00`, `b_r=1.3403603689771351e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-3.3112582781456956e-02`, `x_rem=-6.1309210719645228e-02`, `y_exact=4.1130857867186309e-02`
+  - train[1] t_remaining=29: `x_unmit=8.9947089947089942e-02`, `x_rem=1.6895700906541017e-01`, `y_exact=2.3594582616893273e-01`
+  - train[2] t_remaining=30: `x_unmit=2.8132992327365727e-02`, `x_rem=4.4560794108545410e-02`, `y_exact=-1.0720544513074082e-01`
+  - train[3] t_remaining=31: `x_unmit=-1.1386902816668272e-18`, `x_rem=1.5038397777609807e-02`, `y_exact=3.0561751279127938e-02`
+  - train[4] t_remaining=30: `x_unmit=3.7135278514588858e-02`, `x_rem=5.8157480166925762e-02`, `y_exact=5.4387328792446519e-08`
+  - train[5] t_remaining=31: `x_unmit=1.1406844106463879e-02`, `x_rem=2.1047314750365878e-02`, `y_exact=1.3151973379099341e-01`
+  - train[6] t_remaining=31: `x_unmit=9.5238095238095233e-02`, `x_rem=1.8230931269625575e-01`, `y_exact=2.3477335321474593e-01`
+  - train[7] t_remaining=31: `x_unmit=-7.8740157480314907e-03`, `x_rem=-1.4108930567543931e-02`, `y_exact=-3.8647136120799275e-01`
+  - train[8] t_remaining=30: `x_unmit=5.1655629139072845e-02`, `x_rem=9.7438697987882336e-02`, `y_exact=-2.6079425437567127e-08`
+  - train[9] t_remaining=32: `x_unmit=3.2994923857868015e-02`, `x_rem=6.8261179069647598e-02`, `y_exact=2.7655784016263982e-03`
+  - train[10] t_remaining=30: `x_unmit=8.3226632522407168e-02`, `x_rem=1.5896527610715180e-01`, `y_exact=4.8588217541018569e-01`
+  - train[11] t_remaining=29: `x_unmit=-3.6204744069912607e-02`, `x_rem=-7.5644150550517569e-02`, `y_exact=-2.7480835267484452e-08`
+  - train[12] t_remaining=30: `x_unmit=7.4792243767313013e-02`, `x_rem=1.4032117916990564e-01`, `y_exact=3.2781921052800922e-01`
+  - train[13] t_remaining=29: `x_unmit=4.4295302013422820e-02`, `x_rem=9.7796821319492827e-02`, `y_exact=4.0378964537921841e-01`
+  - train[14] t_remaining=32: `x_unmit=3.1746031746031744e-02`, `x_rem=5.5026833191757739e-02`, `y_exact=3.4872323363445268e-01`
+  - train[15] t_remaining=32: `x_unmit=1.3210039630118890e-03`, `x_rem=-1.9704710235367048e-03`, `y_exact=-1.5367642123046810e-01`
+  - train[16] t_remaining=31: `x_unmit=1.6905071521456438e-02`, `x_rem=2.3658045923262115e-02`, `y_exact=1.0039498123573244e-01`
+  - train[17] t_remaining=32: `x_unmit=-2.0188425302826381e-02`, `x_rem=-4.0711210064195626e-02`, `y_exact=8.5012100593596877e-03`
+  - train[18] t_remaining=30: `x_unmit=5.8214747736093142e-02`, `x_rem=1.0800996911494504e-01`, `y_exact=-5.9363136353594699e-02`
+  - train[19] t_remaining=32: `x_unmit=-3.8461538461538464e-02`, `x_rem=-8.8013169861199864e-02`, `y_exact=-1.6915410634700379e-01`
+  - train[20] t_remaining=31: `x_unmit=-3.9840637450199202e-03`, `x_rem=6.9941898724329927e-03`, `y_exact=2.9587031783266748e-01`
+  - train[21] t_remaining=31: `x_unmit=-2.7777777777777776e-02`, `x_rem=-6.1761785339021102e-02`, `y_exact=-1.7156950182646466e-01`
+  - train[22] t_remaining=30: `x_unmit=-4.3256997455470736e-02`, `x_rem=-7.6589125928168938e-02`, `y_exact=-2.6269267214299641e-08`
+  - train[23] t_remaining=30: `x_unmit=2.5125628140703518e-03`, `x_rem=2.5117397344386130e-03`, `y_exact=2.5862082198009767e-08`
+- target x values: `x_u_target=9.9630996309963096e-02`, `x_r_target=1.7499105393984346e-01`
+- target contribution to E_cdr_unmit: `-1.9538530095675223e-03`
+- target contribution to E_cdr_rem: `-1.8753831364643439e-03`
+
+### term 6
+- pauli term from int row: `(2.1782157013652687e-02)*Z(q(0, 2))`
+- int observable row: `[0, 0, 3, 0, 0, 0, 0, 0]`
+- Hamiltonian weight w_6: `2.1782157013652687e-02`
+- OGM effective shots used for this term: `3992`
+- fitted unmit coeffs: `a_u=2.0616697506468253e+00`, `b_u=2.1692470390908902e-01`
+- fitted rem coeffs: `a_r=1.6905691955303954e+00`, `b_r=5.1991123857343217e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-9.2941471991961812e-03`, `x_rem=8.6226649757077681e-02`, `y_exact=1.9811109248791570e-01`
+  - train[1] t_remaining=29: `x_unmit=-7.4120920819630662e-02`, `x_rem=7.1696087565478487e-03`, `y_exact=6.1480273766501364e-02`
+  - train[2] t_remaining=30: `x_unmit=3.7366193676873288e-01`, `x_rem=5.5324626435211310e-01`, `y_exact=9.3408634193712126e-01`
+  - train[3] t_remaining=31: `x_unmit=9.2541780992766276e-02`, `x_rem=2.1041680608873919e-01`, `y_exact=3.7861206818517029e-01`
+  - train[4] t_remaining=30: `x_unmit=3.0898021308980211e-01`, `x_rem=4.7436611352414876e-01`, `y_exact=8.8292660196855399e-01`
+  - train[5] t_remaining=31: `x_unmit=2.0732013035848584e-01`, `x_rem=3.5039040287620221e-01`, `y_exact=7.6564161517279905e-01`
+  - train[6] t_remaining=31: `x_unmit=3.2530724855781290e-01`, `x_rem=4.9427713238757653e-01`, `y_exact=8.4693855651480066e-01`
+  - train[7] t_remaining=31: `x_unmit=2.2698927413320032e-02`, `x_rem=1.2524259440648769e-01`, `y_exact=4.3650217546390785e-01`
+  - train[8] t_remaining=30: `x_unmit=5.9807399898631528e-02`, `x_rem=1.7049682914467251e-01`, `y_exact=4.1675161927795523e-01`
+  - train[9] t_remaining=32: `x_unmit=-1.0594184576485462e-01`, `x_rem=-3.1636397274213066e-02`, `y_exact=-8.8261061354322434e-02`
+  - train[10] t_remaining=30: `x_unmit=3.1954602774274904e-01`, `x_rem=4.8725125334481578e-01`, `y_exact=8.8292656940533432e-01`
+  - train[11] t_remaining=29: `x_unmit=2.3610072301171778e-01`, `x_rem=3.8548868659965563e-01`, `y_exact=7.9255551731771101e-01`
+  - train[12] t_remaining=30: `x_unmit=4.1744548286604360e-01`, `x_rem=6.0664083276346759e-01`, `y_exact=9.7565717486499426e-01`
+  - train[13] t_remaining=29: `x_unmit=3.3030303030303032e-01`, `x_rem=5.0036954915003695e-01`, `y_exact=8.8292653098941232e-01`
+  - train[14] t_remaining=32: `x_unmit=2.0534388916378030e-01`, `x_rem=3.4798035263875632e-01`, `y_exact=7.8072609944380766e-01`
+  - train[15] t_remaining=32: `x_unmit=-1.7174721189591077e-01`, `x_rem=-1.1188684377550105e-01`, `y_exact=-1.6918034405418778e-01`
+  - train[16] t_remaining=31: `x_unmit=2.7281770703805025e-01`, `x_rem=4.3026549638786593e-01`, `y_exact=7.2466433475694392e-01`
+  - train[17] t_remaining=32: `x_unmit=2.1772151898734177e-02`, `x_rem=1.2411238036430984e-01`, `y_exact=9.6411270821777459e-02`
+  - train[18] t_remaining=30: `x_unmit=-7.4863658899355479e-02`, `x_rem=6.2638306105419666e-03`, `y_exact=-5.7332028860926691e-02`
+  - train[19] t_remaining=32: `x_unmit=-7.1321695760598505e-02`, `x_rem=1.0583297852928525e-02`, `y_exact=7.1979750524300584e-02`
+  - train[20] t_remaining=31: `x_unmit=-1.1196815128141328e-02`, `x_rem=8.3906323014461631e-02`, `y_exact=1.5047877330126169e-01`
+  - train[21] t_remaining=31: `x_unmit=-2.9791459781529295e-02`, `x_rem=6.1229927095695837e-02`, `y_exact=1.8790781308962112e-01`
+  - train[22] t_remaining=30: `x_unmit=-7.5471698113207544e-02`, `x_rem=5.5223193741370117e-03`, `y_exact=3.9770125998769695e-02`
+  - train[23] t_remaining=30: `x_unmit=-1.8650000000000000e-01`, `x_rem=-1.2987804878048792e-01`, `y_exact=-7.2310074964922991e-02`
+- target x values: `x_u_target=-2.7234463976231740e-03`, `x_r_target=9.4239699515093533e-02`
+- target contribution to E_cdr_unmit: `4.6027844805176157e-03`
+- target contribution to E_cdr_rem: `4.6027844805176122e-03`
+
+### term 7
+- pauli term from int row: `(-1.4954441747214900e-02)*Z(q(0, 3))`
+- int observable row: `[0, 0, 0, 3, 0, 0, 0, 0]`
+- Hamiltonian weight w_7: `-1.4954441747214900e-02`
+- OGM effective shots used for this term: `2689`
+- fitted unmit coeffs: `a_u=2.1279184953604724e+00`, `b_u=-7.7343337003514354e-02`
+- fitted rem coeffs: `a_r=1.7874515361027954e+00`, `b_r=-2.4757681663235198e-01`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=4.4136926438455937e-01`, `x_rem=6.2067769569590392e-01`, `y_exact=8.7579120295605661e-01`
+  - train[1] t_remaining=29: `x_unmit=4.5855953673543248e-01`, `x_rem=6.4114230563741970e-01`, `y_exact=8.9378325392438407e-01`
+  - train[2] t_remaining=30: `x_unmit=2.0178372352285395e-01`, `x_rem=3.3545681371768332e-01`, `y_exact=2.9556314315767052e-01`
+  - train[3] t_remaining=31: `x_unmit=3.5523913837166848e-01`, `x_rem=5.1814183139484349e-01`, `y_exact=6.3830835097771310e-01`
+  - train[4] t_remaining=30: `x_unmit=5.1905104241552835e-01`, `x_rem=7.1315600287562908e-01`, `y_exact=1.0000001970204699e+00`
+  - train[5] t_remaining=31: `x_unmit=2.1879483500717359e-01`, `x_rem=3.5570813691330189e-01`, `y_exact=3.3984325024741863e-01`
+  - train[6] t_remaining=31: `x_unmit=2.1185827910339841e-01`, `x_rem=3.4745033226595046e-01`, `y_exact=4.2434841128186762e-01`
+  - train[7] t_remaining=31: `x_unmit=3.3237098520389752e-01`, `x_rem=4.9091783952844931e-01`, `y_exact=7.1935317039776447e-01`
+  - train[8] t_remaining=30: `x_unmit=5.1475881929445644e-01`, `x_rem=7.0804621344578156e-01`, `y_exact=1.0000001415048172e+00`
+  - train[9] t_remaining=32: `x_unmit=4.4996237772761477e-01`, `x_rem=6.3090759253287465e-01`, `y_exact=8.9378318442423899e-01`
+  - train[10] t_remaining=30: `x_unmit=3.0895522388059704e-01`, `x_rem=4.6304193319118692e-01`, `y_exact=6.1808011835423660e-01`
+  - train[11] t_remaining=29: `x_unmit=5.0256786500366835e-01`, `x_rem=6.9353317262341485e-01`, `y_exact=1.0000001705799095e+00`
+  - train[12] t_remaining=30: `x_unmit=2.4085476276711337e-01`, `x_rem=3.8196995567513498e-01`, `y_exact=4.3034053885292622e-01`
+  - train[13] t_remaining=29: `x_unmit=4.5939849624060153e-01`, `x_rem=6.4214106695309714e-01`, `y_exact=8.9378322749734285e-01`
+  - train[14] t_remaining=32: `x_unmit=2.0654105936722361e-01`, `x_rem=3.4112030877050431e-01`, `y_exact=2.8241787417702768e-01`
+  - train[15] t_remaining=32: `x_unmit=4.1472303206997085e-01`, `x_rem=5.8895599055948922e-01`, `y_exact=7.8292641132232843e-01`
+  - train[16] t_remaining=31: `x_unmit=4.7158885269634454e-01`, `x_rem=6.5665339606707696e-01`, `y_exact=9.1812601949384565e-01`
+  - train[17] t_remaining=32: `x_unmit=4.0558412931667892e-01`, `x_rem=5.7807634442461775e-01`, `y_exact=9.6094202493133207e-01`
+  - train[18] t_remaining=30: `x_unmit=4.7668955547524394e-01`, `x_rem=6.6272566128005239e-01`, `y_exact=8.9378323832855822e-01`
+  - train[19] t_remaining=32: `x_unmit=3.9231327048585934e-01`, `x_rem=5.6227770295935631e-01`, `y_exact=7.7284594690141639e-01`
+  - train[20] t_remaining=31: `x_unmit=3.8326635001826820e-01`, `x_rem=5.5150755954555730e-01`, `y_exact=7.2131348557884811e-01`
+  - train[21] t_remaining=31: `x_unmit=3.8157894736842107e-01`, `x_rem=5.4949874686716793e-01`, `y_exact=7.7284582610635455e-01`
+  - train[22] t_remaining=30: `x_unmit=5.4903417533432397e-01`, `x_rem=7.4885020873133823e-01`, `y_exact=1.0000001368120595e+00`
+  - train[23] t_remaining=30: `x_unmit=4.9469058952764555e-01`, `x_rem=6.8415546372338765e-01`, `y_exact=1.0000001479542675e+00`
+- target x values: `x_u_target=2.3155588020452886e-01`, `x_r_target=3.7089985738634385e-01`
+- target contribution to E_cdr_unmit: `-6.2119061643534975e-03`
+- target contribution to E_cdr_rem: `-6.2119061643534923e-03`
+
+### term 8
+- pauli term from int row: `(8.4009482161116783e-02)*Z(q(1, 0))`
+- int observable row: `[0, 0, 0, 0, 3, 0, 0, 0]`
+- Hamiltonian weight w_8: `8.4009482161116783e-02`
+- OGM effective shots used for this term: `2697`
+- fitted unmit coeffs: `a_u=1.6766193704095216e+00`, `b_u=-1.5762237203296007e-02`
+- fitted rem coeffs: `a_r=1.4083602711439975e+00`, `b_r=-8.2827012019677501e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-3.2846715328467152e-01`, `x_rem=-3.4341327771984725e-01`, `y_exact=-4.8454166277993860e-01`
+  - train[1] t_remaining=29: `x_unmit=-5.5734112490869248e-01`, `x_rem=-6.1588229155796748e-01`, `y_exact=-1.0000001107322440e+00`
+  - train[2] t_remaining=30: `x_unmit=-5.6813104988830976e-01`, `x_rem=-6.2872744034322614e-01`, `y_exact=-9.9999996124257262e-01`
+  - train[3] t_remaining=31: `x_unmit=-2.7015250544662311e-01`, `x_rem=-2.7399107791264676e-01`, `y_exact=-4.8454206524818089e-01`
+  - train[4] t_remaining=30: `x_unmit=-5.3365207796984182e-01`, `x_rem=-5.8768104520219311e-01`, `y_exact=-8.8292650677373163e-01`
+  - train[5] t_remaining=31: `x_unmit=-5.8433079434167579e-01`, `x_rem=-6.4801285040675705e-01`, `y_exact=-1.0000001650413228e+00`
+  - train[6] t_remaining=31: `x_unmit=-5.6865564342199859e-01`, `x_rem=-6.2935195645476050e-01`, `y_exact=-1.0000000836160490e+00`
+  - train[7] t_remaining=31: `x_unmit=-5.6537618699780867e-01`, `x_rem=-6.2544784166405820e-01`, `y_exact=-1.0000000139510623e+00`
+  - train[8] t_remaining=30: `x_unmit=-5.4693729612178321e-01`, `x_rem=-6.0349678109736116e-01`, `y_exact=-8.8700126574051241e-01`
+  - train[9] t_remaining=32: `x_unmit=-5.3362573099415200e-01`, `x_rem=-5.8764967975494320e-01`, `y_exact=-9.3733923491648374e-01`
+  - train[10] t_remaining=30: `x_unmit=-5.0366568914956011e-01`, `x_rem=-5.5198296327328622e-01`, `y_exact=-8.8292657854317824e-01`
+  - train[11] t_remaining=29: `x_unmit=-3.8102084831056793e-01`, `x_rem=-4.0597720036972396e-01`, `y_exact=-7.9255549168215123e-01`
+  - train[12] t_remaining=30: `x_unmit=-5.9940097341819543e-01`, `x_rem=-6.6595353978356631e-01`, `y_exact=-1.0000000007338015e+00`
+  - train[13] t_remaining=29: `x_unmit=-5.1951951951951947e-01`, `x_rem=-5.7085657085657104e-01`, `y_exact=-8.8292648065090429e-01`
+  - train[14] t_remaining=32: `x_unmit=-6.2373371924746746e-01`, `x_rem=-6.9492109434222349e-01`, `y_exact=-9.9480439310929858e-01`
+  - train[15] t_remaining=32: `x_unmit=-4.1232227488151657e-01`, `x_rem=-4.4324080343037714e-01`, `y_exact=-6.9407016452225390e-01`
+  - train[16] t_remaining=31: `x_unmit=-5.4692082111436946e-01`, `x_rem=-6.0347716799329731e-01`, `y_exact=-8.9276661534692303e-01`
+  - train[17] t_remaining=32: `x_unmit=-5.1449275362318836e-01`, `x_rem=-5.6487232574189117e-01`, `y_exact=-8.1193355262952194e-01`
+  - train[18] t_remaining=30: `x_unmit=-5.8561765752936989e-01`, `x_rem=-6.4954483039210720e-01`, `y_exact=-1.0000000814863119e+00`
+  - train[19] t_remaining=32: `x_unmit=-4.8852223816355811e-01`, `x_rem=-5.3395504543280758e-01`, `y_exact=-8.3457118147044951e-01`
+  - train[20] t_remaining=31: `x_unmit=-5.8861671469740628e-01`, `x_rem=-6.5311513654453157e-01`, `y_exact=-1.0000000384920569e+00`
+  - train[21] t_remaining=31: `x_unmit=-5.4646573376390384e-01`, `x_rem=-6.0293539733798118e-01`, `y_exact=-9.5151770438165484e-01`
+  - train[22] t_remaining=30: `x_unmit=-5.4081252329481921e-01`, `x_rem=-5.9620538487478503e-01`, `y_exact=-9.5151773477027957e-01`
+  - train[23] t_remaining=30: `x_unmit=-2.8680479825517996e-01`, `x_rem=-2.9381523601807163e-01`, `y_exact=-4.5803141894151794e-01`
+- target x values: `x_u_target=-4.3437945791726107e-01`, `x_r_target=-4.6949935466340631e-01`
+- target contribution to E_cdr_unmit: `-6.2507360252086502e-02`
+- target contribution to E_cdr_rem: `-6.2507360252086558e-02`
+
+### term 9
+- pauli term from int row: `(5.1918283643748245e-03)*Y(q(1, 0))*Z(q(1, 1))*Y(q(1, 2))`
+- int observable row: `[0, 0, 0, 0, 2, 3, 2, 0]`
+- Hamiltonian weight w_9: `5.1918283643748245e-03`
+- OGM effective shots used for this term: `771`
+- fitted unmit coeffs: `a_u=4.2521084919902856e+00`, `b_u=-4.3216437774203080e-02`
+- fitted rem coeffs: `a_r=2.3562248125406975e+00`, `b_r=-4.2219154632546239e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-8.9947089947089942e-02`, `x_rem=-1.5895071814953879e-01`, `y_exact=-4.5481019185836791e-01`
+  - train[1] t_remaining=29: `x_unmit=1.3440860215053764e-02`, `x_rem=1.4559784960292647e-02`, `y_exact=2.4359630537978209e-08`
+  - train[2] t_remaining=30: `x_unmit=4.0650406504065040e-02`, `x_rem=6.3350477727962956e-02`, `y_exact=-8.0252530409919212e-08`
+  - train[3] t_remaining=31: `x_unmit=-9.4240837696335081e-02`, `x_rem=-1.5857005177199340e-01`, `y_exact=-7.3929083026597819e-01`
+  - train[4] t_remaining=30: `x_unmit=5.2362707535121331e-02`, `x_rem=1.0385167328961707e-01`, `y_exact=1.9509047992039913e-01`
+  - train[5] t_remaining=31: `x_unmit=5.9553349875930521e-02`, `x_rem=1.1814924454457676e-01`, `y_exact=4.4110374044564712e-09`
+  - train[6] t_remaining=31: `x_unmit=5.8487874465049931e-02`, `x_rem=1.1363980478670335e-01`, `y_exact=-9.8588407278642979e-08`
+  - train[7] t_remaining=31: `x_unmit=-3.5761589403973511e-02`, `x_rem=-7.0846118748012207e-02`, `y_exact=1.0716496237549706e-08`
+  - train[8] t_remaining=30: `x_unmit=7.2727272727272724e-02`, `x_rem=1.2485535481679187e-01`, `y_exact=3.9781701574402911e-01`
+  - train[9] t_remaining=32: `x_unmit=2.3936170212765957e-02`, `x_rem=4.4653625080909212e-02`, `y_exact=1.3923876139957950e-01`
+  - train[10] t_remaining=30: `x_unmit=-1.7038007863695935e-02`, `x_rem=-2.2144372284118741e-02`, `y_exact=1.7327572268785180e-01`
+  - train[11] t_remaining=29: `x_unmit=-6.2750333778371165e-02`, `x_rem=-1.0946472292015016e-01`, `y_exact=-5.3971339785211325e-01`
+  - train[12] t_remaining=30: `x_unmit=3.7593984962406013e-02`, `x_rem=5.9001363696684427e-02`, `y_exact=-4.8707147620297842e-08`
+  - train[13] t_remaining=29: `x_unmit=6.6489361702127658e-02`, `x_rem=1.1932903403850481e-01`, `y_exact=1.7327562008008623e-01`
+  - train[14] t_remaining=32: `x_unmit=-2.7814569536423840e-02`, `x_rem=-5.6148332597241696e-02`, `y_exact=2.8470097969614035e-02`
+  - train[15] t_remaining=32: `x_unmit=-6.1497326203208559e-02`, `x_rem=-1.0481871010358758e-01`, `y_exact=-3.1515954684709974e-01`
+  - train[16] t_remaining=31: `x_unmit=8.3870967741935490e-02`, `x_rem=1.4256173032560743e-01`, `y_exact=3.8305503982738504e-01`
+  - train[17] t_remaining=32: `x_unmit=3.5294117647058823e-02`, `x_rem=6.5465326659021744e-02`, `y_exact=2.3819353285725547e-01`
+  - train[18] t_remaining=30: `x_unmit=5.2631578947368420e-03`, `x_rem=6.2613641011174895e-03`, `y_exact=-3.9226961136826501e-08`
+  - train[19] t_remaining=32: `x_unmit=9.5926412614980291e-02`, `x_rem=1.7117417828898290e-01`, `y_exact=3.2335938497683697e-01`
+  - train[20] t_remaining=31: `x_unmit=-3.7333333333333336e-02`, `x_rem=-7.2485239329832918e-02`, `y_exact=-1.4023509245861047e-08`
+  - train[21] t_remaining=31: `x_unmit=3.7135278514588858e-02`, `x_rem=6.6079427961701701e-02`, `y_exact=9.3865016578275742e-02`
+  - train[22] t_remaining=30: `x_unmit=4.8969072164948453e-02`, `x_rem=8.1679133528577502e-02`, `y_exact=1.7506341662839350e-01`
+  - train[23] t_remaining=30: `x_unmit=-2.1108179419525065e-02`, `x_rem=-3.8448631514995377e-02`, `y_exact=-1.0043379089806997e-01`
+- target x values: `x_u_target=-3.6048064085447265e-02`, `x_r_target=-6.2756548930071376e-02`
+- target contribution to E_cdr_unmit: `-1.0201772298226318e-03`
+- target contribution to E_cdr_rem: `-9.8690267297033853e-04`
+
+### term 10
+- pauli term from int row: `(5.1918283643748245e-03)*X(q(1, 0))*Z(q(1, 1))*X(q(1, 2))`
+- int observable row: `[0, 0, 0, 0, 1, 3, 1, 0]`
+- Hamiltonian weight w_10: `5.1918283643748245e-03`
+- OGM effective shots used for this term: `741`
+- fitted unmit coeffs: `a_u=3.3004004111224572e+00`, `b_u=-6.4120910407763224e-03`
+- fitted rem coeffs: `a_r=1.8300987604406886e+00`, `b_r=-8.6500113683604576e-03`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-6.3186813186813184e-02`, `x_rem=-1.0434400998465580e-01`, `y_exact=-4.5481015698978566e-01`
+  - train[1] t_remaining=29: `x_unmit=5.8974358974358973e-02`, `x_rem=1.0007107765228859e-01`, `y_exact=-3.2654463835895451e-08`
+  - train[2] t_remaining=30: `x_unmit=-6.4516129032258064e-03`, `x_rem=-1.9067110183720381e-02`, `y_exact=-8.9192029561332170e-08`
+  - train[3] t_remaining=31: `x_unmit=-1.4974619289340102e-01`, `x_rem=-2.6652907330665598e-01`, `y_exact=-7.3929086271378652e-01`
+  - train[4] t_remaining=30: `x_unmit=7.3738680465717993e-02`, `x_rem=1.3270132526860420e-01`, `y_exact=1.9509047992039197e-01`
+  - train[5] t_remaining=31: `x_unmit=-5.1948051948051948e-03`, `x_rem=-8.3092285536783446e-03`, `y_exact=3.1201570294165873e-08`
+  - train[6] t_remaining=31: `x_unmit=-1.1703511053315995e-02`, `x_rem=-1.3765831166228969e-02`, `y_exact=-3.9735482441089925e-08`
+  - train[7] t_remaining=31: `x_unmit=-7.7519379844961239e-03`, `x_rem=-1.6240767115919201e-02`, `y_exact=-1.6826549980652250e-08`
+  - train[8] t_remaining=30: `x_unmit=9.0909090909090912e-02`, `x_rem=1.5278808934444132e-01`, `y_exact=3.9781704668392831e-01`
+  - train[9] t_remaining=32: `x_unmit=4.1487839771101577e-02`, `x_rem=7.3135949645737372e-02`, `y_exact=1.3923890040416959e-01`
+  - train[10] t_remaining=30: `x_unmit=4.8913043478260872e-02`, `x_rem=8.7211018774366239e-02`, `y_exact=1.7327572268781088e-01`
+  - train[11] t_remaining=29: `x_unmit=-8.2568807339449546e-02`, `x_rem=-1.3522196736198128e-01`, `y_exact=-5.3971339785209449e-01`
+  - train[12] t_remaining=30: `x_unmit=-2.2408963585434174e-02`, `x_rem=-3.5700315406524595e-02`, `y_exact=-5.0472160051674550e-08`
+  - train[13] t_remaining=29: `x_unmit=5.9782608695652176e-02`, `x_rem=1.2036016540412768e-01`, `y_exact=1.7327562008008096e-01`
+  - train[14] t_remaining=32: `x_unmit=-6.3371356147021544e-03`, `x_rem=-3.7568021106352471e-03`, `y_exact=2.8470104063712743e-02`
+  - train[15] t_remaining=32: `x_unmit=-1.2401055408970976e-01`, `x_rem=-2.1556354768700497e-01`, `y_exact=-3.1515960356163397e-01`
+  - train[16] t_remaining=31: `x_unmit=5.0131926121372031e-02`, `x_rem=9.1868377669811221e-02`, `y_exact=3.8305506052635541e-01`
+  - train[17] t_remaining=32: `x_unmit=-4.7222222222222221e-02`, `x_rem=-9.0289831215559530e-02`, `y_exact=2.3819347759871132e-01`
+  - train[18] t_remaining=30: `x_unmit=6.3535911602209949e-02`, `x_rem=1.1850775967105610e-01`, `y_exact=1.9111624572179850e-08`
+  - train[19] t_remaining=32: `x_unmit=1.1363636363636363e-01`, `x_rem=2.0263484023587730e-01`, `y_exact=3.2335945315496706e-01`
+  - train[20] t_remaining=31: `x_unmit=-7.6517150395778361e-02`, `x_rem=-1.4430799773499858e-01`, `y_exact=-5.1385181185358603e-08`
+  - train[21] t_remaining=31: `x_unmit=6.4471879286694095e-02`, `x_rem=1.1412106976737740e-01`, `y_exact=9.3864927728170997e-02`
+  - train[22] t_remaining=30: `x_unmit=2.2784810126582278e-02`, `x_rem=3.6442609313808876e-02`, `y_exact=1.7506346607737028e-01`
+  - train[23] t_remaining=30: `x_unmit=1.3262599469496022e-02`, `x_rem=3.0290337437739765e-02`, `y_exact=-1.0043370052154253e-01`
+- target x values: `x_u_target=5.8047493403693931e-02`, `x_r_target=1.0256066228394137e-01`
+- target contribution to E_cdr_unmit: `9.6135985183241424e-04`
+- target contribution to E_cdr_rem: `9.2957677391601514e-04`
+
+### term 11
+- pauli term from int row: `(5.8307795842772549e-02)*Z(q(1, 1))`
+- int observable row: `[0, 0, 0, 0, 0, 3, 0, 0]`
+- Hamiltonian weight w_11: `5.8307795842772549e-02`
+- OGM effective shots used for this term: `3888`
+- fitted unmit coeffs: `a_u=2.2479719873337749e+00`, `b_u=8.9559655206670238e-02`
+- fitted rem coeffs: `a_r=1.8658167494870326e+00`, `b_r=-2.2838944160018644e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-2.5933503836317134e-01`, `x_rem=-2.5221088959418242e-01`, `y_exact=-5.8936092220875924e-01`
+  - train[1] t_remaining=29: `x_unmit=-4.5500505561172903e-02`, `x_rem=5.4210776371411227e-03`, `y_exact=4.4736752906999126e-02`
+  - train[2] t_remaining=30: `x_unmit=-1.7695262483994878e-01`, `x_rem=-1.5295496968668523e-01`, `y_exact=-2.2964963538687400e-01`
+  - train[3] t_remaining=31: `x_unmit=-2.8470111448834851e-01`, `x_rem=-2.8277242709439582e-01`, `y_exact=-5.3237892574120982e-01`
+  - train[4] t_remaining=30: `x_unmit=-4.8395313295975545e-01`, `x_rem=-5.2283509995151267e-01`, `y_exact=-1.0000001970203685e+00`
+  - train[5] t_remaining=31: `x_unmit=-1.0159055926115956e-01`, `x_rem=-6.2157300314650027e-02`, `y_exact=-1.0548459378587344e-01`
+  - train[6] t_remaining=31: `x_unmit=-1.8596311475409835e-01`, `x_rem=-1.6381098163144378e-01`, `y_exact=-2.7128692248945652e-01`
+  - train[7] t_remaining=31: `x_unmit=-6.0338298409492550e-02`, `x_rem=-1.2455781216256049e-02`, `y_exact=-1.5585520737074254e-01`
+  - train[8] t_remaining=30: `x_unmit=-2.4200206398348814e-01`, `x_rem=-2.3132778793191341e-01`, `y_exact=-5.2975034494729811e-01`
+  - train[9] t_remaining=32: `x_unmit=-2.6062027625749240e-04`, `x_rem=5.9926963522581367e-02`, `y_exact=1.3181707483252050e-01`
+  - train[10] t_remaining=30: `x_unmit=-3.0833333333333335e-01`, `x_rem=-3.1124497991967870e-01`, `y_exact=-6.1808010009391623e-01`
+  - train[11] t_remaining=29: `x_unmit=-4.8406831506500125e-01`, `x_rem=-5.2297387357229075e-01`, `y_exact=-1.0000001705798629e+00`
+  - train[12] t_remaining=30: `x_unmit=-2.5835708732832341e-01`, `x_rem=-2.5103263533532938e-01`, `y_exact=-4.0599771433888254e-01`
+  - train[13] t_remaining=29: `x_unmit=-4.4071246819338422e-01`, `x_rem=-4.7073791348600508e-01`, `y_exact=-8.9378321749594802e-01`
+  - train[14] t_remaining=32: `x_unmit=-7.7270446562970399e-02`, `x_rem=-3.2855959714422116e-02`, `y_exact=-6.8339625791903225e-02`
+  - train[15] t_remaining=32: `x_unmit=-1.3615733736762481e-02`, `x_rem=4.3836465377394634e-02`, `y_exact=8.0324260278264559e-02`
+  - train[16] t_remaining=31: `x_unmit=-3.7754065040650409e-01`, `x_rem=-3.9462728964639049e-01`, `y_exact=-7.5002363221667034e-01`
+  - train[17] t_remaining=32: `x_unmit=-7.4727555786196165e-02`, `x_rem=-2.9792235886983282e-02`, `y_exact=-2.4541984633625707e-01`
+  - train[18] t_remaining=30: `x_unmit=3.3028455284552845e-02`, `x_rem=1.0003428347536492e-01`, `y_exact=1.6354881041080266e-01`
+  - train[19] t_remaining=32: `x_unmit=-1.8376722817764167e-02`, `x_rem=3.8100333954501048e-02`, `y_exact=-1.0254340975574566e-02`
+  - train[20] t_remaining=31: `x_unmit=7.6745970836531081e-04`, `x_rem=6.1165614106464268e-02`, `y_exact=1.2820749077351509e-01`
+  - train[21] t_remaining=31: `x_unmit=-4.8503611971104234e-02`, `x_rem=1.8028771432479559e-03`, `y_exact=-9.2361199575617531e-03`
+  - train[22] t_remaining=30: `x_unmit=-1.1161731207289294e-01`, `x_rem=-7.4237725389027606e-02`, `y_exact=-8.8252467403980808e-02`
+  - train[23] t_remaining=30: `x_unmit=-2.3885187083546899e-01`, `x_rem=-2.2753237450056510e-01`, `y_exact=-4.6965842642156336e-01`
+- target x values: `x_u_target=-9.1784989858012173e-02`, `x_r_target=-5.0343361274713422e-02`
+- target contribution to E_cdr_unmit: `-6.8086264425825938e-03`
+- target contribution to E_cdr_rem: `-6.8086264425825964e-03`
+
+### term 12
+- pauli term from int row: `(-6.6196238813543192e-03)*Y(q(1, 1))*Z(q(1, 2))*Y(q(1, 3))`
+- int observable row: `[0, 0, 0, 0, 0, 2, 3, 2]`
+- Hamiltonian weight w_12: `-6.6196238813543192e-03`
+- OGM effective shots used for this term: `740`
+- fitted unmit coeffs: `a_u=2.7407766504266764e+00`, `b_u=4.8540667256881428e-02`
+- fitted rem coeffs: `a_r=1.5243559406647917e+00`, `b_r=4.7613192645487155e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=5.7324840764331211e-02`, `x_rem=8.9908110021466245e-02`, `y_exact=4.1130921429157481e-02`
+  - train[1] t_remaining=29: `x_unmit=3.6386449184441651e-02`, `x_rem=6.4827018382537793e-02`, `y_exact=2.3594584869047047e-01`
+  - train[2] t_remaining=30: `x_unmit=-7.5098814229249009e-02`, `x_rem=-1.4856626079390195e-01`, `y_exact=-1.0720553875574440e-01`
+  - train[3] t_remaining=31: `x_unmit=-1.2787723785166240e-02`, `x_rem=-2.3103087483023008e-02`, `y_exact=3.0561683625357793e-02`
+  - train[4] t_remaining=30: `x_unmit=-4.7375160051216392e-02`, `x_rem=-8.7045300790112412e-02`, `y_exact=-3.3680278238180295e-08`
+  - train[5] t_remaining=31: `x_unmit=-3.7313432835820892e-02`, `x_rem=-6.6206680596965509e-02`, `y_exact=1.3151986385492892e-01`
+  - train[6] t_remaining=31: `x_unmit=-5.2770448548812663e-03`, `x_rem=-2.4242128413394510e-03`, `y_exact=2.3477336548294911e-01`
+  - train[7] t_remaining=31: `x_unmit=-4.1994750656167978e-02`, `x_rem=-8.4962455688513294e-02`, `y_exact=-3.8647135054086784e-01`
+  - train[8] t_remaining=30: `x_unmit=-1.3106159895150721e-03`, `x_rem=6.3403932232855727e-04`, `y_exact=8.2267346552493746e-09`
+  - train[9] t_remaining=32: `x_unmit=-2.6525198938992044e-02`, `x_rem=-3.9302218239155091e-02`, `y_exact=2.7655070661777165e-03`
+  - train[10] t_remaining=30: `x_unmit=1.3947368421052631e-01`, `x_rem=2.4749541213674869e-01`, `y_exact=4.8588219863871512e-01`
+  - train[11] t_remaining=29: `x_unmit=0.0000000000000000e+00`, `x_rem=4.4307277516332606e-03`, `y_exact=1.1513167347650740e-07`
+  - train[12] t_remaining=30: `x_unmit=1.1458333333333333e-01`, `x_rem=2.1586197601710932e-01`, `y_exact=3.2781917221445855e-01`
+  - train[13] t_remaining=29: `x_unmit=3.8251366120218580e-02`, `x_rem=7.6959851548053182e-02`, `y_exact=4.0378968977620688e-01`
+  - train[14] t_remaining=32: `x_unmit=7.1808510638297879e-02`, `x_rem=1.4218980784121463e-01`, `y_exact=3.4872319810420271e-01`
+  - train[15] t_remaining=32: `x_unmit=-9.2105263157894732e-02`, `x_rem=-1.6803264994346723e-01`, `y_exact=-1.5367650878488104e-01`
+  - train[16] t_remaining=31: `x_unmit=0.0000000000000000e+00`, `x_rem=2.9246968874776782e-03`, `y_exact=1.0039484100161306e-01`
+  - train[17] t_remaining=32: `x_unmit=-2.5974025974025976e-02`, `x_rem=-3.3200942578813182e-02`, `y_exact=8.5012173151374926e-03`
+  - train[18] t_remaining=30: `x_unmit=2.0512820512820513e-02`, `x_rem=4.0168827298505856e-02`, `y_exact=-5.9363254869123014e-02`
+  - train[19] t_remaining=32: `x_unmit=-3.4229828850855744e-02`, `x_rem=-6.5601664004476506e-02`, `y_exact=-1.6915420927861599e-01`
+  - train[20] t_remaining=31: `x_unmit=5.9299191374663072e-02`, `x_rem=1.0534557815053432e-01`, `y_exact=2.9587034599239953e-01`
+  - train[21] t_remaining=31: `x_unmit=7.7922077922077922e-03`, `x_rem=1.4394137841119743e-02`, `y_exact=-1.7156946139971607e-01`
+  - train[22] t_remaining=30: `x_unmit=-3.4120734908136482e-02`, `x_rem=-7.0342726572126091e-02`, `y_exact=1.5086162540318007e-07`
+  - train[23] t_remaining=30: `x_unmit=4.7489823609226593e-02`, `x_rem=8.3788628707278462e-02`, `y_exact=-2.1103640613656222e-08`
+- target x values: `x_u_target=1.2300123001229948e-03`, `x_r_target=-1.1717685123054447e-03`
+- target contribution to E_cdr_unmit: `-3.4363696334996341e-04`
+- target contribution to E_cdr_rem: `-3.0335750594536983e-04`
+
+### term 13
+- pauli term from int row: `(-6.6196238813543192e-03)*X(q(1, 1))*Z(q(1, 2))*X(q(1, 3))`
+- int observable row: `[0, 0, 0, 0, 0, 1, 3, 1]`
+- Hamiltonian weight w_13: `-6.6196238813543192e-03`
+- OGM effective shots used for this term: `807`
+- fitted unmit coeffs: `a_u=4.9237786127610139e+00`, `b_u=-2.0048102464333927e-02`
+- fitted rem coeffs: `a_r=2.5647139647410993e+00`, `b_r=-1.2718664301758862e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=9.2226613965744400e-03`, `x_rem=1.3449481866211099e-02`, `y_exact=4.1130878224234474e-02`
+  - train[1] t_remaining=29: `x_unmit=5.2208835341365459e-02`, `x_rem=8.9852976390169703e-02`, `y_exact=2.3594593568112876e-01`
+  - train[2] t_remaining=30: `x_unmit=-2.8871391076115485e-02`, `x_rem=-5.6477023599277511e-02`, `y_exact=-1.0720551440891228e-01`
+  - train[3] t_remaining=31: `x_unmit=1.2970168612191958e-03`, `x_rem=-1.8722610046293620e-04`, `y_exact=3.0561679498722495e-02`
+  - train[4] t_remaining=30: `x_unmit=-1.4685489743719001e-19`, `x_rem=-7.1365922169785330e-03`, `y_exact=-3.3680335556695251e-08`
+  - train[5] t_remaining=31: `x_unmit=4.8366013071895426e-02`, `x_rem=9.4430722364195169e-02`, `y_exact=1.3151983688970720e-01`
+  - train[6] t_remaining=31: `x_unmit=4.0201005025125629e-02`, `x_rem=7.7282753913778382e-02`, `y_exact=2.3477330950902681e-01`
+  - train[7] t_remaining=31: `x_unmit=-1.3906447534766119e-02`, `x_rem=-2.6296362539184829e-02`, `y_exact=-3.8647142334701268e-01`
+  - train[8] t_remaining=30: `x_unmit=-1.7587939698492462e-02`, `x_rem=-3.4278382132367030e-02`, `y_exact=-4.8875093989504391e-08`
+  - train[9] t_remaining=32: `x_unmit=2.5882352941176471e-02`, `x_rem=4.1580024230326237e-02`, `y_exact=2.7655652377516987e-03`
+  - train[10] t_remaining=30: `x_unmit=8.9570552147239260e-02`, `x_rem=1.6630614556812978e-01`, `y_exact=4.8588219863872212e-01`
+  - train[11] t_remaining=29: `x_unmit=-1.3530135301353014e-02`, `x_rem=-2.9368811622083456e-02`, `y_exact=1.1513169030781939e-07`
+  - train[12] t_remaining=30: `x_unmit=7.4270557029177717e-02`, `x_rem=1.4345006257883272e-01`, `y_exact=3.2781916822837814e-01`
+  - train[13] t_remaining=29: `x_unmit=8.6007702182284984e-02`, `x_rem=1.6245778446676903e-01`, `y_exact=4.0378968977621443e-01`
+  - train[14] t_remaining=32: `x_unmit=5.1792828685258967e-02`, `x_rem=8.3081223323712150e-02`, `y_exact=3.4872321767513481e-01`
+  - train[15] t_remaining=32: `x_unmit=-7.9365079365079361e-03`, `x_rem=-2.0788632284956112e-02`, `y_exact=-1.5367644129466618e-01`
+  - train[16] t_remaining=31: `x_unmit=2.5572005383580086e-02`, `x_rem=3.8843934361932758e-02`, `y_exact=1.0039484118792286e-01`
+  - train[17] t_remaining=32: `x_unmit=-1.8915510718789406e-02`, `x_rem=-3.5630850205013796e-02`, `y_exact=8.5012041070524225e-03`
+  - train[18] t_remaining=30: `x_unmit=2.5125628140703518e-03`, `x_rem=9.8238674316855016e-03`, `y_exact=-5.9363105983959066e-02`
+  - train[19] t_remaining=32: `x_unmit=-3.3248081841432228e-02`, `x_rem=-6.3627260839549643e-02`, `y_exact=-1.6915417519811560e-01`
+  - train[20] t_remaining=31: `x_unmit=5.7527539779681759e-02`, `x_rem=1.1123142498344736e-01`, `y_exact=2.9587033752476022e-01`
+  - train[21] t_remaining=31: `x_unmit=-3.0450669914738125e-02`, `x_rem=-5.8135031289353635e-02`, `y_exact=-1.7156946215486024e-01`
+  - train[22] t_remaining=30: `x_unmit=3.2171581769436998e-02`, `x_rem=6.6789978898753960e-02`, `y_exact=1.1035975517351968e-07`
+  - train[23] t_remaining=30: `x_unmit=-9.4339622641509430e-03`, `x_rem=-2.3691892669962786e-02`, `y_exact=-1.7235457982913313e-09`
+- target x values: `x_u_target=3.1928480204342274e-02`, `x_r_target=6.6562746541745099e-02`
+- target contribution to E_cdr_unmit: `-9.0795201695120732e-04`
+- target contribution to E_cdr_rem: `-1.0458723821649609e-03`
+
+### term 14
+- pauli term from int row: `(2.1782157013652700e-02)*Z(q(1, 2))`
+- int observable row: `[0, 0, 0, 0, 0, 0, 3, 0]`
+- Hamiltonian weight w_14: `2.1782157013652700e-02`
+- OGM effective shots used for this term: `3923`
+- fitted unmit coeffs: `a_u=2.4002113557041027e+00`, `b_u=1.4615273190870534e-01`
+- fitted rem coeffs: `a_r=1.8961669710062410e+00`, `b_r=2.6142164123500271e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=4.0302267002518891e-02`, `x_rem=1.1430666709179604e-01`, `y_exact=1.9811137348969243e-01`
+  - train[1] t_remaining=29: `x_unmit=-3.0684104627766599e-02`, `x_rem=2.4450500471181486e-02`, `y_exact=6.1480075014557538e-02`
+  - train[2] t_remaining=30: `x_unmit=3.4985944288269871e-01`, `x_rem=5.0615119352240334e-01`, `y_exact=9.3408632678156667e-01`
+  - train[3] t_remaining=31: `x_unmit=1.1724487211952393e-01`, `x_rem=2.1170236977154924e-01`, `y_exact=3.7861269383296015e-01`
+  - train[4] t_remaining=30: `x_unmit=3.3094445866393651e-01`, `x_rem=4.8220817552397027e-01`, `y_exact=8.8292650677369999e-01`
+  - train[5] t_remaining=31: `x_unmit=2.2487792341300436e-01`, `x_rem=3.4794673849747376e-01`, `y_exact=7.6564149333156317e-01`
+  - train[6] t_remaining=31: `x_unmit=3.1544633901705116e-01`, `x_rem=4.6259030255322930e-01`, `y_exact=8.4693860018896139e-01`
+  - train[7] t_remaining=31: `x_unmit=9.0589711417816812e-02`, `x_rem=1.7796166002255287e-01`, `y_exact=4.3650206528551000e-01`
+  - train[8] t_remaining=30: `x_unmit=7.3924050632911395e-02`, `x_rem=1.5686588687710298e-01`, `y_exact=4.1675146918297140e-01`
+  - train[9] t_remaining=32: `x_unmit=-6.6165413533834580e-02`, `x_rem=-2.0462548777005835e-02`, `y_exact=-8.8261101568060066e-02`
+  - train[10] t_remaining=30: `x_unmit=3.1869254341164455e-01`, `x_rem=4.6669942204005627e-01`, `y_exact=8.8292657854314549e-01`
+  - train[11] t_remaining=29: `x_unmit=2.4067628045748385e-01`, `x_rem=3.6794465880694160e-01`, `y_exact=7.9255549168213946e-01`
+  - train[12] t_remaining=30: `x_unmit=3.3161023520289479e-01`, `x_rem=4.8305093063657573e-01`, `y_exact=9.7565713553652289e-01`
+  - train[13] t_remaining=29: `x_unmit=3.0634960789273968e-01`, `x_rem=4.5107545302878438e-01`, `y_exact=8.8292648065089552e-01`
+  - train[14] t_remaining=32: `x_unmit=2.0445908284773245e-01`, `x_rem=3.2210010487054741e-01`, `y_exact=7.8072620023724304e-01`
+  - train[15] t_remaining=32: `x_unmit=-1.3933601609657947e-01`, `x_rem=-1.1308356467921456e-01`, `y_exact=-1.6918048937294849e-01`
+  - train[16] t_remaining=31: `x_unmit=2.6256983240223464e-01`, `x_rem=3.9565801569903108e-01`, `y_exact=7.2466427271950562e-01`
+  - train[17] t_remaining=32: `x_unmit=3.5605289928789421e-03`, `x_rem=6.7798137965669511e-02`, `y_exact=9.6411369206978695e-02`
+  - train[18] t_remaining=30: `x_unmit=-7.5471698113207544e-02`, `x_rem=-3.2242655839503254e-02`, `y_exact=-5.7331932497497760e-02`
+  - train[19] t_remaining=32: `x_unmit=-4.2622950819672129e-02`, `x_rem=9.3380369371238552e-03`, `y_exact=7.1979692069028212e-02`
+  - train[20] t_remaining=31: `x_unmit=3.2828282828282832e-02`, `x_rem=1.0484592763073773e-01`, `y_exact=1.5047902020285397e-01`
+  - train[21] t_remaining=31: `x_unmit=1.7068273092369479e-02`, `x_rem=8.4896548218189150e-02`, `y_exact=1.8790784272795569e-01`
+  - train[22] t_remaining=30: `x_unmit=-4.3411250963267402e-02`, `x_rem=8.3401886540918711e-03`, `y_exact=3.9770065362303014e-02`
+  - train[23] t_remaining=30: `x_unmit=-1.0842767295597484e-01`, `x_rem=-7.3959079691107446e-02`, `y_exact=-7.2310302591134828e-02`
+- target x values: `x_u_target=4.8351103396974959e-02`, `x_r_target=1.2449506759110751e-01`
+- target contribution to E_cdr_unmit: `5.7114035347470013e-03`
+- target contribution to E_cdr_rem: `5.7114035347470013e-03`
+
+### term 15
+- pauli term from int row: `(-1.4954441747214900e-02)*Z(q(1, 3))`
+- int observable row: `[0, 0, 0, 0, 0, 0, 0, 3]`
+- Hamiltonian weight w_15: `-1.4954441747214900e-02`
+- OGM effective shots used for this term: `2662`
+- fitted unmit coeffs: `a_u=2.2471009264839772e+00`, `b_u=-1.3150680701273981e-01`
+- fitted rem coeffs: `a_r=1.9325067967762199e+00`, `b_r=-2.2139084407209855e-01`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=4.1940298507462687e-01`, `x_rem=5.3418951752863575e-01`, `y_exact=8.7579121149898920e-01`
+  - train[1] t_remaining=29: `x_unmit=4.7387785136129507e-01`, `x_rem=5.9753238530383157e-01`, `y_exact=8.9378328281069019e-01`
+  - train[2] t_remaining=30: `x_unmit=2.2404779686333084e-01`, `x_rem=3.0703232193410562e-01`, `y_exact=2.9556326984790093e-01`
+  - train[3] t_remaining=31: `x_unmit=3.6650926262259353e-01`, `x_rem=4.7268518909603896e-01`, `y_exact=6.3830829715641946e-01`
+  - train[4] t_remaining=30: `x_unmit=4.9671292914536158e-01`, `x_rem=6.2408480133181576e-01`, `y_exact=1.0000001970204655e+00`
+  - train[5] t_remaining=31: `x_unmit=2.0911722141823444e-01`, `x_rem=2.8967118769562133e-01`, `y_exact=3.3984326549559746e-01`
+  - train[6] t_remaining=31: `x_unmit=2.2609340252038548e-01`, `x_rem=3.0941093316323881e-01`, `y_exact=4.2434840591649314e-01`
+  - train[7] t_remaining=31: `x_unmit=3.5814296241709653e-01`, `x_rem=4.6295693304313540e-01`, `y_exact=7.1935315603634442e-01`
+  - train[8] t_remaining=30: `x_unmit=5.4264432029795162e-01`, `x_rem=6.7749339569529266e-01`, `y_exact=1.0000001415047941e+00`
+  - train[9] t_remaining=32: `x_unmit=4.7038327526132406e-01`, `x_rem=5.9346892472246981e-01`, `y_exact=8.9378326165199884e-01`
+  - train[10] t_remaining=30: `x_unmit=3.1674208144796379e-01`, `x_rem=4.1481637377670211e-01`, `y_exact=6.1808010009392322e-01`
+  - train[11] t_remaining=29: `x_unmit=4.9310473350726797e-01`, `x_rem=6.1988922500845123e-01`, `y_exact=1.0000001705798840e+00`
+  - train[12] t_remaining=30: `x_unmit=2.5667042465238632e-01`, `x_rem=3.4496561006091425e-01`, `y_exact=4.3034057953613220e-01`
+  - train[13] t_remaining=29: `x_unmit=4.6005301022340023e-01`, `x_rem=5.8145698863186068e-01`, `y_exact=8.9378321749599277e-01`
+  - train[14] t_remaining=32: `x_unmit=2.2868355333571175e-01`, `x_rem=3.1242273643687407e-01`, `y_exact=2.8241781866394094e-01`
+  - train[15] t_remaining=32: `x_unmit=3.9114526161727042e-01`, `x_rem=5.0133169955496559e-01`, `y_exact=7.8292639361692584e-01`
+  - train[16] t_remaining=31: `x_unmit=4.8275862068965519e-01`, `x_rem=6.0785886126704081e-01`, `y_exact=9.1812597484409364e-01`
+  - train[17] t_remaining=32: `x_unmit=4.4444444444444442e-01`, `x_rem=5.6330749354005161e-01`, `y_exact=9.6094202975882437e-01`
+  - train[18] t_remaining=30: `x_unmit=4.5969819654030181e-01`, `x_rem=5.8104441458174627e-01`, `y_exact=8.9378320357298136e-01`
+  - train[19] t_remaining=32: `x_unmit=3.9657059467347683e-01`, `x_rem=5.0764022636450790e-01`, `y_exact=7.7284583037700472e-01`
+  - train[20] t_remaining=31: `x_unmit=3.4018348623853217e-01`, `x_rem=4.4207382120759542e-01`, `y_exact=7.2131352751562161e-01`
+  - train[21] t_remaining=31: `x_unmit=3.9753639417693171e-01`, `x_rem=5.0876324904294379e-01`, `y_exact=7.7284598161132512e-01`
+  - train[22] t_remaining=30: `x_unmit=5.1477562933236043e-01`, `x_rem=6.4508794108413992e-01`, `y_exact=1.0000001368120164e+00`
+  - train[23] t_remaining=30: `x_unmit=5.0261389096340547e-01`, `x_rem=6.3094638484116927e-01`, `y_exact=1.0000001479542371e+00`
+- target x values: `x_u_target=3.1565377532228361e-01`, `x_r_target=4.1355090153753904e-01`
+- target contribution to E_cdr_unmit: `-8.6406627427057896e-03`
+- target contribution to E_cdr_rem: `-8.6406627427057896e-03`
+
+### term 16
+- pauli term from int row: `(3.8617185736002355e-02)*Z(q(0, 0))*Z(q(0, 1))`
+- int observable row: `[3, 3, 0, 0, 0, 0, 0, 0]`
+- Hamiltonian weight w_16: `3.8617185736002355e-02`
+- OGM effective shots used for this term: `1150`
+- fitted unmit coeffs: `a_u=2.7698634107650468e+00`, `b_u=-1.4092664058952287e-02`
+- fitted rem coeffs: `a_r=1.9650607476628112e+00`, `b_r=5.0088879197595207e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=3.5117056856187288e-02`, `x_rem=2.4407309524366448e-02`, `y_exact=1.5314311286422794e-01`
+  - train[1] t_remaining=29: `x_unmit=3.1825795644891124e-02`, `x_rem=1.0145912155962488e-02`, `y_exact=-4.4736583041382949e-02`
+  - train[2] t_remaining=30: `x_unmit=8.6695278969957087e-02`, `x_rem=8.6627249717378549e-02`, `y_exact=2.2964952385218762e-01`
+  - train[3] t_remaining=31: `x_unmit=5.9117402164862616e-02`, `x_rem=6.1599793489885146e-02`, `y_exact=2.1378425091000433e-01`
+  - train[4] t_remaining=30: `x_unmit=2.8426395939086296e-01`, `x_rem=3.6777576625292374e-01`, `y_exact=8.8292660196856476e-01`
+  - train[5] t_remaining=31: `x_unmit=-1.3468013468013467e-02`, `x_rem=-5.6913344792132593e-02`, `y_exact=1.0548470037887345e-01`
+  - train[6] t_remaining=31: `x_unmit=1.6938110749185667e-01`, `x_rem=2.0436892098129888e-01`, `y_exact=2.7128688418060565e-01`
+  - train[7] t_remaining=31: `x_unmit=4.4725738396624470e-02`, `x_rem=2.7450748969736389e-02`, `y_exact=1.5585533191056203e-01`
+  - train[8] t_remaining=30: `x_unmit=6.8333333333333329e-02`, `x_rem=6.1480186480186549e-02`, `y_exact=4.1675161927796917e-01`
+  - train[9] t_remaining=32: `x_unmit=-3.0035335689045935e-02`, `x_rem=-7.4664146218916483e-02`, `y_exact=-1.8621334003246848e-01`
+  - train[10] t_remaining=30: `x_unmit=2.4197745013009539e-01`, `x_rem=3.1071068278353625e-01`, `y_exact=5.4571923577257786e-01`
+  - train[11] t_remaining=29: `x_unmit=2.2801024765157984e-01`, `x_rem=2.9380980533841344e-01`, `y_exact=7.9255551731770757e-01`
+  - train[12] t_remaining=30: `x_unmit=1.9234116623150566e-01`, `x_rem=2.3368247650231991e-01`, `y_exact=4.0599771298410725e-01`
+  - train[13] t_remaining=29: `x_unmit=2.9921942758022552e-01`, `x_rem=3.9041559770094042e-01`, `y_exact=7.8914484792197692e-01`
+  - train[14] t_remaining=32: `x_unmit=2.1445591739475776e-02`, `x_rem=-6.9115422570544850e-03`, `y_exact=6.5248055871899080e-02`
+  - train[15] t_remaining=32: `x_unmit=-6.6014669926650366e-02`, `x_rem=-1.1868544386881791e-01`, `y_exact=-2.6941325040315961e-01`
+  - train[16] t_remaining=31: `x_unmit=2.3721709974853311e-01`, `x_rem=3.0174854483320546e-01`, `y_exact=6.5237556904828264e-01`
+  - train[17] t_remaining=32: `x_unmit=3.2581453634085211e-02`, `x_rem=1.4578014578014638e-02`, `y_exact=7.5228340003885119e-02`
+  - train[18] t_remaining=30: `x_unmit=-2.5141930251419302e-02`, `x_rem=-7.3580650222985919e-02`, `y_exact=-1.6354887201869761e-01`
+  - train[19] t_remaining=32: `x_unmit=-3.7037037037037035e-02`, `x_rem=-8.6296139326442298e-02`, `y_exact=-1.2713496963641310e-01`
+  - train[20] t_remaining=31: `x_unmit=-2.7115858668857847e-02`, `x_rem=-7.4036617997176660e-02`, `y_exact=-1.2820777961197347e-01`
+  - train[21] t_remaining=31: `x_unmit=5.1839464882943144e-02`, `x_rem=4.0096748290728297e-02`, `y_exact=-3.1793323823249564e-02`
+  - train[22] t_remaining=30: `x_unmit=2.4680851063829789e-02`, `x_rem=-2.5789813023854857e-03`, `y_exact=3.9770125998759349e-02`
+  - train[23] t_remaining=30: `x_unmit=-6.5180102915951971e-02`, `x_rem=-1.1878316080717445e-01`, `y_exact=-7.2310074964878110e-02`
+- target x values: `x_u_target=-1.6556291390728478e-02`, `x_r_target=-5.2381944766050667e-02`
+- target contribution to E_cdr_unmit: `-2.3151516380106188e-03`
+- target contribution to E_cdr_rem: `-2.0407183970490611e-03`
+
+### term 17
+- pauli term from int row: `(7.3585839913404387e-03)*Z(q(0, 0))*Y(q(0, 1))*Z(q(0, 2))*Y(q(0, 3))`
+- int observable row: `[3, 2, 3, 2, 0, 0, 0, 0]`
+- Hamiltonian weight w_17: `7.3585839913404387e-03`
+- OGM effective shots used for this term: `792`
+- fitted unmit coeffs: `a_u=1.5252065560230079e+00`, `b_u=-1.9026906296087817e-02`
+- fitted rem coeffs: `a_r=7.1733866282638470e-01`, `b_r=-1.9587239631907109e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=5.1930758988015982e-02`, `x_rem=9.2753835535817258e-02`, `y_exact=1.5290962507379609e-02`
+  - train[1] t_remaining=29: `x_unmit=-7.0129870129870125e-02`, `x_rem=-1.5099204107756525e-01`, `y_exact=-2.3594581375616303e-01`
+  - train[2] t_remaining=30: `x_unmit=-1.3227513227513227e-02`, `x_rem=-2.5439946268440261e-02`, `y_exact=1.0720544778007135e-01`
+  - train[3] t_remaining=31: `x_unmit=-4.9939098660170524e-02`, `x_rem=-9.0203265272336353e-02`, `y_exact=8.9721938689765642e-03`
+  - train[4] t_remaining=30: `x_unmit=6.1760840998685937e-02`, `x_rem=1.3621107124520476e-01`, `y_exact=-4.3850310144740135e-08`
+  - train[5] t_remaining=31: `x_unmit=-3.0303030303030304e-02`, `x_rem=-6.3002038611794695e-02`, `y_exact=-1.3151977094192949e-01`
+  - train[6] t_remaining=31: `x_unmit=-4.1608876560332870e-03`, `x_rem=1.2141033757352190e-03`, `y_exact=-2.3477333984792484e-01`
+  - train[7] t_remaining=31: `x_unmit=-5.0980392156862744e-02`, `x_rem=-1.1324396594602243e-01`, `y_exact=3.8647137684387117e-01`
+  - train[8] t_remaining=30: `x_unmit=-4.2666666666666665e-02`, `x_rem=-8.2607726510165555e-02`, `y_exact=7.6753561894730814e-09`
+  - train[9] t_remaining=32: `x_unmit=-5.5483870967741933e-02`, `x_rem=-1.0445590776039243e-01`, `y_exact=1.4421381426871525e-02`
+  - train[10] t_remaining=30: `x_unmit=-8.7011349306431271e-02`, `x_rem=-1.9387269896297052e-01`, `y_exact=-4.2899820066474331e-01`
+  - train[11] t_remaining=29: `x_unmit=-4.1301627033792240e-02`, `x_rem=-8.6929544300037923e-02`, `y_exact=2.7743458727062611e-08`
+  - train[12] t_remaining=30: `x_unmit=-2.7027027027027029e-02`, `x_rem=-5.1414892878307562e-02`, `y_exact=-3.2781921153947352e-01`
+  - train[13] t_remaining=29: `x_unmit=-5.9125964010282778e-02`, `x_rem=-1.4047662232501407e-01`, `y_exact=-3.5651652616874729e-01`
+  - train[14] t_remaining=32: `x_unmit=-2.4643320363164720e-02`, `x_rem=-3.6143126396519218e-02`, `y_exact=-3.4856615448161177e-01`
+  - train[15] t_remaining=32: `x_unmit=-5.4263565891472867e-02`, `x_rem=-1.1997188193066431e-01`, `y_exact=1.7820561175960101e-01`
+  - train[16] t_remaining=31: `x_unmit=-5.6953642384105961e-02`, `x_rem=-1.2483516053214004e-01`, `y_exact=-8.8641419929218895e-02`
+  - train[17] t_remaining=32: `x_unmit=-5.7668711656441718e-02`, `x_rem=-1.3102627168166595e-01`, `y_exact=-1.7686154073757430e-02`
+  - train[18] t_remaining=30: `x_unmit=3.3591731266149873e-02`, `x_rem=6.8562334775229480e-02`, `y_exact=5.9363122049765224e-02`
+  - train[19] t_remaining=32: `x_unmit=4.4929396662387676e-02`, `x_rem=9.1750740675253059e-02`, `y_exact=1.4635257239541000e-01`
+  - train[20] t_remaining=31: `x_unmit=-5.6558363417569195e-02`, `x_rem=-1.2119450897297160e-01`, `y_exact=-2.9587034281217306e-01`
+  - train[21] t_remaining=31: `x_unmit=-1.9255455712451863e-02`, `x_rem=-2.7687936639375320e-02`, `y_exact=1.7611978456319977e-01`
+  - train[22] t_remaining=30: `x_unmit=2.9003783102143757e-02`, `x_rem=5.9910023370792910e-02`, `y_exact=1.6070723217379435e-08`
+  - train[23] t_remaining=30: `x_unmit=-2.1935483870967741e-02`, `x_rem=-4.6896193237656654e-02`, `y_exact=1.8118490017862440e-08`
+- target x values: `x_u_target=-3.7926675094816687e-03`, `x_r_target=-1.7127600180851677e-02`
+- target contribution to E_cdr_unmit: `-1.8257756296756025e-04`
+- target contribution to E_cdr_rem: `-2.3454404350725032e-04`
+
+### term 18
+- pauli term from int row: `(7.3585839913404387e-03)*Z(q(0, 0))*X(q(0, 1))*Z(q(0, 2))*X(q(0, 3))`
+- int observable row: `[3, 1, 3, 1, 0, 0, 0, 0]`
+- Hamiltonian weight w_18: `7.3585839913404387e-03`
+- OGM effective shots used for this term: `761`
+- fitted unmit coeffs: `a_u=6.8399581321107727e-01`, `b_u=-4.5299228282361950e-02`
+- fitted rem coeffs: `a_r=3.6137335332449816e-01`, `b_r=-4.4455259863090416e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=5.4304635761589407e-02`, `x_rem=1.2556663889243441e-01`, `y_exact=1.5290970478985009e-02`
+  - train[1] t_remaining=29: `x_unmit=-3.7037037037037035e-02`, `x_rem=-8.5843616815355087e-02`, `y_exact=-2.3594582616893259e-01`
+  - train[2] t_remaining=30: `x_unmit=-7.4168797953964194e-02`, `x_rem=-1.5688700711469100e-01`, `y_exact=1.0720544513073210e-01`
+  - train[3] t_remaining=31: `x_unmit=-2.2773805633336544e-18`, `x_rem=7.8448755747067243e-03`, `y_exact=8.9721900698629450e-03`
+  - train[4] t_remaining=30: `x_unmit=-3.4482758620689655e-02`, `x_rem=-4.2230899577085805e-02`, `y_exact=-4.3850307789056554e-08`
+  - train[5] t_remaining=31: `x_unmit=-1.1406844106463879e-02`, `x_rem=-2.9415060297004084e-02`, `y_exact=-1.3151973379099571e-01`
+  - train[6] t_remaining=31: `x_unmit=-4.5112781954887216e-02`, `x_rem=-8.7009145875824756e-02`, `y_exact=-2.3477335321474038e-01`
+  - train[7] t_remaining=31: `x_unmit=-2.6246719160104987e-02`, `x_rem=-4.9974749801905562e-02`, `y_exact=3.8647136120799264e-01`
+  - train[8] t_remaining=30: `x_unmit=9.2715231788079479e-03`, `x_rem=1.0934237068948745e-02`, `y_exact=2.8746956487332781e-08`
+  - train[9] t_remaining=32: `x_unmit=-3.2994923857868022e-02`, `x_rem=-8.1245182396600002e-02`, `y_exact=1.4421362471292895e-02`
+  - train[10] t_remaining=30: `x_unmit=-2.4327784891165175e-02`, `x_rem=-3.3791843416777052e-02`, `y_exact=-4.2899820066474770e-01`
+  - train[11] t_remaining=29: `x_unmit=1.1235955056179777e-02`, `x_rem=3.4476767645672354e-02`, `y_exact=2.7743463137628680e-08`
+  - train[12] t_remaining=30: `x_unmit=-3.0470914127423823e-02`, `x_rem=-6.1497076293373816e-02`, `y_exact=-3.2781921052800567e-01`
+  - train[13] t_remaining=29: `x_unmit=-2.2818791946308724e-02`, `x_rem=-4.5506484203488622e-02`, `y_exact=-3.5651652616875862e-01`
+  - train[14] t_remaining=32: `x_unmit=-3.7037037037037035e-02`, `x_rem=-6.9966224824916282e-02`, `y_exact=-3.4856616988916361e-01`
+  - train[15] t_remaining=32: `x_unmit=-1.7173051519154558e-02`, `x_rem=-2.9733388047658120e-02`, `y_exact=1.7820558093951380e-01`
+  - train[16] t_remaining=31: `x_unmit=4.2912873862158647e-02`, `x_rem=7.4453849898678523e-02`, `y_exact=-8.8641375175030637e-02`
+  - train[17] t_remaining=32: `x_unmit=-2.0188425302826378e-02`, `x_rem=-4.8937730978239127e-02`, `y_exact=-1.7686176935585871e-02`
+  - train[18] t_remaining=30: `x_unmit=-5.8214747736093142e-02`, `x_rem=-1.2690818193610609e-01`, `y_exact=5.9363136353591854e-02`
+  - train[19] t_remaining=32: `x_unmit=4.8076923076923080e-03`, `x_rem=8.0437919907901008e-03`, `y_exact=1.4635258091431122e-01`
+  - train[20] t_remaining=31: `x_unmit=-2.2576361221779549e-02`, `x_rem=-6.7411140776217043e-02`, `y_exact=-2.9587031783266293e-01`
+  - train[21] t_remaining=31: `x_unmit=-1.7676767676767676e-02`, `x_rem=-2.9912574628021788e-02`, `y_exact=1.7611972719867805e-01`
+  - train[22] t_remaining=30: `x_unmit=2.5445292620865138e-02`, `x_rem=3.4703444496779104e-02`, `y_exact=2.5339740891702272e-08`
+  - train[23] t_remaining=30: `x_unmit=-5.5276381909547742e-02`, `x_rem=-9.9313114878747902e-02`, `y_exact=-1.8754269094325037e-08`
+- target x values: `x_u_target=-3.5670356703567038e-02`, `x_r_target=-8.0738729465216735e-02`
+- target contribution to E_cdr_unmit: `-5.1287566510654740e-04`
+- target contribution to E_cdr_rem: `-5.4182788393961285e-04`
+
+### term 19
+- pauli term from int row: `(1.3066466930229781e-02)*Y(q(0, 0))*Y(q(0, 2))`
+- int observable row: `[2, 0, 2, 0, 0, 0, 0, 0]`
+- Hamiltonian weight w_19: `1.3066466930229781e-02`
+- OGM effective shots used for this term: `1930`
+- fitted unmit coeffs: `a_u=4.1855208862567048e+00`, `b_u=-1.2961670698884728e-02`
+- fitted rem coeffs: `a_r=3.0245337586323453e+00`, `b_r=-4.2402249964498054e-03`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=9.7650130548302877e-02`, `x_rem=1.3298269583692754e-01`, `y_exact=4.3097127329208879e-01`
+  - train[1] t_remaining=29: `x_unmit=7.5037518759379692e-03`, `x_rem=9.4964333608045844e-03`, `y_exact=5.8341049074477802e-09`
+  - train[2] t_remaining=30: `x_unmit=1.9308943089430895e-02`, `x_rem=2.4497277955041204e-02`, `y_exact=1.7507854934173745e-08`
+  - train[3] t_remaining=31: `x_unmit=8.1549439347604488e-02`, `x_rem=1.1124559535837227e-01`, `y_exact=4.5694110258035059e-01`
+  - train[4] t_remaining=30: `x_unmit=-6.3655030800821355e-02`, `x_rem=-8.9468076872293814e-02`, `y_exact=-1.9509045580984363e-01`
+  - train[5] t_remaining=31: `x_unmit=2.3350253807106598e-02`, `x_rem=2.6641304714846888e-02`, `y_exact=2.1257846096409113e-08`
+  - train[6] t_remaining=31: `x_unmit=-7.6180802437785678e-03`, `x_rem=-1.0634344535420955e-02`, `y_exact=1.0491733716098867e-08`
+  - train[7] t_remaining=31: `x_unmit=1.6639828234031134e-02`, `x_rem=1.9578963905581104e-02`, `y_exact=5.2410311911675022e-08`
+  - train[8] t_remaining=30: `x_unmit=-9.0909090909090912e-02`, `x_rem=-1.2898973575812239e-01`, `y_exact=-3.9781689116161084e-01`
+  - train[9] t_remaining=32: `x_unmit=-2.4065540194572452e-02`, `x_rem=-4.0570365904748253e-02`, `y_exact=-1.2917966962434313e-01`
+  - train[10] t_remaining=30: `x_unmit=-4.8000000000000001e-02`, `x_rem=-7.1840354767184006e-02`, `y_exact=-1.0709822956787945e-01`
+  - train[11] t_remaining=29: `x_unmit=8.8324873096446696e-02`, `x_rem=1.2059495537271939e-01`, `y_exact=5.3971309804452372e-01`
+  - train[12] t_remaining=30: `x_unmit=2.8907398334149927e-02`, `x_rem=3.7103567552534467e-02`, `y_exact=-1.6567148174504971e-09`
+  - train[13] t_remaining=29: `x_unmit=-4.4760400210637180e-02`, `x_rem=-6.1811619839593490e-02`, `y_exact=-1.5487089403349433e-01`
+  - train[14] t_remaining=32: `x_unmit=1.4877789585547290e-02`, `x_rem=1.9271143827272505e-02`, `y_exact=1.8475176863522014e-02`
+  - train[15] t_remaining=32: `x_unmit=7.8501795792714213e-02`, `x_rem=1.0533174668003034e-01`, `y_exact=1.9479385369454130e-01`
+  - train[16] t_remaining=31: `x_unmit=-6.7546978161503304e-02`, `x_rem=-9.8948896363703909e-02`, `y_exact=-3.4881131277354538e-01`
+  - train[17] t_remaining=32: `x_unmit=-4.8247841543930928e-02`, `x_rem=-6.8572294061275713e-02`, `y_exact=-2.4204232066910808e-01`
+  - train[18] t_remaining=30: `x_unmit=3.7017451084082496e-03`, `x_rem=1.2352830128945504e-03`, `y_exact=4.3453748639648430e-08`
+  - train[19] t_remaining=32: `x_unmit=-2.0661157024793389e-03`, `x_rem=-8.1476425207527656e-03`, `y_exact=-2.3137763901998376e-01`
+  - train[20] t_remaining=31: `x_unmit=1.7932489451476793e-02`, `x_rem=2.1630319870517473e-02`, `y_exact=2.6541005498284102e-08`
+  - train[21] t_remaining=31: `x_unmit=-3.5714285714285712e-02`, `x_rem=-5.2341668374666916e-02`, `y_exact=-1.0442542820549239e-01`
+  - train[22] t_remaining=30: `x_unmit=-4.8632218844984802e-02`, `x_rem=-6.9586441926867415e-02`, `y_exact=-1.7506334515944694e-01`
+  - train[23] t_remaining=30: `x_unmit=-5.0050050050050050e-03`, `x_rem=-8.9357650333259878e-03`, `y_exact=1.0043381253789871e-01`
+- target x values: `x_u_target=-3.2863849765258218e-02`, `x_r_target=-4.7706539805474860e-02`
+- target contribution to E_cdr_unmit: `-1.9666862073804401e-03`
+- target contribution to E_cdr_rem: `-1.9407657976638481e-03`
+
+### term 20
+- pauli term from int row: `(1.3066466930229781e-02)*X(q(0, 0))*X(q(0, 2))`
+- int observable row: `[1, 0, 1, 0, 0, 0, 0, 0]`
+- Hamiltonian weight w_20: `1.3066466930229781e-02`
+- OGM effective shots used for this term: `1996`
+- fitted unmit coeffs: `a_u=3.6255330447776353e+00`, `b_u=-1.8609009345175693e-02`
+- fitted rem coeffs: `a_r=2.6228193851714363e+00`, `b_r=-1.4980779418072463e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=1.0338069573738363e-01`, `x_rem=1.3827240027333240e-01`, `y_exact=4.3097127173671901e-01`
+  - train[1] t_remaining=29: `x_unmit=4.1898031297324584e-02`, `x_rem=5.3522320134403216e-02`, `y_exact=-2.4951268442576097e-08`
+  - train[2] t_remaining=30: `x_unmit=-1.0277492291880799e-03`, `x_rem=-1.0585133413699768e-03`, `y_exact=3.1333804885057188e-08`
+  - train[3] t_remaining=31: `x_unmit=1.2710566615620214e-01`, `x_rem=1.7656469826566565e-01`, `y_exact=4.5694112364260081e-01`
+  - train[4] t_remaining=30: `x_unmit=-7.7225774717166754e-02`, `x_rem=-1.0710690458869888e-01`, `y_exact=-1.9509045580984469e-01`
+  - train[5] t_remaining=31: `x_unmit=2.5150905432595575e-02`, `x_rem=3.0268082999103291e-02`, `y_exact=1.7683355433683487e-08`
+  - train[6] t_remaining=31: `x_unmit=-1.5002586652871184e-02`, `x_rem=-2.0595148104516826e-02`, `y_exact=7.0314305751467383e-09`
+  - train[7] t_remaining=31: `x_unmit=-4.8947626040137231e-04`, `x_rem=-3.0871734428197261e-03`, `y_exact=1.3262148301566213e-08`
+  - train[8] t_remaining=30: `x_unmit=-1.0956866633614279e-01`, `x_rem=-1.5565641053264545e-01`, `y_exact=-3.9781690151806431e-01`
+  - train[9] t_remaining=32: `x_unmit=-4.0594059405940595e-02`, `x_rem=-5.9087616078681029e-02`, `y_exact=-1.2917961363263589e-01`
+  - train[10] t_remaining=30: `x_unmit=-7.7760497667185057e-03`, `x_rem=-1.0383583971567122e-02`, `y_exact=-1.0709822956787100e-01`
+  - train[11] t_remaining=29: `x_unmit=1.2873326467559218e-01`, `x_rem=1.7704905679334859e-01`, `y_exact=5.3971309804446443e-01`
+  - train[12] t_remaining=30: `x_unmit=-2.6095519448547513e-02`, `x_rem=-3.4587507819485337e-02`, `y_exact=-1.1677313823625755e-09`
+  - train[13] t_remaining=29: `x_unmit=-3.8310412573673867e-02`, `x_rem=-5.3786826044720515e-02`, `y_exact=-1.5487089403350945e-01`
+  - train[14] t_remaining=32: `x_unmit=7.4515648286140089e-03`, `x_rem=8.7023042022860344e-03`, `y_exact=1.8475182434816190e-02`
+  - train[15] t_remaining=32: `x_unmit=4.5833333333333330e-02`, `x_rem=6.3452743902439018e-02`, `y_exact=1.9479384253453053e-01`
+  - train[16] t_remaining=31: `x_unmit=-7.9446437724243979e-02`, `x_rem=-1.1244049046426813e-01`, `y_exact=-3.4881132933715486e-01`
+  - train[17] t_remaining=32: `x_unmit=-2.0979020979020980e-02`, `x_rem=-3.0981213908043165e-02`, `y_exact=-2.4204233088641119e-01`
+  - train[18] t_remaining=30: `x_unmit=7.9443892750744784e-03`, `x_rem=5.0522176251824921e-03`, `y_exact=7.1568233618853158e-08`
+  - train[19] t_remaining=32: `x_unmit=-6.8859198355601239e-02`, `x_rem=-9.3322364598026994e-02`, `y_exact=-2.3137760078626465e-01`
+  - train[20] t_remaining=31: `x_unmit=9.0725806451612909e-03`, `x_rem=9.0066429439954639e-03`, `y_exact=3.8160114175858806e-08`
+  - train[21] t_remaining=31: `x_unmit=-3.1872509960159362e-02`, `x_rem=-4.3635877774931310e-02`, `y_exact=-1.0442546205815806e-01`
+  - train[22] t_remaining=30: `x_unmit=1.8144116122343183e-02`, `x_rem=2.9588645243161054e-02`, `y_exact=-1.7506341047772814e-01`
+  - train[23] t_remaining=30: `x_unmit=3.0713170223841749e-02`, `x_rem=4.0004224518133687e-02`, `y_exact=1.0043378300065836e-01`
+- target x values: `x_u_target=1.2295081967213115e-02`, `x_r_target=1.7097706371996663e-02`
+- target contribution to E_cdr_unmit: `3.3929977717269029e-04`
+- target contribution to E_cdr_rem: `3.9020934146019815e-04`
+
+### term 21
+- pauli term from int row: `(6.2676336633941477e-03)*Y(q(0, 0))*X(q(0, 1))*X(q(0, 2))*Y(q(0, 3))`
+- int observable row: `[2, 1, 1, 2, 0, 0, 0, 0]`
+- Hamiltonian weight w_21: `6.2676336633941477e-03`
+- OGM effective shots used for this term: `45`
+- fitted unmit coeffs: `a_u=-3.6247319445225870e-02`, `b_u=9.7726160112311024e-03`
+- fitted rem coeffs: `a_r=-1.6293977893942352e-02`, `b_r=1.0022293100864919e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-3.1428571428571428e-01`, `x_rem=-6.4686842387190835e-01`, `y_exact=7.7248093084395258e-02`
+  - train[1] t_remaining=29: `x_unmit=-2.2580645161290322e-01`, `x_rem=-4.4836062617337202e-01`, `y_exact=-2.2500506431959442e-08`
+  - train[2] t_remaining=30: `x_unmit=1.5151515151515152e-01`, `x_rem=3.8285045823848479e-01`, `y_exact=3.0905028487251117e-08`
+  - train[3] t_remaining=31: `x_unmit=8.1081081081081086e-02`, `x_rem=1.5635854660244905e-01`, `y_exact=-6.5343295226079623e-02`
+  - train[4] t_remaining=30: `x_unmit=-3.1250000000000000e-01`, `x_rem=-6.5601505540529925e-01`, `y_exact=-4.2126065417470732e-09`
+  - train[5] t_remaining=31: `x_unmit=-1.4999999999999999e-01`, `x_rem=-2.5587826807339009e-01`, `y_exact=-1.4416676158572054e-08`
+  - train[6] t_remaining=31: `x_unmit=-3.1914893617021278e-01`, `x_rem=-7.4865525410413847e-01`, `y_exact=-2.3288656561762505e-08`
+  - train[7] t_remaining=31: `x_unmit=-2.5641025641025640e-02`, `x_rem=-7.5894781335681824e-02`, `y_exact=1.7533152681471998e-08`
+  - train[8] t_remaining=30: `x_unmit=-8.5714285714285715e-02`, `x_rem=-1.6566553848783816e-01`, `y_exact=7.1775488255117499e-10`
+  - train[9] t_remaining=32: `x_unmit=2.5581395348837210e-01`, `x_rem=4.6434135600329607e-01`, `y_exact=1.6563706914839629e-02`
+  - train[10] t_remaining=30: `x_unmit=0.0000000000000000e+00`, `x_rem=-9.0654602849723938e-03`, `y_exact=8.4191562741339834e-02`
+  - train[11] t_remaining=29: `x_unmit=4.3478260869565216e-02`, `x_rem=1.0156474843643447e-01`, `y_exact=1.2226200128023219e-08`
+  - train[12] t_remaining=30: `x_unmit=-6.6666666666666666e-02`, `x_rem=-7.4539733076318476e-02`, `y_exact=4.2613667141705803e-09`
+  - train[13] t_remaining=29: `x_unmit=-8.3333333333333329e-02`, `x_rem=-1.2849943642626571e-01`, `y_exact=6.9966899504895805e-02`
+  - train[14] t_remaining=32: `x_unmit=2.8571428571428571e-02`, `x_rem=5.8001618977228796e-02`, `y_exact=5.5677785154133585e-03`
+  - train[15] t_remaining=32: `x_unmit=-2.2580645161290322e-01`, `x_rem=-4.8476097728654771e-01`, `y_exact=1.4402197672050285e-02`
+  - train[16] t_remaining=31: `x_unmit=0.0000000000000000e+00`, `x_rem=-5.0763360662930197e-02`, `y_exact=3.3796403524453483e-02`
+  - train[17] t_remaining=32: `x_unmit=1.1764705882352941e-01`, `x_rem=2.6342906256823051e-01`, `y_exact=6.3872124579527709e-03`
+  - train[18] t_remaining=30: `x_unmit=-1.5789473684210525e-01`, `x_rem=-3.6053292022483285e-01`, `y_exact=-1.4687140966500788e-08`
+  - train[19] t_remaining=32: `x_unmit=7.3170731707317069e-02`, `x_rem=1.4427795748438219e-01`, `y_exact=-1.1828136907195712e-02`
+  - train[20] t_remaining=31: `x_unmit=0.0000000000000000e+00`, `x_rem=2.7233642124528022e-02`, `y_exact=-1.5438086495570367e-08`
+  - train[21] t_remaining=31: `x_unmit=0.0000000000000000e+00`, `x_rem=-1.4155221472294598e-02`, `y_exact=3.3190013720758180e-02`
+  - train[22] t_remaining=30: `x_unmit=3.7931034482758619e-01`, `x_rem=9.2873820880549207e-01`, `y_exact=5.1176006431660009e-09`
+  - train[23] t_remaining=30: `x_unmit=1.9607843137254902e-02`, `x_rem=1.4401900772058585e-01`, `y_exact=-3.5365734456346716e-09`
+- target x values: `x_u_target=-1.4893617021276595e-01`, `x_r_target=-3.0662481726311508e-01`
+- target contribution to E_cdr_unmit: `9.5087228941180364e-05`
+- target contribution to E_cdr_rem: `9.4130024302915347e-05`
+
+### term 22
+- pauli term from int row: `(1.6100735746573811e-02)*Y(q(0, 0))*Y(q(0, 1))*Y(q(0, 2))*Y(q(0, 3))`
+- int observable row: `[2, 2, 2, 2, 0, 0, 0, 0]`
+- Hamiltonian weight w_22: `1.6100735746573811e-02`
+- OGM effective shots used for this term: `1189`
+- fitted unmit coeffs: `a_u=-1.0758201698544269e-01`, `b_u=2.1927221054557765e-02`
+- fitted rem coeffs: `a_r=-9.8401584068464346e-02`, `b_r=2.2766210079701827e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-2.7027027027027029e-02`, `x_rem=-6.9618508642898855e-02`, `y_exact=1.2607176689651370e-01`
+  - train[1] t_remaining=29: `x_unmit=7.4074074074074077e-03`, `x_rem=1.9826293237916258e-02`, `y_exact=-2.0643398700231513e-08`
+  - train[2] t_remaining=30: `x_unmit=-3.7098103874690848e-02`, `x_rem=-7.9665056199751449e-02`, `y_exact=-1.8271009846698576e-08`
+  - train[3] t_remaining=31: `x_unmit=2.6755852842809364e-02`, `x_rem=5.8190361722460594e-02`, `y_exact=2.4159881707448477e-01`
+  - train[4] t_remaining=30: `x_unmit=5.1369863013698627e-03`, `x_rem=9.0671384523706797e-03`, `y_exact=-3.8820502719645453e-08`
+  - train[5] t_remaining=31: `x_unmit=3.0927835051546393e-02`, `x_rem=6.1860177650974728e-02`, `y_exact=-7.4226153229728764e-09`
+  - train[6] t_remaining=31: `x_unmit=6.6334991708126038e-03`, `x_rem=1.3827813124015062e-02`, `y_exact=-2.2953112530956118e-08`
+  - train[7] t_remaining=31: `x_unmit=-1.0582010582010581e-02`, `x_rem=-2.7980684710585329e-02`, `y_exact=-1.6663505299713715e-08`
+  - train[8] t_remaining=30: `x_unmit=2.8764805414551606e-02`, `x_rem=6.8761749212411585e-02`, `y_exact=9.8065192254217206e-09`
+  - train[9] t_remaining=32: `x_unmit=-1.5793848711554447e-02`, `x_rem=-4.0221562999982752e-02`, `y_exact=-2.1414886510017644e-02`
+  - train[10] t_remaining=30: `x_unmit=-1.6813450760608487e-02`, `x_rem=-4.0507169996127003e-02`, `y_exact=1.4669602781571338e-08`
+  - train[11] t_remaining=29: `x_unmit=-5.8873002523128683e-03`, `x_rem=-1.5488291842678567e-02`, `y_exact=-6.9655529079131661e-09`
+  - train[12] t_remaining=30: `x_unmit=4.2071197411003236e-02`, `x_rem=9.1852053017101559e-02`, `y_exact=1.8989613644800045e-09`
+  - train[13] t_remaining=29: `x_unmit=1.7123287671232876e-03`, `x_rem=8.4275109751220760e-03`, `y_exact=-7.4338487417120722e-02`
+  - train[14] t_remaining=32: `x_unmit=3.2314410480349345e-02`, `x_rem=6.7570280159480314e-02`, `y_exact=-1.6333329675670644e-04`
+  - train[15] t_remaining=32: `x_unmit=-2.0236087689713321e-02`, `x_rem=-3.9033470037459647e-02`, `y_exact=2.9464018757064738e-08`
+  - train[16] t_remaining=31: `x_unmit=3.5294117647058823e-02`, `x_rem=7.1429811335529753e-02`, `y_exact=9.3159399118825387e-03`
+  - train[17] t_remaining=32: `x_unmit=7.4407195421095668e-02`, `x_rem=1.6041941558962877e-01`, `y_exact=-1.6144544920076748e-02`
+  - train[18] t_remaining=30: `x_unmit=4.0139616055846421e-02`, `x_rem=7.9032910599760337e-02`, `y_exact=-1.9432070866433908e-09`
+  - train[19] t_remaining=32: `x_unmit=1.7331022530329289e-02`, `x_rem=2.3029498998556795e-02`, `y_exact=8.6370623365842808e-02`
+  - train[20] t_remaining=31: `x_unmit=3.3361847733105215e-02`, `x_rem=8.3209267335787832e-02`, `y_exact=-7.0137885074224732e-09`
+  - train[21] t_remaining=31: `x_unmit=-6.9444444444444415e-03`, `x_rem=-2.7185396468933025e-02`, `y_exact=1.5098104856911834e-01`
+  - train[22] t_remaining=30: `x_unmit=4.0551500405515001e-03`, `x_rem=8.8198023038687807e-04`, `y_exact=1.4349525102057041e-08`
+  - train[23] t_remaining=30: `x_unmit=-2.3064250411861616e-02`, `x_rem=-2.9398714133716357e-02`, `y_exact=-2.2181266655575811e-08`
+- target x values: `x_u_target=-1.4234875444839857e-02`, `x_r_target=-2.9072625722222103e-02`
+- target contribution to E_cdr_unmit: `3.7770132604213739e-04`
+- target contribution to E_cdr_rem: `4.1261359529043808e-04`
+
+### term 23
+- pauli term from int row: `(9.8331020831796678e-03)*Y(q(0, 0))*Y(q(0, 1))*X(q(0, 2))*X(q(0, 3))`
+- int observable row: `[2, 2, 1, 1, 0, 0, 0, 0]`
+- Hamiltonian weight w_23: `9.8331020831796678e-03`
+- OGM effective shots used for this term: `99`
+- fitted unmit coeffs: `a_u=1.3303941713865644e-01`, `b_u=1.7524189952089172e-03`
+- fitted rem coeffs: `a_r=5.3483293631086871e-02`, `b_r=1.7315508529833425e-03`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=1.1627906976744186e-01`, `x_rem=2.3127889945813954e-01`, `y_exact=6.7114079041512217e-02`
+  - train[1] t_remaining=29: `x_unmit=4.1666666666666664e-02`, `x_rem=1.1288068300263422e-01`, `y_exact=-2.5100864492776049e-08`
+  - train[2] t_remaining=30: `x_unmit=3.7735849056603772e-02`, `x_rem=7.7030245921180102e-02`, `y_exact=-3.4496810870094571e-08`
+  - train[3] t_remaining=31: `x_unmit=2.1739130434782608e-02`, `x_rem=2.1869493767690987e-02`, `y_exact=6.5343302447765900e-02`
+  - train[4] t_remaining=30: `x_unmit=2.8037383177570093e-02`, `x_rem=7.6371163218667160e-02`, `y_exact=4.2126172811144846e-09`
+  - train[5] t_remaining=31: `x_unmit=1.0256410256410256e-01`, `x_rem=2.2081184745349849e-01`, `y_exact=1.2226578468247657e-08`
+  - train[6] t_remaining=31: `x_unmit=2.8037383177570093e-02`, `x_rem=6.4813184940834712e-02`, `y_exact=1.2271205870191912e-08`
+  - train[7] t_remaining=31: `x_unmit=2.4731182795698925e-01`, `x_rem=5.0603946276644940e-01`, `y_exact=-2.2319544117407122e-08`
+  - train[8] t_remaining=30: `x_unmit=9.0090090090090089e-03`, `x_rem=3.6884036884036894e-02`, `y_exact=1.1648320532849005e-09`
+  - train[9] t_remaining=32: `x_unmit=-7.6923076923076927e-02`, `x_rem=-1.0151366248927224e-01`, `y_exact=3.0266621649418031e-03`
+  - train[10] t_remaining=30: `x_unmit=-1.2000000000000000e-01`, `x_rem=-2.3849050678318981e-01`, `y_exact=-8.4191562741330495e-02`
+  - train[11] t_remaining=29: `x_unmit=-1.1340206185567010e-01`, `x_rem=-2.1999937312987350e-01`, `y_exact=-1.2226200879331201e-08`
+  - train[12] t_remaining=30: `x_unmit=-1.1764705882352941e-02`, `x_rem=-7.0743858405264894e-03`, `y_exact=9.3398478295488427e-11`
+  - train[13] t_remaining=29: `x_unmit=-5.9999999999999991e-02`, `x_rem=-1.5178588349320055e-01`, `y_exact=-6.9966899504892821e-02`
+  - train[14] t_remaining=32: `x_unmit=-2.0000000000000001e-01`, `x_rem=-4.1147311161658362e-01`, `y_exact=-2.5778699542680535e-02`
+  - train[15] t_remaining=32: `x_unmit=0.0000000000000000e+00`, `x_rem=-3.0514201245908566e-02`, `y_exact=-1.4402166917123000e-02`
+  - train[16] t_remaining=31: `x_unmit=1.0526315789473684e-02`, `x_rem=5.1294590447350352e-02`, `y_exact=-3.3796389315322140e-02`
+  - train[17] t_remaining=32: `x_unmit=1.9230769230769232e-02`, `x_rem=5.5888347633188187e-02`, `y_exact=-5.9081431255164379e-02`
+  - train[18] t_remaining=30: `x_unmit=-3.0927835051546393e-02`, `x_rem=-5.9484616185647106e-02`, `y_exact=2.4208714724947395e-08`
+  - train[19] t_remaining=32: `x_unmit=-1.9230769230769232e-02`, `x_rem=-6.1160280203432185e-02`, `y_exact=1.5091241891586965e-01`
+  - train[20] t_remaining=31: `x_unmit=-1.9230769230769232e-02`, `x_rem=-9.0417712368931827e-03`, `y_exact=-5.3737618747454910e-09`
+  - train[21] t_remaining=31: `x_unmit=3.7974683544303806e-02`, `x_rem=3.3973984576022333e-02`, `y_exact=8.1295568197951446e-02`
+  - train[22] t_remaining=30: `x_unmit=1.0679611650485436e-01`, `x_rem=2.4126982024211477e-01`, `y_exact=4.7354353069689649e-09`
+  - train[23] t_remaining=30: `x_unmit=1.3333333333333333e-01`, `x_rem=2.8779140161253985e-01`, `y_exact=-6.8246033374276476e-10`
+- target x values: `x_u_target=5.2631578947368418e-02`, `x_r_target=1.0764816413083428e-01`
+- target contribution to E_cdr_unmit: `8.6083829072978289e-05`
+- target contribution to E_cdr_rem: `7.3639405553694649e-05`
+
+### term 24
+- pauli term from int row: `(9.8331020831796678e-03)*X(q(0, 0))*X(q(0, 1))*Y(q(0, 2))*Y(q(0, 3))`
+- int observable row: `[1, 1, 2, 2, 0, 0, 0, 0]`
+- Hamiltonian weight w_24: `9.8331020831796678e-03`
+- OGM effective shots used for this term: `96`
+- fitted unmit coeffs: `a_u=-7.1042995766454481e-02`, `b_u=6.2833069564380180e-03`
+- fitted rem coeffs: `a_r=-2.8792989123732980e-02`, `b_r=5.8170207786749847e-03`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=1.0679611650485436e-01`, `x_rem=2.5272598845887984e-01`, `y_exact=6.7114079041505723e-02`
+  - train[1] t_remaining=29: `x_unmit=2.0833333333333325e-02`, `x_rem=5.9932840420645263e-02`, `y_exact=-2.5100873004807686e-08`
+  - train[2] t_remaining=30: `x_unmit=1.2643678160919541e-01`, `x_rem=2.4889442551343302e-01`, `y_exact=-3.4496809420110941e-08`
+  - train[3] t_remaining=31: `x_unmit=-1.7525773195876287e-01`, `x_rem=-3.3870697235042213e-01`, `y_exact=6.5343302447758822e-02`
+  - train[4] t_remaining=30: `x_unmit=5.4945054945054944e-02`, `x_rem=1.4680855045368577e-01`, `y_exact=4.2126120005525151e-09`
+  - train[5] t_remaining=31: `x_unmit=0.0000000000000000e+00`, `x_rem=-5.5926930572420350e-03`, `y_exact=1.2226574252712147e-08`
+  - train[6] t_remaining=31: `x_unmit=1.2727272727272726e-01`, `x_rem=2.6260977258759965e-01`, `y_exact=1.2271210376242852e-08`
+  - train[7] t_remaining=31: `x_unmit=0.0000000000000000e+00`, `x_rem=-1.8418851991305395e-02`, `y_exact=-2.2319538526991592e-08`
+  - train[8] t_remaining=30: `x_unmit=1.6504854368932040e-01`, `x_rem=3.3027098667638571e-01`, `y_exact=1.1648261357538600e-09`
+  - train[9] t_remaining=32: `x_unmit=1.0638297872340426e-01`, `x_rem=2.6525760464525378e-01`, `y_exact=3.0266621649388441e-03`
+  - train[10] t_remaining=30: `x_unmit=-8.1300813008130090e-03`, `x_rem=-3.9725141450305028e-02`, `y_exact=-8.4191562741331355e-02`
+  - train[11] t_remaining=29: `x_unmit=-3.6363636363636362e-02`, `x_rem=-6.9956158647954694e-02`, `y_exact=-1.2226195526076453e-08`
+  - train[12] t_remaining=30: `x_unmit=1.4545454545454545e-01`, `x_rem=2.9398760884348468e-01`, `y_exact=9.3408621135489072e-11`
+  - train[13] t_remaining=29: `x_unmit=-1.9607843137254902e-02`, `x_rem=-3.5886373045626974e-02`, `y_exact=-6.9966899504895153e-02`
+  - train[14] t_remaining=32: `x_unmit=1.0091743119266056e-01`, `x_rem=1.9648897384408687e-01`, `y_exact=-2.5778699542670702e-02`
+  - train[15] t_remaining=32: `x_unmit=2.0879120879120880e-01`, `x_rem=4.2140366557412934e-01`, `y_exact=-1.4402166917116113e-02`
+  - train[16] t_remaining=31: `x_unmit=8.5106382978723402e-02`, `x_rem=1.2589687888079176e-01`, `y_exact=-3.3796389315328516e-02`
+  - train[17] t_remaining=32: `x_unmit=1.0416666666666667e-01`, `x_rem=2.0449948651168162e-01`, `y_exact=-5.9081431255168362e-02`
+  - train[18] t_remaining=30: `x_unmit=1.9480519480519481e-01`, `x_rem=3.9342306938125754e-01`, `y_exact=2.4208719349529117e-08`
+  - train[19] t_remaining=32: `x_unmit=-5.3571428571428568e-02`, `x_rem=-1.2531148680974463e-01`, `y_exact=1.5091241891586879e-01`
+  - train[20] t_remaining=31: `x_unmit=2.6086956521739129e-02`, `x_rem=7.9316465318586202e-02`, `y_exact=-5.3737720776659845e-09`
+  - train[21] t_remaining=31: `x_unmit=8.5106382978723402e-02`, `x_rem=1.8700454247937387e-01`, `y_exact=8.1295568197961410e-02`
+  - train[22] t_remaining=30: `x_unmit=-2.4489795918367346e-01`, `x_rem=-5.4352643650801946e-01`, `y_exact=4.7354373768485840e-09`
+  - train[23] t_remaining=30: `x_unmit=-1.3043478260869565e-01`, `x_rem=-2.3764476362567563e-01`, `y_exact=-6.8245940724126714e-10`
+- target x values: `x_u_target=-1.1340206185567010e-01`, `x_r_target=-2.9028502299812325e-01`
+- target contribution to E_cdr_unmit: `1.4100402064354538e-04`
+- target contribution to E_cdr_rem: `1.3938613248912733e-04`
+
+### term 25
+- pauli term from int row: `(1.6100735746573811e-02)*X(q(0, 0))*X(q(0, 1))*X(q(0, 2))*X(q(0, 3))`
+- int observable row: `[1, 1, 1, 1, 0, 0, 0, 0]`
+- Hamiltonian weight w_25: `1.6100735746573811e-02`
+- OGM effective shots used for this term: `1198`
+- fitted unmit coeffs: `a_u=-3.2270793314819390e-01`, `b_u=2.1883229112706001e-02`
+- fitted rem coeffs: `a_r=-1.5626122924109589e-01`, `b_r=2.2077736770301240e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=6.2193126022913256e-02`, `x_rem=1.3680802008613274e-01`, `y_exact=1.2607176689651642e-01`
+  - train[1] t_remaining=29: `x_unmit=3.3444816053511704e-02`, `x_rem=7.1809696860679839e-02`, `y_exact=-2.0643400316242001e-08`
+  - train[2] t_remaining=30: `x_unmit=2.5531914893617020e-03`, `x_rem=1.4588767053738527e-02`, `y_exact=-1.8271010372369198e-08`
+  - train[3] t_remaining=31: `x_unmit=-8.0033698399326031e-02`, `x_rem=-1.6680374668333656e-01`, `y_exact=2.4159881707448927e-01`
+  - train[4] t_remaining=30: `x_unmit=3.7098103874690848e-02`, `x_rem=7.4192618820934031e-02`, `y_exact=-3.8820501693321597e-08`
+  - train[5] t_remaining=31: `x_unmit=-3.8525963149078725e-02`, `x_rem=-7.6005676446906992e-02`, `y_exact=-7.4226035299231651e-09`
+  - train[6] t_remaining=31: `x_unmit=1.2089810017271158e-02`, `x_rem=2.5366702606687476e-02`, `y_exact=-2.2953123880058950e-08`
+  - train[7] t_remaining=31: `x_unmit=-2.6981450252951095e-02`, `x_rem=-3.9775586108823480e-02`, `y_exact=-1.6663502026924884e-08`
+  - train[8] t_remaining=30: `x_unmit=-6.6445182724252493e-03`, `x_rem=-1.6677301216641613e-02`, `y_exact=9.8065200589732253e-09`
+  - train[9] t_remaining=32: `x_unmit=-3.5369774919614148e-02`, `x_rem=-7.4675287678189400e-02`, `y_exact=-2.1414886510027979e-02`
+  - train[10] t_remaining=30: `x_unmit=5.6374674761491758e-02`, `x_rem=1.1507685088799047e-01`, `y_exact=1.4669601534223175e-08`
+  - train[11] t_remaining=29: `x_unmit=1.1986301369863013e-02`, `x_rem=2.2463156066564023e-02`, `y_exact=-6.9655516540357624e-09`
+  - train[12] t_remaining=30: `x_unmit=-1.4705882352941176e-02`, `x_rem=-3.5507259801855678e-02`, `y_exact=1.8989599144294310e-09`
+  - train[13] t_remaining=29: `x_unmit=3.1746031746031746e-03`, `x_rem=9.1602809372844478e-03`, `y_exact=-7.4338487417121915e-02`
+  - train[14] t_remaining=32: `x_unmit=2.0066889632107024e-02`, `x_rem=4.1246297547790328e-02`, `y_exact=-1.6333329675586515e-04`
+  - train[15] t_remaining=32: `x_unmit=1.7152658662092624e-03`, `x_rem=6.4496530212131177e-03`, `y_exact=2.9464029764768983e-08`
+  - train[16] t_remaining=31: `x_unmit=1.5517241379310345e-02`, `x_rem=3.4555062729999649e-02`, `y_exact=9.3159399118783511e-03`
+  - train[17] t_remaining=32: `x_unmit=-4.4971381847914965e-02`, `x_rem=-9.3966704221375832e-02`, `y_exact=-1.6144544920073188e-02`
+  - train[18] t_remaining=30: `x_unmit=-4.0816326530612249e-03`, `x_rem=-1.1162776717779191e-02`, `y_exact=-1.9431979918614285e-09`
+  - train[19] t_remaining=32: `x_unmit=0.0000000000000000e+00`, `x_rem=1.4929961473623804e-02`, `y_exact=8.6370623365844376e-02`
+  - train[20] t_remaining=31: `x_unmit=5.6255247691015954e-02`, `x_rem=1.1491370881921971e-01`, `y_exact=-7.0137893111819382e-09`
+  - train[21] t_remaining=31: `x_unmit=1.8032786885245903e-02`, `x_rem=2.6482868945883749e-02`, `y_exact=1.5098104856912237e-01`
+  - train[22] t_remaining=30: `x_unmit=2.3417172593235037e-02`, `x_rem=5.6730587519832995e-02`, `y_exact=1.4349526926476507e-08`
+  - train[23] t_remaining=30: `x_unmit=-3.1578947368421054e-02`, `x_rem=-7.3644061448939452e-02`, `y_exact=-2.2181260507424936e-08`
+- target x values: `x_u_target=-9.0534979423868307e-03`, `x_r_target=-1.3116997760177494e-02`
+- target contribution to E_cdr_unmit: `3.9937657210965951e-04`
+- target contribution to E_cdr_rem: `3.8846913258746923e-04`
+
+### term 26
+- pauli term from int row: `(6.2676336633941477e-03)*X(q(0, 0))*Y(q(0, 1))*Y(q(0, 2))*X(q(0, 3))`
+- int observable row: `[1, 2, 2, 1, 0, 0, 0, 0]`
+- Hamiltonian weight w_26: `6.2676336633941477e-03`
+- OGM effective shots used for this term: `34`
+- fitted unmit coeffs: `a_u=-4.1447118937537886e-02`, `b_u=9.1595860813673581e-03`
+- fitted rem coeffs: `a_r=-2.3566089596129138e-02`, `b_r=8.4732261242398740e-03`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-3.2258064516129031e-02`, `x_rem=-1.0650910414875786e-01`, `y_exact=7.7248093084390831e-02`
+  - train[1] t_remaining=29: `x_unmit=-1.6666666666666666e-01`, `x_rem=-3.6512388544908869e-01`, `y_exact=-2.2500518201042039e-08`
+  - train[2] t_remaining=30: `x_unmit=-2.0000000000000001e-01`, `x_rem=-4.4905617031052575e-01`, `y_exact=3.0905031738773062e-08`
+  - train[3] t_remaining=31: `x_unmit=2.7777777777777779e-01`, `x_rem=5.1047221372424600e-01`, `y_exact=-6.5343295226084147e-02`
+  - train[4] t_remaining=30: `x_unmit=1.2820512820512819e-01`, `x_rem=2.5535620657571889e-01`, `y_exact=-4.2126088108927052e-09`
+  - train[5] t_remaining=31: `x_unmit=7.3170731707317069e-02`, `x_rem=1.2214396747412809e-01`, `y_exact=-1.4416683118588847e-08`
+  - train[6] t_remaining=31: `x_unmit=-2.5641025641025640e-02`, `x_rem=-6.0105553538949349e-02`, `y_exact=-2.3288638413733962e-08`
+  - train[7] t_remaining=31: `x_unmit=-2.3255813953488372e-02`, `x_rem=-5.5737921875188043e-02`, `y_exact=1.7533158857330498e-08`
+  - train[8] t_remaining=30: `x_unmit=-2.1212121212121213e-01`, `x_rem=-4.1379889716918544e-01`, `y_exact=7.1775084037211138e-10`
+  - train[9] t_remaining=32: `x_unmit=1.1111111111111110e-01`, `x_rem=2.5519827958852348e-01`, `y_exact=1.6563706914822396e-02`
+  - train[10] t_remaining=30: `x_unmit=-2.0000000000000001e-01`, `x_rem=-4.4312327239156496e-01`, `y_exact=8.4191562741335532e-02`
+  - train[11] t_remaining=29: `x_unmit=-2.3076923076923078e-01`, `x_rem=-4.9255129555317179e-01`, `y_exact=1.2226196645125554e-08`
+  - train[12] t_remaining=30: `x_unmit=-2.5581395348837210e-01`, `x_rem=-5.3716548781778517e-01`, `y_exact=4.2613594845068746e-09`
+  - train[13] t_remaining=29: `x_unmit=-6.3829787234042548e-02`, `x_rem=-2.1571359505972884e-01`, `y_exact=6.9966899504896693e-02`
+  - train[14] t_remaining=32: `x_unmit=3.0769230769230771e-01`, `x_rem=6.0469070225167798e-01`, `y_exact=5.5677785154103461e-03`
+  - train[15] t_remaining=32: `x_unmit=-1.3043478260869565e-01`, `x_rem=-2.5192881820665491e-01`, `y_exact=1.4402197672057526e-02`
+  - train[16] t_remaining=31: `x_unmit=0.0000000000000000e+00`, `x_rem=-1.0769215298832004e-01`, `y_exact=3.3796403524440861e-02`
+  - train[17] t_remaining=32: `x_unmit=-1.3513513513513514e-01`, `x_rem=-2.6171748122967653e-01`, `y_exact=6.3872124579541214e-03`
+  - train[18] t_remaining=30: `x_unmit=1.7073170731707318e-01`, `x_rem=3.0833823457261894e-01`, `y_exact=-1.4687126287101720e-08`
+  - train[19] t_remaining=32: `x_unmit=-3.0232558139534882e-01`, `x_rem=-6.5294748108134371e-01`, `y_exact=-1.1828136907191054e-02`
+  - train[20] t_remaining=31: `x_unmit=-5.5555555555555552e-02`, `x_rem=-7.2507739174405880e-02`, `y_exact=-1.5438085333988975e-08`
+  - train[21] t_remaining=31: `x_unmit=-1.2820512820512819e-01`, `x_rem=-2.6606664130116292e-01`, `y_exact=3.3190013720760296e-02`
+  - train[22] t_remaining=30: `x_unmit=-2.2580645161290322e-01`, `x_rem=-3.5856494235723207e-01`, `y_exact=5.1176076568754448e-09`
+  - train[23] t_remaining=30: `x_unmit=2.5000000000000000e-01`, `x_rem=4.7476981013566383e-01`, `y_exact=-3.5365792967827083e-09`
+- target x values: `x_u_target=1.5555555555555556e-01`, `x_r_target=3.1994082400586477e-01`
+- target contribution to E_cdr_unmit: `1.6999429947994658e-05`
+- target contribution to E_cdr_rem: `5.8506605326546702e-06`
+
+### term 27
+- pauli term from int row: `(4.8601141850978559e-02)*Z(q(0, 0))*Z(q(0, 2))`
+- int observable row: `[3, 0, 3, 0, 0, 0, 0, 0]`
+- Hamiltonian weight w_27: `4.8601141850978559e-02`
+- OGM effective shots used for this term: `2703`
+- fitted unmit coeffs: `a_u=2.9451333781712479e+00`, `b_u=-1.5990688258774791e-01`
+- fitted rem coeffs: `a_r=2.1997009736738882e+00`, `b_r=-2.2061493657060810e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-1.2361213915618061e-01`, `x_rem=-2.0595157401678313e-01`, `y_exact=-5.5654425324267909e-01`
+  - train[1] t_remaining=29: `x_unmit=3.0147058823529412e-02`, `x_rem=-2.8861516890569875e-02`, `y_exact=-6.1480273766508449e-02`
+  - train[2] t_remaining=30: `x_unmit=-2.6082130965593786e-01`, `x_rem=-4.1955476915277679e-01`, `y_exact=-9.3408634193712081e-01`
+  - train[3] t_remaining=31: `x_unmit=-2.6766595289079231e-01`, `x_rem=-3.9959816475719750e-01`, `y_exact=-8.9407059848706816e-01`
+  - train[4] t_remaining=30: `x_unmit=-3.0441230997404523e-01`, `x_rem=-4.7602822220961616e-01`, `y_exact=-1.0000001970204537e+00`
+  - train[5] t_remaining=31: `x_unmit=-1.4481762369086312e-01`, `x_rem=-2.6564578213496109e-01`, `y_exact=-7.6564161517279405e-01`
+  - train[6] t_remaining=31: `x_unmit=-2.4572260647979613e-01`, `x_rem=-3.9935967235371461e-01`, `y_exact=-8.4693855651480554e-01`
+  - train[7] t_remaining=31: `x_unmit=-5.0884955752212392e-02`, `x_rem=-1.3673155034044301e-01`, `y_exact=-4.3650217546390291e-01`
+  - train[8] t_remaining=30: `x_unmit=-1.1792975970425139e-01`, `x_rem=-2.2456361095286295e-01`, `y_exact=-5.2975041470223061e-01`
+  - train[9] t_remaining=32: `x_unmit=2.5602968460111317e-02`, `x_rem=-2.9057258864037351e-02`, `y_exact=2.9770800724061207e-02`
+  - train[10] t_remaining=30: `x_unmit=-2.7246057939127244e-01`, `x_rem=-4.2936041571636835e-01`, `y_exact=-1.0000001886277898e+00`
+  - train[11] t_remaining=29: `x_unmit=-2.9339588596174665e-01`, `x_rem=-4.4399229908115484e-01`, `y_exact=-1.0000001705798303e+00`
+  - train[12] t_remaining=30: `x_unmit=-2.7920337035618537e-01`, `x_rem=-4.4418208483467092e-01`, `y_exact=-9.7565717486498849e-01`
+  - train[13] t_remaining=29: `x_unmit=-2.8475336322869954e-01`, `x_rem=-4.4668963505778542e-01`, `y_exact=-1.0000001160748229e+00`
+  - train[14] t_remaining=32: `x_unmit=-1.5865039483129936e-01`, `x_rem=-2.8276399418696263e-01`, `y_exact=-7.7770363812039767e-01`
+  - train[15] t_remaining=32: `x_unmit=-3.7708484408992021e-02`, `x_rem=-9.7552936106854560e-02`, `y_exact=-1.3674952484726685e-01`
+  - train[16] t_remaining=31: `x_unmit=-2.2782480677217520e-01`, `x_rem=-3.7061998568592103e-01`, `y_exact=-8.3189781015306208e-01`
+  - train[17] t_remaining=32: `x_unmit=-1.1869328493647913e-01`, `x_rem=-2.2276167902744851e-01`, `y_exact=-2.6225537791259917e-01`
+  - train[18] t_remaining=30: `x_unmit=5.2517985611510790e-02`, `x_rem=2.0976566861811000e-03`, `y_exact=5.7332028860917025e-02`
+  - train[19] t_remaining=32: `x_unmit=3.3226152197213289e-02`, `x_rem=-1.7478130057535495e-02`, `y_exact=-2.1793275205883911e-01`
+  - train[20] t_remaining=31: `x_unmit=-4.6411995715815784e-03`, `x_rem=-7.4915040637212937e-02`, `y_exact=-1.5047877330125742e-01`
+  - train[21] t_remaining=31: `x_unmit=-2.7827972533429706e-02`, `x_rem=-1.0649386137058785e-01`, `y_exact=-2.2162086559371777e-01`
+  - train[22] t_remaining=30: `x_unmit=1.3071895424836602e-02`, `x_rem=-4.8142834369520063e-02`, `y_exact=-8.8252526859786004e-02`
+  - train[23] t_remaining=30: `x_unmit=-6.8322981366459631e-02`, `x_rem=-1.3285987295718432e-01`, `y_exact=-4.6965847782976200e-01`
+- target x values: `x_u_target=-9.8150782361308683e-02`, `x_r_target=-1.7979091823764481e-01`
+- target contribution to E_cdr_unmit: `-2.1820650413176879e-02`
+- target contribution to E_cdr_rem: `-2.0293297503228259e-02`
+
+### term 28
+- pauli term from int row: `(5.9706375835881995e-02)*Z(q(0, 0))*Z(q(0, 3))`
+- int observable row: `[3, 0, 0, 3, 0, 0, 0, 0]`
+- Hamiltonian weight w_28: `5.9706375835881995e-02`
+- OGM effective shots used for this term: `1150`
+- fitted unmit coeffs: `a_u=2.5691040514824341e+00`, `b_u=-9.0571939919412314e-02`
+- fitted rem coeffs: `a_r=1.8592530745595430e+00`, `b_r=-1.3010760944406249e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-2.4749163879598662e-01`, `x_rem=-3.5952091386874008e-01`, `y_exact=-5.9659874389192180e-01`
+  - train[1] t_remaining=29: `x_unmit=-2.8643216080402012e-01`, `x_rem=-4.4097834047582807e-01`, `y_exact=-8.9378325392437252e-01`
+  - train[2] t_remaining=30: `x_unmit=-1.4849785407725322e-01`, `x_rem=-2.6117551975921077e-01`, `y_exact=-2.9556314315766335e-01`
+  - train[3] t_remaining=31: `x_unmit=-8.7427144046627811e-02`, `x_rem=-1.3865880164797745e-01`, `y_exact=-3.1971370996248460e-01`
+  - train[4] t_remaining=30: `x_unmit=-2.8764805414551609e-01`, `x_rem=-4.3705364009932546e-01`, `y_exact=-8.8292660196856554e-01`
+  - train[5] t_remaining=31: `x_unmit=-1.6835016835016836e-01`, `x_rem=-2.8925984229014540e-01`, `y_exact=-3.3984325024740508e-01`
+  - train[6] t_remaining=31: `x_unmit=-9.1205211726384364e-02`, `x_rem=-1.8423297657825352e-01`, `y_exact=-4.2434841128186207e-01`
+  - train[7] t_remaining=31: `x_unmit=-2.3881856540084387e-01`, `x_rem=-3.8144099220048594e-01`, `y_exact=-7.1935317039774027e-01`
+  - train[8] t_remaining=30: `x_unmit=-3.0499999999999999e-01`, `x_rem=-4.5986652236652237e-01`, `y_exact=-8.8700134608053860e-01`
+  - train[9] t_remaining=32: `x_unmit=-2.0494699646643111e-01`, `x_rem=-3.2365808514218414e-01`, `y_exact=-8.4355750593876899e-01`
+  - train[10] t_remaining=30: `x_unmit=-2.1942758022549869e-01`, `x_rem=-3.4956709956709964e-01`, `y_exact=-5.4571923577260528e-01`
+  - train[11] t_remaining=29: `x_unmit=-2.2288642186165669e-01`, `x_rem=-3.3306993319802897e-01`, `y_exact=-7.9255551731770524e-01`
+  - train[12] t_remaining=30: `x_unmit=-1.3838120104438642e-01`, `x_rem=-2.5047848872914158e-01`, `y_exact=-4.3034053885292189e-01`
+  - train[13] t_remaining=29: `x_unmit=-2.6973113616652211e-01`, `x_rem=-4.1269059070446767e-01`, `y_exact=-7.8914484792196637e-01`
+  - train[14] t_remaining=32: `x_unmit=-1.0563939634630659e-01`, `x_rem=-2.0420676755069139e-01`, `y_exact=-2.8754439948477478e-01`
+  - train[15] t_remaining=32: `x_unmit=-1.7522412387938061e-01`, `x_rem=-2.6842031915381559e-01`, `y_exact=-5.9383727044291290e-01`
+  - train[16] t_remaining=31: `x_unmit=-3.3277451802179381e-01`, `x_rem=-5.0011158162876534e-01`, `y_exact=-8.2047783930900675e-01`
+  - train[17] t_remaining=32: `x_unmit=-2.3141186299081035e-01`, `x_rem=-3.5883449605254120e-01`, `y_exact=-8.1297306975841344e-01`
+  - train[18] t_remaining=30: `x_unmit=-3.1224655312246552e-01`, `x_rem=-4.7697078536494603e-01`, `y_exact=-8.9378323832853457e-01`
+  - train[19] t_remaining=32: `x_unmit=-2.1043771043771045e-01`, `x_rem=-3.3562901744719931e-01`, `y_exact=-6.5493239820879123e-01`
+  - train[20] t_remaining=31: `x_unmit=-2.4897288414133115e-01`, `x_rem=-3.9225243395333792e-01`, `y_exact=-7.2131348557883290e-01`
+  - train[21] t_remaining=31: `x_unmit=-1.8896321070234115e-01`, `x_rem=-3.1006855463377209e-01`, `y_exact=-7.4658590280503356e-01`
+  - train[22] t_remaining=30: `x_unmit=-3.4808510638297874e-01`, `x_rem=-5.2420097632863605e-01`, `y_exact=-9.5151773595103573e-01`
+  - train[23] t_remaining=30: `x_unmit=-1.9554030874785591e-01`, `x_rem=-2.8473413379073764e-01`, `y_exact=-4.5803159515954961e-01`
+- target x values: `x_u_target=-1.5397350993377484e-01`, `x_r_target=-2.4909155414122311e-01`
+- target contribution to E_cdr_unmit: `-2.9026010300766094e-02`
+- target contribution to E_cdr_rem: `-2.8428295188659126e-02`
+
+### term 29
+- pauli term from int row: `(7.3914214661757651e-03)*Y(q(0, 0))*Z(q(0, 1))*Y(q(0, 2))*Z(q(0, 3))`
+- int observable row: `[2, 3, 2, 3, 0, 0, 0, 0]`
+- Hamiltonian weight w_29: `7.3914214661757651e-03`
+- OGM effective shots used for this term: `741`
+- fitted unmit coeffs: `a_u=2.6560917822468881e+00`, `b_u=-9.5828708663432301e-03`
+- fitted rem coeffs: `a_r=1.2322557139268004e+00`, `b_r=-1.2573078618943481e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=2.5991792065663474e-02`, `x_rem=5.2069329504183158e-02`, `y_exact=-4.3097127173673394e-01`
+  - train[1] t_remaining=29: `x_unmit=-5.8673469387755105e-02`, `x_rem=-1.2116659403866972e-01`, `y_exact=2.4951266669092780e-08`
+  - train[2] t_remaining=30: `x_unmit=-1.3245033112582781e-03`, `x_rem=1.1443966217023862e-02`, `y_exact=-3.1333809038432310e-08`
+  - train[3] t_remaining=31: `x_unmit=-4.4386422976501305e-02`, `x_rem=-9.2290573281466781e-02`, `y_exact=-4.5694112364261652e-01`
+  - train[4] t_remaining=30: `x_unmit=5.6410256410256411e-02`, `x_rem=1.2276105521884133e-01`, `y_exact=1.9509045580984105e-01`
+  - train[5] t_remaining=31: `x_unmit=3.9702233250620347e-02`, `x_rem=8.4811575279407983e-02`, `y_exact=-1.7683347020063648e-08`
+  - train[6] t_remaining=31: `x_unmit=-6.5530799475753600e-03`, `x_rem=-2.1283145599867107e-02`, `y_exact=-7.0314288919544241e-09`
+  - train[7] t_remaining=31: `x_unmit=-5.3497942386831275e-02`, `x_rem=-1.1034197604507759e-01`, `y_exact=-1.3262118976494134e-08`
+  - train[8] t_remaining=30: `x_unmit=1.2679738562091503e-01`, `x_rem=2.9601006358538640e-01`, `y_exact=3.9781690151806381e-01`
+  - train[9] t_remaining=32: `x_unmit=1.0666666666666666e-02`, `x_rem=2.1447567789031181e-02`, `y_exact=1.2917961363262898e-01`
+  - train[10] t_remaining=30: `x_unmit=1.7310252996005325e-02`, `x_rem=3.4038702610687956e-02`, `y_exact=1.0709822956786388e-01`
+  - train[11] t_remaining=29: `x_unmit=-7.2983354673495510e-02`, `x_rem=-1.5401278747207986e-01`, `y_exact=-5.3971309804452960e-01`
+  - train[12] t_remaining=30: `x_unmit=-6.3354037267080748e-02`, `x_rem=-1.3544276928612636e-01`, `y_exact=1.1677398683164715e-09`
+  - train[13] t_remaining=29: `x_unmit=6.9767441860465115e-02`, `x_rem=1.5908364358532856e-01`, `y_exact=1.5487089403349499e-01`
+  - train[14] t_remaining=32: `x_unmit=3.1207598371777476e-02`, `x_rem=6.1468457669271802e-02`, `y_exact=-1.8475182434825946e-02`
+  - train[15] t_remaining=32: `x_unmit=-7.2083879423328959e-02`, `x_rem=-1.5854798414015886e-01`, `y_exact=-1.9479384253455739e-01`
+  - train[16] t_remaining=31: `x_unmit=6.8035943517329917e-02`, `x_rem=1.6817587580604582e-01`, `y_exact=3.4881132933714465e-01`
+  - train[17] t_remaining=32: `x_unmit=8.8471849865951746e-02`, `x_rem=1.8542757619459380e-01`, `y_exact=2.4204233088641258e-01`
+  - train[18] t_remaining=30: `x_unmit=9.3959731543624154e-03`, `x_rem=3.8328743517808991e-03`, `y_exact=-7.1568253853921734e-08`
+  - train[19] t_remaining=32: `x_unmit=1.0230179028132993e-02`, `x_rem=3.3176708306145025e-02`, `y_exact=2.3137760078625966e-01`
+  - train[20] t_remaining=31: `x_unmit=7.5653370013755161e-02`, `x_rem=1.6191376569811167e-01`, `y_exact=-3.8160117481245547e-08`
+  - train[21] t_remaining=31: `x_unmit=-2.9255319148936171e-02`, `x_rem=-6.9133469885934884e-02`, `y_exact=1.0442546205815667e-01`
+  - train[22] t_remaining=30: `x_unmit=4.0485829959514170e-03`, `x_rem=1.7821047543571479e-02`, `y_exact=1.7506341047773194e-01`
+  - train[23] t_remaining=30: `x_unmit=-1.5306122448979591e-02`, `x_rem=-2.6857420274543270e-02`, `y_exact=-1.0043378300067569e-01`
+- target x values: `x_u_target=-4.6658259773013869e-02`, `x_r_target=-8.9177945973689235e-02`
+- target contribution to E_cdr_unmit: `-9.8683970220967213e-04`
+- target contribution to E_cdr_rem: `-9.0517647560007207e-04`
+
+### term 30
+- pauli term from int row: `(7.3914214661757651e-03)*X(q(0, 0))*Z(q(0, 1))*X(q(0, 2))*Z(q(0, 3))`
+- int observable row: `[1, 3, 1, 3, 0, 0, 0, 0]`
+- Hamiltonian weight w_30: `7.3914214661757651e-03`
+- OGM effective shots used for this term: `798`
+- fitted unmit coeffs: `a_u=4.1544295742945758e+00`, `b_u=1.7914940449797998e-02`
+- fitted rem coeffs: `a_r=1.7933599670634903e+00`, `b_r=1.2261187099956316e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-8.1807081807081808e-02`, `x_rem=-1.8151215220812295e-01`, `y_exact=-4.3097127329207291e-01`
+  - train[1] t_remaining=29: `x_unmit=1.1464968152866241e-02`, `x_rem=3.3701095997196603e-02`, `y_exact=-5.8341003192869262e-09`
+  - train[2] t_remaining=30: `x_unmit=-5.3177691309987028e-02`, `x_rem=-1.1505535297886060e-01`, `y_exact=-1.7507848922894612e-08`
+  - train[3] t_remaining=31: `x_unmit=-7.2538860103626937e-02`, `x_rem=-1.5410896025075227e-01`, `y_exact=-4.5694110258035381e-01`
+  - train[4] t_remaining=30: `x_unmit=7.0731707317073164e-02`, `x_rem=1.7499679248638197e-01`, `y_exact=1.9509045580984585e-01`
+  - train[5] t_remaining=31: `x_unmit=-2.2670025188916875e-02`, `x_rem=-4.6230465349467668e-02`, `y_exact=-2.1257833018841299e-08`
+  - train[6] t_remaining=31: `x_unmit=3.2258064516129031e-02`, `x_rem=7.9978942292081551e-02`, `y_exact=-1.0491740233808366e-08`
+  - train[7] t_remaining=31: `x_unmit=-2.9171528588098017e-02`, `x_rem=-7.1342368408139539e-02`, `y_exact=-5.2410337542839774e-08`
+  - train[8] t_remaining=30: `x_unmit=1.1070110701107010e-02`, `x_rem=2.6026074446558634e-02`, `y_exact=3.9781689116161784e-01`
+  - train[9] t_remaining=32: `x_unmit=-2.5773195876288681e-03`, `x_rem=4.5673949998817362e-03`, `y_exact=1.2917966962435562e-01`
+  - train[10] t_remaining=30: `x_unmit=-3.6082474226804120e-02`, `x_rem=-8.3480156588026863e-02`, `y_exact=1.0709822956786907e-01`
+  - train[11] t_remaining=29: `x_unmit=-3.8759689922480620e-02`, `x_rem=-8.9716184252013303e-02`, `y_exact=-5.3971309804446332e-01`
+  - train[12] t_remaining=30: `x_unmit=-6.1957868649318466e-03`, `x_rem=-1.7188199616343561e-02`, `y_exact=1.6567183933590809e-09`
+  - train[13] t_remaining=29: `x_unmit=1.8041237113402060e-02`, `x_rem=6.1506411896152850e-02`, `y_exact=1.5487089403350546e-01`
+  - train[14] t_remaining=32: `x_unmit=-3.6719706242350062e-03`, `x_rem=-1.9396047458261997e-02`, `y_exact=-1.8475176863519967e-02`
+  - train[15] t_remaining=32: `x_unmit=-2.9177718832891247e-02`, `x_rem=-7.0133528243122620e-02`, `y_exact=-1.9479385369456031e-01`
+  - train[16] t_remaining=31: `x_unmit=7.7117572692793929e-02`, `x_rem=1.8534398152664625e-01`, `y_exact=3.4881131277353628e-01`
+  - train[17] t_remaining=32: `x_unmit=2.6957637997432605e-02`, `x_rem=5.7942085745085213e-02`, `y_exact=2.4204232066912099e-01`
+  - train[18] t_remaining=30: `x_unmit=4.1825095057034217e-02`, `x_rem=9.3935095511651176e-02`, `y_exact=-4.3453774887084755e-08`
+  - train[19] t_remaining=32: `x_unmit=3.0456852791878174e-02`, `x_rem=8.1592028540152822e-02`, `y_exact=2.3137763901998662e-01`
+  - train[20] t_remaining=31: `x_unmit=3.4047919293820936e-02`, `x_rem=7.6787926017464966e-02`, `y_exact=-2.6541002502080411e-08`
+  - train[21] t_remaining=31: `x_unmit=1.5228426395939083e-02`, `x_rem=2.3194659879072387e-02`, `y_exact=1.0442542820549380e-01`
+  - train[22] t_remaining=30: `x_unmit=2.0618556701030927e-02`, `x_rem=4.7691056743106003e-02`, `y_exact=1.7506334515945923e-01`
+  - train[23] t_remaining=30: `x_unmit=-3.4571062740076826e-02`, `x_rem=-7.1119578193061278e-02`, `y_exact=-1.0043381253789833e-01`
+- target x values: `x_u_target=-2.8493894165535955e-02`, `x_r_target=-4.9878241690797555e-02`
+- target contribution to E_cdr_unmit: `-7.4254912003275089e-04`
+- target contribution to E_cdr_rem: `-5.7053240157106037e-04`
+
+### term 31
+- pauli term from int row: `(8.7493547548985556e-02)*Z(q(0, 0))*Z(q(1, 0))`
+- int observable row: `[3, 0, 0, 0, 3, 0, 0, 0]`
+- Hamiltonian weight w_31: `8.7493547548985556e-02`
+- OGM effective shots used for this term: `1935`
+- fitted unmit coeffs: `a_u=2.2347392901525165e+00`, `b_u=4.2270670931988219e-02`
+- fitted rem coeffs: `a_r=1.7515981033057380e+00`, `b_r=7.2638682783997585e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=8.3588175331294604e-02`, `x_rem=8.6332967066912222e-02`, `y_exact=2.3478042897205487e-01`
+  - train[1] t_remaining=29: `x_unmit=4.0570846075433231e-01`, `x_rem=4.9989960769777314e-01`, `y_exact=1.0000001107322354e+00`
+  - train[2] t_remaining=30: `x_unmit=4.0483701366982122e-01`, `x_rem=4.9893481912409393e-01`, `y_exact=9.9999996124256718e-01`
+  - train[3] t_remaining=31: `x_unmit=1.2969454181271908e-01`, `x_rem=1.5335340673347703e-01`, `y_exact=2.3478061227575334e-01`
+  - train[4] t_remaining=30: `x_unmit=3.4981968057702217e-01`, `x_rem=4.2747300784395098e-01`, `y_exact=7.7955915729587666e-01`
+  - train[5] t_remaining=31: `x_unmit=4.1510390268626457e-01`, `x_rem=5.1150378595893076e-01`, `y_exact=1.0000001650413199e+00`
+  - train[6] t_remaining=31: `x_unmit=4.3311785181501739e-01`, `x_rem=5.3718939770655383e-01`, `y_exact=1.0000000836160472e+00`
+  - train[7] t_remaining=31: `x_unmit=4.1049382716049382e-01`, `x_rem=5.0652245559653009e-01`, `y_exact=1.0000000139510437e+00`
+  - train[8] t_remaining=30: `x_unmit=3.7254901960784315e-01`, `x_rem=4.5725733961028114e-01`, `y_exact=7.8677120625521801e-01`
+  - train[9] t_remaining=32: `x_unmit=3.6363636363636365e-01`, `x_rem=4.4755227748077625e-01`, `y_exact=8.7663053068157382e-01`
+  - train[10] t_remaining=30: `x_unmit=3.4023821853961678e-01`, `x_rem=4.1746308240352809e-01`, `y_exact=7.7955916563245287e-01`
+  - train[11] t_remaining=29: `x_unmit=1.7528879959819185e-01`, `x_rem=2.0534287410229171e-01`, `y_exact=6.3490054486151970e-01`
+  - train[12] t_remaining=30: `x_unmit=4.3374135178286322e-01`, `x_rem=5.3623208439600178e-01`, `y_exact=1.0000000007337941e+00`
+  - train[13] t_remaining=29: `x_unmit=3.6678737713398862e-01`, `x_rem=4.5314463084768347e-01`, `y_exact=7.7955912032270780e-01`
+  - train[14] t_remaining=32: `x_unmit=4.3937162493863524e-01`, `x_rem=5.4261954703780968e-01`, `y_exact=9.8963579953108716e-01`
+  - train[15] t_remaining=32: `x_unmit=1.8195339613287059e-01`, `x_rem=2.1569473329513017e-01`, `y_exact=5.2296440878064221e-01`
+  - train[16] t_remaining=31: `x_unmit=3.5143442622950821e-01`, `x_rem=4.3026799020651513e-01`, `y_exact=7.9703209630876570e-01`
+  - train[17] t_remaining=32: `x_unmit=3.1804586241276173e-01`, `x_rem=3.8893384780722795e-01`, `y_exact=6.5885331484961907e-01`
+  - train[18] t_remaining=30: `x_unmit=4.0176817288801570e-01`, `x_rem=4.9436761666624179e-01`, `y_exact=1.0000000814862957e+00`
+  - train[19] t_remaining=32: `x_unmit=3.2017760236803156e-01`, `x_rem=3.9016139262809252e-01`, `y_exact=7.0028999960576255e-01`
+  - train[20] t_remaining=31: `x_unmit=4.0446650124069478e-01`, `x_rem=4.9809867551803078e-01`, `y_exact=1.0000000384920567e+00`
+  - train[21] t_remaining=31: `x_unmit=3.7221947602570438e-01`, `x_rem=4.5646493891674350e-01`, `y_exact=9.0538588660790564e-01`
+  - train[22] t_remaining=30: `x_unmit=3.8352703385548259e-01`, `x_rem=4.7110132582593450e-01`, `y_exact=9.0538587630087242e-01`
+  - train[23] t_remaining=30: `x_unmit=9.9236641221374045e-02`, `x_rem=1.0951389577343794e-01`, `y_exact=2.0979297466000857e-01`
+- target x values: `x_u_target=2.2050771528123445e-01`, `x_r_target=2.6384731909868819e-01`
+- target contribution to E_cdr_unmit: `4.6813241159080400e-02`
+- target contribution to E_cdr_rem: `4.6790949590381298e-02`
+
+### term 32
+- pauli term from int row: `(1.4402144799171426e-02)*Y(q(0, 0))*Z(q(0, 1))*Y(q(0, 2))*Z(q(1, 0))`
+- int observable row: `[2, 3, 2, 0, 3, 0, 0, 0]`
+- Hamiltonian weight w_32: `1.4402144799171426e-02`
+- OGM effective shots used for this term: `365`
+- fitted unmit coeffs: `a_u=1.1800059252208228e+00`, `b_u=-3.7708012153613697e-02`
+- fitted rem coeffs: `a_r=5.5672621935221644e-01`, `b_r=-3.7382583968503906e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-1.0362694300518133e-02`, `x_rem=-1.9884267830685101e-02`, `y_exact=2.6882336650523814e-01`
+  - train[1] t_remaining=29: `x_unmit=5.3191489361702128e-02`, `x_rem=1.1542580120680802e-01`, `y_exact=-2.1500230463421190e-08`
+  - train[2] t_remaining=30: `x_unmit=-1.5306122448979591e-02`, `x_rem=-3.5900413949194361e-02`, `y_exact=1.0102591159811587e-07`
+  - train[3] t_remaining=31: `x_unmit=1.2919896640826869e-02`, `x_rem=1.3847374028882904e-02`, `y_exact=3.2948063692344454e-01`
+  - train[4] t_remaining=30: `x_unmit=8.0428954423592495e-03`, `x_rem=2.4181489950142354e-02`, `y_exact=-1.4012300789903509e-01`
+  - train[5] t_remaining=31: `x_unmit=6.1124694376528114e-02`, `x_rem=1.2901913122558373e-01`, `y_exact=2.2800051968224584e-08`
+  - train[6] t_remaining=31: `x_unmit=4.2105263157894736e-02`, `x_rem=8.1159462417485589e-02`, `y_exact=3.5051585334944037e-08`
+  - train[7] t_remaining=31: `x_unmit=2.2598870056497175e-02`, `x_rem=2.4375881341569761e-02`, `y_exact=4.2972236772532418e-09`
+  - train[8] t_remaining=30: `x_unmit=-7.0866141732283464e-02`, `x_rem=-1.5327329634992395e-01`, `y_exact=-3.5293891394759097e-01`
+  - train[9] t_remaining=32: `x_unmit=2.7568922305764409e-02`, `x_rem=5.8806161135154376e-02`, `y_exact=-1.4207623434025163e-01`
+  - train[10] t_remaining=30: `x_unmit=5.8510638297872342e-02`, `x_rem=1.1249167139151579e-01`, `y_exact=-1.6193767176224311e-01`
+  - train[11] t_remaining=29: `x_unmit=1.7114914425427872e-02`, `x_rem=3.0610373982071823e-02`, `y_exact=4.1473934071556262e-01`
+  - train[12] t_remaining=30: `x_unmit=9.8522167487684730e-03`, `x_rem=3.6150054172409728e-04`, `y_exact=1.3905002171642039e-09`
+  - train[13] t_remaining=29: `x_unmit=4.1551246537396121e-02`, `x_rem=8.2747031736964904e-02`, `y_exact=-1.6193767319278021e-01`
+  - train[14] t_remaining=32: `x_unmit=-3.3898305084745763e-02`, `x_rem=-4.1038012100434611e-02`, `y_exact=-2.8327272388703702e-02`
+  - train[15] t_remaining=32: `x_unmit=4.4155844155844150e-02`, `x_rem=7.5487951319437030e-02`, `y_exact=1.2026082804777487e-01`
+  - train[16] t_remaining=31: `x_unmit=-1.3994910941475827e-01`, `x_rem=-2.9107865041583159e-01`, `y_exact=-3.7354293440631076e-01`
+  - train[17] t_remaining=32: `x_unmit=7.1240105540897103e-02`, `x_rem=1.4814759573109537e-01`, `y_exact=-2.2368860068622037e-01`
+  - train[18] t_remaining=30: `x_unmit=2.3622047244094488e-02`, `x_rem=5.2327389373673275e-02`, `y_exact=6.6314079867925269e-08`
+  - train[19] t_remaining=32: `x_unmit=-6.2330623306233061e-02`, `x_rem=-1.1385425702300583e-01`, `y_exact=-2.4594858234718750e-01`
+  - train[20] t_remaining=31: `x_unmit=-9.0909090909090912e-02`, `x_rem=-1.9861558090330750e-01`, `y_exact=2.9474658846618885e-08`
+  - train[21] t_remaining=31: `x_unmit=-2.0000000000000000e-02`, `x_rem=-3.5867249281883409e-02`, `y_exact=-8.7000796663507629e-02`
+  - train[22] t_remaining=30: `x_unmit=-1.1173184357541899e-01`, `x_rem=-2.0238791352022042e-01`, `y_exact=-1.6259570864436473e-01`
+  - train[23] t_remaining=30: `x_unmit=-6.3106796116504854e-02`, `x_rem=-1.3576798658494130e-01`, `y_exact=-1.0551683175143521e-01`
+- target x values: `x_u_target=4.8101265822784810e-02`, `x_r_target=1.0659876297418752e-01`
+- target contribution to E_cdr_unmit: `2.7438630021474016e-04`
+- target contribution to E_cdr_rem: `3.1632499736458528e-04`
+
+### term 33
+- pauli term from int row: `(1.4402144799171426e-02)*X(q(0, 0))*Z(q(0, 1))*X(q(0, 2))*Z(q(1, 0))`
+- int observable row: `[1, 3, 1, 0, 3, 0, 0, 0]`
+- Hamiltonian weight w_33: `1.4402144799171426e-02`
+- OGM effective shots used for this term: `397`
+- fitted unmit coeffs: `a_u=1.9177174863992070e+00`, `b_u=-4.5868706328000920e-02`
+- fitted rem coeffs: `a_r=9.3757409963317551e-01`, `b_r=-4.1373992034755031e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=5.6122448979591837e-02`, `x_rem=8.4779055908971418e-02`, `y_exact=2.6882337835706388e-01`
+  - train[1] t_remaining=29: `x_unmit=3.5000000000000003e-02`, `x_rem=7.5811722153185629e-02`, `y_exact=9.2851344629173028e-09`
+  - train[2] t_remaining=30: `x_unmit=-4.5918367346938778e-02`, `x_rem=-1.0065853619860582e-01`, `y_exact=8.7199955530150201e-08`
+  - train[3] t_remaining=31: `x_unmit=1.6756756756756758e-01`, `x_rem=3.1367182586694797e-01`, `y_exact=3.2948061482855684e-01`
+  - train[4] t_remaining=30: `x_unmit=-7.1604938271604940e-02`, `x_rem=-1.4997776154054382e-01`, `y_exact=-1.4012300789902468e-01`
+  - train[5] t_remaining=31: `x_unmit=5.6000000000000001e-02`, `x_rem=1.1042688115858859e-01`, `y_exact=2.6374530907625756e-08`
+  - train[6] t_remaining=31: `x_unmit=-2.8132992327365727e-02`, `x_rem=-6.0035113868312000e-02`, `y_exact=3.8511899042175953e-08`
+  - train[7] t_remaining=31: `x_unmit=-3.6363636363636362e-02`, `x_rem=-7.6756945936546764e-02`, `y_exact=4.3445445163790850e-08`
+  - train[8] t_remaining=30: `x_unmit=-7.9691516709511565e-02`, `x_rem=-1.7023245388660149e-01`, `y_exact=-3.5293889956761415e-01`
+  - train[9] t_remaining=32: `x_unmit=-9.7625329815303433e-02`, `x_rem=-2.0351181378274497e-01`, `y_exact=-1.4207629354276777e-01`
+  - train[10] t_remaining=30: `x_unmit=5.4631828978622329e-02`, `x_rem=1.1982167778471588e-01`, `y_exact=-1.6193767176224630e-01`
+  - train[11] t_remaining=29: `x_unmit=1.0471204188481675e-01`, `x_rem=2.1692622280031304e-01`, `y_exact=4.1473934071548924e-01`
+  - train[12] t_remaining=30: `x_unmit=5.1813471502590676e-03`, `x_rem=1.1178369070445471e-02`, `y_exact=9.0152506320180357e-10`
+  - train[13] t_remaining=29: `x_unmit=-5.4054054054054057e-03`, `x_rem=-2.5221683758269057e-02`, `y_exact=-1.6193767319279129e-01`
+  - train[14] t_remaining=32: `x_unmit=1.3404825737265416e-02`, `x_rem=3.1424477641701282e-02`, `y_exact=-2.8327277334870671e-02`
+  - train[15] t_remaining=32: `x_unmit=3.2258064516129031e-02`, `x_rem=7.9884448098452868e-02`, `y_exact=1.2026084115950021e-01`
+  - train[16] t_remaining=31: `x_unmit=-3.9164490861618800e-02`, `x_rem=-7.5794944546138596e-02`, `y_exact=-3.7354291216643637e-01`
+  - train[17] t_remaining=32: `x_unmit=-2.9333333333333333e-02`, `x_rem=-6.2002676636822927e-02`, `y_exact=-2.2368859746847208e-01`
+  - train[18] t_remaining=30: `x_unmit=-7.6530612244897961e-02`, `x_rem=-1.6506581190503539e-01`, `y_exact=3.8199612012726544e-08`
+  - train[19] t_remaining=32: `x_unmit=-6.6326530612244902e-02`, `x_rem=-1.4314204682547144e-01`, `y_exact=-2.4594862854290497e-01`
+  - train[20] t_remaining=31: `x_unmit=-4.9095607235142120e-02`, `x_rem=-1.0279753369184261e-01`, `y_exact=1.7855544320359505e-08`
+  - train[21] t_remaining=31: `x_unmit=4.9450549450549448e-02`, `x_rem=1.0014128936669814e-01`, `y_exact=-8.7000776389562620e-02`
+  - train[22] t_remaining=30: `x_unmit=1.7341040462427744e-02`, `x_rem=1.9036464264153601e-02`, `y_exact=-1.6259564277268093e-01`
+  - train[23] t_remaining=30: `x_unmit=5.8823529411764705e-02`, `x_rem=1.0878899805468227e-01`, `y_exact=-1.0551682822983653e-01`
+- target x values: `x_u_target=3.4999999999999996e-02`, `x_r_target=6.6901255925646219e-02`
+- target contribution to E_cdr_unmit: `3.0606582201931531e-04`
+- target contribution to E_cdr_rem: `3.0749864903557178e-04`
+
+### term 34
+- pauli term from int row: `(4.1066360429442568e-02)*Y(q(0, 0))*Y(q(0, 1))*Y(q(1, 0))*Y(q(1, 1))`
+- int observable row: `[2, 2, 0, 0, 2, 2, 0, 0]`
+- Hamiltonian weight w_34: `4.1066360429442568e-02`
+- OGM effective shots used for this term: `496`
+- fitted unmit coeffs: `a_u=-2.5428742561198275e-01`, `b_u=2.3873037420192138e-02`
+- fitted rem coeffs: `a_r=-1.1696377728722883e-01`, `b_r=2.3673535083446891e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-2.4070021881838075e-02`, `x_rem=-3.9546865889435311e-02`, `y_exact=6.6707588461174847e-02`
+  - train[1] t_remaining=29: `x_unmit=-5.5555555555555552e-02`, `x_rem=-1.2990213484498320e-01`, `y_exact=-5.4025238567364233e-09`
+  - train[2] t_remaining=30: `x_unmit=1.8867924528301886e-02`, `x_rem=3.3496794881958211e-02`, `y_exact=4.9027940758176903e-08`
+  - train[3] t_remaining=31: `x_unmit=8.8105726872246704e-03`, `x_rem=2.6757795984482489e-02`, `y_exact=2.0348659111389236e-02`
+  - train[4] t_remaining=30: `x_unmit=3.7362637362637362e-02`, `x_rem=8.2092613537072728e-02`, `y_exact=-2.0148692509565970e-08`
+  - train[5] t_remaining=31: `x_unmit=3.1446540880503145e-02`, `x_rem=5.9894051710373673e-02`, `y_exact=1.7482044644269193e-08`
+  - train[6] t_remaining=31: `x_unmit=-1.2987012987012988e-02`, `x_rem=-2.1293605239779544e-02`, `y_exact=1.7660299731657865e-08`
+  - train[7] t_remaining=31: `x_unmit=1.5053763440860216e-02`, `x_rem=4.1426092728074897e-02`, `y_exact=1.4591913708627861e-08`
+  - train[8] t_remaining=30: `x_unmit=1.0920770877944326e-01`, `x_rem=2.3043478140095880e-01`, `y_exact=5.3208632352795451e-02`
+  - train[9] t_remaining=32: `x_unmit=7.1111111111111111e-02`, `x_rem=1.4999710983646730e-01`, `y_exact=1.1609837169577305e-02`
+  - train[10] t_remaining=30: `x_unmit=8.9026915113871632e-02`, `x_rem=1.8289564349580820e-01`, `y_exact=7.1923019377289622e-10`
+  - train[11] t_remaining=29: `x_unmit=1.9189765458422176e-02`, `x_rem=4.4962815276479343e-02`, `y_exact=4.4861902514749547e-09`
+  - train[12] t_remaining=30: `x_unmit=2.5948103792415168e-02`, `x_rem=5.9254620974554674e-02`, `y_exact=-3.9853821049462105e-08`
+  - train[13] t_remaining=29: `x_unmit=-4.1214750542299353e-02`, `x_rem=-1.0089763010339022e-01`, `y_exact=6.4627799294228217e-09`
+  - train[14] t_remaining=32: `x_unmit=4.3290043290043290e-03`, `x_rem=1.9065874174620873e-02`, `y_exact=2.3817476425217060e-03`
+  - train[15] t_remaining=32: `x_unmit=-4.1758241758241756e-02`, `x_rem=-9.2051614625426298e-02`, `y_exact=2.2553622113004615e-02`
+  - train[16] t_remaining=31: `x_unmit=6.1946902654867256e-02`, `x_rem=1.2679277339688902e-01`, `y_exact=6.2483171561901682e-03`
+  - train[17] t_remaining=32: `x_unmit=-2.5531914893617020e-02`, `x_rem=-4.1226112746235770e-02`, `y_exact=2.8568765285403121e-02`
+  - train[18] t_remaining=30: `x_unmit=-1.6786570743405275e-02`, `x_rem=-3.3981601113437801e-02`, `y_exact=2.1022112724711656e-08`
+  - train[19] t_remaining=32: `x_unmit=1.0913140311804009e-01`, `x_rem=2.1809736195117374e-01`, `y_exact=-4.3880995943634149e-02`
+  - train[20] t_remaining=31: `x_unmit=1.2162162162162163e-01`, `x_rem=2.4999907530028020e-01`, `y_exact=-4.9000698045832952e-09`
+  - train[21] t_remaining=31: `x_unmit=4.8054919908466817e-02`, `x_rem=9.2829217474250769e-02`, `y_exact=-1.0165787299517091e-02`
+  - train[22] t_remaining=30: `x_unmit=-5.6000000000000001e-02`, `x_rem=-1.1955300389035327e-01`, `y_exact=2.2009776885701705e-02`
+  - train[23] t_remaining=30: `x_unmit=-1.7167381974248927e-02`, `x_rem=-3.6845332879253914e-02`, `y_exact=2.7129518805590863e-01`
+- target x values: `x_u_target=-4.8309178743961350e-03`, `x_r_target=-5.7667274360132534e-03`
+- target contribution to E_cdr_unmit: `1.0308263876144686e-03`
+- target contribution to E_cdr_rem: `9.9988511153123591e-04`
+
+### term 35
+- pauli term from int row: `(4.1066360429442568e-02)*Y(q(0, 0))*Y(q(0, 1))*X(q(1, 0))*X(q(1, 1))`
+- int observable row: `[2, 2, 0, 0, 1, 1, 0, 0]`
+- Hamiltonian weight w_35: `4.1066360429442568e-02`
+- OGM effective shots used for this term: `529`
+- fitted unmit coeffs: `a_u=5.2442582967711382e-01`, `b_u=2.1993721025071172e-02`
+- fitted rem coeffs: `a_r=2.2462467046565437e-01`, `b_r=2.2035127803461663e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-2.3853211009174313e-02`, `x_rem=-5.5559561473123978e-02`, `y_exact=6.6707589952561888e-02`
+  - train[1] t_remaining=29: `x_unmit=3.1539888682745827e-02`, `x_rem=7.8133562944793053e-02`, `y_exact=1.9663869530195540e-08`
+  - train[2] t_remaining=30: `x_unmit=-3.5714285714285712e-02`, `x_rem=-6.6402449147715911e-02`, `y_exact=-4.8799602974315052e-08`
+  - train[3] t_remaining=31: `x_unmit=3.4090909090909088e-02`, `x_rem=7.7752431941917208e-02`, `y_exact=2.0348637515277160e-02`
+  - train[4] t_remaining=30: `x_unmit=-1.4285714285714285e-02`, `x_rem=-2.6108190910256283e-02`, `y_exact=1.8182851568094006e-08`
+  - train[5] t_remaining=31: `x_unmit=-2.7131782945736434e-02`, `x_rem=-5.5621635195745603e-02`, `y_exact=-1.0854577717783865e-08`
+  - train[6] t_remaining=31: `x_unmit=-1.2345679012345678e-02`, `x_rem=-2.1264041790592460e-02`, `y_exact=-1.8632098870106213e-09`
+  - train[7] t_remaining=31: `x_unmit=-4.3478260869565216e-02`, `x_rem=-9.9216832734755386e-02`, `y_exact=-7.2796758658443102e-09`
+  - train[8] t_remaining=30: `x_unmit=-2.8462998102466792e-02`, `x_rem=-6.9340290642958630e-02`, `y_exact=5.3208604667186986e-02`
+  - train[9] t_remaining=32: `x_unmit=-2.5454545454545455e-02`, `x_rem=-5.3371601016726965e-02`, `y_exact=1.1609831404190543e-02`
+  - train[10] t_remaining=30: `x_unmit=2.2608695652173914e-02`, `x_rem=4.6813555456824238e-02`, `y_exact=-4.1705957656359941e-09`
+  - train[11] t_remaining=29: `x_unmit=-1.6697588126159554e-02`, `x_rem=-3.9395375247131034e-02`, `y_exact=3.2379352233176733e-09`
+  - train[12] t_remaining=30: `x_unmit=-4.6263345195729534e-02`, `x_rem=-9.4722315705894122e-02`, `y_exact=-9.3432368659334689e-09`
+  - train[13] t_remaining=29: `x_unmit=7.6045627376425838e-03`, `x_rem=1.1993417325773397e-02`, `y_exact=-5.5449350523519890e-09`
+  - train[14] t_remaining=32: `x_unmit=-2.4000000000000004e-02`, `x_rem=-5.7874789200090392e-02`, `y_exact=2.3817931294058022e-03`
+  - train[15] t_remaining=32: `x_unmit=1.3937282229965157e-02`, `x_rem=2.1324127365015690e-02`, `y_exact=2.2553569098211153e-02`
+  - train[16] t_remaining=31: `x_unmit=1.6759776536312849e-02`, `x_rem=2.7787085066482017e-02`, `y_exact=6.2482983378626920e-03`
+  - train[17] t_remaining=32: `x_unmit=7.9422382671480149e-02`, `x_rem=1.6892902717790725e-01`, `y_exact=2.8568788148319153e-02`
+  - train[18] t_remaining=30: `x_unmit=-3.8817005545286505e-02`, `x_rem=-7.3910777204543740e-02`, `y_exact=8.5531833018487597e-09`
+  - train[19] t_remaining=32: `x_unmit=-5.0279329608938550e-02`, `x_rem=-9.7173025085793480e-02`, `y_exact=-4.3881001487875722e-02`
+  - train[20] t_remaining=31: `x_unmit=4.9295774647887321e-02`, `x_rem=8.7941924018625287e-02`, `y_exact=6.4846320563599138e-09`
+  - train[21] t_remaining=31: `x_unmit=-7.5471698113207548e-03`, `x_rem=-1.4352801349846095e-02`, `y_exact=-1.0165832932663632e-02`
+  - train[22] t_remaining=30: `x_unmit=-4.8128342245989303e-02`, `x_rem=-1.2126078552210888e-01`, `y_exact=2.2009732093195341e-02`
+  - train[23] t_remaining=30: `x_unmit=4.0441176470588237e-02`, `x_rem=7.7840966616657625e-02`, `y_exact=2.7129521612830315e-01`
+- target x values: `x_u_target=2.0332717190388171e-02`, `x_r_target=3.6276170164774531e-02`
+- target contribution to E_cdr_unmit: `1.3410927615660376e-03`
+- target contribution to E_cdr_rem: `1.2395326734858203e-03`
+
+### term 36
+- pauli term from int row: `(4.1066360429442568e-02)*X(q(0, 0))*X(q(0, 1))*Y(q(1, 0))*Y(q(1, 1))`
+- int observable row: `[1, 1, 0, 0, 2, 2, 0, 0]`
+- Hamiltonian weight w_36: `4.1066360429442568e-02`
+- OGM effective shots used for this term: `461`
+- fitted unmit coeffs: `a_u=-2.1913503491140815e-01`, `b_u=1.6906092466694125e-02`
+- fitted rem coeffs: `a_r=-1.0235335982894220e-01`, `b_r=1.7027954800328326e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-9.1703056768558958e-02`, `x_rem=-1.9350685499998910e-01`, `y_exact=6.6707589828198743e-02`
+  - train[1] t_remaining=29: `x_unmit=1.0799136069114470e-02`, `x_rem=2.2872365894562711e-02`, `y_exact=-1.2659719728461535e-08`
+  - train[2] t_remaining=30: `x_unmit=1.0989010989010990e-02`, `x_rem=3.5528118409092882e-02`, `y_exact=-4.4315912289075109e-08`
+  - train[3] t_remaining=31: `x_unmit=2.1691973969631237e-03`, `x_rem=3.8610273040401719e-03`, `y_exact=2.0348633592140494e-02`
+  - train[4] t_remaining=30: `x_unmit=4.1036717062634988e-02`, `x_rem=8.3060370083191420e-02`, `y_exact=1.1001500270550178e-08`
+  - train[5] t_remaining=31: `x_unmit=-1.4198782961460446e-02`, `x_rem=-3.2381465945336002e-02`, `y_exact=-1.2043302355924334e-08`
+  - train[6] t_remaining=31: `x_unmit=-6.9351230425055935e-02`, `x_rem=-1.4957077219549927e-01`, `y_exact=8.7850907978551651e-09`
+  - train[7] t_remaining=31: `x_unmit=-9.4827586206896547e-02`, `x_rem=-1.8848269627247613e-01`, `y_exact=-6.2726562091695764e-09`
+  - train[8] t_remaining=30: `x_unmit=8.0321285140562242e-03`, `x_rem=3.4056576370410055e-02`, `y_exact=5.3208622709751428e-02`
+  - train[9] t_remaining=32: `x_unmit=-4.9250535331905779e-02`, `x_rem=-9.9221745206110976e-02`, `y_exact=1.1609833358372543e-02`
+  - train[10] t_remaining=30: `x_unmit=2.0785219399538105e-02`, `x_rem=3.9436465603025689e-02`, `y_exact=-1.6366656484229098e-08`
+  - train[11] t_remaining=29: `x_unmit=1.6166281755196306e-02`, `x_rem=3.5743617089787010e-02`, `y_exact=1.6116014563822989e-08`
+  - train[12] t_remaining=30: `x_unmit=-1.0309278350515464e-02`, `x_rem=-1.4367696643190321e-02`, `y_exact=-3.8395527628542483e-09`
+  - train[13] t_remaining=29: `x_unmit=1.8711018711018712e-02`, `x_rem=3.4490414471878852e-02`, `y_exact=-4.9129151521635034e-09`
+  - train[14] t_remaining=32: `x_unmit=2.7368421052631580e-02`, `x_rem=4.9613037564844871e-02`, `y_exact=2.3817791397413245e-03`
+  - train[15] t_remaining=32: `x_unmit=6.5759637188208611e-02`, `x_rem=1.3618745935769139e-01`, `y_exact=2.2553627879593731e-02`
+  - train[16] t_remaining=31: `x_unmit=-6.3157894736842104e-03`, `x_rem=-1.4507439998879379e-02`, `y_exact=6.2483065067550853e-03`
+  - train[17] t_remaining=32: `x_unmit=-8.6680761099365747e-02`, `x_rem=-1.8852638965224616e-01`, `y_exact=2.8568775810112929e-02`
+  - train[18] t_remaining=30: `x_unmit=-1.9108280254777069e-02`, `x_rem=-3.1965976252677199e-02`, `y_exact=1.1921627074004164e-09`
+  - train[19] t_remaining=32: `x_unmit=9.5890410958904104e-02`, `x_rem=1.8910572962396699e-01`, `y_exact=-4.3881011333565124e-02`
+  - train[20] t_remaining=31: `x_unmit=-1.1504424778761062e-01`, `x_rem=-2.4190609594170742e-01`, `y_exact=3.5994894608910841e-08`
+  - train[21] t_remaining=31: `x_unmit=3.5555555555555556e-02`, `x_rem=8.3696758395553628e-02`, `y_exact=-1.0165832955611062e-02`
+  - train[22] t_remaining=30: `x_unmit=2.1929824561403508e-02`, `x_rem=4.3837506583226375e-02`, `y_exact=2.2009797746981190e-02`
+  - train[23] t_remaining=30: `x_unmit=-2.4390243902439025e-02`, `x_rem=-4.9489420098241178e-02`, `y_exact=2.7129514381026543e-01`
+- target x values: `x_u_target=-2.3041474654377881e-02`, `x_r_target=-5.5274154158169463e-02`
+- target contribution to E_cdr_unmit: `9.0162372186102966e-04`
+- target contribution to E_cdr_rem: `9.3160887401162891e-04`
+
+### term 37
+- pauli term from int row: `(4.1066360429442568e-02)*X(q(0, 0))*X(q(0, 1))*X(q(1, 0))*X(q(1, 1))`
+- int observable row: `[1, 1, 0, 0, 1, 1, 0, 0]`
+- Hamiltonian weight w_37: `4.1066360429442568e-02`
+- OGM effective shots used for this term: `553`
+- fitted unmit coeffs: `a_u=1.3731666390344779e-01`, `b_u=1.9779627886423262e-02`
+- fitted rem coeffs: `a_r=7.5022061663331363e-02`, `b_r=1.9958002975516653e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-8.2024432809773118e-02`, `x_rem=-1.7506068158941435e-01`, `y_exact=6.6707585951720702e-02`
+  - train[1] t_remaining=29: `x_unmit=-6.7924528301886791e-02`, `x_rem=-1.2902065982311495e-01`, `y_exact=-7.3159620417096744e-09`
+  - train[2] t_remaining=30: `x_unmit=7.5471698113207548e-03`, `x_rem=1.7940938604725860e-02`, `y_exact=4.1726325485604002e-08`
+  - train[3] t_remaining=31: `x_unmit=2.4667931688804556e-02`, `x_rem=5.7177783567212231e-02`, `y_exact=2.0348641943280149e-02`
+  - train[4] t_remaining=30: `x_unmit=-4.1742286751361164e-02`, `x_rem=-7.8876655090767453e-02`, `y_exact=-7.3274136811443232e-09`
+  - train[5] t_remaining=31: `x_unmit=-2.7777777777777776e-02`, `x_rem=-6.8367120862817862e-02`, `y_exact=1.4079217008061421e-08`
+  - train[6] t_remaining=31: `x_unmit=-1.3937282229965157e-02`, `x_rem=-2.8761871043891066e-02`, `y_exact=-1.8478046870263815e-08`
+  - train[7] t_remaining=31: `x_unmit=-1.4760147601476014e-02`, `x_rem=-4.1829024623671822e-02`, `y_exact=1.6303291827255642e-08`
+  - train[8] t_remaining=30: `x_unmit=3.3582089552238806e-02`, `x_rem=5.8031141469372056e-02`, `y_exact=5.3208614945812541e-02`
+  - train[9] t_remaining=32: `x_unmit=-8.2437275985663083e-02`, `x_rem=-1.5435239622310487e-01`, `y_exact=1.1609855413326580e-02`
+  - train[10] t_remaining=30: `x_unmit=-1.9819819819819819e-02`, `x_rem=-3.8363050411243153e-02`, `y_exact=-4.1977331851433506e-09`
+  - train[11] t_remaining=29: `x_unmit=-9.2526690391459068e-02`, `x_rem=-1.9549799959695774e-01`, `y_exact=-1.6274193303400627e-08`
+  - train[12] t_remaining=30: `x_unmit=1.7730496453900711e-02`, `x_rem=2.2613699875940418e-02`, `y_exact=9.8193538781634828e-09`
+  - train[13] t_remaining=29: `x_unmit=3.0195381882770871e-02`, `x_rem=6.9492402305002698e-02`, `y_exact=7.5689126728502731e-09`
+  - train[14] t_remaining=32: `x_unmit=2.7124773960216998e-02`, `x_rem=5.6108562176232557e-02`, `y_exact=2.3817955556162391e-03`
+  - train[15] t_remaining=32: `x_unmit=9.6711798839458456e-03`, `x_rem=1.7830817159660631e-02`, `y_exact=2.2553589578820241e-02`
+  - train[16] t_remaining=31: `x_unmit=-3.4220532319391636e-02`, `x_rem=-6.3719194462700815e-02`, `y_exact=6.2483043707079909e-03`
+  - train[17] t_remaining=32: `x_unmit=2.7124773960216998e-02`, `x_rem=6.1431846873795576e-02`, `y_exact=2.8568795200814241e-02`
+  - train[18] t_remaining=30: `x_unmit=-7.4626865671641790e-03`, `x_rem=-2.6765877332322219e-02`, `y_exact=1.6438693639032424e-08`
+  - train[19] t_remaining=32: `x_unmit=4.8148148148148148e-02`, `x_rem=9.8385921679094462e-02`, `y_exact=-4.3880962211400497e-02`
+  - train[20] t_remaining=31: `x_unmit=-2.8571428571428571e-02`, `x_rem=-6.5013156665480243e-02`, `y_exact=2.5290817021066109e-08`
+  - train[21] t_remaining=31: `x_unmit=4.1144901610017888e-02`, `x_rem=7.6913839872651907e-02`, `y_exact=-1.0165822156564586e-02`
+  - train[22] t_remaining=30: `x_unmit=4.5627376425855515e-02`, `x_rem=9.4422021445705565e-02`, `y_exact=2.2009730683364700e-02`
+  - train[23] t_remaining=30: `x_unmit=2.7131782945736434e-02`, `x_rem=6.0633408910237184e-02`, `y_exact=2.7129520142113883e-01`
+- target x values: `x_u_target=-1.7699115044247787e-03`, `x_r_target=-4.9253562421277160e-03`
+- target contribution to E_cdr_unmit: `8.0229662774441600e-04`
+- target contribution to E_cdr_rem: `8.0442809720883098e-04`
+
+### term 38
+- pauli term from int row: `(-7.6214047937498827e-03)*Y(q(0, 0))*Z(q(0, 1))*Z(q(0, 2))*Y(q(0, 3))*Y(q(1, 0))*Y(q(1, 1))`
+- int observable row: `[2, 3, 3, 2, 2, 2, 0, 0]`
+- Hamiltonian weight w_38: `-7.6214047937498827e-03`
+- OGM effective shots used for this term: `137`
+- fitted unmit coeffs: `a_u=-4.7499085950279241e-02`, `b_u=-4.8949349140399332e-03`
+- fitted rem coeffs: `a_r=-1.9389370300873121e-02`, `b_r=-5.1833011534721928e-03`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-8.8235294117647065e-02`, `x_rem=-3.3206036694061347e-01`, `y_exact=5.8345862785593276e-02`
+  - train[1] t_remaining=29: `x_unmit=0.0000000000000000e+00`, `x_rem=3.6898104670001979e-02`, `y_exact=-2.2028311790048201e-09`
+  - train[2] t_remaining=30: `x_unmit=-2.9239766081871343e-02`, `x_rem=-7.5387683638401592e-02`, `y_exact=1.2604776507426634e-08`
+  - train[3] t_remaining=31: `x_unmit=5.2631578947368418e-02`, `x_rem=1.1839799841430436e-01`, `y_exact=3.1668928605592273e-03`
+  - train[4] t_remaining=30: `x_unmit=-4.4776119402985072e-02`, `x_rem=-1.5334072544974497e-01`, `y_exact=-1.0891319725059321e-09`
+  - train[5] t_remaining=31: `x_unmit=-5.2631578947368418e-02`, `x_rem=-6.0385398184421298e-02`, `y_exact=9.7077775540067630e-09`
+  - train[6] t_remaining=31: `x_unmit=-6.1538461538461542e-02`, `x_rem=-1.7545230724939653e-01`, `y_exact=-2.0172283967520985e-09`
+  - train[7] t_remaining=31: `x_unmit=4.6357615894039736e-02`, `x_rem=1.0503049541729595e-01`, `y_exact=2.4680098432888384e-09`
+  - train[8] t_remaining=30: `x_unmit=2.9850746268656716e-02`, `x_rem=8.1376503021270336e-02`, `y_exact=1.7172664752992130e-08`
+  - train[9] t_remaining=32: `x_unmit=6.3694267515923570e-03`, `x_rem=2.1232752663591505e-02`, `y_exact=-7.0694390322079675e-03`
+  - train[10] t_remaining=30: `x_unmit=1.5436241610738255e-01`, `x_rem=5.1018951655100075e-01`, `y_exact=-9.7483699434387871e-09`
+  - train[11] t_remaining=29: `x_unmit=-1.0606060606060606e-01`, `x_rem=-3.5783502934336231e-01`, `y_exact=1.0461413724725207e-08`
+  - train[12] t_remaining=30: `x_unmit=-1.1627906976744186e-01`, `x_rem=-3.6470431491566185e-01`, `y_exact=-6.7819379885951754e-09`
+  - train[13] t_remaining=29: `x_unmit=-1.4705882352941176e-02`, `x_rem=-8.8560489035107159e-02`, `y_exact=1.4871590876910993e-08`
+  - train[14] t_remaining=32: `x_unmit=-1.1450381679389313e-01`, `x_rem=-3.2476686290708245e-01`, `y_exact=1.7928949334379682e-04`
+  - train[15] t_remaining=32: `x_unmit=1.6438356164383561e-01`, `x_rem=5.3953835360019509e-01`, `y_exact=-6.5748918234731016e-02`
+  - train[16] t_remaining=31: `x_unmit=0.0000000000000000e+00`, `x_rem=3.1513419700313250e-03`, `y_exact=3.5448947067726914e-03`
+  - train[17] t_remaining=32: `x_unmit=-1.3178294573643412e-01`, `x_rem=-3.8878458465240906e-01`, `y_exact=-6.0061917633223501e-02`
+  - train[18] t_remaining=30: `x_unmit=-1.1111111111111110e-01`, `x_rem=-3.3856079194226218e-01`, `y_exact=-1.4407817306703899e-09`
+  - train[19] t_remaining=32: `x_unmit=-4.1095890410958902e-02`, `x_rem=-1.1732930564765942e-01`, `y_exact=-1.3607568763825722e-02`
+  - train[20] t_remaining=31: `x_unmit=1.0204081632653061e-01`, `x_rem=2.8213893558797326e-01`, `y_exact=-1.6755847995587060e-08`
+  - train[21] t_remaining=31: `x_unmit=-6.2500000000000000e-02`, `x_rem=-1.7076190944573896e-01`, `y_exact=-1.1013216834399228e-02`
+  - train[22] t_remaining=30: `x_unmit=6.9444444444444448e-02`, `x_rem=1.6683316213026242e-01`, `y_exact=-1.6464185029941014e-08`
+  - train[23] t_remaining=30: `x_unmit=-1.8181818181818182e-01`, `x_rem=-5.7421473164266990e-01`, `y_exact=-2.6897799230775212e-09`
+- target x values: `x_u_target=-1.1940298507462686e-01`, `x_r_target=-3.6276589438323703e-01`
+- target contribution to E_cdr_unmit: `-5.9187657136030870e-06`
+- target contribution to E_cdr_rem: `-1.4103417994405666e-05`
+
+### term 39
+- pauli term from int row: `(-7.6214047937498827e-03)*Y(q(0, 0))*Z(q(0, 1))*Z(q(0, 2))*Y(q(0, 3))*X(q(1, 0))*X(q(1, 1))`
+- int observable row: `[2, 3, 3, 2, 1, 1, 0, 0]`
+- Hamiltonian weight w_39: `-7.6214047937498827e-03`
+- OGM effective shots used for this term: `141`
+- fitted unmit coeffs: `a_u=4.7537537976675787e-02`, `b_u=-3.6494962966237324e-03`
+- fitted rem coeffs: `a_r=1.6201652598460368e-02`, `b_r=-3.5723626276152423e-03`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=6.2893081761006293e-03`, `x_rem=7.4950897070484468e-02`, `y_exact=5.8345879842252160e-02`
+  - train[1] t_remaining=29: `x_unmit=-1.2857142857142856e-01`, `x_rem=-3.8543386456692252e-01`, `y_exact=-1.3681482013876802e-08`
+  - train[2] t_remaining=30: `x_unmit=1.2230215827338130e-01`, `x_rem=4.1029455220246930e-01`, `y_exact=-1.6050356804847731e-08`
+  - train[3] t_remaining=31: `x_unmit=-6.1224489795918366e-02`, `x_rem=-2.2834767719733173e-01`, `y_exact=3.1668918980107389e-03`
+  - train[4] t_remaining=30: `x_unmit=-5.8064516129032261e-02`, `x_rem=-1.5655560418855480e-01`, `y_exact=8.6028362071731863e-09`
+  - train[5] t_remaining=31: `x_unmit=3.4013605442176874e-02`, `x_rem=8.3973185760981325e-02`, `y_exact=-6.1888543950478706e-09`
+  - train[6] t_remaining=31: `x_unmit=-8.2706766917293228e-02`, `x_rem=-2.5281378519012715e-01`, `y_exact=8.8665214579344684e-09`
+  - train[7] t_remaining=31: `x_unmit=6.2068965517241378e-02`, `x_rem=1.5727377258567501e-01`, `y_exact=3.5934542741535948e-09`
+  - train[8] t_remaining=30: `x_unmit=-5.0000000000000003e-02`, `x_rem=-1.7801004900098133e-01`, `y_exact=2.1775673441127365e-08`
+  - train[9] t_remaining=32: `x_unmit=4.6979865771812082e-02`, `x_rem=1.5913424914393839e-01`, `y_exact=-7.0694294801600466e-03`
+  - train[10] t_remaining=30: `x_unmit=8.8235294117647065e-02`, `x_rem=2.4651141048684508e-01`, `y_exact=-1.3971922481984471e-08`
+  - train[11] t_remaining=29: `x_unmit=1.6176470588235295e-01`, `x_rem=4.9881957993189585e-01`, `y_exact=-1.4504633325962667e-08`
+  - train[12] t_remaining=30: `x_unmit=6.5789473684210523e-02`, `x_rem=2.2958012408386810e-01`, `y_exact=-1.5622318399573176e-08`
+  - train[13] t_remaining=29: `x_unmit=-5.0359712230215826e-02`, `x_rem=-1.8234020054552616e-01`, `y_exact=-5.5671010873180046e-09`
+  - train[14] t_remaining=32: `x_unmit=1.3953488372093023e-01`, `x_rem=4.5292206976298521e-01`, `y_exact=1.7927459706342831e-04`
+  - train[15] t_remaining=32: `x_unmit=-1.6216216216216217e-01`, `x_rem=-4.7182472080671162e-01`, `y_exact=-6.5748891954262340e-02`
+  - train[16] t_remaining=31: `x_unmit=-1.1764705882352941e-01`, `x_rem=-3.7997669035038439e-01`, `y_exact=3.5448686118830790e-03`
+  - train[17] t_remaining=32: `x_unmit=-7.4074074074074077e-03`, `x_rem=-5.5508398193890397e-02`, `y_exact=-6.0061922534871887e-02`
+  - train[18] t_remaining=30: `x_unmit=-2.0408163265306121e-02`, `x_rem=-1.2059325082447933e-01`, `y_exact=-3.2808319884949905e-11`
+  - train[19] t_remaining=32: `x_unmit=6.4748201438848921e-02`, `x_rem=2.1817737588750352e-01`, `y_exact=-1.3607612696524624e-02`
+  - train[20] t_remaining=31: `x_unmit=-1.4062500000000000e-01`, `x_rem=-4.5017207640260848e-01`, `y_exact=-3.4555012142209729e-08`
+  - train[21] t_remaining=31: `x_unmit=1.9108280254777069e-02`, `x_rem=3.0667402624437796e-02`, `y_exact=-1.1013205068197663e-02`
+  - train[22] t_remaining=30: `x_unmit=-8.7999999999999995e-02`, `x_rem=-2.8798103276924503e-01`, `y_exact=-2.4778754785313210e-10`
+  - train[23] t_remaining=30: `x_unmit=5.7971014492753624e-02`, `x_rem=1.8436045033572857e-01`, `y_exact=5.4807934408652109e-10`
+- target x values: `x_u_target=3.1250000000000000e-02`, `x_r_target=1.1760630254422483e-01`
+- target contribution to E_cdr_unmit: `1.6492325450532311e-05`
+- target contribution to E_cdr_rem: `1.2704471534042233e-05`
+
+### term 40
+- pauli term from int row: `(-7.6214047937498827e-03)*X(q(0, 0))*Z(q(0, 1))*Z(q(0, 2))*X(q(0, 3))*Y(q(1, 0))*Y(q(1, 1))`
+- int observable row: `[1, 3, 3, 1, 2, 2, 0, 0]`
+- Hamiltonian weight w_40: `-7.6214047937498827e-03`
+- OGM effective shots used for this term: `176`
+- fitted unmit coeffs: `a_u=-6.6057260330857140e-02`, `b_u=-1.9050694623817276e-03`
+- fitted rem coeffs: `a_r=-2.1427266177435917e-02`, `b_r=-2.0097079642729175e-03`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-8.0213903743315509e-02`, `x_rem=-2.7102972051335822e-01`, `y_exact=5.8345851122807560e-02`
+  - train[1] t_remaining=29: `x_unmit=-1.0769230769230770e-01`, `x_rem=-3.1838419148043595e-01`, `y_exact=-8.3596879063513275e-09`
+  - train[2] t_remaining=30: `x_unmit=0.0000000000000000e+00`, `x_rem=-6.4093750203199198e-02`, `y_exact=-1.5735702843555302e-08`
+  - train[3] t_remaining=31: `x_unmit=1.1702127659574468e-01`, `x_rem=3.6031701443143360e-01`, `y_exact=3.1668900936034959e-03`
+  - train[4] t_remaining=30: `x_unmit=9.2896174863387984e-02`, `x_rem=2.6052389619183230e-01`, `y_exact=-8.6000460256836080e-09`
+  - train[5] t_remaining=31: `x_unmit=1.0869565217391304e-01`, `x_rem=3.7369030271255765e-01`, `y_exact=-1.0085983121533116e-08`
+  - train[6] t_remaining=31: `x_unmit=-1.1764705882352941e-02`, `x_rem=-4.1249325741259280e-02`, `y_exact=3.9704647503783502e-09`
+  - train[7] t_remaining=31: `x_unmit=1.4606741573033707e-01`, `x_rem=4.4093608077138813e-01`, `y_exact=7.5270475190064735e-09`
+  - train[8] t_remaining=30: `x_unmit=2.6455026455026454e-02`, `x_rem=7.0426768727076899e-02`, `y_exact=1.8031297062884222e-08`
+  - train[9] t_remaining=32: `x_unmit=-2.2471910112359550e-02`, `x_rem=-1.0241956805488456e-01`, `y_exact=-7.0694461572172480e-03`
+  - train[10] t_remaining=30: `x_unmit=1.3989637305699482e-01`, `x_rem=4.5201337593451241e-01`, `y_exact=1.6252279281122606e-09`
+  - train[11] t_remaining=29: `x_unmit=-1.2658227848101266e-02`, `x_rem=-9.2827360327210270e-02`, `y_exact=1.1233835792711100e-08`
+  - train[12] t_remaining=30: `x_unmit=0.0000000000000000e+00`, `x_rem=-1.0683273350666272e-03`, `y_exact=-1.3387177913472176e-08`
+  - train[13] t_remaining=29: `x_unmit=4.3956043956043959e-02`, `x_rem=1.1271191208922772e-01`, `y_exact=1.0517998678012045e-08`
+  - train[14] t_remaining=32: `x_unmit=1.1111111111111110e-01`, `x_rem=3.1503017465818489e-01`, `y_exact=1.7930914713340344e-04`
+  - train[15] t_remaining=32: `x_unmit=1.0638297872340426e-01`, `x_rem=3.0150200662184101e-01`, `y_exact=-6.5748911267872343e-02`
+  - train[16] t_remaining=31: `x_unmit=-1.6894977168949771e-01`, `x_rem=-4.9717508502867125e-01`, `y_exact=3.5449041943074124e-03`
+  - train[17] t_remaining=32: `x_unmit=0.0000000000000000e+00`, `x_rem=1.8921372369010661e-02`, `y_exact=-6.0061925486434284e-02`
+  - train[18] t_remaining=30: `x_unmit=7.1428571428571425e-02`, `x_rem=2.3356429846501650e-01`, `y_exact=1.4151587268672845e-09`
+  - train[19] t_remaining=32: `x_unmit=-5.3475935828877002e-03`, `x_rem=-4.3058458019238362e-02`, `y_exact=-1.3607566305484538e-02`
+  - train[20] t_remaining=31: `x_unmit=-5.4054054054054057e-03`, `x_rem=-1.3251942222178487e-03`, `y_exact=-2.2917714537423676e-08`
+  - train[21] t_remaining=31: `x_unmit=5.7692307692307696e-02`, `x_rem=2.1539959067205541e-01`, `y_exact=-1.1013191737014452e-02`
+  - train[22] t_remaining=30: `x_unmit=9.1891891891891897e-02`, `x_rem=3.2457248359183632e-01`, `y_exact=-1.2923025764361287e-08`
+  - train[23] t_remaining=30: `x_unmit=5.5865921787709499e-03`, `x_rem=7.9334628189343618e-03`, `y_exact=-8.2920793976702801e-09`
+- target x values: `x_u_target=-5.8201058201058198e-02`, `x_r_target=-1.7818298783318096e-01`
+- target contribution to E_cdr_unmit: `-1.4781966033238573e-05`
+- target contribution to E_cdr_rem: `-1.3781529784973033e-05`
+
+### term 41
+- pauli term from int row: `(-7.6214047937498827e-03)*X(q(0, 0))*Z(q(0, 1))*Z(q(0, 2))*X(q(0, 3))*X(q(1, 0))*X(q(1, 1))`
+- int observable row: `[1, 3, 3, 1, 1, 1, 0, 0]`
+- Hamiltonian weight w_41: `-7.6214047937498827e-03`
+- OGM effective shots used for this term: `152`
+- fitted unmit coeffs: `a_u=-4.6394264944885855e-02`, `b_u=-4.3758746978479618e-03`
+- fitted rem coeffs: `a_r=-1.6542639813642755e-02`, `b_r=-4.4076520561615162e-03`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-8.5271317829457363e-02`, `x_rem=-2.5079190773326210e-01`, `y_exact=5.8345860146448110e-02`
+  - train[1] t_remaining=29: `x_unmit=-1.0743801652892562e-01`, `x_rem=-3.2839944750436950e-01`, `y_exact=-2.2386512268275773e-08`
+  - train[2] t_remaining=30: `x_unmit=-2.5974025974025976e-02`, `x_rem=-6.6734960763311826e-02`, `y_exact=1.4837377381673599e-08`
+  - train[3] t_remaining=31: `x_unmit=7.8740157480314960e-03`, `x_rem=5.3442631892732337e-02`, `y_exact=3.1669048406115768e-03`
+  - train[4] t_remaining=30: `x_unmit=6.6666666666666666e-02`, `x_rem=1.6257478235471512e-01`, `y_exact=1.5308524272902292e-08`
+  - train[5] t_remaining=31: `x_unmit=7.4074074074074077e-03`, `x_rem=2.0061917827194936e-02`, `y_exact=1.4289541012200362e-08`
+  - train[6] t_remaining=31: `x_unmit=-1.8181818181818182e-01`, `x_rem=-5.6786425839451371e-01`, `y_exact=1.5708211693366151e-08`
+  - train[7] t_remaining=31: `x_unmit=-6.5693430656934310e-02`, `x_rem=-1.8142342976254777e-01`, `y_exact=-1.0818946676245509e-08`
+  - train[8] t_remaining=30: `x_unmit=-6.4748201438848921e-02`, `x_rem=-1.5208929429167362e-01`, `y_exact=1.6082254550349562e-08`
+  - train[9] t_remaining=32: `x_unmit=1.6279069767441862e-01`, `x_rem=4.9246199280580405e-01`, `y_exact=-7.0694280868345916e-03`
+  - train[10] t_remaining=30: `x_unmit=-7.2847682119205295e-02`, `x_rem=-2.1649284377841269e-01`, `y_exact=-1.4881662588095192e-08`
+  - train[11] t_remaining=29: `x_unmit=-1.4074074074074075e-01`, `x_rem=-4.4828354228556661e-01`, `y_exact=-1.2640488127879591e-08`
+  - train[12] t_remaining=30: `x_unmit=-8.7999999999999995e-02`, `x_rem=-2.5293134707516973e-01`, `y_exact=-3.8470010856512361e-08`
+  - train[13] t_remaining=29: `x_unmit=2.1897810218978103e-02`, `x_rem=5.2770984963857889e-02`, `y_exact=-5.4556904505678578e-09`
+  - train[14] t_remaining=32: `x_unmit=8.3333333333333329e-02`, `x_rem=2.4830785360126889e-01`, `y_exact=1.7927047720307061e-04`
+  - train[15] t_remaining=32: `x_unmit=-4.3478260869565216e-02`, `x_rem=-1.0848093449062396e-01`, `y_exact=-6.5748883464810823e-02`
+  - train[16] t_remaining=31: `x_unmit=8.6956521739130432e-02`, `x_rem=2.3179723356585946e-01`, `y_exact=3.5448711025177489e-03`
+  - train[17] t_remaining=32: `x_unmit=8.9655172413793102e-02`, `x_rem=2.9449665615378579e-01`, `y_exact=-6.0061905410951744e-02`
+  - train[18] t_remaining=30: `x_unmit=9.3750000000000000e-02`, `x_rem=2.8600708145542553e-01`, `y_exact=3.1707666886048012e-09`
+  - train[19] t_remaining=32: `x_unmit=-6.3492063492063489e-02`, `x_rem=-2.4119087812387646e-01`, `y_exact=-1.3607621570055834e-02`
+  - train[20] t_remaining=31: `x_unmit=1.1627906976744186e-01`, `x_rem=3.7325165074148225e-01`, `y_exact=-1.8441274593310052e-08`
+  - train[21] t_remaining=31: `x_unmit=-1.4285714285714285e-02`, `x_rem=-1.7096666721547572e-02`, `y_exact=-1.1013220842158142e-02`
+  - train[22] t_remaining=30: `x_unmit=-7.7922077922077920e-02`, `x_rem=-2.1065988354482576e-01`, `y_exact=4.0437273120558047e-09`
+  - train[23] t_remaining=30: `x_unmit=2.0134228187919462e-02`, `x_rem=1.0018207784602507e-02`, `y_exact=-1.0944301953017007e-08`
+- target x values: `x_u_target=0.0000000000000000e+00`, `x_r_target=4.3968132121577644e-02`
+- target contribution to E_cdr_unmit: `3.3350312399027278e-05`
+- target contribution to E_cdr_rem: `3.9135921459302386e-05`
+
+### term 42
+- pauli term from int row: `(1.4402144799171426e-02)*Z(q(0, 0))*Y(q(1, 0))*Z(q(1, 1))*Y(q(1, 2))`
+- int observable row: `[3, 0, 0, 0, 2, 3, 2, 0]`
+- Hamiltonian weight w_42: `1.4402144799171426e-02`
+- OGM effective shots used for this term: `403`
+- fitted unmit coeffs: `a_u=8.0903837625963271e-01`, `b_u=-5.0100621370516671e-02`
+- fitted rem coeffs: `a_r=3.7973228528989617e-01`, `b_r=-4.9872280906025281e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=3.1746031746031744e-02`, `x_rem=4.8558353387071450e-02`, `y_exact=2.6882319361168033e-01`
+  - train[1] t_remaining=29: `x_unmit=6.5963060686015845e-02`, `x_rem=1.3859386176147293e-01`, `y_exact=-2.4359629547546226e-08`
+  - train[2] t_remaining=30: `x_unmit=-2.6041666666666668e-02`, `x_rem=-3.9250067011428996e-02`, `y_exact=8.0252531541133288e-08`
+  - train[3] t_remaining=31: `x_unmit=7.8125000000000000e-02`, `x_rem=1.5761201640498099e-01`, `y_exact=3.2948002886029865e-01`
+  - train[4] t_remaining=30: `x_unmit=2.4128686327077747e-02`, `x_rem=3.7660331894927956e-02`, `y_exact=-1.4012305574661515e-01`
+  - train[5] t_remaining=31: `x_unmit=-4.2821158690176324e-02`, `x_rem=-9.0891364988807011e-02`, `y_exact=-4.4110401514830514e-09`
+  - train[6] t_remaining=31: `x_unmit=-1.0169491525423729e-01`, `x_rem=-2.1452578961632568e-01`, `y_exact=9.8588413841534908e-08`
+  - train[7] t_remaining=31: `x_unmit=5.2631578947368418e-02`, `x_rem=1.1765961203284107e-01`, `y_exact=-1.0716496472210178e-08`
+  - train[8] t_remaining=30: `x_unmit=1.0869565217391304e-01`, `x_rem=2.1249478038521938e-01`, `y_exact=-3.5293904652224400e-01`
+  - train[9] t_remaining=32: `x_unmit=-8.2666666666666666e-02`, `x_rem=-1.7391171348773923e-01`, `y_exact=-1.4207614504045812e-01`
+  - train[10] t_remaining=30: `x_unmit=4.6153846153846156e-02`, `x_rem=9.9365053803058961e-02`, `y_exact=-1.6193770715432140e-01`
+  - train[11] t_remaining=29: `x_unmit=1.7721518987341769e-02`, `x_rem=3.2745427028857813e-02`, `y_exact=4.1473960082252320e-01`
+  - train[12] t_remaining=30: `x_unmit=7.9575596816976128e-03`, `x_rem=2.8044875352043769e-02`, `y_exact=4.8707148292486288e-08`
+  - train[13] t_remaining=29: `x_unmit=-2.4390243902439025e-02`, `x_rem=-4.3509254852931514e-02`, `y_exact=-1.6193761160499442e-01`
+  - train[14] t_remaining=32: `x_unmit=1.4005602240896359e-02`, `x_rem=2.9272619201529560e-02`, `y_exact=-2.8327332140421824e-02`
+  - train[15] t_remaining=32: `x_unmit=8.8888888888888892e-02`, `x_rem=1.8011671230559445e-01`, `y_exact=1.2026084302416873e-01`
+  - train[16] t_remaining=31: `x_unmit=-2.8571428571428571e-02`, `x_rem=-5.8725243444062908e-02`, `y_exact=-3.7354288711150674e-01`
+  - train[17] t_remaining=32: `x_unmit=-6.4356435643564358e-02`, `x_rem=-1.3526061069254278e-01`, `y_exact=-2.2368861479047641e-01`
+  - train[18] t_remaining=30: `x_unmit=1.3192612137203167e-02`, `x_rem=3.0265780634075180e-02`, `y_exact=3.9226963351508134e-08`
+  - train[19] t_remaining=32: `x_unmit=-1.8087855297157621e-02`, `x_rem=-3.4648267807575683e-02`, `y_exact=-2.4594860845465555e-01`
+  - train[20] t_remaining=31: `x_unmit=-1.0204081632653060e-02`, `x_rem=-2.6347055363405019e-02`, `y_exact=1.4023509970038398e-08`
+  - train[21] t_remaining=31: `x_unmit=5.6701030927835051e-02`, `x_rem=1.2196154080997380e-01`, `y_exact=-8.7000952974821480e-02`
+  - train[22] t_remaining=30: `x_unmit=-6.2176165803108807e-02`, `x_rem=-1.2419723586980669e-01`, `y_exact=-1.6259572306071815e-01`
+  - train[23] t_remaining=30: `x_unmit=4.0609137055837560e-02`, `x_rem=8.7721300883078598e-02`, `y_exact=-1.0551676020601530e-01`
+- target x values: `x_u_target=-1.0784313725490197e-01`, `x_r_target=-2.2701879276072556e-01`
+- target contribution to E_cdr_unmit: `-1.9781325434356182e-03`
+- target contribution to E_cdr_rem: `-1.9598243621081913e-03`
+
+### term 43
+- pauli term from int row: `(1.4402144799171426e-02)*Z(q(0, 0))*X(q(1, 0))*Z(q(1, 1))*X(q(1, 2))`
+- int observable row: `[3, 0, 0, 0, 1, 3, 1, 0]`
+- Hamiltonian weight w_43: `1.4402144799171426e-02`
+- OGM effective shots used for this term: `365`
+- fitted unmit coeffs: `a_u=1.9367027908477668e+00`, `b_u=-2.2835914178416131e-02`
+- fitted rem coeffs: `a_r=9.1422324754154394e-01`, `b_r=-2.3666766357241686e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=5.5248618784530384e-03`, `x_rem=2.1278130287353692e-03`, `y_exact=2.6882318274807482e-01`
+  - train[1] t_remaining=29: `x_unmit=-4.4854881266490766e-02`, `x_rem=-8.5319288019337150e-02`, `y_exact=3.2654462786066855e-08`
+  - train[2] t_remaining=30: `x_unmit=9.3525179856115109e-02`, `x_rem=1.9181628685393684e-01`, `y_exact=8.9192028920285764e-08`
+  - train[3] t_remaining=31: `x_unmit=3.5629453681710214e-02`, `x_rem=6.6416650830616847e-02`, `y_exact=3.2948006107388783e-01`
+  - train[4] t_remaining=30: `x_unmit=-1.8276762402088774e-02`, `x_rem=-2.2563986399299261e-02`, `y_exact=-1.4012305574660419e-01`
+  - train[5] t_remaining=31: `x_unmit=-5.2631578947368418e-02`, `x_rem=-1.0388496469491247e-01`, `y_exact=-3.1201573950352527e-08`
+  - train[6] t_remaining=31: `x_unmit=0.0000000000000000e+00`, `x_rem=-4.3554058606914293e-03`, `y_exact=3.9735490265685207e-08`
+  - train[7] t_remaining=31: `x_unmit=-4.5782392768047692e-18`, `x_rem=7.2176347304917761e-03`, `y_exact=1.6826553654672677e-08`
+  - train[8] t_remaining=30: `x_unmit=-8.0459770114942528e-02`, `x_rem=-1.4327698306191949e-01`, `y_exact=-3.5293907176562161e-01`
+  - train[9] t_remaining=32: `x_unmit=-3.3149171270718231e-02`, `x_rem=-5.4163278206032922e-02`, `y_exact=-1.4207628693889562e-01`
+  - train[10] t_remaining=30: `x_unmit=2.9556650246305417e-02`, `x_rem=6.6911990712449132e-02`, `y_exact=-1.6193770715427541e-01`
+  - train[11] t_remaining=29: `x_unmit=9.0909090909090912e-02`, `x_rem=1.6870066138321146e-01`, `y_exact=4.1473960082249284e-01`
+  - train[12] t_remaining=30: `x_unmit=-8.4507042253521118e-03`, `x_rem=-1.8907958358754969e-02`, `y_exact=5.0472162530699429e-08`
+  - train[13] t_remaining=29: `x_unmit=-3.2085561497326207e-02`, `x_rem=-7.4800640337002344e-02`, `y_exact=-1.6193761160499298e-01`
+  - train[14] t_remaining=32: `x_unmit=-1.5306122448979591e-02`, `x_rem=-4.4387808491562757e-02`, `y_exact=-2.8327336499240015e-02`
+  - train[15] t_remaining=32: `x_unmit=-7.8740157480314960e-03`, `x_rem=-1.9953451580888265e-02`, `y_exact=1.2026083524200024e-01`
+  - train[16] t_remaining=31: `x_unmit=-1.3684210526315790e-01`, `x_rem=-2.7245533958428181e-01`, `y_exact=-3.7354291941175433e-01`
+  - train[17] t_remaining=32: `x_unmit=2.6086956521739129e-02`, `x_rem=6.0624962737540755e-02`, `y_exact=-2.2368861587996389e-01`
+  - train[18] t_remaining=30: `x_unmit=-6.8493150684931503e-02`, `x_rem=-1.3459613361736167e-01`, `y_exact=-1.9111620740382563e-08`
+  - train[19] t_remaining=32: `x_unmit=-2.5974025974025974e-03`, `x_rem=-3.8530178323289001e-04`, `y_exact=-2.4594866386649217e-01`
+  - train[20] t_remaining=31: `x_unmit=6.0913705583756347e-02`, `x_rem=1.1860921121396804e-01`, `y_exact=5.1385179347703359e-08`
+  - train[21] t_remaining=31: `x_unmit=-5.0561797752808987e-02`, `x_rem=-1.0737754365158313e-01`, `y_exact=-8.7000855487131573e-02`
+  - train[22] t_remaining=30: `x_unmit=2.3136246786632390e-02`, `x_rem=3.6277285840440335e-02`, `y_exact=-1.6259575449504426e-01`
+  - train[23] t_remaining=30: `x_unmit=-7.4074074074074070e-02`, `x_rem=-1.6204484647878487e-01`, `y_exact=-1.0551686908357592e-01`
+- target x values: `x_u_target=6.8354430379746839e-02`, `x_r_target=1.4506248618309742e-01`
+- target contribution to E_cdr_unmit: `1.5777017022473832e-03`
+- target contribution to E_cdr_rem: `1.5691530060751554e-03`
+
+### term 44
+- pauli term from int row: `(3.1904871706747322e-02)*Y(q(0, 0))*Z(q(0, 1))*Y(q(0, 2))*Y(q(1, 0))*Z(q(1, 1))*Y(q(1, 2))`
+- int observable row: `[2, 3, 2, 0, 2, 3, 2, 0]`
+- Hamiltonian weight w_44: `3.1904871706747322e-02`
+- OGM effective shots used for this term: `191`
+- fitted unmit coeffs: `a_u=-1.2706950852540147e-01`, `b_u=1.0711644079965489e-01`
+- fitted rem coeffs: `a_r=-3.0111070246817823e-02`, `b_r=1.0694948970383267e-01`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-3.4482758620689655e-02`, `x_rem=-1.1340878506510091e-01`, `y_exact=4.1743195055572646e-01`
+  - train[1] t_remaining=29: `x_unmit=3.6649214659685861e-02`, `x_rem=1.1770440125915918e-01`, `y_exact=-1.1025294909613907e-08`
+  - train[2] t_remaining=30: `x_unmit=7.3446327683615822e-02`, `x_rem=2.3801940278580427e-01`, `y_exact=-1.7622904118611126e-09`
+  - train[3] t_remaining=31: `x_unmit=-3.5175879396984924e-02`, `x_rem=-8.1624181635989529e-02`, `y_exact=6.1975889137618656e-01`
+  - train[4] t_remaining=30: `x_unmit=7.1090047393364927e-02`, `x_rem=2.0495849180567971e-01`, `y_exact=1.5201362179167191e-01`
+  - train[5] t_remaining=31: `x_unmit=-8.7557603686635940e-02`, `x_rem=-2.6927346007968922e-01`, `y_exact=1.6409651003196293e-08`
+  - train[6] t_remaining=31: `x_unmit=-1.6763005780346821e-01`, `x_rem=-5.5295719123088072e-01`, `y_exact=-1.0525304743759809e-08`
+  - train[7] t_remaining=31: `x_unmit=4.1237113402061855e-02`, `x_rem=7.8258096630015483e-02`, `y_exact=-1.1919748021643076e-08`
+  - train[8] t_remaining=30: `x_unmit=8.3798882681564241e-02`, `x_rem=3.2825911750324066e-01`, `y_exact=1.5939047590773986e-01`
+  - train[9] t_remaining=32: `x_unmit=-5.5865921787709499e-03`, `x_rem=3.7356573365194545e-02`, `y_exact=2.5609947080422892e-02`
+  - train[10] t_remaining=30: `x_unmit=7.2164948453608241e-02`, `x_rem=2.5387599611378103e-01`, `y_exact=1.9044696486974419e-02`
+  - train[11] t_remaining=29: `x_unmit=-4.3010752688172046e-02`, `x_rem=-1.0395776401967714e-01`, `y_exact=3.1026033194386510e-01`
+  - train[12] t_remaining=30: `x_unmit=-4.8780487804878049e-03`, `x_rem=-6.2553438381769202e-02`, `y_exact=1.0813796154158674e-08`
+  - train[13] t_remaining=29: `x_unmit=5.5865921787709499e-03`, `x_rem=5.6035698860368903e-02`, `y_exact=1.9044617785017245e-02`
+  - train[14] t_remaining=32: `x_unmit=-5.4054054054054057e-03`, `x_rem=1.7659258760744017e-02`, `y_exact=8.0881712065566632e-04`
+  - train[15] t_remaining=32: `x_unmit=-1.5384615384615385e-02`, `x_rem=-6.0597695052201569e-02`, `y_exact=2.0182100844762174e-01`
+  - train[16] t_remaining=31: `x_unmit=1.1578947368421053e-01`, `x_rem=3.3366887580838001e-01`, `y_exact=1.1154411909285408e-01`
+  - train[17] t_remaining=32: `x_unmit=2.7027027027027029e-02`, `x_rem=7.9423862236495960e-02`, `y_exact=1.0056463561665416e-01`
+  - train[18] t_remaining=30: `x_unmit=-1.0989010989010990e-02`, `x_rem=-1.6819296562195652e-02`, `y_exact=-1.6351304686952816e-08`
+  - train[19] t_remaining=32: `x_unmit=1.2371134020618557e-01`, `x_rem=3.8781522349785780e-01`, `y_exact=1.9279903780687382e-01`
+  - train[20] t_remaining=31: `x_unmit=-8.8757396449704137e-02`, `x_rem=-2.2043838565554413e-01`, `y_exact=7.5719176495254210e-09`
+  - train[21] t_remaining=31: `x_unmit=8.7719298245614030e-02`, `x_rem=2.4971166880087237e-01`, `y_exact=3.7450786507377432e-02`
+  - train[22] t_remaining=30: `x_unmit=7.6142131979695438e-02`, `x_rem=2.2974946133996579e-01`, `y_exact=4.9722001128527989e-02`
+  - train[23] t_remaining=30: `x_unmit=-7.6923076923076927e-02`, `x_rem=-2.5711520679651012e-01`, `y_exact=1.2321326159514975e-01`
+- target x values: `x_u_target=-2.6737967914438502e-02`, `x_r_target=-5.8312543885427184e-02`
+- target contribution to E_cdr_unmit: `3.5259356695071424e-03`
+- target contribution to E_cdr_rem: `3.4682300161603262e-03`
+
+### term 45
+- pauli term from int row: `(3.1904871706747322e-02)*Y(q(0, 0))*Z(q(0, 1))*Y(q(0, 2))*X(q(1, 0))*Z(q(1, 1))*X(q(1, 2))`
+- int observable row: `[2, 3, 2, 0, 1, 3, 1, 0]`
+- Hamiltonian weight w_45: `3.1904871706747322e-02`
+- OGM effective shots used for this term: `185`
+- fitted unmit coeffs: `a_u=-3.1800603197493879e-02`, `b_u=1.0621657508006087e-01`
+- fitted rem coeffs: `a_r=-4.6741039838416945e-03`, `b_r=1.0604743973735706e-01`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=5.8479532163742687e-03`, `x_rem=1.2737048268067206e-03`, `y_exact=4.1743189130458824e-01`
+  - train[1] t_remaining=29: `x_unmit=-2.3041474654377881e-02`, `x_rem=-8.3573676089751761e-02`, `y_exact=-1.4717559343865179e-08`
+  - train[2] t_remaining=30: `x_unmit=0.0000000000000000e+00`, `x_rem=-1.1918682081811242e-02`, `y_exact=2.7048531317296825e-09`
+  - train[3] t_remaining=31: `x_unmit=5.5555555555555552e-02`, `x_rem=1.8366531619295684e-01`, `y_exact=6.1975887728585388e-01`
+  - train[4] t_remaining=30: `x_unmit=4.0816326530612242e-02`, `x_rem=1.0555621481155376e-01`, `y_exact=1.5201362179166839e-01`
+  - train[5] t_remaining=31: `x_unmit=6.6666666666666666e-02`, `x_rem=2.1983764865139080e-01`, `y_exact=1.3729115335240611e-08`
+  - train[6] t_remaining=31: `x_unmit=5.7142857142857141e-02`, `x_rem=1.8918085067036716e-01`, `y_exact=4.1057379018873148e-10`
+  - train[7] t_remaining=31: `x_unmit=1.3812154696132597e-01`, `x_rem=3.9559757833869869e-01`, `y_exact=6.8023284397551017e-09`
+  - train[8] t_remaining=30: `x_unmit=4.3902439024390241e-02`, `x_rem=1.6740903106265306e-01`, `y_exact=1.5939048764712221e-01`
+  - train[9] t_remaining=32: `x_unmit=6.9767441860465115e-02`, `x_rem=2.3228451775887501e-01`, `y_exact=2.5609959716480647e-02`
+  - train[10] t_remaining=30: `x_unmit=-3.8674033149171269e-02`, `x_rem=-1.3010102026640769e-01`, `y_exact=1.9044696486977077e-02`
+  - train[11] t_remaining=29: `x_unmit=-3.2258064516129031e-02`, `x_rem=-5.8750957628764484e-02`, `y_exact=3.1026033194385966e-01`
+  - train[12] t_remaining=30: `x_unmit=8.2474226804123710e-02`, `x_rem=2.4295620149912581e-01`, `y_exact=4.8941019409517104e-09`
+  - train[13] t_remaining=29: `x_unmit=1.5706806282722512e-02`, `x_rem=2.6234298912071505e-02`, `y_exact=1.9044617785002351e-02`
+  - train[14] t_remaining=32: `x_unmit=1.1111111111111110e-01`, `x_rem=3.9259697346984890e-01`, `y_exact=8.0881449268061900e-04`
+  - train[15] t_remaining=32: `x_unmit=-1.2568306010928962e-01`, `x_rem=-3.8524303064026300e-01`, `y_exact=2.0182112735659136e-01`
+  - train[16] t_remaining=31: `x_unmit=5.1020408163265307e-02`, `x_rem=1.7331350108634996e-01`, `y_exact=1.1154410294402405e-01`
+  - train[17] t_remaining=32: `x_unmit=7.6923076923076927e-02`, `x_rem=2.6116419155879683e-01`, `y_exact=1.0056461422023040e-01`
+  - train[18] t_remaining=30: `x_unmit=-4.3956043956043959e-02`, `x_rem=-9.0162415296968418e-02`, `y_exact=4.1834018300482895e-09`
+  - train[19] t_remaining=32: `x_unmit=1.0502283105022830e-01`, `x_rem=3.3000049610919552e-01`, `y_exact=1.9279904537959353e-01`
+  - train[20] t_remaining=31: `x_unmit=0.0000000000000000e+00`, `x_rem=2.6301530390964931e-02`, `y_exact=1.5251058771511279e-08`
+  - train[21] t_remaining=31: `x_unmit=-1.0497237569060773e-01`, `x_rem=-3.3684446147032848e-01`, `y_exact=3.7450852948209844e-02`
+  - train[22] t_remaining=30: `x_unmit=-1.7204301075268819e-01`, `x_rem=-5.7076044605722931e-01`, `y_exact=4.9722071306404762e-02`
+  - train[23] t_remaining=30: `x_unmit=-1.0526315789473684e-01`, `x_rem=-2.8301421276189997e-01`, `y_exact=1.2321331141985178e-01`
+- target x values: `x_u_target=5.2132701421800945e-02`, `x_r_target=1.6926804961317035e-01`
+- target contribution to E_cdr_unmit: `3.3359326663800746e-03`
+- target contribution to E_cdr_rem: `3.3581875760350863e-03`
+
+### term 46
+- pauli term from int row: `(3.1904871706747322e-02)*X(q(0, 0))*Z(q(0, 1))*X(q(0, 2))*Y(q(1, 0))*Z(q(1, 1))*Y(q(1, 2))`
+- int observable row: `[1, 3, 1, 0, 2, 3, 2, 0]`
+- Hamiltonian weight w_46: `3.1904871706747322e-02`
+- OGM effective shots used for this term: `177`
+- fitted unmit coeffs: `a_u=6.7996150682351664e-01`, `b_u=1.0858805505189635e-01`
+- fitted rem coeffs: `a_r=1.9512322518719286e-01`, `b_r=1.0743115484497311e-01`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=3.9215686274509803e-02`, `x_rem=1.4583401711814747e-01`, `y_exact=4.1743194979366466e-01`
+  - train[1] t_remaining=29: `x_unmit=2.2988505747126436e-02`, `x_rem=5.0148411801473419e-02`, `y_exact=1.6789964763627355e-08`
+  - train[2] t_remaining=30: `x_unmit=1.6949152542372881e-02`, `x_rem=8.4141590572650179e-02`, `y_exact=-1.0628478902288287e-08`
+  - train[3] t_remaining=31: `x_unmit=3.8674033149171269e-02`, `x_rem=1.1131777009463741e-01`, `y_exact=6.1975889093258030e-01`
+  - train[4] t_remaining=30: `x_unmit=5.0251256281407036e-03`, `x_rem=5.9620805045312829e-02`, `y_exact=1.5201362179166378e-01`
+  - train[5] t_remaining=31: `x_unmit=-6.2500000000000000e-02`, `x_rem=-1.8495065088702689e-01`, `y_exact=2.0729908208054590e-08`
+  - train[6] t_remaining=31: `x_unmit=-9.1954022988505746e-02`, `x_rem=-2.6041437951333868e-01`, `y_exact=-8.5016727662837333e-09`
+  - train[7] t_remaining=31: `x_unmit=-1.2707182320441990e-01`, `x_rem=-4.6384088945605767e-01`, `y_exact=1.1133361803218906e-08`
+  - train[8] t_remaining=30: `x_unmit=-4.4843049327354259e-03`, `x_rem=-3.5319826044033456e-02`, `y_exact=1.5939047739115372e-01`
+  - train[9] t_remaining=32: `x_unmit=4.0404040404040407e-02`, `x_rem=1.6353334201335143e-01`, `y_exact=2.5609973407877809e-02`
+  - train[10] t_remaining=30: `x_unmit=1.6759776536312849e-02`, `x_rem=9.3756080452594894e-03`, `y_exact=1.9044696486968146e-02`
+  - train[11] t_remaining=29: `x_unmit=1.1904761904761904e-02`, `x_rem=5.2884581381402854e-02`, `y_exact=3.1026033194385960e-01`
+  - train[12] t_remaining=30: `x_unmit=5.5555555555555552e-02`, `x_rem=2.4573554969709935e-01`, `y_exact=8.0185437619700130e-09`
+  - train[13] t_remaining=29: `x_unmit=0.0000000000000000e+00`, `x_rem=1.4270069058352040e-02`, `y_exact=1.9044617785009661e-02`
+  - train[14] t_remaining=32: `x_unmit=-8.9201877934272297e-02`, `x_rem=-2.7771975587152570e-01`, `y_exact=8.0881402060643402e-04`
+  - train[15] t_remaining=32: `x_unmit=1.3989637305699482e-01`, `x_rem=4.4383269598941927e-01`, `y_exact=2.0182100295114819e-01`
+  - train[16] t_remaining=31: `x_unmit=7.0000000000000007e-02`, `x_rem=2.4741457536236527e-01`, `y_exact=1.1154411794862110e-01`
+  - train[17] t_remaining=32: `x_unmit=2.2727272727272728e-02`, `x_rem=6.8234935317709758e-02`, `y_exact=1.0056464264934223e-01`
+  - train[18] t_remaining=30: `x_unmit=-1.0552763819095477e-01`, `x_rem=-2.9224478466788034e-01`, `y_exact=1.6576698109704031e-08`
+  - train[19] t_remaining=32: `x_unmit=-1.1111111111111110e-01`, `x_rem=-3.6956885635948922e-01`, `y_exact=1.9279907539811625e-01`
+  - train[20] t_remaining=31: `x_unmit=-6.8783068783068779e-02`, `x_rem=-2.4302210450765332e-01`, `y_exact=-1.9423871027066823e-08`
+  - train[21] t_remaining=31: `x_unmit=-4.6153846153846156e-02`, `x_rem=-1.7379580377576592e-01`, `y_exact=3.7450840925131255e-02`
+  - train[22] t_remaining=30: `x_unmit=1.1917098445595854e-01`, `x_rem=3.7806309581330688e-01`, `y_exact=4.9721992689740868e-02`
+  - train[23] t_remaining=30: `x_unmit=1.0989010989010990e-02`, `x_rem=3.2391000139871423e-02`, `y_exact=1.2321331433954451e-01`
+- target x values: `x_u_target=-1.9480519480519481e-01`, `x_r_target=-6.3043373035827810e-01`
+- target contribution to E_cdr_unmit: `-7.6163241924199804e-04`
+- target contribution to E_cdr_rem: `-4.9711324825797308e-04`
+
+### term 47
+- pauli term from int row: `(3.1904871706747322e-02)*X(q(0, 0))*Z(q(0, 1))*X(q(0, 2))*X(q(1, 0))*Z(q(1, 1))*X(q(1, 2))`
+- int observable row: `[1, 3, 1, 0, 1, 3, 1, 0]`
+- Hamiltonian weight w_47: `3.1904871706747322e-02`
+- OGM effective shots used for this term: `191`
+- fitted unmit coeffs: `a_u=4.5931714656839090e-01`, `b_u=1.0959242958011946e-01`
+- fitted rem coeffs: `a_r=1.1737383944614224e-01`, `b_r=1.0877648889119840e-01`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-5.6410256410256411e-02`, `x_rem=-1.9669520553813910e-01`, `y_exact=4.1743192780011135e-01`
+  - train[1] t_remaining=29: `x_unmit=7.6086956521739135e-02`, `x_rem=2.5815033920600078e-01`, `y_exact=2.8941854240857534e-09`
+  - train[2] t_remaining=30: `x_unmit=-2.3255813953488372e-02`, `x_rem=-2.8638153916538789e-02`, `y_exact=1.7365592434940212e-09`
+  - train[3] t_remaining=31: `x_unmit=5.8823529411764705e-02`, `x_rem=1.3726952368320236e-01`, `y_exact=6.1975887886410275e-01`
+  - train[4] t_remaining=30: `x_unmit=-4.1237113402061855e-02`, `x_rem=-1.4503159469819807e-01`, `y_exact=1.5201362179167144e-01`
+  - train[5] t_remaining=31: `x_unmit=-8.9005235602094238e-02`, `x_rem=-2.6306850755274297e-01`, `y_exact=1.5786557636944026e-08`
+  - train[6] t_remaining=31: `x_unmit=-1.5254237288135594e-01`, `x_rem=-5.0618793642652293e-01`, `y_exact=3.9595177427603892e-10`
+  - train[7] t_remaining=31: `x_unmit=5.3658536585365853e-02`, `x_rem=2.0665770866930919e-01`, `y_exact=-1.4259187263304174e-08`
+  - train[8] t_remaining=30: `x_unmit=-2.4691358024691357e-02`, `x_rem=-7.7207427537704876e-02`, `y_exact=1.5939049044499420e-01`
+  - train[9] t_remaining=32: `x_unmit=-3.0303030303030304e-02`, `x_rem=-1.3601475183298847e-01`, `y_exact=2.5609933541952325e-02`
+  - train[10] t_remaining=30: `x_unmit=-4.6979865771812082e-02`, `x_rem=-1.6706633513409455e-01`, `y_exact=1.9044696486978714e-02`
+  - train[11] t_remaining=29: `x_unmit=4.1666666666666664e-02`, `x_rem=1.4698894187789863e-01`, `y_exact=3.1026033194384828e-01`
+  - train[12] t_remaining=30: `x_unmit=-1.6363636363636364e-01`, `x_rem=-5.1773747953961269e-01`, `y_exact=1.6291190640455516e-09`
+  - train[13] t_remaining=29: `x_unmit=-9.9415204678362568e-02`, `x_rem=-2.8526679939206778e-01`, `y_exact=1.9044617785004919e-02`
+  - train[14] t_remaining=32: `x_unmit=1.5075376884422110e-02`, `x_rem=5.6628743659084955e-02`, `y_exact=8.0880930277986841e-04`
+  - train[15] t_remaining=32: `x_unmit=-1.0309278350515464e-02`, `x_rem=-3.6844794897512918e-02`, `y_exact=2.0182107619104167e-01`
+  - train[16] t_remaining=31: `x_unmit=0.0000000000000000e+00`, `x_rem=4.5509441284085933e-02`, `y_exact=1.1154410186553665e-01`
+  - train[17] t_remaining=32: `x_unmit=-2.5906735751295335e-02`, `x_rem=-8.7917853670744256e-02`, `y_exact=1.0056461342399929e-01`
+  - train[18] t_remaining=30: `x_unmit=5.0847457627118647e-02`, `x_rem=1.4059022237565058e-01`, `y_exact=-2.2185766845003995e-08`
+  - train[19] t_remaining=32: `x_unmit=7.4468085106382975e-02`, `x_rem=2.8700488885807224e-01`, `y_exact=1.9279902420643935e-01`
+  - train[20] t_remaining=31: `x_unmit=4.4444444444444446e-02`, `x_rem=1.6559590526963566e-01`, `y_exact=-6.5654485857764758e-09`
+  - train[21] t_remaining=31: `x_unmit=4.1666666666666664e-02`, `x_rem=1.4718353134730897e-01`, `y_exact=3.7450825140992280e-02`
+  - train[22] t_remaining=30: `x_unmit=-6.0465116279069767e-02`, `x_rem=-2.4890732567754112e-01`, `y_exact=4.9722041847880781e-02`
+  - train[23] t_remaining=30: `x_unmit=1.7204301075268819e-01`, `x_rem=5.0727857318779968e-01`, `y_exact=1.2321332710480305e-01`
+- target x values: `x_u_target=-2.6315789473684209e-02`, `x_r_target=-4.2027428471533006e-02`
+- target contribution to E_cdr_unmit: `3.1108888627851420e-03`
+- target contribution to E_cdr_rem: `3.3131157225694489e-03`
+
+### term 48
+- pauli term from int row: `(-7.6214047937498827e-03)*Y(q(0, 0))*Y(q(0, 1))*Y(q(1, 0))*Z(q(1, 1))*Z(q(1, 2))*Y(q(1, 3))`
+- int observable row: `[2, 2, 0, 0, 2, 3, 3, 2]`
+- Hamiltonian weight w_48: `-7.6214047937498827e-03`
+- OGM effective shots used for this term: `138`
+- fitted unmit coeffs: `a_u=3.6901105198513647e-02`, `b_u=-2.9415107347496995e-03`
+- fitted rem coeffs: `a_r=1.1524901981909287e-02`, `b_r=-2.9228670451416894e-03`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-2.5641025641025640e-02`, `x_rem=-9.8241030121446860e-02`, `y_exact=5.8345860169439850e-02`
+  - train[1] t_remaining=29: `x_unmit=-5.5214723926380369e-02`, `x_rem=-1.6510298107546451e-01`, `y_exact=7.4857142657856641e-09`
+  - train[2] t_remaining=30: `x_unmit=-2.7027027027027029e-02`, `x_rem=-9.3329392037323641e-02`, `y_exact=7.7088529877593921e-09`
+  - train[3] t_remaining=31: `x_unmit=-4.6357615894039736e-02`, `x_rem=-1.5175028945798066e-01`, `y_exact=3.1669188837886390e-03`
+  - train[4] t_remaining=30: `x_unmit=3.8759689922480620e-02`, `x_rem=1.1563377968871640e-01`, `y_exact=-1.5246826237151765e-09`
+  - train[5] t_remaining=31: `x_unmit=5.6000000000000001e-02`, `x_rem=1.4988089750016473e-01`, `y_exact=1.7868891521285987e-08`
+  - train[6] t_remaining=31: `x_unmit=3.5460992907801421e-02`, `x_rem=1.4067320366279659e-01`, `y_exact=-5.4644430180804749e-09`
+  - train[7] t_remaining=31: `x_unmit=-2.1621621621621623e-01`, `x_rem=-6.4355459388638925e-01`, `y_exact=-1.7687364495364880e-08`
+  - train[8] t_remaining=30: `x_unmit=5.6338028169014086e-02`, `x_rem=1.5169671683756811e-01`, `y_exact=-6.4096317979266280e-09`
+  - train[9] t_remaining=32: `x_unmit=-7.2992700729927005e-03`, `x_rem=-4.4319773872615591e-02`, `y_exact=-7.0694097731977320e-03`
+  - train[10] t_remaining=30: `x_unmit=2.0979020979020980e-02`, `x_rem=2.6679554568557362e-02`, `y_exact=-1.3947860667507827e-08`
+  - train[11] t_remaining=29: `x_unmit=5.0359712230215826e-02`, `x_rem=9.4858532366003903e-02`, `y_exact=4.8780367673893002e-09`
+  - train[12] t_remaining=30: `x_unmit=-4.8387096774193547e-02`, `x_rem=-1.5902151506587933e-01`, `y_exact=5.8670013295297375e-09`
+  - train[13] t_remaining=29: `x_unmit=-2.1582733812949641e-02`, `x_rem=-8.2621000639078651e-02`, `y_exact=-4.5739698581681699e-09`
+  - train[14] t_remaining=32: `x_unmit=-5.8823529411764705e-02`, `x_rem=-1.5392995364796902e-01`, `y_exact=1.7930879048321191e-04`
+  - train[15] t_remaining=32: `x_unmit=-2.6315789473684209e-02`, `x_rem=-7.2682271665521728e-02`, `y_exact=-6.5748903096521399e-02`
+  - train[16] t_remaining=31: `x_unmit=-1.4492753623188406e-02`, `x_rem=-3.6493887691898881e-02`, `y_exact=3.5448914619394000e-03`
+  - train[17] t_remaining=32: `x_unmit=-1.2582781456953643e-01`, `x_rem=-3.8626948592822397e-01`, `y_exact=-6.0061886501384790e-02`
+  - train[18] t_remaining=30: `x_unmit=-6.6666666666666666e-02`, `x_rem=-2.2543835901476059e-01`, `y_exact=8.9149556205957052e-09`
+  - train[19] t_remaining=32: `x_unmit=-7.5187969924812026e-03`, `x_rem=-4.9622493430585991e-03`, `y_exact=-1.3607574673544389e-02`
+  - train[20] t_remaining=31: `x_unmit=8.6614173228346455e-02`, `x_rem=2.5930167395804871e-01`, `y_exact=-9.8859185023909528e-10`
+  - train[21] t_remaining=31: `x_unmit=-1.5873015873015872e-02`, `x_rem=-4.9450474828339322e-02`, `y_exact=-1.1013184891014188e-02`
+  - train[22] t_remaining=30: `x_unmit=7.8125000000000000e-02`, `x_rem=2.2546284627284519e-01`, `y_exact=1.0491628029039493e-08`
+  - train[23] t_remaining=30: `x_unmit=-2.4657534246575341e-01`, `x_rem=-7.1592067961008621e-01`, `y_exact=1.5066874583170254e-08`
+- target x values: `x_u_target=2.3255813953488372e-02`, `x_r_target=1.0422552754458854e-01`
+- target contribution to E_cdr_unmit: `1.5878019362255061e-05`
+- target contribution to E_cdr_rem: `1.3121605390645331e-05`
+
+### term 49
+- pauli term from int row: `(-7.6214047937498827e-03)*Y(q(0, 0))*Y(q(0, 1))*X(q(1, 0))*Z(q(1, 1))*Z(q(1, 2))*X(q(1, 3))`
+- int observable row: `[2, 2, 0, 0, 1, 3, 3, 1]`
+- Hamiltonian weight w_49: `-7.6214047937498827e-03`
+- OGM effective shots used for this term: `125`
+- fitted unmit coeffs: `a_u=-5.8577384268965541e-03`, `b_u=-3.7712646057755767e-03`
+- fitted rem coeffs: `a_r=3.3323229805315587e-03`, `b_r=-3.9708859703348033e-03`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-3.3112582781456956e-02`, `x_rem=-4.0403367321216854e-02`, `y_exact=5.8345901423399869e-02`
+  - train[1] t_remaining=29: `x_unmit=-3.5460992907801421e-02`, `x_rem=-9.6316561309686383e-02`, `y_exact=1.3485126648840681e-08`
+  - train[2] t_remaining=30: `x_unmit=8.9552238805970144e-02`, `x_rem=2.8004374527060777e-01`, `y_exact=-1.9464502484818468e-08`
+  - train[3] t_remaining=31: `x_unmit=-7.0967741935483872e-02`, `x_rem=-2.5391275026163551e-01`, `y_exact=3.1669055470449564e-03`
+  - train[4] t_remaining=30: `x_unmit=-9.9236641221374045e-02`, `x_rem=-2.7393307554786545e-01`, `y_exact=-1.3744995315986071e-09`
+  - train[5] t_remaining=31: `x_unmit=-3.2258064516129031e-02`, `x_rem=-1.0239547366851932e-01`, `y_exact=-1.6731425972887103e-09`
+  - train[6] t_remaining=31: `x_unmit=-6.9930069930069930e-03`, `x_rem=-3.4858648956476321e-02`, `y_exact=1.6370930166570744e-09`
+  - train[7] t_remaining=31: `x_unmit=-5.3435114503816793e-02`, `x_rem=-1.6562458849748168e-01`, `y_exact=-5.6854193568880800e-10`
+  - train[8] t_remaining=30: `x_unmit=1.9108280254777069e-02`, `x_rem=3.8374071062182956e-02`, `y_exact=-9.6862934936631322e-09`
+  - train[9] t_remaining=32: `x_unmit=4.4585987261146494e-02`, `x_rem=1.4925294688975896e-01`, `y_exact=-7.0694074913992440e-03`
+  - train[10] t_remaining=30: `x_unmit=-1.3513513513513514e-02`, `x_rem=-3.4897220401084464e-02`, `y_exact=-1.6390638143493821e-08`
+  - train[11] t_remaining=29: `x_unmit=-7.1942446043165471e-03`, `x_rem=4.3392273839785792e-02`, `y_exact=4.4594003607051050e-09`
+  - train[12] t_remaining=30: `x_unmit=1.3432835820895522e-01`, `x_rem=3.7235732960252049e-01`, `y_exact=1.8791948248989627e-09`
+  - train[13] t_remaining=29: `x_unmit=4.2253521126760563e-02`, `x_rem=1.2994080384973045e-01`, `y_exact=2.4302485101573965e-09`
+  - train[14] t_remaining=32: `x_unmit=-1.5151515151515152e-02`, `x_rem=-2.6446975997526486e-02`, `y_exact=1.7929580430181888e-04`
+  - train[15] t_remaining=32: `x_unmit=-2.4000000000000000e-02`, `x_rem=-6.1107343124431272e-02`, `y_exact=-6.5748884628725857e-02`
+  - train[16] t_remaining=31: `x_unmit=1.1392405063291139e-01`, `x_rem=3.3453938592496435e-01`, `y_exact=3.5449106148544647e-03`
+  - train[17] t_remaining=32: `x_unmit=5.2631578947368418e-02`, `x_rem=1.0020890239625541e-01`, `y_exact=-6.0061871281510491e-02`
+  - train[18] t_remaining=30: `x_unmit=-5.3333333333333337e-02`, `x_rem=-1.7982004859157286e-01`, `y_exact=4.5775598323857571e-09`
+  - train[19] t_remaining=32: `x_unmit=-7.9136690647482008e-02`, `x_rem=-2.7486481970932553e-01`, `y_exact=-1.3607595131983240e-02`
+  - train[20] t_remaining=31: `x_unmit=1.3432835820895522e-01`, `x_rem=4.1096328941305921e-01`, `y_exact=-2.3932886977103313e-08`
+  - train[21] t_remaining=31: `x_unmit=-5.7971014492753624e-02`, `x_rem=-1.6886623197957298e-01`, `y_exact=-1.1013173604263541e-02`
+  - train[22] t_remaining=30: `x_unmit=6.1224489795918366e-02`, `x_rem=1.8298787411874734e-01`, `y_exact=8.0440129254062651e-09`
+  - train[23] t_remaining=30: `x_unmit=1.8918918918918920e-01`, `x_rem=5.8286200435013535e-01`, `y_exact=2.2864106196991501e-08`
+- target x values: `x_u_target=6.6666666666666666e-02`, `x_r_target=1.9550223837099537e-01`
+- target contribution to E_cdr_unmit: `3.1718613860109395e-05`
+- target contribution to E_cdr_rem: `2.5298562474767623e-05`
+
+### term 50
+- pauli term from int row: `(-7.6214047937498827e-03)*X(q(0, 0))*X(q(0, 1))*Y(q(1, 0))*Z(q(1, 1))*Z(q(1, 2))*Y(q(1, 3))`
+- int observable row: `[1, 1, 0, 0, 2, 3, 3, 2]`
+- Hamiltonian weight w_50: `-7.6214047937498827e-03`
+- OGM effective shots used for this term: `140`
+- fitted unmit coeffs: `a_u=-5.0037145373617420e-02`, `b_u=-1.2857255376240229e-03`
+- fitted rem coeffs: `a_r=-1.4909901762792508e-02`, `b_r=-1.6380047286700785e-03`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=2.5316455696202531e-02`, `x_rem=7.0993720963154122e-02`, `y_exact=5.8345846468460007e-02`
+  - train[1] t_remaining=29: `x_unmit=1.2987012987012988e-02`, `x_rem=3.8902733185938905e-02`, `y_exact=-1.2847476880281211e-08`
+  - train[2] t_remaining=30: `x_unmit=0.0000000000000000e+00`, `x_rem=-5.8425658192993522e-02`, `y_exact=-1.2415010490374982e-08`
+  - train[3] t_remaining=31: `x_unmit=2.5316455696202531e-02`, `x_rem=7.0283190314505598e-02`, `y_exact=3.1669132998219077e-03`
+  - train[4] t_remaining=30: `x_unmit=1.3725490196078433e-01`, `x_rem=4.0123314181294356e-01`, `y_exact=1.1857991924494159e-09`
+  - train[5] t_remaining=31: `x_unmit=9.5541401273885357e-02`, `x_rem=2.7457147389921549e-01`, `y_exact=-4.7906057558376954e-09`
+  - train[6] t_remaining=31: `x_unmit=-5.1851851851851850e-02`, `x_rem=-1.8226979302564150e-01`, `y_exact=4.3260066217319039e-09`
+  - train[7] t_remaining=31: `x_unmit=-2.0408163265306121e-02`, `x_rem=-8.0397289696719984e-02`, `y_exact=-7.0598807739380296e-10`
+  - train[8] t_remaining=30: `x_unmit=6.2500000000000000e-02`, `x_rem=1.7705682780797788e-01`, `y_exact=-3.3264079872003491e-09`
+  - train[9] t_remaining=32: `x_unmit=2.4390243902439025e-02`, `x_rem=7.6724951047950088e-02`, `y_exact=-7.0694106283196081e-03`
+  - train[10] t_remaining=30: `x_unmit=2.6315789473684209e-02`, `x_rem=1.1093186815302779e-01`, `y_exact=7.8861028492727916e-09`
+  - train[11] t_remaining=29: `x_unmit=-1.5384615384615385e-02`, `x_rem=-3.7380111386423949e-02`, `y_exact=1.0344733861976365e-09`
+  - train[12] t_remaining=30: `x_unmit=1.2230215827338130e-01`, `x_rem=3.9291016562974301e-01`, `y_exact=-2.4637668997721517e-08`
+  - train[13] t_remaining=29: `x_unmit=6.4748201438848921e-02`, `x_rem=1.9025555726164636e-01`, `y_exact=4.5962011601573336e-09`
+  - train[14] t_remaining=32: `x_unmit=1.2500000000000000e-01`, `x_rem=3.9288199235539367e-01`, `y_exact=1.7930108935133475e-04`
+  - train[15] t_remaining=32: `x_unmit=1.1267605633802817e-01`, `x_rem=3.4445220385280600e-01`, `y_exact=-6.5748898967610020e-02`
+  - train[16] t_remaining=31: `x_unmit=-3.0303030303030304e-02`, `x_rem=-1.0707095411691092e-01`, `y_exact=3.5448921081821941e-03`
+  - train[17] t_remaining=32: `x_unmit=-6.6225165562913907e-03`, `x_rem=-4.3588827911198939e-02`, `y_exact=-6.0061876663380240e-02`
+  - train[18] t_remaining=30: `x_unmit=1.2307692307692308e-01`, `x_rem=3.8557521502594078e-01`, `y_exact=1.6768768306562295e-08`
+  - train[19] t_remaining=32: `x_unmit=2.2535211267605634e-01`, `x_rem=7.1993409257935470e-01`, `y_exact=-1.3607576496566767e-02`
+  - train[20] t_remaining=31: `x_unmit=3.2258064516129031e-02`, `x_rem=9.5677124801723343e-02`, `y_exact=-6.7687099096672890e-09`
+  - train[21] t_remaining=31: `x_unmit=1.4970059880239520e-01`, `x_rem=4.1723645554922412e-01`, `y_exact=-1.1013155426988337e-02`
+  - train[22] t_remaining=30: `x_unmit=-2.8571428571428571e-02`, `x_rem=-1.1596966898723993e-01`, `y_exact=-2.8574410238561539e-09`
+  - train[23] t_remaining=30: `x_unmit=1.5625000000000000e-02`, `x_rem=1.6938486859900438e-02`, `y_exact=1.0820184074185759e-08`
+- target x values: `x_u_target=-6.3694267515923570e-03`, `x_r_target=-4.4629232738373822e-03`
+- target contribution to E_cdr_unmit: `7.3700326127348340e-06`
+- target contribution to E_cdr_rem: `1.1976755497220990e-05`
+
+### term 51
+- pauli term from int row: `(-7.6214047937498827e-03)*X(q(0, 0))*X(q(0, 1))*X(q(1, 0))*Z(q(1, 1))*Z(q(1, 2))*X(q(1, 3))`
+- int observable row: `[1, 1, 0, 0, 1, 3, 3, 1]`
+- Hamiltonian weight w_51: `-7.6214047937498827e-03`
+- OGM effective shots used for this term: `140`
+- fitted unmit coeffs: `a_u=-4.3295204858317733e-02`, `b_u=-3.7327481170235698e-03`
+- fitted rem coeffs: `a_r=-1.4206214034017818e-02`, `b_r=-3.7138405026871202e-03`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-4.4117647058823532e-02`, `x_rem=-1.4663855355197844e-01`, `y_exact=5.8345880852276641e-02`
+  - train[1] t_remaining=29: `x_unmit=-6.2068965517241378e-02`, `x_rem=-2.0096522203332412e-01`, `y_exact=-9.3962576853735323e-09`
+  - train[2] t_remaining=30: `x_unmit=1.3385826771653545e-01`, `x_rem=4.5354475473943645e-01`, `y_exact=1.9639810621161197e-08`
+  - train[3] t_remaining=31: `x_unmit=1.4492753623188406e-02`, `x_rem=4.1369647790621550e-02`, `y_exact=3.1669166289809711e-03`
+  - train[4] t_remaining=30: `x_unmit=2.1897810218978103e-02`, `x_rem=1.0775197251016790e-01`, `y_exact=-9.1179459118224829e-10`
+  - train[5] t_remaining=31: `x_unmit=0.0000000000000000e+00`, `x_rem=-3.2327422480152496e-02`, `y_exact=1.5939511131183151e-08`
+  - train[6] t_remaining=31: `x_unmit=2.3214285714285715e-01`, `x_rem=6.6917266577592582e-01`, `y_exact=1.2281526521492384e-08`
+  - train[7] t_remaining=31: `x_unmit=7.4074074074074077e-03`, `x_rem=4.6234524092969992e-02`, `y_exact=-3.0586064879653565e-09`
+  - train[8] t_remaining=30: `x_unmit=-1.4482758620689656e-01`, `x_rem=-3.9742438403296459e-01`, `y_exact=-8.7672097313678906e-09`
+  - train[9] t_remaining=32: `x_unmit=7.3825503355704702e-02`, `x_rem=2.5343261214199725e-01`, `y_exact=-7.0694183777692222e-03`
+  - train[10] t_remaining=30: `x_unmit=1.4705882352941176e-02`, `x_rem=2.4025532353324705e-02`, `y_exact=2.9348842855712518e-09`
+  - train[11] t_remaining=29: `x_unmit=5.8823529411764705e-02`, `x_rem=1.9912738249765385e-01`, `y_exact=-2.4158589644916481e-09`
+  - train[12] t_remaining=30: `x_unmit=2.7397260273972601e-02`, `x_rem=5.2159084999873623e-02`, `y_exact=-4.4867926494852329e-08`
+  - train[13] t_remaining=29: `x_unmit=-1.6759776536312849e-02`, `x_rem=-6.2600581550455045e-02`, `y_exact=-6.2106593440926110e-09`
+  - train[14] t_remaining=32: `x_unmit=4.6979865771812082e-02`, `x_rem=1.9345051358443932e-01`, `y_exact=1.7926364907521391e-04`
+  - train[15] t_remaining=32: `x_unmit=1.2101910828025478e-01`, `x_rem=3.8093924432353354e-01`, `y_exact=-6.5748885798522116e-02`
+  - train[16] t_remaining=31: `x_unmit=-2.4793388429752067e-02`, `x_rem=-5.6143803722474253e-02`, `y_exact=3.5448919752895675e-03`
+  - train[17] t_remaining=32: `x_unmit=0.0000000000000000e+00`, `x_rem=-9.6693041491510284e-03`, `y_exact=-6.0061862096073303e-02`
+  - train[18] t_remaining=30: `x_unmit=-1.8181818181818181e-02`, `x_rem=-4.6390911212361531e-02`, `y_exact=1.2779000353014042e-08`
+  - train[19] t_remaining=32: `x_unmit=-9.3333333333333338e-02`, `x_rem=-2.9256796716390776e-01`, `y_exact=-1.3607590799795007e-02`
+  - train[20] t_remaining=31: `x_unmit=5.0359712230215826e-02`, `x_rem=1.4884713311699052e-01`, `y_exact=-7.4374072265843787e-09`
+  - train[21] t_remaining=31: `x_unmit=-1.4492753623188406e-01`, `x_rem=-4.4700238054834229e-01`, `y_exact=-1.1013190025288774e-02`
+  - train[22] t_remaining=30: `x_unmit=-3.8759689922480620e-02`, `x_rem=-1.6211426199950513e-01`, `y_exact=-4.1806800172652430e-09`
+  - train[23] t_remaining=30: `x_unmit=-1.5328467153284672e-01`, `x_rem=-4.9575525334928283e-01`, `y_exact=1.4369706660224742e-08`
+- target x values: `x_u_target=-1.2820512820512820e-02`, `x_r_target=-4.2476849289708060e-02`
+- target contribution to E_cdr_unmit: `2.4218396164052414e-05`
+- target contribution to E_cdr_rem: `2.3705657789134747e-05`
+
+### term 52
+- pauli term from int row: `(3.0832666024554867e-02)*Y(q(0, 0))*Z(q(0, 1))*Z(q(0, 2))*Y(q(0, 3))*Y(q(1, 0))*Z(q(1, 1))*Z(q(1, 2))*Y(q(1, 3))`
+- int observable row: `[2, 3, 3, 2, 2, 3, 3, 2]`
+- Hamiltonian weight w_52: `3.0832666024554867e-02`
+- OGM effective shots used for this term: `166`
+- fitted unmit coeffs: `a_u=-3.1731707026572444e-02`, `b_u=5.0834608537529830e-03`
+- fitted rem coeffs: `a_r=-7.1220543155903681e-03`, `b_r=4.9938316799430444e-03`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-1.4838709677419354e-01`, `x_rem=-6.1936955504379032e-01`, `y_exact=3.5818116192500866e-02`
+  - train[1] t_remaining=29: `x_unmit=1.2258064516129032e-01`, `x_rem=5.6480074681067938e-01`, `y_exact=5.1508246014724336e-10`
+  - train[2] t_remaining=30: `x_unmit=4.4025157232704400e-02`, `x_rem=2.0306150034063744e-01`, `y_exact=-3.1162143267594153e-09`
+  - train[3] t_remaining=31: `x_unmit=2.1739130434782608e-01`, `x_rem=8.8136383976243393e-01`, `y_exact=-4.3755259516391580e-03`
+  - train[4] t_remaining=30: `x_unmit=8.6092715231788075e-02`, `x_rem=3.9537126153009144e-01`, `y_exact=7.1484119330048327e-09`
+  - train[5] t_remaining=31: `x_unmit=-8.2191780821917804e-02`, `x_rem=-3.7185418466025155e-01`, `y_exact=-1.5239932015935450e-08`
+  - train[6] t_remaining=31: `x_unmit=3.1446540880503145e-02`, `x_rem=5.6574931672327619e-02`, `y_exact=-1.9914469499158464e-08`
+  - train[7] t_remaining=31: `x_unmit=5.3475935828877002e-03`, `x_rem=7.2492964235701439e-03`, `y_exact=-1.4213539042332307e-08`
+  - train[8] t_remaining=30: `x_unmit=-7.1895424836601302e-02`, `x_rem=-3.9776804071848237e-01`, `y_exact=8.8450679114957236e-09`
+  - train[9] t_remaining=32: `x_unmit=-6.3583815028901730e-02`, `x_rem=-2.9504747530814962e-01`, `y_exact=2.4451861188411663e-03`
+  - train[10] t_remaining=30: `x_unmit=5.0000000000000003e-02`, `x_rem=2.1966526141479967e-01`, `y_exact=9.0508704379960132e-09`
+  - train[11] t_remaining=29: `x_unmit=6.0240963855421686e-02`, `x_rem=2.5615774646644318e-01`, `y_exact=-6.1833892675046165e-09`
+  - train[12] t_remaining=30: `x_unmit=1.6091954022988506e-01`, `x_rem=8.1242593926313378e-01`, `y_exact=4.3560567819184072e-08`
+  - train[13] t_remaining=29: `x_unmit=8.4337349397590355e-02`, `x_rem=3.4559349019290936e-01`, `y_exact=-7.3751802011684979e-09`
+  - train[14] t_remaining=32: `x_unmit=-1.8343195266272189e-01`, `x_rem=-7.8019614928304803e-01`, `y_exact=2.1736466786948863e-03`
+  - train[15] t_remaining=32: `x_unmit=2.7322404371584699e-02`, `x_rem=9.5640328454593096e-02`, `y_exact=3.1942963134411584e-02`
+  - train[16] t_remaining=31: `x_unmit=4.6511627906976744e-02`, `x_rem=2.4900871184772769e-01`, `y_exact=7.9249275356990190e-04`
+  - train[17] t_remaining=32: `x_unmit=5.7142857142857141e-02`, `x_rem=2.1250931892732627e-01`, `y_exact=1.0613505533900790e-02`
+  - train[18] t_remaining=30: `x_unmit=1.1888111888111888e-01`, `x_rem=5.8167414192862021e-01`, `y_exact=-4.2611098508648690e-09`
+  - train[19] t_remaining=32: `x_unmit=2.9940119760479042e-02`, `x_rem=6.6029137068816662e-02`, `y_exact=1.8486251123742095e-02`
+  - train[20] t_remaining=31: `x_unmit=6.1728395061728392e-02`, `x_rem=2.2849013385488792e-01`, `y_exact=5.1964250343951009e-11`
+  - train[21] t_remaining=31: `x_unmit=3.4090909090909088e-02`, `x_rem=9.5710197924506843e-02`, `y_exact=6.4583673100094890e-03`
+  - train[22] t_remaining=30: `x_unmit=1.6042780748663103e-02`, `x_rem=4.2397014653679866e-03`, `y_exact=5.6578662342612540e-09`
+  - train[23] t_remaining=30: `x_unmit=-1.4838709677419354e-01`, `x_rem=-6.3541875109396229e-01`, `y_exact=-7.1985704190784568e-09`
+- target x values: `x_u_target=1.1377245508982035e-01`, `x_r_target=5.3761279528396055e-01`
+- target contribution to E_cdr_unmit: `4.5424738311662760e-05`
+- target contribution to E_cdr_rem: `3.5917717297095630e-05`
+
+### term 53
+- pauli term from int row: `(3.0832666024554867e-02)*Y(q(0, 0))*Z(q(0, 1))*Z(q(0, 2))*Y(q(0, 3))*X(q(1, 0))*Z(q(1, 1))*Z(q(1, 2))*X(q(1, 3))`
+- int observable row: `[2, 3, 3, 2, 1, 3, 3, 1]`
+- Hamiltonian weight w_53: `3.0832666024554867e-02`
+- OGM effective shots used for this term: `179`
+- fitted unmit coeffs: `a_u=6.6831617380915236e-03`, `b_u=4.2749343584362149e-03`
+- fitted rem coeffs: `a_r=1.3024931865982959e-03`, `b_r=4.2843927986004606e-03`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-1.8181818181818181e-02`, `x_rem=-2.2909281856371335e-02`, `y_exact=3.5818122030019009e-02`
+  - train[1] t_remaining=29: `x_unmit=6.0240963855421686e-02`, `x_rem=2.4983217805614960e-01`, `y_exact=-6.7809089781244746e-09`
+  - train[2] t_remaining=30: `x_unmit=-2.3529411764705882e-02`, `x_rem=-1.2074609953585806e-01`, `y_exact=1.4362351769875532e-08`
+  - train[3] t_remaining=31: `x_unmit=5.8479532163742687e-03`, `x_rem=1.1568066164815533e-01`, `y_exact=-4.3755173246716895e-03`
+  - train[4] t_remaining=30: `x_unmit=-2.7777777777777776e-02`, `x_rem=-2.0683234051590962e-02`, `y_exact=1.6607958075555940e-08`
+  - train[5] t_remaining=31: `x_unmit=-7.3825503355704702e-02`, `x_rem=-3.2634170266655921e-01`, `y_exact=2.9237848953796478e-09`
+  - train[6] t_remaining=31: `x_unmit=-2.0000000000000001e-01`, `x_rem=-9.2986974333191352e-01`, `y_exact=-5.8181452342687854e-09`
+  - train[7] t_remaining=31: `x_unmit=3.1847133757961783e-02`, `x_rem=2.7844551411057511e-01`, `y_exact=-1.2662194772288897e-09`
+  - train[8] t_remaining=30: `x_unmit=1.0958904109589040e-01`, `x_rem=4.7634591585066555e-01`, `y_exact=1.9466136097698283e-08`
+  - train[9] t_remaining=32: `x_unmit=-1.2048192771084338e-02`, `x_rem=-6.0207539855401351e-02`, `y_exact=2.4451822425431207e-03`
+  - train[10] t_remaining=30: `x_unmit=-1.1949685534591195e-01`, `x_rem=-5.2067465557015058e-01`, `y_exact=4.8693944196395810e-09`
+  - train[11] t_remaining=29: `x_unmit=-1.1235955056179775e-02`, `x_rem=-1.0730158052270621e-01`, `y_exact=-2.0451779024647867e-08`
+  - train[12] t_remaining=30: `x_unmit=2.9940119760479042e-02`, `x_rem=1.2663518046776759e-01`, `y_exact=2.2692492476346706e-08`
+  - train[13] t_remaining=29: `x_unmit=1.1235955056179775e-02`, `x_rem=-1.2526245310183242e-02`, `y_exact=-1.2482275431528173e-08`
+  - train[14] t_remaining=32: `x_unmit=1.6438356164383561e-01`, `x_rem=7.2838155803297044e-01`, `y_exact=2.1736120021064410e-03`
+  - train[15] t_remaining=32: `x_unmit=1.8181818181818181e-02`, `x_rem=2.8629235081893148e-02`, `y_exact=3.1942927588871399e-02`
+  - train[16] t_remaining=31: `x_unmit=1.1250000000000000e-01`, `x_rem=5.4974547926930628e-01`, `y_exact=7.9248597720216587e-04`
+  - train[17] t_remaining=32: `x_unmit=7.2463768115942032e-02`, `x_rem=3.6943590159986717e-01`, `y_exact=1.0613487902408509e-02`
+  - train[18] t_remaining=30: `x_unmit=-9.9415204678362568e-02`, `x_rem=-5.3187751880738532e-01`, `y_exact=3.4340379936605317e-09`
+  - train[19] t_remaining=32: `x_unmit=3.3112582781456956e-02`, `x_rem=8.7085075637410567e-02`, `y_exact=1.8486256545994031e-02`
+  - train[20] t_remaining=31: `x_unmit=-3.8251366120218580e-02`, `x_rem=-1.1080602085791962e-01`, `y_exact=-1.1785014093172880e-08`
+  - train[21] t_remaining=31: `x_unmit=8.3870967741935490e-02`, `x_rem=3.9591031730670906e-01`, `y_exact=6.4583491138785276e-03`
+  - train[22] t_remaining=30: `x_unmit=0.0000000000000000e+00`, `x_rem=-7.0700563871836306e-02`, `y_exact=2.6393796090533304e-09`
+  - train[23] t_remaining=30: `x_unmit=1.5337423312883436e-01`, `x_rem=6.0280829603431074e-01`, `y_exact=-1.1313182050298570e-09`
+- target x values: `x_u_target=-5.2631578947368418e-02`, `x_r_target=-2.4279083969964138e-01`
+- target contribution to E_cdr_unmit: `1.2096237630536592e-04`
+- target contribution to E_cdr_rem: `1.2234893302287393e-04`
+
+### term 54
+- pauli term from int row: `(3.0832666024554867e-02)*X(q(0, 0))*Z(q(0, 1))*Z(q(0, 2))*X(q(0, 3))*Y(q(1, 0))*Z(q(1, 1))*Z(q(1, 2))*Y(q(1, 3))`
+- int observable row: `[1, 3, 3, 1, 2, 3, 3, 2]`
+- Hamiltonian weight w_54: `3.0832666024554867e-02`
+- OGM effective shots used for this term: `163`
+- fitted unmit coeffs: `a_u=1.9148088088571078e-02`, `b_u=4.8486310280860560e-03`
+- fitted rem coeffs: `a_r=4.3191419650691672e-03`, `b_r=4.8143682356226051e-03`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-1.0112359550561797e-01`, `x_rem=-4.3905278674337789e-01`, `y_exact=3.5818111974276333e-02`
+  - train[1] t_remaining=29: `x_unmit=-6.1728395061728392e-02`, `x_rem=-2.7165387845970951e-01`, `y_exact=-5.9648525160620956e-09`
+  - train[2] t_remaining=30: `x_unmit=1.9108280254777069e-02`, `x_rem=3.5703413429539886e-02`, `y_exact=2.3211999387520676e-08`
+  - train[3] t_remaining=31: `x_unmit=-1.2698412698412698e-01`, `x_rem=-5.4211547880230737e-01`, `y_exact=-4.3755229754193683e-03`
+  - train[4] t_remaining=30: `x_unmit=-1.2707182320441990e-01`, `x_rem=-5.1985662833023227e-01`, `y_exact=5.6658482098858478e-09`
+  - train[5] t_remaining=31: `x_unmit=-6.7567567567567571e-02`, `x_rem=-3.9780921596363461e-01`, `y_exact=-2.8883147152815838e-09`
+  - train[6] t_remaining=31: `x_unmit=-6.5088757396449703e-02`, `x_rem=-2.3674673082549977e-01`, `y_exact=-7.5542098796633776e-09`
+  - train[7] t_remaining=31: `x_unmit=-3.3707865168539325e-02`, `x_rem=-1.5266597936951945e-01`, `y_exact=-6.6042892444101942e-09`
+  - train[8] t_remaining=30: `x_unmit=3.2679738562091505e-02`, `x_rem=1.5693113463790673e-01`, `y_exact=1.1960236426194573e-08`
+  - train[9] t_remaining=32: `x_unmit=6.2893081761006293e-03`, `x_rem=1.4026193631005673e-01`, `y_exact=2.4451878480550946e-03`
+  - train[10] t_remaining=30: `x_unmit=-1.0256410256410256e-01`, `x_rem=-3.7227587133565859e-01`, `y_exact=2.0736018850852441e-08`
+  - train[11] t_remaining=29: `x_unmit=-8.5365853658536592e-02`, `x_rem=-3.4465466634658537e-01`, `y_exact=-2.9014396208446108e-09`
+  - train[12] t_remaining=30: `x_unmit=4.7619047619047616e-02`, `x_rem=2.2240066915830806e-01`, `y_exact=1.4064346164355311e-08`
+  - train[13] t_remaining=29: `x_unmit=-5.9171597633136093e-03`, `x_rem=-8.2871882802009703e-02`, `y_exact=1.1626910612055388e-09`
+  - train[14] t_remaining=32: `x_unmit=1.7341040462427744e-02`, `x_rem=1.4880012774244789e-01`, `y_exact=2.1736323716229065e-03`
+  - train[15] t_remaining=32: `x_unmit=4.1916167664670656e-02`, `x_rem=1.7960507508755838e-01`, `y_exact=3.1942980522843376e-02`
+  - train[16] t_remaining=31: `x_unmit=1.2195121951219512e-01`, `x_rem=5.4162462124568578e-01`, `y_exact=7.9249275396368977e-04`
+  - train[17] t_remaining=32: `x_unmit=1.1258278145695365e-01`, `x_rem=5.9364059815816339e-01`, `y_exact=1.0613505361220904e-02`
+  - train[18] t_remaining=30: `x_unmit=-4.0935672514619881e-02`, `x_rem=-1.8055467808492262e-01`, `y_exact=-1.5982127164025739e-09`
+  - train[19] t_remaining=32: `x_unmit=-2.0979020979020980e-02`, `x_rem=-9.6010144707583123e-02`, `y_exact=1.8486254531467051e-02`
+  - train[20] t_remaining=31: `x_unmit=-2.8571428571428571e-02`, `x_rem=-2.2805261129073187e-01`, `y_exact=-6.6203811036685210e-09`
+  - train[21] t_remaining=31: `x_unmit=3.7974683544303799e-02`, `x_rem=1.5690858726171897e-01`, `y_exact=6.4583661337229131e-03`
+  - train[22] t_remaining=30: `x_unmit=-8.9655172413793102e-02`, `x_rem=-5.1083490804187437e-01`, `y_exact=5.6630099770992937e-09`
+  - train[23] t_remaining=30: `x_unmit=-1.0752688172043011e-01`, `x_rem=-3.9145988466663262e-01`, `y_exact=1.0476022700828879e-08`
+- target x values: `x_u_target=1.3286713286713286e-01`, `x_r_target=5.7198231481515016e-01`
+- target contribution to E_cdr_unmit: `2.2793919666058414e-04`
+- target contribution to E_cdr_rem: `2.2461107128517321e-04`
+
+### term 55
+- pauli term from int row: `(3.0832666024554867e-02)*X(q(0, 0))*Z(q(0, 1))*Z(q(0, 2))*X(q(0, 3))*X(q(1, 0))*Z(q(1, 1))*Z(q(1, 2))*X(q(1, 3))`
+- int observable row: `[1, 3, 3, 1, 1, 3, 3, 1]`
+- Hamiltonian weight w_55: `3.0832666024554867e-02`
+- OGM effective shots used for this term: `175`
+- fitted unmit coeffs: `a_u=1.1626439064830395e-02`, `b_u=4.4935381900990772e-03`
+- fitted rem coeffs: `a_r=2.1023135297221014e-03`, `b_r=4.4717229875731552e-03`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=8.2352941176470587e-02`, `x_rem=2.8442592030962266e-01`, `y_exact=3.5818118645781702e-02`
+  - train[1] t_remaining=29: `x_unmit=3.9473684210526314e-02`, `x_rem=1.4605701995321910e-01`, `y_exact=-1.1490960875719380e-08`
+  - train[2] t_remaining=30: `x_unmit=6.5934065934065936e-02`, `x_rem=2.4056654459032917e-01`, `y_exact=6.8655701047230490e-10`
+  - train[3] t_remaining=31: `x_unmit=-1.3924050632911392e-01`, `x_rem=-6.3221324481462227e-01`, `y_exact=-4.3755251368486842e-03`
+  - train[4] t_remaining=30: `x_unmit=-2.0987654320987653e-01`, `x_rem=-9.0831747049487166e-01`, `y_exact=9.5902421121267834e-09`
+  - train[5] t_remaining=31: `x_unmit=-3.1446540880503145e-02`, `x_rem=-1.4242146301550931e-01`, `y_exact=-1.1213981155217174e-08`
+  - train[6] t_remaining=31: `x_unmit=-1.6949152542372881e-02`, `x_rem=-1.3450324204457820e-01`, `y_exact=5.3026461570173901e-09`
+  - train[7] t_remaining=31: `x_unmit=2.4390243902439025e-02`, `x_rem=6.4355471167955633e-02`, `y_exact=-1.3585458803819281e-08`
+  - train[8] t_remaining=30: `x_unmit=5.9880239520958087e-03`, `x_rem=3.7152726724614733e-02`, `y_exact=1.3855677501744200e-08`
+  - train[9] t_remaining=32: `x_unmit=-1.2751677852348994e-01`, `x_rem=-5.6721930140806520e-01`, `y_exact=2.4451875376296115e-03`
+  - train[10] t_remaining=30: `x_unmit=-2.9850746268656716e-02`, `x_rem=-1.1915216068515945e-01`, `y_exact=8.6904943357310451e-09`
+  - train[11] t_remaining=29: `x_unmit=-7.6023391812865493e-02`, `x_rem=-4.0509110233707790e-01`, `y_exact=-3.5203544614375168e-09`
+  - train[12] t_remaining=30: `x_unmit=-4.1095890410958902e-02`, `x_rem=-2.5390592537783119e-01`, `y_exact=3.0720818270283198e-09`
+  - train[13] t_remaining=29: `x_unmit=-3.9548022598870060e-02`, `x_rem=-1.6805115573374965e-01`, `y_exact=-9.2856343414597833e-09`
+  - train[14] t_remaining=32: `x_unmit=1.3333333333333334e-02`, `x_rem=2.3701035536375922e-01`, `y_exact=2.1736002723686297e-03`
+  - train[15] t_remaining=32: `x_unmit=-5.6338028169014086e-02`, `x_rem=-2.7573965605961170e-01`, `y_exact=3.1942945485891813e-02`
+  - train[16] t_remaining=31: `x_unmit=-6.0606060606060606e-03`, `x_rem=2.9051461200657342e-02`, `y_exact=7.9249236347961208e-04`
+  - train[17] t_remaining=32: `x_unmit=-1.2925170068027211e-01`, `x_rem=-5.5579660673197495e-01`, `y_exact=1.0613494651000654e-02`
+  - train[18] t_remaining=30: `x_unmit=2.0779220779220781e-01`, `x_rem=9.7405233623126553e-01`, `y_exact=6.1567585849648237e-09`
+  - train[19] t_remaining=32: `x_unmit=2.6315789473684209e-02`, `x_rem=1.8031034576460747e-01`, `y_exact=1.8486257828009493e-02`
+  - train[20] t_remaining=31: `x_unmit=9.7222222222222224e-02`, `x_rem=4.8948893293622991e-01`, `y_exact=-1.6001567169950015e-08`
+  - train[21] t_remaining=31: `x_unmit=2.1582733812949641e-02`, `x_rem=1.1359429003943364e-01`, `y_exact=6.4583435511244526e-03`
+  - train[22] t_remaining=30: `x_unmit=0.0000000000000000e+00`, `x_rem=-1.9065970074914715e-02`, `y_exact=1.2210741691284998e-09`
+  - train[23] t_remaining=30: `x_unmit=1.8633540372670808e-02`, `x_rem=-2.5628542533333441e-02`, `y_exact=3.6239912183251703e-09`
+- target x values: `x_u_target=-7.8947368421052627e-02`, `x_r_target=-3.3765999882519437e-01`
+- target contribution to E_cdr_unmit: `1.1024717443595334e-04`
+- target contribution to E_cdr_rem: `1.1598804362483977e-04`
+
+### term 56
+- pauli term from int row: `(7.9683546165444930e-02)*Z(q(0, 0))*Z(q(1, 1))`
+- int observable row: `[3, 0, 0, 0, 0, 3, 0, 0]`
+- Hamiltonian weight w_56: `7.9683546165444930e-02`
+- OGM effective shots used for this term: `1918`
+- fitted unmit coeffs: `a_u=3.4798760645504156e+00`, `b_u=-9.3415910454808848e-02`
+- fitted rem coeffs: `a_r=2.6407104175901575e+00`, `b_r=3.8838038920585506e-03`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=1.0330578512396695e-01`, `x_rem=1.1300555339313674e-01`, `y_exact=3.1683191221597928e-01`
+  - train[1] t_remaining=29: `x_unmit=4.7131147540983603e-02`, `x_rem=2.1891777243100461e-02`, `y_exact=-4.4736752907001333e-02`
+  - train[2] t_remaining=30: `x_unmit=1.0172939979654121e-01`, `x_rem=9.2652585742953222e-02`, `y_exact=2.2964963538687716e-01`
+  - train[3] t_remaining=31: `x_unmit=7.7766699900299108e-02`, `x_rem=7.8997672917720002e-02`, `y_exact=2.1556312310325737e-01`
+  - train[4] t_remaining=30: `x_unmit=2.8379772961816307e-01`, `x_rem=3.3734572401624519e-01`, `y_exact=8.8292660196847428e-01`
+  - train[5] t_remaining=31: `x_unmit=7.4596774193548390e-02`, `x_rem=5.6161228491679240e-02`, `y_exact=1.0548459378587355e-01`
+  - train[6] t_remaining=31: `x_unmit=8.5539714867617106e-02`, `x_rem=6.9518027674482327e-02`, `y_exact=2.7128692248945391e-01`
+  - train[7] t_remaining=31: `x_unmit=5.4787506400409629e-02`, `x_rem=3.0805388850472321e-02`, `y_exact=1.5585520737076128e-01`
+  - train[8] t_remaining=30: `x_unmit=1.1795407098121086e-01`, `x_rem=1.1695767697855376e-01`, `y_exact=4.7037875358341019e-01`
+  - train[9] t_remaining=32: `x_unmit=-1.7656500802568219e-02`, `x_rem=-6.1797606301464553e-02`, `y_exact=-1.4160650718197298e-01`
+  - train[10] t_remaining=30: `x_unmit=1.9343252950230888e-01`, `x_rem=2.1814413772445998e-01`, `y_exact=5.4571923422090585e-01`
+  - train[11] t_remaining=29: `x_unmit=2.0758585340850846e-01`, `x_rem=2.4317085685830783e-01`, `y_exact=7.9255551731766949e-01`
+  - train[12] t_remaining=30: `x_unmit=1.7809675704412548e-01`, `x_rem=1.9337244585126054e-01`, `y_exact=4.0599771433887560e-01`
+  - train[13] t_remaining=29: `x_unmit=2.5527426160337552e-01`, `x_rem=2.9935333971097272e-01`, `y_exact=7.8914482784591633e-01`
+  - train[14] t_remaining=32: `x_unmit=6.9721115537848599e-02`, `x_rem=5.1142636464001502e-02`, `y_exact=6.7919495398942320e-02`
+  - train[15] t_remaining=32: `x_unmit=-4.2682926829268296e-02`, `x_rem=-8.5410934202441793e-02`, `y_exact=-1.1152724360752517e-01`
+  - train[16] t_remaining=31: `x_unmit=2.3084780388151174e-01`, `x_rem=2.6626936756217923e-01`, `y_exact=6.6959814544905705e-01`
+  - train[17] t_remaining=32: `x_unmit=5.9609455292908529e-02`, `x_rem=4.2667634004203224e-02`, `y_exact=2.4522885534407224e-01`
+  - train[18] t_remaining=30: `x_unmit=-1.5680323722812341e-02`, `x_rem=-6.2377389264604406e-02`, `y_exact=-1.6354881041079311e-01`
+  - train[19] t_remaining=32: `x_unmit=1.2244897959183673e-02`, `x_rem=-2.2338891745088071e-02`, `y_exact=-6.2511602863043733e-02`
+  - train[20] t_remaining=31: `x_unmit=1.5476784822765851e-02`, `x_rem=-2.0989189818776875e-02`, `y_exact=-1.2820749077351451e-01`
+  - train[21] t_remaining=31: `x_unmit=4.0206185567010312e-02`, `x_rem=1.1686859904472513e-02`, `y_exact=-9.3013106446301064e-03`
+  - train[22] t_remaining=30: `x_unmit=6.1538461538461542e-02`, `x_rem=4.1038278990086129e-02`, `y_exact=6.8253373266929679e-02`
+  - train[23] t_remaining=30: `x_unmit=4.5407636738906090e-02`, `x_rem=3.6296325182520073e-02`, `y_exact=-1.7906411361919693e-02`
+- target x values: `x_u_target=8.0059671805072105e-02`, `x_r_target=7.9982467730875528e-02`
+- target contribution to E_cdr_unmit: `1.4755944516960870e-02`
+- target contribution to E_cdr_rem: `1.7139479743709555e-02`
+
+### term 57
+- pauli term from int row: `(-4.3868561231028644e-03)*Y(q(0, 0))*Z(q(0, 1))*Y(q(0, 2))*Z(q(1, 1))`
+- int observable row: `[2, 3, 2, 0, 0, 3, 0, 0]`
+- Hamiltonian weight w_57: `-4.3868561231028644e-03`
+- OGM effective shots used for this term: `376`
+- fitted unmit coeffs: `a_u=2.7767256878936357e+00`, `b_u=-1.0587921530743560e-02`
+- fitted rem coeffs: `a_r=1.3318996448878437e+00`, `b_r=-8.5337886852614748e-03`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-8.6956521739130436e-03`, `x_rem=-1.2109632904583625e-02`, `y_exact=3.1844479414765547e-01`
+  - train[1] t_remaining=29: `x_unmit=-1.9607843137254902e-02`, `x_rem=-4.3485470141880568e-02`, `y_exact=3.4531782821099655e-08`
+  - train[2] t_remaining=30: `x_unmit=-1.3774104683195593e-02`, `x_rem=-2.7652277951600624e-02`, `y_exact=2.8494774963416173e-08`
+  - train[3] t_remaining=31: `x_unmit=9.2348284960422161e-02`, `x_rem=1.8887624065268810e-01`, `y_exact=4.7056248417161550e-01`
+  - train[4] t_remaining=30: `x_unmit=-1.3022113022113022e-01`, `x_rem=-2.6593973752897687e-01`, `y_exact=-1.9509045580983250e-01`
+  - train[5] t_remaining=31: `x_unmit=2.2670025188916875e-02`, `x_rem=4.8367361043759396e-02`, `y_exact=7.0008724310010353e-09`
+  - train[6] t_remaining=31: `x_unmit=-2.3498694516971279e-02`, `x_rem=-6.1534985465567342e-02`, `y_exact=1.0090712869327791e-08`
+  - train[7] t_remaining=31: `x_unmit=4.0000000000000001e-02`, `x_rem=7.7172091629923001e-02`, `y_exact=5.4000820509241559e-08`
+  - train[8] t_remaining=30: `x_unmit=-5.7291666666666664e-02`, `x_rem=-1.0731185159079663e-01`, `y_exact=-2.1930102686492486e-01`
+  - train[9] t_remaining=32: `x_unmit=-3.1339031339031341e-02`, `x_rem=-7.3438908026790525e-02`, `y_exact=-1.7814775101716809e-01`
+  - train[10] t_remaining=30: `x_unmit=-2.4000000000000000e-02`, `x_rem=-4.8572252509954478e-02`, `y_exact=-1.0709824884580878e-01`
+  - train[11] t_remaining=29: `x_unmit=1.3978494623655913e-01`, `x_rem=2.7118458078332203e-01`, `y_exact=5.3971309804451983e-01`
+  - train[12] t_remaining=30: `x_unmit=1.7543859649122806e-02`, `x_rem=3.4023627602049147e-02`, `y_exact=1.0497563166735505e-09`
+  - train[13] t_remaining=29: `x_unmit=-6.4864864864864868e-02`, `x_rem=-1.3306703726921179e-01`, `y_exact=-1.5487088749776645e-01`
+  - train[14] t_remaining=32: `x_unmit=8.0939947780678853e-02`, `x_rem=1.8550808076867487e-01`, `y_exact=-5.9689168056288131e-03`
+  - train[15] t_remaining=32: `x_unmit=-4.2328042328042326e-02`, `x_rem=-1.0228335676469677e-01`, `y_exact=-1.8320728777933851e-02`
+  - train[16] t_remaining=31: `x_unmit=-5.1813471502590670e-02`, `x_rem=-1.1334282736078459e-01`, `y_exact=-3.3456438364567653e-01`
+  - train[17] t_remaining=32: `x_unmit=-1.9073569482288829e-02`, `x_rem=-5.9790805838731115e-02`, `y_exact=-2.0029519213277952e-01`
+  - train[18] t_remaining=30: `x_unmit=2.1978021978021980e-02`, `x_rem=4.9613748894926139e-02`, `y_exact=4.1526891331229164e-08`
+  - train[19] t_remaining=32: `x_unmit=-3.6319612590799029e-02`, `x_rem=-7.0930512216117569e-02`, `y_exact=-2.3644991320797734e-01`
+  - train[20] t_remaining=31: `x_unmit=4.8158640226628892e-02`, `x_rem=9.9276533900540961e-02`, `y_exact=-5.9113366933422257e-09`
+  - train[21] t_remaining=31: `x_unmit=-1.7045454545454544e-02`, `x_rem=-4.4584085804399383e-02`, `y_exact=-1.5489853921965649e-01`
+  - train[22] t_remaining=30: `x_unmit=-7.8328981723237590e-03`, `x_rem=-1.7847280683251660e-02`, `y_exact=-1.4103101691012986e-02`
+  - train[23] t_remaining=30: `x_unmit=5.3763440860215058e-03`, `x_rem=2.6352514645576822e-02`, `y_exact=1.7178258581910039e-02`
+- target x values: `x_u_target=-2.5125628140703519e-02`, `x_r_target=-2.4475667324055643e-02`
+- target contribution to E_cdr_unmit: `3.5250537900393460e-04`
+- target contribution to E_cdr_rem: `1.8044420767726195e-04`
+
+### term 58
+- pauli term from int row: `(-4.3868561231028644e-03)*X(q(0, 0))*Z(q(0, 1))*X(q(0, 2))*Z(q(1, 1))`
+- int observable row: `[1, 3, 1, 0, 0, 3, 0, 0]`
+- Hamiltonian weight w_58: `-4.3868561231028644e-03`
+- OGM effective shots used for this term: `368`
+- fitted unmit coeffs: `a_u=2.2702876871632292e+00`, `b_u=-3.0029007830892636e-02`
+- fitted rem coeffs: `a_r=1.0832891888608176e+00`, `b_r=-2.8417772598103446e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=5.7644110275689213e-02`, `x_rem=9.5126392975040538e-02`, `y_exact=3.1844479563631883e-01`
+  - train[1] t_remaining=29: `x_unmit=7.8212290502793297e-02`, `x_rem=1.7931723827113533e-01`, `y_exact=3.6979082262230577e-08`
+  - train[2] t_remaining=30: `x_unmit=3.7249283667621778e-02`, `x_rem=8.2218044575546462e-02`, `y_exact=2.1578521523713298e-08`
+  - train[3] t_remaining=31: `x_unmit=3.2608695652173912e-02`, `x_rem=5.3205111825063621e-02`, `y_exact=4.7056246924960726e-01`
+  - train[4] t_remaining=30: `x_unmit=-2.2900763358778626e-02`, `x_rem=-3.7193125779083777e-02`, `y_exact=-1.9509045580983381e-01`
+  - train[5] t_remaining=31: `x_unmit=7.8328981723237573e-03`, `x_rem=-5.2432077699292911e-03`, `y_exact=1.1525820802482606e-08`
+  - train[6] t_remaining=31: `x_unmit=3.7037037037037035e-02`, `x_rem=8.0664558011092402e-02`, `y_exact=2.0911157817987160e-08`
+  - train[7] t_remaining=31: `x_unmit=6.7357512953367879e-02`, `x_rem=1.3594335931834550e-01`, `y_exact=3.9098084368170240e-08`
+  - train[8] t_remaining=30: `x_unmit=-1.1168831168831168e-01`, `x_rem=-2.1566675428241422e-01`, `y_exact=-2.1930101898860874e-01`
+  - train[9] t_remaining=32: `x_unmit=3.0303030303030307e-02`, `x_rem=5.7148051164026395e-02`, `y_exact=-1.7814768434739173e-01`
+  - train[10] t_remaining=30: `x_unmit=4.8780487804878050e-02`, `x_rem=9.3696652131462194e-02`, `y_exact=-1.0709824884580274e-01`
+  - train[11] t_remaining=29: `x_unmit=1.1111111111111110e-01`, `x_rem=2.1390363698621123e-01`, `y_exact=5.3971309804445222e-01`
+  - train[12] t_remaining=30: `x_unmit=-1.3123359580052493e-02`, `x_rem=-9.3793258694075329e-03`, `y_exact=1.4469896776157179e-09`
+  - train[13] t_remaining=29: `x_unmit=-5.0666666666666665e-02`, `x_rem=-9.9927277476498683e-02`, `y_exact=-1.5487088749778766e-01`
+  - train[14] t_remaining=32: `x_unmit=-1.9417475728155338e-02`, `x_rem=-5.5175137541068210e-02`, `y_exact=-5.9689204399282682e-03`
+  - train[15] t_remaining=32: `x_unmit=-7.7519379844961239e-03`, `x_rem=-4.5776312066657769e-02`, `y_exact=-1.8320751741369712e-02`
+  - train[16] t_remaining=31: `x_unmit=-6.8062827225130892e-02`, `x_rem=-1.2564199501964604e-01`, `y_exact=-3.3456437013783752e-01`
+  - train[17] t_remaining=32: `x_unmit=-1.1653116531165311e-01`, `x_rem=-2.1030994411727333e-01`, `y_exact=-2.0029518827307355e-01`
+  - train[18] t_remaining=30: `x_unmit=0.0000000000000000e+00`, `x_rem=-4.5270736416221377e-03`, `y_exact=7.5487916787150160e-08`
+  - train[19] t_remaining=32: `x_unmit=1.6304347826086956e-02`, `x_rem=3.4856088921236143e-02`, `y_exact=-2.3644987683170260e-01`
+  - train[20] t_remaining=31: `x_unmit=-2.7100271002710027e-03`, `x_rem=-6.4436995265603871e-03`, `y_exact=-4.4874609878230879e-09`
+  - train[21] t_remaining=31: `x_unmit=-8.5271317829457363e-02`, `x_rem=-1.8050205928206867e-01`, `y_exact=-1.5489852173567911e-01`
+  - train[22] t_remaining=30: `x_unmit=3.9215686274509803e-02`, `x_rem=1.0716848122424519e-01`, `y_exact=-1.4103027728435798e-02`
+  - train[23] t_remaining=30: `x_unmit=4.3478260869565216e-02`, `x_rem=5.5299805663934588e-02`, `y_exact=1.7178302950390991e-02`
+- target x values: `x_u_target=4.5751633986928102e-02`, `x_r_target=1.2826113576316681e-01`
+- target contribution to E_cdr_unmit: `-3.2392705065222293e-04`
+- target contribution to E_cdr_rem: `-4.8486222631549891e-04`
+
+### term 59
+- pauli term from int row: `(1.7453323053332640e-02)*Y(q(0, 0))*Y(q(0, 1))*Y(q(1, 1))*Y(q(1, 2))`
+- int observable row: `[2, 2, 0, 0, 0, 2, 2, 0]`
+- Hamiltonian weight w_59: `1.7453323053332640e-02`
+- OGM effective shots used for this term: `496`
+- fitted unmit coeffs: `a_u=3.6455245115183477e-01`, `b_u=1.4456573945995300e-02`
+- fitted rem coeffs: `a_r=1.4380721852687695e-01`, `b_r=1.4298203081479437e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=2.4070021881838075e-02`, `x_rem=7.2646135258493713e-02`, `y_exact=9.5717943018816531e-04`
+  - train[1] t_remaining=29: `x_unmit=1.7094017094017096e-02`, `x_rem=3.8915365460103379e-02`, `y_exact=-4.3830333243087643e-08`
+  - train[2] t_remaining=30: `x_unmit=2.0964360587002098e-03`, `x_rem=6.4054160065623892e-03`, `y_exact=-1.2239812845989411e-08`
+  - train[3] t_remaining=31: `x_unmit=-8.8105726872246701e-02`, `x_rem=-2.0251115117112314e-01`, `y_exact=2.0141838868121834e-02`
+  - train[4] t_remaining=30: `x_unmit=7.6923076923076927e-02`, `x_rem=1.7101440888116315e-01`, `y_exact=2.4066952146042221e-09`
+  - train[5] t_remaining=31: `x_unmit=2.0964360587002098e-03`, `x_rem=1.2522297074885249e-02`, `y_exact=2.1628811454090258e-08`
+  - train[6] t_remaining=31: `x_unmit=4.7619047619047616e-02`, `x_rem=1.1743026338808778e-01`, `y_exact=-3.3599124826445706e-09`
+  - train[7] t_remaining=31: `x_unmit=-4.9462365591397849e-02`, `x_rem=-1.1735992637959017e-01`, `y_exact=1.5493678373287479e-08`
+  - train[8] t_remaining=30: `x_unmit=-5.3533190578158460e-02`, `x_rem=-1.1521539933727704e-01`, `y_exact=-1.7645663724902755e-01`
+  - train[9] t_remaining=32: `x_unmit=8.8888888888888892e-02`, `x_rem=2.0498940279327652e-01`, `y_exact=1.3286673421821735e-01`
+  - train[10] t_remaining=30: `x_unmit=-1.1801242236024845e-01`, `x_rem=-2.6349666230046304e-01`, `y_exact=-1.5192627762554076e-08`
+  - train[11] t_remaining=29: `x_unmit=2.1321961620469083e-03`, `x_rem=2.5728146979448548e-04`, `y_exact=2.0601816729133712e-08`
+  - train[12] t_remaining=30: `x_unmit=6.9860279441117765e-02`, `x_rem=1.5429429670187139e-01`, `y_exact=-6.4438229579001881e-09`
+  - train[13] t_remaining=29: `x_unmit=5.4229934924078092e-02`, `x_rem=1.1577586670787396e-01`, `y_exact=-4.6328279655749273e-09`
+  - train[14] t_remaining=32: `x_unmit=-2.1645021645021644e-02`, `x_rem=-2.2672327079830489e-02`, `y_exact=3.0245772282355258e-02`
+  - train[15] t_remaining=32: `x_unmit=9.4505494505494503e-02`, `x_rem=1.9831140418651125e-01`, `y_exact=2.2727879210070339e-02`
+  - train[16] t_remaining=31: `x_unmit=-6.1946902654867256e-02`, `x_rem=-1.3298042985966854e-01`, `y_exact=-3.7648362226305340e-02`
+  - train[17] t_remaining=32: `x_unmit=5.1063829787234040e-02`, `x_rem=1.2838017329725079e-01`, `y_exact=-1.8364961573544680e-02`
+  - train[18] t_remaining=30: `x_unmit=-3.5971223021582732e-02`, `x_rem=-8.2400775410497548e-02`, `y_exact=-1.8866543425426820e-08`
+  - train[19] t_remaining=32: `x_unmit=-1.5590200445434299e-02`, `x_rem=-5.8737641526296604e-02`, `y_exact=1.6215801705682947e-01`
+  - train[20] t_remaining=31: `x_unmit=-2.2522522522522521e-02`, `x_rem=-5.5598612484383393e-02`, `y_exact=1.1147749121580250e-08`
+  - train[21] t_remaining=31: `x_unmit=-6.1784897025171627e-02`, `x_rem=-1.3118535909697662e-01`, `y_exact=1.3573933075142811e-01`
+  - train[22] t_remaining=30: `x_unmit=-1.2000000000000000e-02`, `x_rem=-7.4390684807034051e-03`, `y_exact=-1.2168355362375316e-01`
+  - train[23] t_remaining=30: `x_unmit=7.7253218884120178e-02`, `x_rem=1.6558616697478229e-01`, `y_exact=2.2079378743629471e-01`
+- target x values: `x_u_target=-9.6618357487922701e-03`, `x_r_target=-2.7640915656378707e-02`
+- target contribution to E_cdr_unmit: `1.9084035967324646e-04`
+- target contribution to E_cdr_rem: `1.8017484064202137e-04`
+
+### term 60
+- pauli term from int row: `(1.7453323053332640e-02)*Y(q(0, 0))*Y(q(0, 1))*X(q(1, 1))*X(q(1, 2))`
+- int observable row: `[2, 2, 0, 0, 0, 1, 1, 0]`
+- Hamiltonian weight w_60: `1.7453323053332640e-02`
+- OGM effective shots used for this term: `463`
+- fitted unmit coeffs: `a_u=5.4903090234274277e-01`, `b_u=1.7177765195199222e-02`
+- fitted rem coeffs: `a_r=2.5236472250943665e-01`, `b_r=1.6934901185697227e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=4.0816326530612242e-02`, `x_rem=9.4633102432836652e-02`, `y_exact=9.5718617404331324e-04`
+  - train[1] t_remaining=29: `x_unmit=3.1446540880503145e-02`, `x_rem=6.5560761101462264e-02`, `y_exact=-4.5541659627037691e-08`
+  - train[2] t_remaining=30: `x_unmit=-5.5214723926380369e-02`, `x_rem=-1.1414163376520842e-01`, `y_exact=-4.3039788172151835e-09`
+  - train[3] t_remaining=31: `x_unmit=5.3995680345572353e-02`, `x_rem=1.1839934113988089e-01`, `y_exact=2.0141833725875379e-02`
+  - train[4] t_remaining=30: `x_unmit=-9.2024539877300610e-02`, `x_rem=-1.9912290180752398e-01`, `y_exact=-7.0466229021829825e-09`
+  - train[5] t_remaining=31: `x_unmit=2.3655913978494623e-02`, `x_rem=7.2396941416506780e-02`, `y_exact=2.2252101515138471e-08`
+  - train[6] t_remaining=31: `x_unmit=-1.1952191235059761e-02`, `x_rem=-1.4760420286402343e-02`, `y_exact=-4.6271402674804785e-09`
+  - train[7] t_remaining=31: `x_unmit=-4.3269230769230768e-02`, `x_rem=-1.0993628865493633e-01`, `y_exact=2.3425228547679678e-08`
+  - train[8] t_remaining=30: `x_unmit=-3.9473684210526314e-02`, `x_rem=-9.4633042371698534e-02`, `y_exact=-1.7645662891637684e-01`
+  - train[9] t_remaining=32: `x_unmit=-2.2494887525562373e-02`, `x_rem=-4.8039488070326666e-02`, `y_exact=1.3286673268616261e-01`
+  - train[10] t_remaining=30: `x_unmit=-3.9370078740157480e-02`, `x_rem=-7.7338217056964420e-02`, `y_exact=-1.6173709711026372e-08`
+  - train[11] t_remaining=29: `x_unmit=-5.3078556263269641e-02`, `x_rem=-1.3393553054089902e-01`, `y_exact=2.0573032744838073e-08`
+  - train[12] t_remaining=30: `x_unmit=-6.9860279441117765e-02`, `x_rem=-1.4252043792170493e-01`, `y_exact=8.9174509871964017e-09`
+  - train[13] t_remaining=29: `x_unmit=3.7362637362637362e-02`, `x_rem=8.4547847361516854e-02`, `y_exact=-1.0757388938632483e-08`
+  - train[14] t_remaining=32: `x_unmit=6.6371681415929210e-02`, `x_rem=1.4767357950722082e-01`, `y_exact=3.0245733726479391e-02`
+  - train[15] t_remaining=32: `x_unmit=1.6194331983805668e-02`, `x_rem=3.7533711655196325e-02`, `y_exact=2.2727844159685116e-02`
+  - train[16] t_remaining=31: `x_unmit=1.4736842105263158e-02`, `x_rem=2.9308589304736475e-02`, `y_exact=-3.7648351232730498e-02`
+  - train[17] t_remaining=32: `x_unmit=6.5843621399176960e-02`, `x_rem=1.5696571942653317e-01`, `y_exact=-1.8364993249013799e-02`
+  - train[18] t_remaining=30: `x_unmit=2.1052631578947368e-03`, `x_rem=-3.4346748585449473e-03`, `y_exact=-1.9373136809924164e-08`
+  - train[19] t_remaining=32: `x_unmit=-4.2735042735042739e-03`, `x_rem=1.4388755575508820e-03`, `y_exact=1.6215801921057160e-01`
+  - train[20] t_remaining=31: `x_unmit=3.6144578313253010e-02`, `x_rem=8.3971196145989566e-02`, `y_exact=1.4390614920280089e-08`
+  - train[21] t_remaining=31: `x_unmit=-1.4492753623188406e-02`, `x_rem=-2.9969150424554895e-02`, `y_exact=1.3573934427600023e-01`
+  - train[22] t_remaining=30: `x_unmit=-8.8295687885010271e-02`, `x_rem=-2.1419454899482668e-01`, `y_exact=-1.2168354983291872e-01`
+  - train[23] t_remaining=30: `x_unmit=7.0833333333333331e-02`, `x_rem=1.5106455742417310e-01`, `y_exact=2.2079385791997888e-01`
+- target x values: `x_u_target=-8.7499999999999994e-02`, `x_r_target=-1.9829972719060721e-01`
+- target contribution to E_cdr_unmit: `-5.3865211388832296e-04`
+- target contribution to E_cdr_rem: `-5.7786127780737426e-04`
+
+### term 61
+- pauli term from int row: `(1.7453323053332640e-02)*X(q(0, 0))*X(q(0, 1))*Y(q(1, 1))*Y(q(1, 2))`
+- int observable row: `[1, 1, 0, 0, 0, 2, 2, 0]`
+- Hamiltonian weight w_61: `1.7453323053332640e-02`
+- OGM effective shots used for this term: `461`
+- fitted unmit coeffs: `a_u=7.8089408495677226e-01`, `b_u=2.0913614717093829e-02`
+- fitted rem coeffs: `a_r=3.8243138169279334e-01`, `b_r=2.0616119258787029e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=1.3100436681222707e-02`, `x_rem=2.6291233577956111e-02`, `y_exact=9.5719553235511581e-04`
+  - train[1] t_remaining=29: `x_unmit=7.1274298056155511e-02`, `x_rem=1.5506499779979960e-01`, `y_exact=-3.0050650029450988e-08`
+  - train[2] t_remaining=30: `x_unmit=-3.7362637362637362e-02`, `x_rem=-7.2915142247975046e-02`, `y_exact=-9.5835129313583122e-10`
+  - train[3] t_remaining=31: `x_unmit=-4.5553145336225599e-02`, `x_rem=-1.0576116737768756e-01`, `y_exact=2.0141853168244128e-02`
+  - train[4] t_remaining=30: `x_unmit=-1.9438444924406047e-02`, `x_rem=-3.2464096770094569e-02`, `y_exact=-3.3382069938830797e-09`
+  - train[5] t_remaining=31: `x_unmit=2.0283975659229209e-03`, `x_rem=2.3956294696172416e-03`, `y_exact=-1.6639751349129858e-09`
+  - train[6] t_remaining=31: `x_unmit=-4.6979865771812082e-02`, `x_rem=-1.0856673424880153e-01`, `y_exact=5.7548670217799748e-09`
+  - train[7] t_remaining=31: `x_unmit=-4.7413793103448273e-02`, `x_rem=-1.0238031071090496e-01`, `y_exact=-3.0736089769072521e-08`
+  - train[8] t_remaining=30: `x_unmit=-2.4096385542168676e-02`, `x_rem=-5.4639945421617132e-02`, `y_exact=-1.7645666914200708e-01`
+  - train[9] t_remaining=32: `x_unmit=-4.4967880085653104e-02`, `x_rem=-8.5034964182378089e-02`, `y_exact=1.3286670441539092e-01`
+  - train[10] t_remaining=30: `x_unmit=-3.4642032332563508e-02`, `x_rem=-7.8074999777772505e-02`, `y_exact=2.3903751090771022e-08`
+  - train[11] t_remaining=29: `x_unmit=-2.0785219399538105e-02`, `x_rem=-3.8334005294900005e-02`, `y_exact=1.3804029680230721e-08`
+  - train[12] t_remaining=30: `x_unmit=-3.0927835051546393e-02`, `x_rem=-6.8365437633191126e-02`, `y_exact=1.9901943394241037e-09`
+  - train[13] t_remaining=29: `x_unmit=1.8711018711018712e-02`, `x_rem=3.2568891451354130e-02`, `y_exact=-5.4570586531938570e-09`
+  - train[14] t_remaining=32: `x_unmit=-4.4210526315789471e-02`, `x_rem=-1.1086120828220471e-01`, `y_exact=3.0245727264242534e-02`
+  - train[15] t_remaining=32: `x_unmit=7.9365079365079361e-02`, `x_rem=1.7021220152007316e-01`, `y_exact=2.2727860361246140e-02`
+  - train[16] t_remaining=31: `x_unmit=1.4736842105263158e-02`, `x_rem=2.7283371640145857e-02`, `y_exact=-3.7648378254532489e-02`
+  - train[17] t_remaining=32: `x_unmit=-1.0570824524312896e-02`, `x_rem=-2.1544587202514197e-02`, `y_exact=-1.8364977383133876e-02`
+  - train[18] t_remaining=30: `x_unmit=-6.5817409766454352e-02`, `x_rem=-1.2684311309109622e-01`, `y_exact=-7.0130694421858601e-08`
+  - train[19] t_remaining=32: `x_unmit=5.9360730593607303e-02`, `x_rem=1.3499680547445039e-01`, `y_exact=1.6215798360251277e-01`
+  - train[20] t_remaining=31: `x_unmit=1.7699115044247787e-02`, `x_rem=4.4127917045598743e-02`, `y_exact=1.8362657788073174e-08`
+  - train[21] t_remaining=31: `x_unmit=1.3333333333333334e-02`, `x_rem=4.0116106533675526e-02`, `y_exact=1.3573931991009955e-01`
+  - train[22] t_remaining=30: `x_unmit=-5.2631578947368418e-02`, `x_rem=-1.0986440976889114e-01`, `y_exact=-1.2168362183043038e-01`
+  - train[23] t_remaining=30: `x_unmit=6.8736141906873618e-02`, `x_rem=1.6015558885063794e-01`, `y_exact=2.2079377086116037e-01`
+- target x values: `x_u_target=3.6866359447004608e-02`, `x_r_target=7.4591610969872088e-02`
+- target contribution to E_cdr_unmit: `8.6747093968372099e-04`
+- target contribution to E_cdr_rem: `8.5769629968433195e-04`
+
+### term 62
+- pauli term from int row: `(1.7453323053332640e-02)*X(q(0, 0))*X(q(0, 1))*X(q(1, 1))*X(q(1, 2))`
+- int observable row: `[1, 1, 0, 0, 0, 1, 1, 0]`
+- Hamiltonian weight w_62: `1.7453323053332640e-02`
+- OGM effective shots used for this term: `487`
+- fitted unmit coeffs: `a_u=-1.9447464221364691e-01`, `b_u=1.4187814766915659e-02`
+- fitted rem coeffs: `a_r=-4.3739956547160355e-02`, `b_r=1.4953733184968591e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=4.3137254901960784e-02`, `x_rem=9.1916785683662586e-02`, `y_exact=9.5721825428534205e-04`
+  - train[1] t_remaining=29: `x_unmit=-2.1052631578947368e-03`, `x_rem=9.3748642908640760e-03`, `y_exact=-2.9596777587127010e-08`
+  - train[2] t_remaining=30: `x_unmit=-2.5316455696202531e-02`, `x_rem=-6.0092487066848242e-02`, `y_exact=-1.9042047675860583e-09`
+  - train[3] t_remaining=31: `x_unmit=-6.5075921908893707e-03`, `x_rem=3.2936223151379786e-03`, `y_exact=2.0141857478239461e-02`
+  - train[4] t_remaining=30: `x_unmit=2.4096385542168676e-02`, `x_rem=5.6063509082539612e-02`, `y_exact=1.1274055965528071e-09`
+  - train[5] t_remaining=31: `x_unmit=-3.8031319910514540e-02`, `x_rem=-1.0307758605341084e-01`, `y_exact=-5.9149813826620853e-09`
+  - train[6] t_remaining=31: `x_unmit=-4.5186640471512773e-02`, `x_rem=-8.7124897447733635e-02`, `y_exact=-4.6827034825851923e-09`
+  - train[7] t_remaining=31: `x_unmit=2.5210084033613446e-02`, `x_rem=5.8693310236340120e-02`, `y_exact=-1.8757642895893262e-08`
+  - train[8] t_remaining=30: `x_unmit=4.4585987261146494e-02`, `x_rem=9.0677407159330994e-02`, `y_exact=-1.7645666582993358e-01`
+  - train[9] t_remaining=32: `x_unmit=5.0709939148073022e-02`, `x_rem=1.3467551808967901e-01`, `y_exact=1.3286669515704996e-01`
+  - train[10] t_remaining=30: `x_unmit=-6.4182194616977231e-02`, `x_rem=-1.4839571652403605e-01`, `y_exact=2.6294408043107176e-08`
+  - train[11] t_remaining=29: `x_unmit=-4.6277665995975853e-02`, `x_rem=-1.0364096841939037e-01`, `y_exact=2.0736904984637315e-09`
+  - train[12] t_remaining=30: `x_unmit=-2.2964509394572025e-02`, `x_rem=-5.7256989823279397e-02`, `y_exact=-2.4299282000921355e-08`
+  - train[13] t_remaining=29: `x_unmit=2.8112449799196786e-02`, `x_rem=6.8489709331557749e-02`, `y_exact=7.7635747935311062e-09`
+  - train[14] t_remaining=32: `x_unmit=5.2410901467505239e-02`, `x_rem=1.2261907614994196e-01`, `y_exact=3.0245767648792238e-02`
+  - train[15] t_remaining=32: `x_unmit=-1.3215859030837005e-02`, `x_rem=-3.1169585590357929e-02`, `y_exact=2.2727864574497648e-02`
+  - train[16] t_remaining=31: `x_unmit=-5.6521739130434782e-02`, `x_rem=-1.2645982477427137e-01`, `y_exact=-3.7648400451200326e-02`
+  - train[17] t_remaining=32: `x_unmit=-9.0163934426229511e-02`, `x_rem=-1.9630920080352174e-01`, `y_exact=-1.8365008563952023e-02`
+  - train[18] t_remaining=30: `x_unmit=1.4613778705636743e-02`, `x_rem=2.8910249576747926e-02`, `y_exact=-7.0588091784209767e-08`
+  - train[19] t_remaining=32: `x_unmit=-1.0615711252653927e-02`, `x_rem=-2.1273516220813270e-02`, `y_exact=1.6215800474960493e-01`
+  - train[20] t_remaining=31: `x_unmit=4.3841336116910233e-02`, `x_rem=1.0411112724756721e-01`, `y_exact=1.5811814083824005e-08`
+  - train[21] t_remaining=31: `x_unmit=-2.9940119760479042e-02`, `x_rem=-6.7702681515775145e-02`, `y_exact=1.3573931561405961e-01`
+  - train[22] t_remaining=30: `x_unmit=4.7445428402784472e-19`, `x_rem=4.8312066589655768e-03`, `y_exact=-1.2168361139284110e-01`
+  - train[23] t_remaining=30: `x_unmit=-3.4934497816593885e-02`, `x_rem=-5.8925220416356588e-02`, `y_exact=2.2079380928248757e-01`
+- target x values: `x_u_target=-4.1749502982107355e-02`, `x_r_target=-9.2419238485346014e-02`
+- target contribution to E_cdr_unmit: `3.8933187812825428e-04`
+- target contribution to E_cdr_rem: `3.3154588443313262e-04`
+
+### term 63
+- pauli term from int row: `(2.5997720777610030e-02)*Y(q(0, 0))*Z(q(0, 1))*Z(q(0, 2))*Y(q(0, 3))*Y(q(1, 1))*Y(q(1, 2))`
+- int observable row: `[2, 3, 3, 2, 0, 2, 2, 0]`
+- Hamiltonian weight w_63: `2.5997720777610030e-02`
+- OGM effective shots used for this term: `137`
+- fitted unmit coeffs: `a_u=4.1796024740586232e-02`, `b_u=-5.4286532558132632e-03`
+- fitted rem coeffs: `a_r=1.3761026847329902e-02`, `b_r=-5.3814411485754166e-03`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-1.4705882352941177e-01`, `x_rem=-5.0891893088558726e-01`, `y_exact=-1.2048007757978971e-01`
+  - train[1] t_remaining=29: `x_unmit=-1.4084507042253522e-01`, `x_rem=-4.4754671789525674e-01`, `y_exact=8.2735126534235876e-09`
+  - train[2] t_remaining=30: `x_unmit=-5.8479532163742687e-03`, `x_rem=-4.0347096405782969e-02`, `y_exact=2.0379565555135513e-09`
+  - train[3] t_remaining=31: `x_unmit=1.0526315789473684e-01`, `x_rem=3.1139462250428929e-01`, `y_exact=1.5174361590116286e-02`
+  - train[4] t_remaining=30: `x_unmit=1.3432835820895522e-01`, `x_rem=4.6627784086352853e-01`, `y_exact=1.8790447737132259e-09`
+  - train[5] t_remaining=31: `x_unmit=3.9473684210526314e-02`, `x_rem=1.2809821544443159e-01`, `y_exact=1.0467107947757830e-08`
+  - train[6] t_remaining=31: `x_unmit=6.1538461538461542e-02`, `x_rem=1.6578578500286281e-01`, `y_exact=2.0948065885905229e-08`
+  - train[7] t_remaining=31: `x_unmit=-3.3112582781456956e-02`, `x_rem=-1.1703274135590214e-01`, `y_exact=-4.2503091715854734e-08`
+  - train[8] t_remaining=30: `x_unmit=-7.4626865671641784e-02`, `x_rem=-2.3572887360848768e-01`, `y_exact=4.4811174902264888e-09`
+  - train[9] t_remaining=32: `x_unmit=-6.3694267515923570e-03`, `x_rem=-3.3815388669319615e-02`, `y_exact=4.6861455063693373e-02`
+  - train[10] t_remaining=30: `x_unmit=-6.0402684563758392e-02`, `x_rem=-2.2568687836105045e-01`, `y_exact=-1.1326335691825925e-08`
+  - train[11] t_remaining=29: `x_unmit=-3.0303030303030304e-02`, `x_rem=-8.0240911314792759e-02`, `y_exact=3.4393440375894688e-09`
+  - train[12] t_remaining=30: `x_unmit=-1.1627906976744186e-01`, `x_rem=-3.7856067321834203e-01`, `y_exact=1.4721165224187967e-08`
+  - train[13] t_remaining=29: `x_unmit=-2.9411764705882353e-02`, `x_rem=-6.1547613394851229e-02`, `y_exact=-9.2820771779088081e-09`
+  - train[14] t_remaining=32: `x_unmit=1.9083969465648856e-01`, `x_rem=5.8472394830783581e-01`, `y_exact=-2.2960927474193920e-03`
+  - train[15] t_remaining=32: `x_unmit=-1.3698630136986301e-02`, `x_rem=-5.2042552470957917e-02`, `y_exact=-9.2496050972904323e-02`
+  - train[16] t_remaining=31: `x_unmit=-1.2000000000000000e-01`, `x_rem=-3.1117464857984212e-01`, `y_exact=-6.2675269434421957e-03`
+  - train[17] t_remaining=32: `x_unmit=-1.3178294573643412e-01`, `x_rem=-4.4992771403198550e-01`, `y_exact=8.7227346203740563e-02`
+  - train[18] t_remaining=30: `x_unmit=8.3333333333333329e-02`, `x_rem=2.8364514070924152e-01`, `y_exact=-2.7790146843065177e-08`
+  - train[19] t_remaining=32: `x_unmit=0.0000000000000000e+00`, `x_rem=2.6721183621215543e-03`, `y_exact=-4.9024800387991056e-02`
+  - train[20] t_remaining=31: `x_unmit=-3.4013605442176874e-02`, `x_rem=-8.7185473577334041e-02`, `y_exact=6.1155066035574919e-09`
+  - train[21] t_remaining=31: `x_unmit=-1.5625000000000000e-02`, `x_rem=-4.2233642947958241e-02`, `y_exact=-1.7584218630554146e-02`
+  - train[22] t_remaining=30: `x_unmit=1.3888888888888890e-01`, `x_rem=4.0715725688946758e-01`, `y_exact=-7.9795802555784601e-09`
+  - train[23] t_remaining=30: `x_unmit=0.0000000000000000e+00`, `x_rem=1.5090812919642619e-02`, `y_exact=1.4195878987721999e-08`
+- target x values: `x_u_target=-5.9701492537313432e-02`, `x_r_target=-2.3003041453465750e-01`
+- target contribution to E_cdr_unmit: `-2.0600433577114705e-04`
+- target contribution to E_cdr_rem: `-2.2219981204951500e-04`
+
+### term 64
+- pauli term from int row: `(2.5997720777610030e-02)*Y(q(0, 0))*Z(q(0, 1))*Z(q(0, 2))*Y(q(0, 3))*X(q(1, 1))*X(q(1, 2))`
+- int observable row: `[2, 3, 3, 2, 0, 1, 1, 0]`
+- Hamiltonian weight w_64: `2.5997720777610030e-02`
+- OGM effective shots used for this term: `141`
+- fitted unmit coeffs: `a_u=3.3671299083649540e-02`, `b_u=-5.3602103544794343e-03`
+- fitted rem coeffs: `a_r=1.0416527409253527e-02`, `b_r=-5.3538983063915156e-03`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-1.8867924528301886e-02`, `x_rem=-4.0687765661887240e-02`, `y_exact=-1.2048004997071909e-01`
+  - train[1] t_remaining=29: `x_unmit=2.8571428571428571e-02`, `x_rem=1.1843733281550886e-01`, `y_exact=9.4158993084014360e-09`
+  - train[2] t_remaining=30: `x_unmit=-3.5971223021582732e-02`, `x_rem=-4.9208227701718850e-02`, `y_exact=4.7204024256926264e-09`
+  - train[3] t_remaining=31: `x_unmit=1.2925170068027211e-01`, `x_rem=3.5964409345806614e-01`, `y_exact=1.5174363941786975e-02`
+  - train[4] t_remaining=30: `x_unmit=6.4516129032258064e-03`, `x_rem=4.5958761450952665e-02`, `y_exact=3.4104766091814316e-09`
+  - train[5] t_remaining=31: `x_unmit=1.1564625850340136e-01`, `x_rem=3.0443975146679092e-01`, `y_exact=1.2539114593177226e-08`
+  - train[6] t_remaining=31: `x_unmit=-2.2556390977443608e-02`, `x_rem=-6.7963843382053066e-02`, `y_exact=1.0320675279122498e-08`
+  - train[7] t_remaining=31: `x_unmit=-1.3103448275862070e-01`, `x_rem=-4.2106013920366758e-01`, `y_exact=-3.2734216146045272e-08`
+  - train[8] t_remaining=30: `x_unmit=1.6250000000000001e-01`, `x_rem=5.4451062565993735e-01`, `y_exact=2.9424691896935846e-09`
+  - train[9] t_remaining=32: `x_unmit=-1.8120805369127516e-01`, `x_rem=-5.7253972861950997e-01`, `y_exact=4.6861447872431322e-02`
+  - train[10] t_remaining=30: `x_unmit=-1.3235294117647059e-01`, `x_rem=-4.7302201404189514e-01`, `y_exact=7.8107815396413250e-09`
+  - train[11] t_remaining=29: `x_unmit=8.8235294117647065e-02`, `x_rem=2.7758694903300796e-01`, `y_exact=-5.8783779792510490e-09`
+  - train[12] t_remaining=30: `x_unmit=-6.5789473684210523e-02`, `x_rem=-2.0165501199988345e-01`, `y_exact=-8.7344119987205249e-09`
+  - train[13] t_remaining=29: `x_unmit=9.3525179856115109e-02`, `x_rem=3.0733468955896964e-01`, `y_exact=-4.3462042013563291e-10`
+  - train[14] t_remaining=32: `x_unmit=-4.6511627906976744e-02`, `x_rem=-1.1419105232737957e-01`, `y_exact=-2.2960600677423668e-03`
+  - train[15] t_remaining=32: `x_unmit=-1.3513513513513514e-02`, `x_rem=-7.1250919208975513e-02`, `y_exact=-9.2496037036958773e-02`
+  - train[16] t_remaining=31: `x_unmit=2.9411764705882353e-02`, `x_rem=6.7730060481791352e-02`, `y_exact=-6.2675163534095185e-03`
+  - train[17] t_remaining=32: `x_unmit=8.1481481481481488e-02`, `x_rem=2.3247514591918664e-01`, `y_exact=8.7227348792192502e-02`
+  - train[18] t_remaining=30: `x_unmit=-8.8435374149659865e-02`, `x_rem=-3.0934214297200430e-01`, `y_exact=-2.6840816871118114e-08`
+  - train[19] t_remaining=32: `x_unmit=-9.3525179856115109e-02`, `x_rem=-3.4933123216165374e-01`, `y_exact=-4.9024800936381827e-02`
+  - train[20] t_remaining=31: `x_unmit=-1.0937500000000000e-01`, `x_rem=-3.9125883874078193e-01`, `y_exact=5.5017981840417955e-09`
+  - train[21] t_remaining=31: `x_unmit=6.3694267515923570e-03`, `x_rem=2.7832630603864424e-02`, `y_exact=-1.7584225191180258e-02`
+  - train[22] t_remaining=30: `x_unmit=2.4000000000000000e-02`, `x_rem=1.2308458317750205e-01`, `y_exact=-1.1684480661451774e-08`
+  - train[23] t_remaining=30: `x_unmit=-1.3043478260869565e-01`, `x_rem=-3.4516929792974721e-01`, `y_exact=-3.3944556769479290e-09`
+- target x values: `x_u_target=-9.3750000000000000e-02`, `x_r_target=-2.8173481032462488e-01`
+- target contribution to E_cdr_unmit: `-2.2141984883589639e-04`
+- target contribution to E_cdr_rem: `-2.1548462213211405e-04`
+
+### term 65
+- pauli term from int row: `(2.5997720777610030e-02)*X(q(0, 0))*Z(q(0, 1))*Z(q(0, 2))*X(q(0, 3))*Y(q(1, 1))*Y(q(1, 2))`
+- int observable row: `[1, 3, 3, 1, 0, 2, 2, 0]`
+- Hamiltonian weight w_65: `2.5997720777610030e-02`
+- OGM effective shots used for this term: `124`
+- fitted unmit coeffs: `a_u=-1.2009671489073107e-01`, `b_u=-5.4140512686475005e-03`
+- fitted rem coeffs: `a_r=-4.3923452576900168e-02`, `b_r=-5.5028903976034943e-03`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-5.1851851851851850e-02`, `x_rem=-1.2247974158392415e-01`, `y_exact=-1.2048007075438481e-01`
+  - train[1] t_remaining=29: `x_unmit=-2.7397260273972601e-02`, `x_rem=-7.8052891504654304e-02`, `y_exact=1.4872743690953919e-08`
+  - train[2] t_remaining=30: `x_unmit=6.9767441860465115e-02`, `x_rem=2.0080945581233614e-01`, `y_exact=1.2504459746930979e-08`
+  - train[3] t_remaining=31: `x_unmit=-1.0294117647058823e-01`, `x_rem=-3.5903073124785639e-01`, `y_exact=1.5174346242921573e-02`
+  - train[4] t_remaining=30: `x_unmit=-1.6030534351145037e-01`, `x_rem=-4.6886685471313233e-01`, `y_exact=5.2661623662663259e-09`
+  - train[5] t_remaining=31: `x_unmit=5.3435114503816793e-02`, `x_rem=1.1810362859937520e-01`, `y_exact=-1.0250683961594453e-08`
+  - train[6] t_remaining=31: `x_unmit=-6.6666666666666666e-02`, `x_rem=-3.0198993230288934e-01`, `y_exact=2.6404612604920947e-08`
+  - train[7] t_remaining=31: `x_unmit=-8.1300813008130090e-03`, `x_rem=1.6005480745788930e-02`, `y_exact=-1.5303167214256470e-08`
+  - train[8] t_remaining=30: `x_unmit=1.3888888888888888e-02`, `x_rem=7.2179580022622369e-02`, `y_exact=-5.4660480476002353e-09`
+  - train[9] t_remaining=32: `x_unmit=-4.6153846153846156e-02`, `x_rem=-1.8550960022214691e-01`, `y_exact=4.6861447261788237e-02`
+  - train[10] t_remaining=30: `x_unmit=1.4084507042253521e-02`, `x_rem=3.4116989972276385e-02`, `y_exact=1.9201914649458116e-08`
+  - train[11] t_remaining=29: `x_unmit=1.4529914529914531e-01`, `x_rem=5.3801349059089343e-01`, `y_exact=6.9137559899824622e-09`
+  - train[12] t_remaining=30: `x_unmit=-4.9180327868852458e-02`, `x_rem=-1.6033067448920194e-01`, `y_exact=-4.5367461342732887e-09`
+  - train[13] t_remaining=29: `x_unmit=2.3255813953488372e-02`, `x_rem=1.0099151366216375e-01`, `y_exact=-2.4769611762589317e-09`
+  - train[14] t_remaining=32: `x_unmit=7.3170731707317069e-02`, `x_rem=2.0836107045113739e-01`, `y_exact=-2.2961129238553602e-03`
+  - train[15] t_remaining=32: `x_unmit=3.6496350364963501e-02`, `x_rem=1.1482806308498993e-01`, `y_exact=-9.2496054707287140e-02`
+  - train[16] t_remaining=31: `x_unmit=3.5714285714285712e-02`, `x_rem=1.6352627657459740e-01`, `y_exact=-6.2675292076083628e-03`
+  - train[17] t_remaining=32: `x_unmit=-1.1949685534591195e-01`, `x_rem=-4.3445776675725006e-01`, `y_exact=8.7227366795770075e-02`
+  - train[18] t_remaining=30: `x_unmit=-1.5625000000000000e-02`, `x_rem=-5.0111473814544838e-02`, `y_exact=-2.1777139271925216e-08`
+  - train[19] t_remaining=32: `x_unmit=4.2253521126760563e-02`, `x_rem=1.0532593866638847e-01`, `y_exact=-4.9024788660595522e-02`
+  - train[20] t_remaining=31: `x_unmit=3.8167938931297711e-02`, `x_rem=1.7245655352454481e-01`, `y_exact=7.5772182491510363e-09`
+  - train[21] t_remaining=31: `x_unmit=4.1095890410958902e-02`, `x_rem=1.3583561351290041e-01`, `y_exact=-1.7584220360302993e-02`
+  - train[22] t_remaining=30: `x_unmit=3.7037037037037035e-02`, `x_rem=1.1553763379012309e-01`, `y_exact=-1.1262790628812131e-08`
+  - train[23] t_remaining=30: `x_unmit=9.8591549295774641e-02`, `x_rem=2.1992298894523607e-01`, `y_exact=-1.8812229273497393e-08`
+- target x values: `x_u_target=1.4925373134328358e-02`, `x_r_target=8.1742821035991980e-02`
+- target contribution to E_cdr_unmit: `-1.8735360300926854e-04`
+- target contribution to E_cdr_rem: `-2.3640552465044120e-04`
+
+### term 66
+- pauli term from int row: `(2.5997720777610030e-02)*X(q(0, 0))*Z(q(0, 1))*Z(q(0, 2))*X(q(0, 3))*X(q(1, 1))*X(q(1, 2))`
+- int observable row: `[1, 3, 3, 1, 0, 1, 1, 0]`
+- Hamiltonian weight w_66: `2.5997720777610030e-02`
+- OGM effective shots used for this term: `152`
+- fitted unmit coeffs: `a_u=-1.7613099535714627e-01`, `b_u=-1.3084970462003275e-03`
+- fitted rem coeffs: `a_r=-5.0256092738352548e-02`, `b_r=-1.9394557340261076e-03`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=2.2480620155038761e-01`, `x_rem=7.1031017690491749e-01`, `y_exact=-1.2048005659034311e-01`
+  - train[1] t_remaining=29: `x_unmit=1.9008264462809918e-01`, `x_rem=5.6533261081889674e-01`, `y_exact=1.6848275845505474e-08`
+  - train[2] t_remaining=30: `x_unmit=-5.1948051948051951e-02`, `x_rem=-1.6050559839126938e-01`, `y_exact=2.0210086280960724e-08`
+  - train[3] t_remaining=31: `x_unmit=3.9370078740157480e-02`, `x_rem=1.6540006967863047e-01`, `y_exact=1.5174351817134592e-02`
+  - train[4] t_remaining=30: `x_unmit=1.4074074074074075e-01`, `x_rem=4.6945315480607225e-01`, `y_exact=3.2526501043621208e-09`
+  - train[5] t_remaining=31: `x_unmit=9.6296296296296297e-02`, `x_rem=3.4188329679649709e-01`, `y_exact=-4.6519738720110825e-09`
+  - train[6] t_remaining=31: `x_unmit=-1.3636363636363635e-01`, `x_rem=-4.6922611870297315e-01`, `y_exact=2.1749636409941579e-08`
+  - train[7] t_remaining=31: `x_unmit=3.6496350364963501e-02`, `x_rem=6.9390491193581497e-02`, `y_exact=-1.5264387344014191e-08`
+  - train[8] t_remaining=30: `x_unmit=-9.3525179856115109e-02`, `x_rem=-3.3235057363903536e-01`, `y_exact=-5.5208742743941782e-09`
+  - train[9] t_remaining=32: `x_unmit=-3.8759689922480620e-02`, `x_rem=-5.9241315393677496e-02`, `y_exact=4.6861443460818712e-02`
+  - train[10] t_remaining=30: `x_unmit=3.3112582781456956e-02`, `x_rem=1.0420740346037656e-01`, `y_exact=2.0946982480122977e-08`
+  - train[11] t_remaining=29: `x_unmit=2.2222222222222223e-02`, `x_rem=-1.0281339674243108e-02`, `y_exact=-2.3492732669098989e-09`
+  - train[12] t_remaining=30: `x_unmit=7.1999999999999995e-02`, `x_rem=2.3434858209089446e-01`, `y_exact=-4.6853599068261318e-09`
+  - train[13] t_remaining=29: `x_unmit=-3.6496350364963501e-02`, `x_rem=-1.4422818495560158e-01`, `y_exact=8.8439652195616123e-09`
+  - train[14] t_remaining=32: `x_unmit=-4.1666666666666664e-02`, `x_rem=-1.1633037003661216e-01`, `y_exact=-2.2960710644901422e-03`
+  - train[15] t_remaining=32: `x_unmit=1.0144927536231885e-01`, `x_rem=2.9567490516431461e-01`, `y_exact=-9.2496019809965635e-02`
+  - train[16] t_remaining=31: `x_unmit=-1.0144927536231885e-01`, `x_rem=-3.1285018372717066e-01`, `y_exact=-6.2675224129674044e-03`
+  - train[17] t_remaining=32: `x_unmit=3.4482758620689655e-02`, `x_rem=1.1065689119805507e-01`, `y_exact=8.7227352762944577e-02`
+  - train[18] t_remaining=30: `x_unmit=1.2500000000000000e-01`, `x_rem=4.3929385451414837e-01`, `y_exact=-2.0805407426940168e-08`
+  - train[19] t_remaining=32: `x_unmit=1.2698412698412698e-01`, `x_rem=4.3557138083968561e-01`, `y_exact=-4.9024781981253818e-02`
+  - train[20] t_remaining=31: `x_unmit=-1.0077519379844961e-01`, `x_rem=-3.6042211911552979e-01`, `y_exact=6.6300381570042017e-09`
+  - train[21] t_remaining=31: `x_unmit=1.4285714285714285e-02`, `x_rem=2.2758523030063076e-02`, `y_exact=-1.7584231048433992e-02`
+  - train[22] t_remaining=30: `x_unmit=-2.5974025974025976e-02`, `x_rem=-6.5224901709124802e-02`, `y_exact=-1.5109155607859754e-08`
+  - train[23] t_remaining=30: `x_unmit=-2.0134228187919462e-02`, `x_rem=-9.6259574991641728e-02`, `y_exact=-2.0678474246579176e-08`
+- target x values: `x_u_target=-1.6129032258064516e-02`, `x_r_target=-6.1302922715708238e-02`
+- target contribution to E_cdr_unmit: `3.9836969438066352e-05`
+- target contribution to E_cdr_rem: `2.9673529031959189e-05`
+
+### term 67
+- pauli term from int row: `(1.4979988785090322e-02)*Z(q(0, 0))*Y(q(1, 1))*Z(q(1, 2))*Y(q(1, 3))`
+- int observable row: `[3, 0, 0, 0, 0, 2, 3, 2]`
+- Hamiltonian weight w_67: `1.4979988785090322e-02`
+- OGM effective shots used for this term: `392`
+- fitted unmit coeffs: `a_u=2.2131041302681806e+00`, `b_u=-8.4320880006542157e-02`
+- fitted rem coeffs: `a_r=1.0863621301681841e+00`, `b_r=-8.4098660403690698e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=3.8961038961038960e-02`, `x_rem=8.7738289508358505e-02`, `y_exact=-1.1228903537914239e-02`
+  - train[1] t_remaining=29: `x_unmit=-7.6923076923076927e-02`, `x_rem=-1.5718588815295889e-01`, `y_exact=-2.3594584869047108e-01`
+  - train[2] t_remaining=30: `x_unmit=7.4792243767313013e-02`, `x_rem=1.5722122975764455e-01`, `y_exact=1.0720553875573917e-01`
+  - train[3] t_remaining=31: `x_unmit=1.1822660098522167e-01`, `x_rem=2.3935580984561988e-01`, `y_exact=9.8363803384523690e-03`
+  - train[4] t_remaining=30: `x_unmit=7.7922077922077922e-03`, `x_rem=3.2943627736533400e-02`, `y_exact=2.6357025443155628e-08`
+  - train[5] t_remaining=31: `x_unmit=8.0952380952380956e-02`, `x_rem=1.6390863854164214e-01`, `y_exact=-1.3151986385492670e-01`
+  - train[6] t_remaining=31: `x_unmit=1.3404825737265416e-02`, `x_rem=3.7585611526629530e-02`, `y_exact=-2.3477336548295133e-01`
+  - train[7] t_remaining=31: `x_unmit=5.0938337801608578e-02`, `x_rem=1.1272554257320595e-01`, `y_exact=3.8647135054087089e-01`
+  - train[8] t_remaining=30: `x_unmit=6.9892473118279563e-02`, `x_rem=1.3208971583087381e-01`, `y_exact=-8.9320603626492198e-09`
+  - train[9] t_remaining=32: `x_unmit=0.0000000000000000e+00`, `x_rem=-8.2419470355055476e-03`, `y_exact=1.1501380586838791e-02`
+  - train[10] t_remaining=30: `x_unmit=-1.6304347826086956e-02`, `x_rem=-3.3260446692984294e-02`, `y_exact=-4.2899820263860688e-01`
+  - train[11] t_remaining=29: `x_unmit=4.9261083743842365e-03`, `x_rem=3.9551715610248138e-03`, `y_exact=-1.1916522062926218e-07`
+  - train[12] t_remaining=30: `x_unmit=-5.3475935828877002e-03`, `x_rem=3.3109288098537510e-04`, `y_exact=-3.2781917221446288e-01`
+  - train[13] t_remaining=29: `x_unmit=-8.9005235602094238e-02`, `x_rem=-1.9189368666583725e-01`, `y_exact=-3.5651658143090970e-01`
+  - train[14] t_remaining=32: `x_unmit=-3.9164490861618800e-02`, `x_rem=-9.2044887632899502e-02`, `y_exact=-3.4818960601333204e-01`
+  - train[15] t_remaining=32: `x_unmit=9.5000000000000001e-02`, `x_rem=1.8909515547672537e-01`, `y_exact=2.5491178888788124e-01`
+  - train[16] t_remaining=31: `x_unmit=-2.4691358024691358e-03`, `x_rem=2.9424603198060051e-03`, `y_exact=-9.2361870717287478e-02`
+  - train[17] t_remaining=32: `x_unmit=-6.4676616915422883e-02`, `x_rem=-1.2388688694093092e-01`, `y_exact=5.6343696132400499e-02`
+  - train[18] t_remaining=30: `x_unmit=1.2106537530266344e-02`, `x_rem=2.6780493507522440e-02`, `y_exact=5.9363254869126622e-02`
+  - train[19] t_remaining=32: `x_unmit=6.8807339449541288e-02`, `x_rem=1.3730975084193006e-01`, `y_exact=1.9045686090613509e-01`
+  - train[20] t_remaining=31: `x_unmit=-4.3478260869565216e-02`, `x_rem=-9.5029712220002227e-02`, `y_exact=-2.9587034599240369e-01`
+  - train[21] t_remaining=31: `x_unmit=9.8039215686274508e-03`, `x_rem=1.9124328128948646e-02`, `y_exact=1.9052900294885855e-01`
+  - train[22] t_remaining=30: `x_unmit=6.8292682926829273e-02`, `x_rem=1.3617520038805314e-01`, `y_exact=-1.5340517090048364e-07`
+  - train[23] t_remaining=30: `x_unmit=-2.8011204481792717e-03`, `x_rem=-2.1302962740221268e-02`, `y_exact=1.0824960411771366e-08`
+- target x values: `x_u_target=5.9101654846335699e-02`, `x_r_target=1.2344329038070222e-01`
+- target contribution to E_cdr_unmit: `6.9622848062671715e-04`
+- target contribution to E_cdr_rem: `7.4908116242242834e-04`
+
+### term 68
+- pauli term from int row: `(1.4979988785090322e-02)*Z(q(0, 0))*X(q(1, 1))*Z(q(1, 2))*X(q(1, 3))`
+- int observable row: `[3, 0, 0, 0, 0, 1, 3, 1]`
+- Hamiltonian weight w_68: `1.4979988785090322e-02`
+- OGM effective shots used for this term: `393`
+- fitted unmit coeffs: `a_u=2.3513126009336056e+00`, `b_u=-5.3369980829856674e-02`
+- fitted rem coeffs: `a_r=1.1798891860906924e+00`, `b_r=-5.6147247409739066e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-2.3622047244094488e-02`, `x_rem=-4.1143868119639361e-02`, `y_exact=-1.1228905021538352e-02`
+  - train[1] t_remaining=29: `x_unmit=-4.8593350383631710e-02`, `x_rem=-9.0317388088224843e-02`, `y_exact=-2.3594593568112757e-01`
+  - train[2] t_remaining=30: `x_unmit=1.5957446808510637e-02`, `x_rem=2.7960891451384341e-02`, `y_exact=1.0720551440890433e-01`
+  - train[3] t_remaining=31: `x_unmit=6.6666666666666666e-02`, `x_rem=1.4088428498201833e-01`, `y_exact=9.8363811165968484e-03`
+  - train[4] t_remaining=30: `x_unmit=2.6737967914438502e-02`, `x_rem=7.2981108418685936e-02`, `y_exact=2.6357092415582996e-08`
+  - train[5] t_remaining=31: `x_unmit=-2.4657534246575342e-02`, `x_rem=-4.9984065618425159e-02`, `y_exact=-1.3151983688970376e-01`
+  - train[6] t_remaining=31: `x_unmit=9.7560975609756097e-03`, `x_rem=1.0056039600093720e-02`, `y_exact=-2.3477330950903097e-01`
+  - train[7] t_remaining=31: `x_unmit=3.1088082901554404e-02`, `x_rem=7.2214900297373277e-02`, `y_exact=3.8647142334701323e-01`
+  - train[8] t_remaining=30: `x_unmit=-1.1990407673860911e-02`, `x_rem=-1.9150949588400724e-02`, `y_exact=4.1159955915385715e-08`
+  - train[9] t_remaining=32: `x_unmit=6.3106796116504854e-02`, `x_rem=1.2025662675238463e-01`, `y_exact=1.1501323049098648e-02`
+  - train[10] t_remaining=30: `x_unmit=-8.7804878048780483e-02`, `x_rem=-1.8958590570151521e-01`, `y_exact=-4.2899820263860877e-01`
+  - train[11] t_remaining=29: `x_unmit=2.8985507246376812e-02`, `x_rem=5.7062517927210253e-02`, `y_exact=-1.1916523078159180e-07`
+  - train[12] t_remaining=30: `x_unmit=-1.0674157303370786e-01`, `x_rem=-2.2058598649786770e-01`, `y_exact=-3.2781916822838186e-01`
+  - train[13] t_remaining=29: `x_unmit=2.5125628140703519e-02`, `x_rem=5.5462574755192451e-02`, `y_exact=-3.5651658143091552e-01`
+  - train[14] t_remaining=32: `x_unmit=-9.8734177215189872e-02`, `x_rem=-1.8011886835579119e-01`, `y_exact=-3.4818962339544646e-01`
+  - train[15] t_remaining=32: `x_unmit=1.0256410256410256e-01`, `x_rem=2.0963434858934435e-01`, `y_exact=2.5491173600479544e-01`
+  - train[16] t_remaining=31: `x_unmit=-3.9548022598870060e-02`, `x_rem=-7.5031796979035267e-02`, `y_exact=-9.2361879944323308e-02`
+  - train[17] t_remaining=32: `x_unmit=1.1056511056511056e-01`, `x_rem=2.1692540643286762e-01`, `y_exact=5.6343696343073471e-02`
+  - train[18] t_remaining=30: `x_unmit=1.0256410256410256e-02`, `x_rem=9.6497119029402383e-03`, `y_exact=5.9363105983962453e-02`
+  - train[19] t_remaining=32: `x_unmit=3.7220843672456573e-02`, `x_rem=8.9870276081996034e-02`, `y_exact=1.9045684754641540e-01`
+  - train[20] t_remaining=31: `x_unmit=2.4570024570024569e-03`, `x_rem=6.7422056768367562e-03`, `y_exact=-2.9587033752476510e-01`
+  - train[21] t_remaining=31: `x_unmit=1.1933174224343675e-02`, `x_rem=2.4320511186536723e-02`, `y_exact=1.9052900298886383e-01`
+  - train[22] t_remaining=30: `x_unmit=-5.5837563451776651e-02`, `x_rem=-1.2145604287883865e-01`, `y_exact=-1.0851257663890381e-07`
+  - train[23] t_remaining=30: `x_unmit=-9.0497737556561094e-03`, `x_rem=1.2714048861756134e-03`, `y_exact=-3.7490845301079907e-08`
+- target x values: `x_u_target=5.2910052910052907e-03`, `x_r_target=1.3013665385886027e-02`
+- target contribution to E_cdr_unmit: `-6.1311855877731007e-04`
+- target contribution to E_cdr_rem: `-6.1107215647102553e-04`
+
+### term 69
+- pauli term from int row: `(3.2265354441004174e-02)*Y(q(0, 0))*Z(q(0, 1))*Y(q(0, 2))*Y(q(1, 1))*Z(q(1, 2))*Y(q(1, 3))`
+- int observable row: `[2, 3, 2, 0, 0, 2, 3, 2]`
+- Hamiltonian weight w_69: `3.2265354441004174e-02`
+- OGM effective shots used for this term: `175`
+- fitted unmit coeffs: `a_u=-5.0623367647697697e-02`, `b_u=2.0520893011597382e-03`
+- fitted rem coeffs: `a_r=-1.8773936742171069e-02`, `b_r=2.2243753296085815e-03`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-3.7433155080213901e-02`, `x_rem=-8.3053461190146533e-02`, `y_exact=-2.6947920708780021e-02`
+  - train[1] t_remaining=29: `x_unmit=-5.1282051282051282e-03`, `x_rem=-4.1176747721029354e-02`, `y_exact=4.5956985582293380e-09`
+  - train[2] t_remaining=30: `x_unmit=5.3658536585365853e-02`, `x_rem=1.7935411027739603e-01`, `y_exact=3.4578218369029568e-08`
+  - train[3] t_remaining=31: `x_unmit=-3.2258064516129031e-02`, `x_rem=-8.0773734589030491e-02`, `y_exact=-5.8725512381468378e-02`
+  - train[4] t_remaining=30: `x_unmit=6.3829787234042548e-02`, `x_rem=2.1705238052881273e-01`, `y_exact=-2.7048347408934378e-08`
+  - train[5] t_remaining=31: `x_unmit=-2.0000000000000000e-02`, `x_rem=-7.4864472994194742e-02`, `y_exact=-2.1965539510909867e-08`
+  - train[6] t_remaining=31: `x_unmit=1.6577540106951871e-01`, `x_rem=4.8292218040955959e-01`, `y_exact=-1.6370014345497800e-09`
+  - train[7] t_remaining=31: `x_unmit=1.1764705882352941e-02`, `x_rem=3.1991690375690704e-02`, `y_exact=-1.3219251381369743e-08`
+  - train[8] t_remaining=30: `x_unmit=3.0612244897959183e-02`, `x_rem=6.1991977491120925e-02`, `y_exact=2.8483694017152214e-09`
+  - train[9] t_remaining=32: `x_unmit=3.5294117647058823e-02`, `x_rem=1.1339893806268823e-01`, `y_exact=3.3351126129293376e-02`
+  - train[10] t_remaining=30: `x_unmit=-2.2222222222222223e-02`, `x_rem=-6.5358253171721239e-02`, `y_exact=8.4191538218309325e-02`
+  - train[11] t_remaining=29: `x_unmit=7.3891625615763554e-02`, `x_rem=2.7555943815441925e-01`, `y_exact=-2.5127057740493519e-08`
+  - train[12] t_remaining=30: `x_unmit=-3.9603960396039604e-02`, `x_rem=-1.6060212960722561e-01`, `y_exact=1.2895237767690393e-09`
+  - train[13] t_remaining=29: `x_unmit=1.7499999999999999e-01`, `x_rem=5.1031238058978834e-01`, `y_exact=6.9966939863562186e-02`
+  - train[14] t_remaining=32: `x_unmit=-7.7777777777777779e-02`, `x_rem=-2.6350570868295831e-01`, `y_exact=-5.2636985265577026e-04`
+  - train[15] t_remaining=32: `x_unmit=3.5532994923857870e-02`, `x_rem=1.1436496122270338e-01`, `y_exact=-8.9135665630917196e-02`
+  - train[16] t_remaining=31: `x_unmit=-1.4285714285714285e-01`, `x_rem=-4.2944329344277893e-01`, `y_exact=3.0718577999246030e-02`
+  - train[17] t_remaining=32: `x_unmit=-8.8082901554404139e-02`, `x_rem=-2.2901971677185937e-01`, `y_exact=7.3582372503824128e-02`
+  - train[18] t_remaining=30: `x_unmit=-6.0109289617486336e-02`, `x_rem=-1.6224008701761086e-01`, `y_exact=-2.1265166407469956e-08`
+  - train[19] t_remaining=32: `x_unmit=1.4432989690721648e-01`, `x_rem=4.1856212246071317e-01`, `y_exact=-4.2381695124418556e-02`
+  - train[20] t_remaining=31: `x_unmit=-1.3227513227513227e-01`, `x_rem=-3.6596302118769525e-01`, `y_exact=2.4661448876499927e-10`
+  - train[21] t_remaining=31: `x_unmit=5.6410256410256411e-02`, `x_rem=2.2955571235310060e-01`, `y_exact=-3.8928593771154874e-02`
+  - train[22] t_remaining=30: `x_unmit=8.9887640449438200e-02`, `x_rem=2.5141398816440930e-01`, `y_exact=-1.7040299694752039e-08`
+  - train[23] t_remaining=30: `x_unmit=0.0000000000000000e+00`, `x_rem=4.0029923762663865e-02`, `y_exact=1.6504358453404298e-08`
+- target x values: `x_u_target=-1.6751269035532995e-01`, `x_r_target=-5.2218486521686780e-01`
+- target contribution to E_cdr_unmit: `3.3982341760568707e-04`
+- target contribution to E_cdr_rem: `3.8808255163470156e-04`
+
+### term 70
+- pauli term from int row: `(3.2265354441004174e-02)*Y(q(0, 0))*Z(q(0, 1))*Y(q(0, 2))*X(q(1, 1))*Z(q(1, 2))*X(q(1, 3))`
+- int observable row: `[2, 3, 2, 0, 0, 1, 3, 1]`
+- Hamiltonian weight w_70: `3.2265354441004174e-02`
+- OGM effective shots used for this term: `190`
+- fitted unmit coeffs: `a_u=1.3992305936928331e-01`, `b_u=-2.3798510177310152e-04`
+- fitted rem coeffs: `a_r=4.5698522335450999e-02`, `b_r=-8.2318435485047146e-05`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-7.5376884422110546e-02`, `x_rem=-2.5243280058632500e-01`, `y_exact=-2.6947894786920702e-02`
+  - train[1] t_remaining=29: `x_unmit=6.0773480662983423e-02`, `x_rem=1.4150836346275650e-01`, `y_exact=-2.2020157590046986e-09`
+  - train[2] t_remaining=30: `x_unmit=1.6577540106951871e-01`, `x_rem=5.6922683683781716e-01`, `y_exact=3.4937236524859770e-08`
+  - train[3] t_remaining=31: `x_unmit=-6.4676616915422883e-02`, `x_rem=-2.2469052970919148e-01`, `y_exact=-5.8725530989876304e-02`
+  - train[4] t_remaining=30: `x_unmit=4.8648648648648651e-02`, `x_rem=1.4073341504132764e-01`, `y_exact=-2.7048352616859445e-08`
+  - train[5] t_remaining=31: `x_unmit=-5.2631578947368418e-02`, `x_rem=-1.7844565027746284e-01`, `y_exact=-1.4560215702196785e-08`
+  - train[6] t_remaining=31: `x_unmit=-1.0880829015544041e-01`, `x_rem=-3.4472472662382991e-01`, `y_exact=-2.4367919215701262e-09`
+  - train[7] t_remaining=31: `x_unmit=6.5217391304347824e-02`, `x_rem=2.2842023246901719e-01`, `y_exact=-2.6279018052848575e-08`
+  - train[8] t_remaining=30: `x_unmit=3.7837837837837840e-02`, `x_rem=5.5292814586485502e-02`, `y_exact=-3.1131069089166273e-08`
+  - train[9] t_remaining=32: `x_unmit=4.3668122270742356e-03`, `x_rem=8.7453031808103158e-03`, `y_exact=3.3351115446224322e-02`
+  - train[10] t_remaining=30: `x_unmit=0.0000000000000000e+00`, `x_rem=-2.5719193336686652e-02`, `y_exact=8.4191538218297779e-02`
+  - train[11] t_remaining=29: `x_unmit=-6.7961165048543687e-02`, `x_rem=-1.6389564012922647e-01`, `y_exact=-2.5127062173808121e-08`
+  - train[12] t_remaining=30: `x_unmit=-7.8431372549019607e-02`, `x_rem=-2.4609279101422074e-01`, `y_exact=-2.0145176465370111e-09`
+  - train[13] t_remaining=29: `x_unmit=1.8407960199004975e-01`, `x_rem=5.7703478900714600e-01`, `y_exact=6.9966939863554317e-02`
+  - train[14] t_remaining=32: `x_unmit=-1.0344827586206896e-01`, `x_rem=-2.8643111637845758e-01`, `y_exact=-5.2636978316952289e-04`
+  - train[15] t_remaining=32: `x_unmit=-2.1276595744680851e-02`, `x_rem=-6.2885387258302311e-02`, `y_exact=-8.9135668423317507e-02`
+  - train[16] t_remaining=31: `x_unmit=5.2631578947368418e-02`, `x_rem=1.9973845475275817e-01`, `y_exact=3.0718560257570728e-02`
+  - train[17] t_remaining=32: `x_unmit=1.0752688172043012e-02`, `x_rem=2.7427319006497430e-02`, `y_exact=7.3582398852312825e-02`
+  - train[18] t_remaining=30: `x_unmit=1.2121212121212122e-01`, `x_rem=3.4697402727439192e-01`, `y_exact=-2.3202686876500084e-08`
+  - train[19] t_remaining=32: `x_unmit=5.7142857142857143e-03`, `x_rem=-3.1201770642571104e-02`, `y_exact=-4.2381643821609943e-02`
+  - train[20] t_remaining=31: `x_unmit=-7.0270270270270274e-02`, `x_rem=-2.0995729289965853e-01`, `y_exact=4.6510202776717595e-09`
+  - train[21] t_remaining=31: `x_unmit=3.4146341463414637e-02`, `x_rem=1.1682096200851351e-01`, `y_exact=-3.8928589385215463e-02`
+  - train[22] t_remaining=30: `x_unmit=1.0000000000000001e-01`, `x_rem=2.9493763714664067e-01`, `y_exact=6.5807244600756978e-09`
+  - train[23] t_remaining=30: `x_unmit=4.3859649122807015e-02`, `x_rem=1.3234309627405985e-01`, `y_exact=3.2915258477614218e-09`
+- target x values: `x_u_target=8.0808080808080815e-02`, `x_r_target=2.3152951934801178e-01`
+- target contribution to E_cdr_unmit: `3.5714291058362024e-04`
+- target contribution to E_cdr_rem: `3.3872938542646458e-04`
+
+### term 71
+- pauli term from int row: `(3.2265354441004174e-02)*X(q(0, 0))*Z(q(0, 1))*X(q(0, 2))*Y(q(1, 1))*Z(q(1, 2))*Y(q(1, 3))`
+- int observable row: `[1, 3, 1, 0, 0, 2, 3, 2]`
+- Hamiltonian weight w_71: `3.2265354441004174e-02`
+- OGM effective shots used for this term: `173`
+- fitted unmit coeffs: `a_u=-1.1313706729110794e-01`, `b_u=2.4262682120242637e-03`
+- fitted rem coeffs: `a_r=-3.5680369274910334e-02`, `b_r=1.9166385483922375e-03`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=5.1643192488262914e-02`, `x_rem=1.5510757721299506e-01`, `y_exact=-2.6947925541073212e-02`
+  - train[1] t_remaining=29: `x_unmit=3.1111111111111110e-02`, `x_rem=6.6029286173142784e-02`, `y_exact=-1.3355153102605699e-08`
+  - train[2] t_remaining=30: `x_unmit=1.5025906735751296e-01`, `x_rem=5.1664978165577569e-01`, `y_exact=2.2636669618906497e-08`
+  - train[3] t_remaining=31: `x_unmit=-5.2631578947368418e-02`, `x_rem=-2.2085303182658247e-01`, `y_exact=-5.8725530083430968e-02`
+  - train[4] t_remaining=30: `x_unmit=-9.6153846153846159e-03`, `x_rem=-2.9884350106455310e-02`, `y_exact=-2.7048346225195832e-08`
+  - train[5] t_remaining=31: `x_unmit=7.6086956521739135e-02`, `x_rem=2.3421972089880080e-01`, `y_exact=-2.2557555796591271e-08`
+  - train[6] t_remaining=31: `x_unmit=-7.0707070707070704e-02`, `x_rem=-2.4854730022674429e-01`, `y_exact=-5.6827298367843283e-09`
+  - train[7] t_remaining=31: `x_unmit=8.6757990867579904e-02`, `x_rem=2.9548737495461125e-01`, `y_exact=-3.8425318312108229e-09`
+  - train[8] t_remaining=30: `x_unmit=-5.1282051282051282e-03`, `x_rem=-3.3311455580795443e-02`, `y_exact=8.8638523010486368e-10`
+  - train[9] t_remaining=32: `x_unmit=-1.1764705882352941e-02`, `x_rem=-7.7493205629011561e-02`, `y_exact=3.3351110523889567e-02`
+  - train[10] t_remaining=30: `x_unmit=-3.7735849056603772e-02`, `x_rem=-1.7702439884289101e-01`, `y_exact=8.4191538218304884e-02`
+  - train[11] t_remaining=29: `x_unmit=-4.7619047619047616e-02`, `x_rem=-1.4620801289810517e-01`, `y_exact=-2.5127059011126019e-08`
+  - train[12] t_remaining=30: `x_unmit=2.0833333333333332e-02`, `x_rem=4.0354450853397207e-02`, `y_exact=-1.6223538850755949e-09`
+  - train[13] t_remaining=29: `x_unmit=1.2631578947368421e-01`, `x_rem=3.8795859807312161e-01`, `y_exact=6.9966939863559618e-02`
+  - train[14] t_remaining=32: `x_unmit=-5.2910052910052907e-03`, `x_rem=-3.8610210515476903e-02`, `y_exact=-5.2637862725082472e-04`
+  - train[15] t_remaining=32: `x_unmit=6.7484662576687116e-02`, `x_rem=1.7738269172076709e-01`, `y_exact=-8.9135668107869215e-02`
+  - train[16] t_remaining=31: `x_unmit=-3.2608695652173912e-02`, `x_rem=-1.2207002935920420e-01`, `y_exact=3.0718566075015448e-02`
+  - train[17] t_remaining=32: `x_unmit=-1.4285714285714285e-01`, `x_rem=-4.5818693945669142e-01`, `y_exact=7.3582384020626626e-02`
+  - train[18] t_remaining=30: `x_unmit=-5.4347826086956520e-02`, `x_rem=-1.7806909327507131e-01`, `y_exact=-2.0733400646143738e-08`
+  - train[19] t_remaining=32: `x_unmit=-2.1276595744680851e-02`, `x_rem=-4.3512704701149277e-02`, `y_exact=-4.2381650353612049e-02`
+  - train[20] t_remaining=31: `x_unmit=4.9382716049382713e-02`, `x_rem=1.5061211266487051e-01`, `y_exact=9.5757600786700863e-09`
+  - train[21] t_remaining=31: `x_unmit=4.1916167664670656e-02`, `x_rem=1.5742250068544644e-01`, `y_exact=-3.8928595236852347e-02`
+  - train[22] t_remaining=30: `x_unmit=3.4482758620689655e-02`, `x_rem=6.3752221708651474e-03`, `y_exact=-1.0799176914717933e-08`
+  - train[23] t_remaining=30: `x_unmit=-4.0816326530612242e-02`, `x_rem=-1.1017057766365046e-01`, `y_exact=2.2571986557098383e-09`
+- target x values: `x_u_target=-1.0880829015544041e-01`, `x_r_target=-3.3068625342441066e-01`
+- target contribution to E_cdr_unmit: `4.7547901060622603e-04`
+- target contribution to E_cdr_rem: `4.4254018553713259e-04`
+
+### term 72
+- pauli term from int row: `(3.2265354441004174e-02)*X(q(0, 0))*Z(q(0, 1))*X(q(0, 2))*X(q(1, 1))*Z(q(1, 2))*X(q(1, 3))`
+- int observable row: `[1, 3, 1, 0, 0, 1, 3, 1]`
+- Hamiltonian weight w_72: `3.2265354441004174e-02`
+- OGM effective shots used for this term: `224`
+- fitted unmit coeffs: `a_u=1.1966335714357977e-01`, `b_u=1.1059378797194618e-03`
+- fitted rem coeffs: `a_r=4.2404221980730836e-02`, `b_r=1.1423486598194389e-03`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=6.1452513966480445e-02`, `x_rem=1.9312787888695082e-01`, `y_exact=-2.6947884253273002e-02`
+  - train[1] t_remaining=29: `x_unmit=9.7142857142857142e-02`, `x_rem=2.9943391132513170e-01`, `y_exact=-1.1609720241878518e-08`
+  - train[2] t_remaining=30: `x_unmit=5.0251256281407036e-03`, `x_rem=2.5051929508625219e-02`, `y_exact=2.3348637515066868e-08`
+  - train[3] t_remaining=31: `x_unmit=-1.1111111111111110e-01`, `x_rem=-3.5459640930354536e-01`, `y_exact=-5.8725548830503016e-02`
+  - train[4] t_remaining=30: `x_unmit=1.5228426395939087e-02`, `x_rem=6.1239966051126235e-02`, `y_exact=-2.7048359477699296e-08`
+  - train[5] t_remaining=31: `x_unmit=-4.7120418848167540e-02`, `x_rem=-1.2602636941189835e-01`, `y_exact=-1.5961776518488708e-08`
+  - train[6] t_remaining=31: `x_unmit=2.5906735751295335e-02`, `x_rem=5.7660289965551809e-02`, `y_exact=-6.7961149677327170e-09`
+  - train[7] t_remaining=31: `x_unmit=-2.2624434389140271e-02`, `x_rem=-8.0206863399293046e-02`, `y_exact=6.3197765136125908e-09`
+  - train[8] t_remaining=30: `x_unmit=-9.2783505154639179e-02`, `x_rem=-2.9747547098715943e-01`, `y_exact=-2.6792019762023664e-08`
+  - train[9] t_remaining=32: `x_unmit=4.7846889952153108e-03`, `x_rem=5.0437503466529983e-02`, `y_exact=3.3351136969179060e-02`
+  - train[10] t_remaining=30: `x_unmit=1.4354066985645933e-02`, `x_rem=-4.8808504523105648e-03`, `y_exact=8.4191538218299500e-02`
+  - train[11] t_remaining=29: `x_unmit=-5.6994818652849742e-02`, `x_rem=-1.9092390960889591e-01`, `y_exact=-2.5127063782492366e-08`
+  - train[12] t_remaining=30: `x_unmit=-3.0927835051546393e-02`, `x_rem=-8.0586792982005648e-02`, `y_exact=-3.9130735646513947e-09`
+  - train[13] t_remaining=29: `x_unmit=-1.1111111111111112e-02`, `x_rem=1.3091415775033808e-02`, `y_exact=6.9966939863549515e-02`
+  - train[14] t_remaining=32: `x_unmit=1.0869565217391304e-01`, `x_rem=3.1479426594007576e-01`, `y_exact=-5.2637918521033025e-04`
+  - train[15] t_remaining=32: `x_unmit=-2.2471910112359550e-02`, `x_rem=-7.6159587271488374e-02`, `y_exact=-8.9135695149966193e-02`
+  - train[16] t_remaining=31: `x_unmit=3.5175879396984924e-02`, `x_rem=6.5163416662678705e-02`, `y_exact=3.0718550564976618e-02`
+  - train[17] t_remaining=32: `x_unmit=-4.0000000000000001e-02`, `x_rem=-1.0580054675633989e-01`, `y_exact=7.3582387410732697e-02`
+  - train[18] t_remaining=30: `x_unmit=3.8461538461538464e-02`, `x_rem=1.3124316757109053e-01`, `y_exact=-1.6161326717660754e-08`
+  - train[19] t_remaining=32: `x_unmit=-3.9215686274509803e-02`, `x_rem=-1.6005142615102769e-01`, `y_exact=-4.2381681925032180e-02`
+  - train[20] t_remaining=31: `x_unmit=9.3333333333333338e-02`, `x_rem=3.0265797440875702e-01`, `y_exact=1.5247162947127826e-08`
+  - train[21] t_remaining=31: `x_unmit=-5.5837563451776651e-02`, `x_rem=-1.7056785856045983e-01`, `y_exact=-3.8928597617643224e-02`
+  - train[22] t_remaining=30: `x_unmit=4.6511627906976744e-02`, `x_rem=1.4028490529456983e-01`, `y_exact=1.5729092802238746e-08`
+  - train[23] t_remaining=30: `x_unmit=5.6179775280898875e-02`, `x_rem=1.7581523073898861e-01`, `y_exact=1.8678158357041392e-08`
+- target x values: `x_u_target=-4.8309178743961350e-03`, `x_r_target=8.0264856452644077e-03`
+- target contribution to E_cdr_unmit: `1.7031397331837259e-05`
+- target contribution to E_cdr_rem: `4.7840019742518549e-05`
+
+### term 73
+- pauli term from int row: `(8.0506013557725881e-02)*Z(q(0, 0))*Z(q(1, 2))`
+- int observable row: `[3, 0, 0, 0, 0, 0, 3, 0]`
+- Hamiltonian weight w_73: `8.0506013557725881e-02`
+- OGM effective shots used for this term: `1935`
+- fitted unmit coeffs: `a_u=3.6309696533096161e+00`, `b_u=-1.4480546892925103e-01`
+- fitted rem coeffs: `a_r=2.5764407627932511e+00`, `b_r=-4.8762641461190304e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-2.5484199796126400e-02`, `x_rem=-5.8562339220799363e-02`, `y_exact=-1.2725528229827163e-01`
+  - train[1] t_remaining=29: `x_unmit=2.0387359836901122e-02`, `x_rem=-1.6406370052868720e-02`, `y_exact=-6.1480075014554186e-02`
+  - train[2] t_remaining=30: `x_unmit=-2.1871713985278654e-01`, `x_rem=-3.4924626611924464e-01`, `y_exact=-9.3408632678155223e-01`
+  - train[3] t_remaining=31: `x_unmit=-4.6569854782173258e-02`, `x_rem=-8.3794420053555640e-02`, `y_exact=-1.3104987464649406e-01`
+  - train[4] t_remaining=30: `x_unmit=-1.7774343122102010e-01`, `x_rem=-2.8724901866274910e-01`, `y_exact=-7.7955915729584557e-01`
+  - train[5] t_remaining=31: `x_unmit=-1.4647744551444500e-01`, `x_rem=-2.5013822973782435e-01`, `y_exact=-7.6564149333155873e-01`
+  - train[6] t_remaining=31: `x_unmit=-2.1531576330183988e-01`, `x_rem=-3.4463714815923241e-01`, `y_exact=-8.4693860018895584e-01`
+  - train[7] t_remaining=31: `x_unmit=-5.5555555555555552e-02`, `x_rem=-1.2205683179663493e-01`, `y_exact=-4.3650206528552171e-01`
+  - train[8] t_remaining=30: `x_unmit=-6.7873303167420809e-02`, `x_rem=-1.3758135221277445e-01`, `y_exact=-3.7014861375806701e-01`
+  - train[9] t_remaining=32: `x_unmit=8.7844739530132790e-02`, `x_rem=8.4335780974691757e-02`, `y_exact=1.0053652726288717e-01`
+  - train[10] t_remaining=30: `x_unmit=-2.0455722423614708e-01`, `x_rem=-3.2423188614805737e-01`, `y_exact=-7.7955916563242811e-01`
+  - train[11] t_remaining=29: `x_unmit=-1.0698141637368157e-01`, `x_rem=-1.7592038164837284e-01`, `y_exact=-6.3490054486149894e-01`
+  - train[12] t_remaining=30: `x_unmit=-1.8893028206492815e-01`, `x_rem=-3.0811981619878359e-01`, `y_exact=-9.7565713553651889e-01`
+  - train[13] t_remaining=29: `x_unmit=-1.6916709777547853e-01`, `x_rem=-2.7339715331261238e-01`, `y_exact=-7.7955912032269892e-01`
+  - train[14] t_remaining=32: `x_unmit=-1.2322042218949436e-01`, `x_rem=-2.1756099613988175e-01`, `y_exact=-7.7646421458907922e-01`
+  - train[15] t_remaining=32: `x_unmit=6.2964799206742680e-02`, `x_rem=6.1878377861822390e-02`, `y_exact=1.4513375860164754e-01`
+  - train[16] t_remaining=31: `x_unmit=-1.7213114754098360e-01`, `x_rem=-2.8060388330283542e-01`, `y_exact=-6.4695696590285479e-01`
+  - train[17] t_remaining=32: `x_unmit=1.3958125623130608e-02`, `x_rem=-1.7606845745846492e-02`, `y_exact=-9.3957056858354482e-02`
+  - train[18] t_remaining=30: `x_unmit=8.2514734774066803e-02`, `x_rem=7.1170032623366297e-02`, `y_exact=5.7331932497491501e-02`
+  - train[19] t_remaining=32: `x_unmit=3.9960532807104092e-02`, `x_rem=1.7142710349294866e-02`, `y_exact=-1.5942255106709907e-02`
+  - train[20] t_remaining=31: `x_unmit=-2.1339950372208438e-02`, `x_rem=-7.3767086323231729e-02`, `y_exact=-1.5047902020284920e-01`
+  - train[21] t_remaining=31: `x_unmit=1.6312407315867524e-02`, `x_rem=-1.8918655257405236e-02`, `y_exact=-1.6070798403023012e-01`
+  - train[22] t_remaining=30: `x_unmit=5.4067710965133908e-02`, `x_rem=3.3136337760524624e-02`, `y_exact=-2.2121513616854035e-02`
+  - train[23] t_remaining=30: `x_unmit=6.2595419847328249e-02`, `x_rem=6.4297677714432955e-02`, `y_exact=2.6614503186142319e-01`
+- target x values: `x_u_target=1.3439522150323544e-02`, `x_r_target=-9.1940983640362052e-03`
+- target contribution to E_cdr_unmit: `-7.7291385771060149e-03`
+- target contribution to E_cdr_rem: `-5.8327163331198190e-03`
+
+### term 74
+- pauli term from int row: `(-4.5401029857615252e-03)*Y(q(0, 0))*Z(q(0, 1))*Y(q(0, 2))*Z(q(1, 2))`
+- int observable row: `[2, 3, 2, 0, 0, 0, 3, 0]`
+- Hamiltonian weight w_74: `-4.5401029857615252e-03`
+- OGM effective shots used for this term: `365`
+- fitted unmit coeffs: `a_u=5.9340088681272507e-01`, `b_u=5.3536408396389928e-02`
+- fitted rem coeffs: `a_r=2.9486468280736944e-01`, `b_r=5.3270508824061050e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-3.1088082901554400e-02`, `x_rem=-6.2728586884478521e-02`, `y_exact=-6.4171654487792079e-02`
+  - train[1] t_remaining=29: `x_unmit=-9.0425531914893623e-02`, `x_rem=-1.9991905427389198e-01`, `y_exact=-3.4492376198250407e-08`
+  - train[2] t_remaining=30: `x_unmit=-4.0816326530612242e-02`, `x_rem=-8.0041835874765016e-02`, `y_exact=-1.0185743888738361e-07`
+  - train[3] t_remaining=31: `x_unmit=4.3927648578811367e-02`, `x_rem=9.6325922413503198e-02`, `y_exact=-3.4631710729821086e-01`
+  - train[4] t_remaining=30: `x_unmit=-2.6809651474530832e-03`, `x_rem=-1.3457237967169329e-02`, `y_exact=1.4012300789903551e-01`
+  - train[5] t_remaining=31: `x_unmit=3.1784841075794622e-02`, `x_rem=6.5784610419790862e-02`, `y_exact=-3.5264069134059226e-08`
+  - train[6] t_remaining=31: `x_unmit=1.5789473684210527e-02`, `x_rem=1.7457802592915694e-02`, `y_exact=-3.0061222714899631e-08`
+  - train[7] t_remaining=31: `x_unmit=1.6949152542372881e-02`, `x_rem=2.6930986554431720e-02`, `y_exact=-2.8547087686288529e-08`
+  - train[8] t_remaining=30: `x_unmit=4.9868766404199474e-02`, `x_rem=1.2936625753354930e-01`, `y_exact=1.7442303929443770e-01`
+  - train[9] t_remaining=32: `x_unmit=6.7669172932330823e-02`, `x_rem=1.5742846278586672e-01`, `y_exact=1.8229708461868224e-01`
+  - train[10] t_remaining=30: `x_unmit=2.1276595744680851e-02`, `x_rem=5.8112960875502398e-02`, `y_exact=1.6193767176226154e-01`
+  - train[11] t_remaining=29: `x_unmit=-5.6234718826405870e-02`, `x_rem=-1.3915006227523827e-01`, `y_exact=-4.1473934071559920e-01`
+  - train[12] t_remaining=30: `x_unmit=-7.3891625615763554e-02`, `x_rem=-1.5722805121406233e-01`, `y_exact=-7.6734077770988194e-10`
+  - train[13] t_remaining=29: `x_unmit=1.1357340720221606e-01`, `x_rem=2.8230984594692465e-01`, `y_exact=1.6193767319277633e-01`
+  - train[14] t_remaining=32: `x_unmit=-1.1299435028248588e-02`, `x_rem=-2.7055545917299709e-02`, `y_exact=2.7354743248664139e-02`
+  - train[15] t_remaining=32: `x_unmit=-3.8961038961038960e-02`, `x_rem=-9.9301841422024514e-02`, `y_exact=1.4315577447647909e-01`
+  - train[16] t_remaining=31: `x_unmit=4.3256997455470736e-02`, `x_rem=1.0720667437824033e-01`, `y_exact=3.5863048573807288e-01`
+  - train[17] t_remaining=32: `x_unmit=9.2348284960422161e-02`, `x_rem=2.2264614486227552e-01`, `y_exact=1.8223671522844503e-01`
+  - train[18] t_remaining=30: `x_unmit=-2.3622047244094488e-02`, `x_rem=-3.5168194583587269e-02`, `y_exact=-4.5701909422888427e-08`
+  - train[19] t_remaining=32: `x_unmit=-8.9430894308943090e-02`, `x_rem=-1.9166818796334084e-01`, `y_exact=1.9888774727335087e-01`
+  - train[20] t_remaining=31: `x_unmit=2.1390374331550801e-02`, `x_rem=3.2977002200684766e-02`, `y_exact=1.2119910016724057e-08`
+  - train[21] t_remaining=31: `x_unmit=-5.0000000000000003e-02`, `x_rem=-1.1686712998846374e-01`, `y_exact=8.6071900759692552e-02`
+  - train[22] t_remaining=30: `x_unmit=-9.4972067039106142e-02`, `x_rem=-2.0682729133851202e-01`, `y_exact=1.6353998576396644e-03`
+  - train[23] t_remaining=30: `x_unmit=-8.7378640776699032e-02`, `x_rem=-1.9357823694832901e-01`, `y_exact=1.8877235617019783e-01`
+- target x values: `x_u_target=3.7974683544303799e-02`, `x_r_target=9.5218267298257497e-02`
+- target contribution to E_cdr_unmit: `-3.4536844575823336e-04`
+- target contribution to E_cdr_rem: `-3.6932381664235038e-04`
+
+### term 75
+- pauli term from int row: `(-4.5401029857615252e-03)*X(q(0, 0))*Z(q(0, 1))*X(q(0, 2))*Z(q(1, 2))`
+- int observable row: `[1, 3, 1, 0, 0, 0, 3, 0]`
+- Hamiltonian weight w_75: `-4.5401029857615252e-03`
+- OGM effective shots used for this term: `397`
+- fitted unmit coeffs: `a_u=1.5804273038690166e+00`, `b_u=4.4311713886234970e-02`
+- fitted rem coeffs: `a_r=7.3515332704956982e-01`, `b_r=4.5127791519707139e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=1.1224489795918367e-01`, `x_rem=2.4439711848744611e-01`, `y_exact=-6.4171672681648806e-02`
+  - train[1] t_remaining=29: `x_unmit=-1.0000000000000000e-02`, `x_rem=-1.2196831161017711e-02`, `y_exact=-4.2367304553946659e-08`
+  - train[2] t_remaining=30: `x_unmit=-4.5918367346938778e-02`, `x_rem=-9.4801073608465750e-02`, `y_exact=-8.9318322031730803e-08`
+  - train[3] t_remaining=31: `x_unmit=-6.4864864864864868e-02`, `x_rem=-1.5742099409898117e-01`, `y_exact=-3.4631708256931482e-01`
+  - train[4] t_remaining=30: `x_unmit=7.6543209876543214e-02`, `x_rem=1.9807242715547735e-01`, `y_exact=1.4012300789902249e-01`
+  - train[5] t_remaining=31: `x_unmit=-3.4666666666666665e-02`, `x_rem=-6.8874078136196171e-02`, `y_exact=-3.7486649246983175e-08`
+  - train[6] t_remaining=31: `x_unmit=2.3017902813299233e-02`, `x_rem=3.0349639342974178e-02`, `y_exact=-3.6113207045161815e-08`
+  - train[7] t_remaining=31: `x_unmit=-3.6363636363636362e-02`, `x_rem=-9.1523441428013622e-02`, `y_exact=-2.6265820478488185e-08`
+  - train[8] t_remaining=30: `x_unmit=-5.3984575835475578e-02`, `x_rem=-1.1205360206249912e-01`, `y_exact=1.7442302739460405e-01`
+  - train[9] t_remaining=32: `x_unmit=2.3746701846965697e-02`, `x_rem=4.8494352650249470e-02`, `y_exact=1.8229701501860499e-01`
+  - train[10] t_remaining=30: `x_unmit=2.3752969121140144e-03`, `x_rem=6.5755709084233654e-03`, `y_exact=1.6193767176225499e-01`
+  - train[11] t_remaining=29: `x_unmit=-1.4136125654450263e-01`, `x_rem=-3.0937437736769829e-01`, `y_exact=-4.1473934071552199e-01`
+  - train[12] t_remaining=30: `x_unmit=-1.0362694300518135e-02`, `x_rem=-4.4299324717543775e-02`, `y_exact=4.3770758012178508e-11`
+  - train[13] t_remaining=29: `x_unmit=9.7297297297297303e-02`, `x_rem=2.1489858322213984e-01`, `y_exact=1.6193767319279193e-01`
+  - train[14] t_remaining=32: `x_unmit=4.0214477211796246e-02`, `x_rem=7.7734832677732790e-02`, `y_exact=2.7354745778808663e-02`
+  - train[15] t_remaining=32: `x_unmit=6.1583577712609971e-02`, `x_rem=1.3116761430702853e-01`, `y_exact=1.4315580689022636e-01`
+  - train[16] t_remaining=31: `x_unmit=4.4386422976501305e-02`, `x_rem=1.1938947644210762e-01`, `y_exact=3.5863046337709392e-01`
+  - train[17] t_remaining=32: `x_unmit=-2.6666666666666666e-03`, `x_rem=-1.6139738276200192e-02`, `y_exact=1.8223671340625047e-01`
+  - train[18] t_remaining=30: `x_unmit=-4.0816326530612242e-02`, `x_rem=-1.0111440992885889e-01`, `y_exact=-7.3442723943898172e-08`
+  - train[19] t_remaining=32: `x_unmit=5.1020408163265307e-02`, `x_rem=1.1658448433467172e-01`, `y_exact=1.9888771623499560e-01`
+  - train[20] t_remaining=31: `x_unmit=1.8087855297157621e-02`, `x_rem=2.9286869396865978e-02`, `y_exact=2.2533487786138558e-08`
+  - train[21] t_remaining=31: `x_unmit=2.1978021978021980e-02`, `x_rem=5.1782314945209372e-02`, `y_exact=8.6071885936530923e-02`
+  - train[22] t_remaining=30: `x_unmit=-1.0982658959537572e-01`, `x_rem=-2.3694169642126897e-01`, `y_exact=1.6353253416557319e-03`
+  - train[23] t_remaining=30: `x_unmit=5.3475935828877004e-02`, `x_rem=1.1090061292061312e-01`, `y_exact=1.8877233781732822e-01`
+- target x values: `x_u_target=7.4999999999999997e-02`, `x_r_target=1.8346577010516488e-01`
+- target contribution to E_cdr_unmit: `-7.3932744859971273e-04`
+- target contribution to E_cdr_rem: `-8.1723335094062476e-04`
+
+### term 76
+- pauli term from int row: `(4.2098456524183842e-02)*Y(q(0, 0))*Y(q(0, 1))*Y(q(1, 2))*Y(q(1, 3))`
+- int observable row: `[2, 2, 0, 0, 0, 0, 2, 2]`
+- Hamiltonian weight w_76: `4.2098456524183842e-02`
+- OGM effective shots used for this term: `562`
+- fitted unmit coeffs: `a_u=-4.8789378535009892e-02`, `b_u=-1.8977056436749657e-03`
+- fitted rem coeffs: `a_r=-1.3981820901793758e-02`, `b_r=-1.9480430988304282e-03`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-3.5156250000000000e-02`, `x_rem=-6.6771190154414364e-02`, `y_exact=4.0214742599275044e-02`
+  - train[1] t_remaining=29: `x_unmit=-6.0377358490566038e-02`, `x_rem=-1.2342552536175103e-01`, `y_exact=-1.5443181361433114e-08`
+  - train[2] t_remaining=30: `x_unmit=-2.9197080291970802e-02`, `x_rem=-6.4550556375674722e-02`, `y_exact=3.0802513011554042e-09`
+  - train[3] t_remaining=31: `x_unmit=2.5048169556840076e-02`, `x_rem=5.2909447870319523e-02`, `y_exact=1.5174395237517690e-02`
+  - train[4] t_remaining=30: `x_unmit=3.0418250950570342e-02`, `x_rem=6.9113315972824066e-02`, `y_exact=-1.2065526941149407e-08`
+  - train[5] t_remaining=31: `x_unmit=-3.0303030303030304e-02`, `x_rem=-6.1706368106400254e-02`, `y_exact=9.7907298632198704e-09`
+  - train[6] t_remaining=31: `x_unmit=2.0872865275142316e-02`, `x_rem=4.7944492931391212e-02`, `y_exact=-7.1557477338599404e-10`
+  - train[7] t_remaining=31: `x_unmit=-3.3834586466165412e-02`, `x_rem=-7.7513317601320894e-02`, `y_exact=-1.9119239492035921e-08`
+  - train[8] t_remaining=30: `x_unmit=-1.8587360594795540e-02`, `x_rem=-4.4204514834077557e-02`, `y_exact=-8.4214622541691978e-09`
+  - train[9] t_remaining=32: `x_unmit=1.7612524461839529e-02`, `x_rem=4.3529942756093169e-02`, `y_exact=-1.1054914791952589e-02`
+  - train[10] t_remaining=30: `x_unmit=-6.1818181818181821e-02`, `x_rem=-1.2596994356300700e-01`, `y_exact=1.3372075823872080e-08`
+  - train[11] t_remaining=29: `x_unmit=3.5381750465549346e-02`, `x_rem=6.6373091240580356e-02`, `y_exact=-5.9113611736014747e-09`
+  - train[12] t_remaining=30: `x_unmit=1.4234875444839857e-02`, `x_rem=3.1258913735287594e-02`, `y_exact=-1.2056476886343814e-08`
+  - train[13] t_remaining=29: `x_unmit=-1.8796992481203006e-02`, `x_rem=-5.4395015971019492e-02`, `y_exact=1.8859674274624752e-09`
+  - train[14] t_remaining=32: `x_unmit=-2.3529411764705882e-02`, `x_rem=-3.8362168096016329e-02`, `y_exact=1.5719295405439960e-03`
+  - train[15] t_remaining=32: `x_unmit=9.3457943925233638e-03`, `x_rem=1.4231286794488493e-02`, `y_exact=-9.2495993825833317e-02`
+  - train[16] t_remaining=31: `x_unmit=5.4474708171206226e-02`, `x_rem=1.1903272512026626e-01`, `y_exact=-5.8217848544650074e-03`
+  - train[17] t_remaining=32: `x_unmit=-2.9739776951672861e-02`, `x_rem=-5.9295179338777849e-02`, `y_exact=-1.1169669833440723e-02`
+  - train[18] t_remaining=30: `x_unmit=8.0745341614906832e-02`, `x_rem=1.8722201517762815e-01`, `y_exact=-1.6400928023601017e-09`
+  - train[19] t_remaining=32: `x_unmit=3.8610038610038609e-02`, `x_rem=6.6818695020049224e-02`, `y_exact=-2.7964929357032160e-02`
+  - train[20] t_remaining=31: `x_unmit=1.5564202334630350e-02`, `x_rem=3.4829598349252346e-02`, `y_exact=-1.3427539612544918e-09`
+  - train[21] t_remaining=31: `x_unmit=3.3057851239669422e-02`, `x_rem=7.3793429391587201e-02`, `y_exact=4.2245439353241848e-02`
+  - train[22] t_remaining=30: `x_unmit=-1.7421602787456445e-02`, `x_rem=-3.7000438143484034e-02`, `y_exact=-2.7311394337852517e-08`
+  - train[23] t_remaining=30: `x_unmit=6.0377358490566038e-02`, `x_rem=1.2836029876592861e-01`, `y_exact=1.7610597212317833e-08`
+- target x values: `x_u_target=4.4210526315789471e-02`, `x_r_target=9.0298269558607619e-02`
+- target contribution to E_cdr_unmit: `-1.7069702201607371e-04`
+- target contribution to E_cdr_rem: `-1.3516035020939951e-04`
+
+### term 77
+- pauli term from int row: `(4.2098456524183842e-02)*Y(q(0, 0))*Y(q(0, 1))*X(q(1, 2))*X(q(1, 3))`
+- int observable row: `[2, 2, 0, 0, 0, 0, 1, 1]`
+- Hamiltonian weight w_77: `4.2098456524183842e-02`
+- OGM effective shots used for this term: `463`
+- fitted unmit coeffs: `a_u=-8.9568278322458922e-02`, `b_u=-1.9372825671528729e-03`
+- fitted rem coeffs: `a_r=-4.4030637516703559e-02`, `b_r=-1.9617520221805553e-03`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=1.6326530612244899e-02`, `x_rem=4.1430176423237534e-02`, `y_exact=4.0214825587343572e-02`
+  - train[1] t_remaining=29: `x_unmit=6.0796645702306078e-02`, `x_rem=1.3051037451035233e-01`, `y_exact=-1.8747030424083872e-08`
+  - train[2] t_remaining=30: `x_unmit=-3.8854805725971372e-02`, `x_rem=-8.5622998767220210e-02`, `y_exact=-2.5906954293488367e-09`
+  - train[3] t_remaining=31: `x_unmit=-3.6717062634989202e-02`, `x_rem=-8.8355100597512448e-02`, `y_exact=1.5174354783545209e-02`
+  - train[4] t_remaining=30: `x_unmit=-4.7034764826175871e-02`, `x_rem=-8.9904627217413158e-02`, `y_exact=1.4828810835279563e-08`
+  - train[5] t_remaining=31: `x_unmit=1.0967741935483871e-01`, `x_rem=2.2621777718779817e-01`, `y_exact=1.5612417018074298e-08`
+  - train[6] t_remaining=31: `x_unmit=3.9840637450199202e-03`, `x_rem=1.6406142305840560e-02`, `y_exact=8.4708573042889011e-09`
+  - train[7] t_remaining=31: `x_unmit=-1.4423076923076924e-02`, `x_rem=-4.3165288814730612e-02`, `y_exact=-1.6974509614521828e-08`
+  - train[8] t_remaining=30: `x_unmit=-8.7719298245614030e-03`, `x_rem=-1.9095947081940883e-02`, `y_exact=2.8310398943509207e-09`
+  - train[9] t_remaining=32: `x_unmit=-6.3394683026584880e-02`, `x_rem=-1.2836659437503561e-01`, `y_exact=-1.1054962510921893e-02`
+  - train[10] t_remaining=30: `x_unmit=4.3307086614173228e-02`, `x_rem=8.7337470739685244e-02`, `y_exact=-1.8230953872723855e-08`
+  - train[11] t_remaining=29: `x_unmit=6.1571125265392782e-02`, `x_rem=1.3576520565639855e-01`, `y_exact=2.7595585457451247e-09`
+  - train[12] t_remaining=30: `x_unmit=2.5948103792415168e-02`, `x_rem=5.5545011309079267e-02`, `y_exact=2.6004702989485851e-08`
+  - train[13] t_remaining=29: `x_unmit=-2.1978021978021978e-03`, `x_rem=-1.2479689117446383e-02`, `y_exact=-3.5526028899773437e-09`
+  - train[14] t_remaining=32: `x_unmit=-6.6371681415929210e-02`, `x_rem=-1.4938093516016251e-01`, `y_exact=1.5718333861713149e-03`
+  - train[15] t_remaining=32: `x_unmit=5.2631578947368418e-02`, `x_rem=1.1464546873856590e-01`, `y_exact=-9.2496016896992661e-02`
+  - train[16] t_remaining=31: `x_unmit=-9.0526315789473691e-02`, `x_rem=-1.9146643604756802e-01`, `y_exact=-5.8218337536345161e-03`
+  - train[17] t_remaining=32: `x_unmit=0.0000000000000000e+00`, `x_rem=2.1710851528010215e-03`, `y_exact=-1.1169679375816035e-02`
+  - train[18] t_remaining=30: `x_unmit=-2.1052631578947368e-03`, `x_rem=-2.4216016593191503e-02`, `y_exact=-2.8660974440407529e-09`
+  - train[19] t_remaining=32: `x_unmit=3.8461538461538464e-02`, `x_rem=8.8675580965157735e-02`, `y_exact=-2.7964891866835442e-02`
+  - train[20] t_remaining=31: `x_unmit=-4.0160642570281124e-02`, `x_rem=-8.9794680911577121e-02`, `y_exact=1.4192800724217350e-09`
+  - train[21] t_remaining=31: `x_unmit=2.0703933747412010e-03`, `x_rem=9.2592200718295825e-04`, `y_exact=4.2245446654295860e-02`
+  - train[22] t_remaining=30: `x_unmit=-2.0533880903490761e-03`, `x_rem=2.5481624234963240e-03`, `y_exact=-8.0381306839289883e-09`
+  - train[23] t_remaining=30: `x_unmit=2.9166666666666667e-02`, `x_rem=7.0064020792604834e-02`, `y_exact=-9.0909606085212830e-09`
+- target x values: `x_u_target=1.6666666666666666e-02`, `x_r_target=2.5343731923066649e-02`
+- target contribution to E_cdr_unmit: `-1.4440137711007838e-04`
+- target contribution to E_cdr_rem: `-1.2956442821090972e-04`
+
+### term 78
+- pauli term from int row: `(4.2098456524183842e-02)*X(q(0, 0))*X(q(0, 1))*Y(q(1, 2))*Y(q(1, 3))`
+- int observable row: `[1, 1, 0, 0, 0, 0, 2, 2]`
+- Hamiltonian weight w_78: `4.2098456524183842e-02`
+- OGM effective shots used for this term: `527`
+- fitted unmit coeffs: `a_u=8.0784818661251978e-02`, `b_u=-1.1179462360942532e-03`
+- fitted rem coeffs: `a_r=3.5065355361435589e-02`, `b_r=-1.2491870749982716e-03`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-1.7274472168905951e-02`, `x_rem=-3.1816397120094604e-02`, `y_exact=4.0214758598321347e-02`
+  - train[1] t_remaining=29: `x_unmit=3.0888030888030889e-02`, `x_rem=6.8251225154374970e-02`, `y_exact=-1.0243865010440161e-08`
+  - train[2] t_remaining=30: `x_unmit=-5.8708414872798431e-03`, `x_rem=-1.7333619343450745e-02`, `y_exact=9.5113814400356053e-09`
+  - train[3] t_remaining=31: `x_unmit=-1.3282732447817837e-02`, `x_rem=-3.7466395794622645e-02`, `y_exact=1.5174364153071543e-02`
+  - train[4] t_remaining=30: `x_unmit=-7.7519379844961239e-03`, `x_rem=-1.4597615319182248e-02`, `y_exact=7.8332985227097033e-09`
+  - train[5] t_remaining=31: `x_unmit=2.5454545454545455e-02`, `x_rem=5.3746237705346013e-02`, `y_exact=3.4035794147332288e-09`
+  - train[6] t_remaining=31: `x_unmit=1.5625000000000000e-02`, `x_rem=3.0517503575072776e-02`, `y_exact=7.7529516416426091e-09`
+  - train[7] t_remaining=31: `x_unmit=-8.6792452830188674e-02`, `x_rem=-1.9467218221946306e-01`, `y_exact=7.2313021778060410e-09`
+  - train[8] t_remaining=30: `x_unmit=-1.5985790408525755e-02`, `x_rem=-3.2432447493066736e-02`, `y_exact=-1.1704725864035505e-08`
+  - train[9] t_remaining=32: `x_unmit=-7.1428571428571425e-02`, `x_rem=-1.5077682183332680e-01`, `y_exact=-1.1054936332055777e-02`
+  - train[10] t_remaining=30: `x_unmit=4.9504950495049507e-02`, `x_rem=1.0361345004317694e-01`, `y_exact=1.0362109114470794e-08`
+  - train[11] t_remaining=29: `x_unmit=4.4176706827309238e-02`, `x_rem=1.0923186719690363e-01`, `y_exact=5.6589391804549059e-09`
+  - train[12] t_remaining=30: `x_unmit=4.9122807017543860e-02`, `x_rem=1.1202821592794168e-01`, `y_exact=7.0134632481368783e-09`
+  - train[13] t_remaining=29: `x_unmit=-4.7619047619047616e-02`, `x_rem=-9.2038674951199564e-02`, `y_exact=-5.9340051793423309e-09`
+  - train[14] t_remaining=32: `x_unmit=-2.3593466424682397e-02`, `x_rem=-5.0386867739854041e-02`, `y_exact=1.5718713641539993e-03`
+  - train[15] t_remaining=32: `x_unmit=-3.5714285714285712e-02`, `x_rem=-7.3350204348143738e-02`, `y_exact=-9.2496003386390385e-02`
+  - train[16] t_remaining=31: `x_unmit=1.8484288354898336e-03`, `x_rem=1.3414377278981057e-02`, `y_exact=-5.8218131569055896e-03`
+  - train[17] t_remaining=32: `x_unmit=1.1152416356877323e-02`, `x_rem=2.6799002901905854e-02`, `y_exact=-1.1169663961923433e-02`
+  - train[18] t_remaining=30: `x_unmit=-3.7878787878787880e-02`, `x_rem=-6.5454315059581797e-02`, `y_exact=-1.2116685431805410e-08`
+  - train[19] t_remaining=32: `x_unmit=-2.1696252465483234e-02`, `x_rem=-4.5200233288225963e-02`, `y_exact=-2.7964869183859473e-02`
+  - train[20] t_remaining=31: `x_unmit=1.8761726078799250e-03`, `x_rem=3.0323869756194728e-04`, `y_exact=7.7134845215337860e-09`
+  - train[21] t_remaining=31: `x_unmit=-7.8740157480314960e-03`, `x_rem=-1.7074164283721573e-02`, `y_exact=4.2245436977955048e-02`
+  - train[22] t_remaining=30: `x_unmit=-8.9494163424124515e-02`, `x_rem=-1.8871677967767561e-01`, `y_exact=-1.8993606520046583e-08`
+  - train[23] t_remaining=30: `x_unmit=-2.5540275049115914e-02`, `x_rem=-5.7569794694832178e-02`, `y_exact=-7.6212209258765283e-10`
+- target x values: `x_u_target=-1.2096774193548387e-02`, `x_r_target=-1.7773292353804579e-02`
+- target contribution to E_cdr_unmit: `-8.8203926051566196e-05`
+- target contribution to E_cdr_rem: `-7.8825734630918630e-05`
+
+### term 79
+- pauli term from int row: `(4.2098456524183842e-02)*X(q(0, 0))*X(q(0, 1))*X(q(1, 2))*X(q(1, 3))`
+- int observable row: `[1, 1, 0, 0, 0, 0, 1, 1]`
+- Hamiltonian weight w_79: `4.2098456524183842e-02`
+- OGM effective shots used for this term: `487`
+- fitted unmit coeffs: `a_u=7.9866399730094545e-02`, `b_u=-1.1235213649081711e-03`
+- fitted rem coeffs: `a_r=4.4517502693887115e-02`, `b_r=-1.0294994098448927e-03`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=6.2745098039215685e-02`, `x_rem=1.4570987973124805e-01`, `y_exact=4.0214781260163604e-02`
+  - train[1] t_remaining=29: `x_unmit=-1.4736842105263158e-02`, `x_rem=-2.5216560239723112e-02`, `y_exact=-1.5110201365415356e-08`
+  - train[2] t_remaining=30: `x_unmit=-4.2194092827004216e-03`, `x_rem=1.0408468616194703e-02`, `y_exact=5.8652275673577107e-09`
+  - train[3] t_remaining=31: `x_unmit=2.1691973969631237e-03`, `x_rem=2.3872687822057426e-02`, `y_exact=1.5174344171553835e-02`
+  - train[4] t_remaining=30: `x_unmit=-3.6144578313253010e-02`, `x_rem=-6.9901795414384446e-02`, `y_exact=-1.1251169390655617e-08`
+  - train[5] t_remaining=31: `x_unmit=-3.3557046979865772e-02`, `x_rem=-7.4867860260814545e-02`, `y_exact=3.9122328234088163e-09`
+  - train[6] t_remaining=31: `x_unmit=1.9646365422396855e-03`, `x_rem=4.7173504858634820e-04`, `y_exact=1.1935731352340195e-08`
+  - train[7] t_remaining=31: `x_unmit=-3.7815126050420166e-02`, `x_rem=-8.5851163618744050e-02`, `y_exact=-7.6185221285990650e-09`
+  - train[8] t_remaining=30: `x_unmit=-7.0063694267515922e-02`, `x_rem=-1.6081441850526226e-01`, `y_exact=1.1297169087482214e-08`
+  - train[9] t_remaining=32: `x_unmit=-2.2312373225152130e-02`, `x_rem=-4.3497013117624564e-02`, `y_exact=-1.1054947611069354e-02`
+  - train[10] t_remaining=30: `x_unmit=3.5196687370600416e-02`, `x_rem=6.6536476412197981e-02`, `y_exact=1.3850209159023902e-08`
+  - train[11] t_remaining=29: `x_unmit=1.8108651911468814e-02`, `x_rem=2.8189003465448750e-02`, `y_exact=-7.2191289899659747e-09`
+  - train[12] t_remaining=30: `x_unmit=-2.0876826722338224e-03`, `x_rem=-1.4306336401910121e-02`, `y_exact=-1.3038241570682585e-08`
+  - train[13] t_remaining=29: `x_unmit=4.0160642570281124e-02`, `x_rem=8.9659067956715383e-02`, `y_exact=5.9645624963710250e-09`
+  - train[14] t_remaining=32: `x_unmit=1.0482180293501049e-02`, `x_rem=2.6440867915865248e-02`, `y_exact=1.5718751015399107e-03`
+  - train[15] t_remaining=32: `x_unmit=-8.8105726872246704e-03`, `x_rem=-1.7609773289506279e-02`, `y_exact=-9.2496043409475981e-02`
+  - train[16] t_remaining=31: `x_unmit=-1.7391304347826087e-02`, `x_rem=-4.8377897631074966e-02`, `y_exact=-5.8218196971150911e-03`
+  - train[17] t_remaining=32: `x_unmit=-8.1967213114754103e-03`, `x_rem=-8.7718422000841213e-03`, `y_exact=-1.1169652942539136e-02`
+  - train[18] t_remaining=30: `x_unmit=-1.4613778705636743e-02`, `x_rem=-2.9743131497534717e-02`, `y_exact=-1.0177176682090363e-08`
+  - train[19] t_remaining=32: `x_unmit=3.1847133757961776e-02`, `x_rem=5.4267457240106370e-02`, `y_exact=-2.7964913224683779e-02`
+  - train[20] t_remaining=31: `x_unmit=-1.4405010438413360e-01`, `x_rem=-2.9666501205001039e-01`, `y_exact=1.6588148112660137e-08`
+  - train[21] t_remaining=31: `x_unmit=2.1956087824351298e-02`, `x_rem=5.0333084165331339e-02`, `y_exact=4.2245431601622085e-02`
+  - train[22] t_remaining=30: `x_unmit=-6.4102564102564097e-02`, `x_rem=-1.2620017964099847e-01`, `y_exact=-3.2581009406618721e-09`
+  - train[23] t_remaining=30: `x_unmit=-2.6200873362445413e-02`, `x_rem=-4.6499048675384590e-02`, `y_exact=6.0664369305835835e-09`
+- target x values: `x_u_target=1.9880715705765406e-03`, `x_r_target=1.0415475844860113e-02`
+- target contribution to E_cdr_unmit: `-4.0614117408573418e-05`
+- target contribution to E_cdr_rem: `-2.3820503807334564e-05`
+
+### term 80
+- pauli term from int row: `(-7.6471876029928004e-03)*Y(q(0, 0))*Z(q(0, 1))*Z(q(0, 2))*Y(q(0, 3))*Y(q(1, 2))*Y(q(1, 3))`
+- int observable row: `[2, 3, 3, 2, 0, 0, 2, 2]`
+- Hamiltonian weight w_80: `-7.6471876029928004e-03`
+- OGM effective shots used for this term: `137`
+- fitted unmit coeffs: `a_u=-2.0527780774750915e-02`, `b_u=1.5985645291792768e-03`
+- fitted rem coeffs: `a_r=-7.7219688098000838e-03`, `b_r=1.5874301533540952e-03`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-1.4705882352941176e-02`, `x_rem=1.1607171431288343e-02`, `y_exact=3.4975019495184556e-02`
+  - train[1] t_remaining=29: `x_unmit=-2.8169014084507043e-02`, `x_rem=-9.1571485942436054e-02`, `y_exact=2.7361628160319786e-09`
+  - train[2] t_remaining=30: `x_unmit=-9.9415204678362568e-02`, `x_rem=-3.4006695072003656e-01`, `y_exact=1.3047701155273645e-09`
+  - train[3] t_remaining=31: `x_unmit=-1.1842105263157894e-01`, `x_rem=-3.2310192297691664e-01`, `y_exact=-7.9343016947148598e-03`
+  - train[4] t_remaining=30: `x_unmit=-7.4626865671641784e-02`, `x_rem=-2.4718733649577893e-01`, `y_exact=1.7905896071496660e-08`
+  - train[5] t_remaining=31: `x_unmit=6.5789473684210523e-02`, `x_rem=1.8456742518561017e-01`, `y_exact=-5.6063381906374133e-09`
+  - train[6] t_remaining=31: `x_unmit=3.0769230769230771e-02`, `x_rem=3.6019185075216772e-02`, `y_exact=1.1803819127930234e-08`
+  - train[7] t_remaining=31: `x_unmit=-9.9337748344370855e-02`, `x_rem=-2.9720657130886885e-01`, `y_exact=1.4942427197376216e-08`
+  - train[8] t_remaining=30: `x_unmit=0.0000000000000000e+00`, `x_rem=-7.3837656303779725e-03`, `y_exact=2.4799006367323479e-08`
+  - train[9] t_remaining=32: `x_unmit=9.5541401273885357e-02`, `x_rem=3.3495567344096938e-01`, `y_exact=-3.2125690957151725e-03`
+  - train[10] t_remaining=30: `x_unmit=-7.3825503355704702e-02`, `x_rem=-1.9362490946398883e-01`, `y_exact=-5.2854517015117626e-09`
+  - train[11] t_remaining=29: `x_unmit=-4.5454545454545456e-02`, `x_rem=-1.4777507609646590e-01`, `y_exact=1.6275108488327762e-08`
+  - train[12] t_remaining=30: `x_unmit=-7.7519379844961239e-03`, `x_rem=3.0077496935828861e-02`, `y_exact=1.1578640122493513e-09`
+  - train[13] t_remaining=29: `x_unmit=8.8235294117647065e-02`, `x_rem=2.7635788737765365e-01`, `y_exact=-1.5046955902768679e-08`
+  - train[14] t_remaining=32: `x_unmit=3.8167938931297711e-02`, `x_rem=1.2871174162525734e-01`, `y_exact=-9.1182097666263513e-03`
+  - train[15] t_remaining=32: `x_unmit=-5.4794520547945202e-02`, `x_rem=-1.8943552776249037e-01`, `y_exact=4.4937525782949732e-02`
+  - train[16] t_remaining=31: `x_unmit=-1.3333333333333334e-02`, `x_rem=-3.8865162754965189e-02`, `y_exact=-1.0456165042672409e-03`
+  - train[17] t_remaining=32: `x_unmit=-2.3255813953488372e-02`, `x_rem=-1.1163060396552087e-01`, `y_exact=3.5888725075800230e-02`
+  - train[18] t_remaining=30: `x_unmit=2.7777777777777776e-02`, `x_rem=8.3215224283024358e-02`, `y_exact=2.4112972358036977e-11`
+  - train[19] t_remaining=32: `x_unmit=-4.1095890410958902e-02`, `x_rem=-1.1629173144202663e-01`, `y_exact=-3.9852506238428433e-02`
+  - train[20] t_remaining=31: `x_unmit=2.0408163265306121e-02`, `x_rem=6.0826019425920051e-02`, `y_exact=1.6501444034397708e-09`
+  - train[21] t_remaining=31: `x_unmit=1.5625000000000000e-02`, `x_rem=1.2913409772726064e-02`, `y_exact=-1.2229128963506272e-02`
+  - train[22] t_remaining=30: `x_unmit=6.9444444444444448e-02`, `x_rem=2.1003310104047010e-01`, `y_exact=-8.9010115252747949e-09`
+  - train[23] t_remaining=30: `x_unmit=4.5454545454545456e-02`, `x_rem=1.7662277915390248e-01`, `y_exact=-7.1751517213410068e-09`
+- target x values: `x_u_target=2.9850746268656716e-02`, `x_r_target=4.3979581040858862e-02`
+- target contribution to E_cdr_unmit: `-7.5385589498960535e-06`
+- target contribution to E_cdr_rem: `-9.5423228135978737e-06`
+
+### term 81
+- pauli term from int row: `(-7.6471876029928004e-03)*Y(q(0, 0))*Z(q(0, 1))*Z(q(0, 2))*Y(q(0, 3))*X(q(1, 2))*X(q(1, 3))`
+- int observable row: `[2, 3, 3, 2, 0, 0, 1, 1]`
+- Hamiltonian weight w_81: `-7.6471876029928004e-03`
+- OGM effective shots used for this term: `141`
+- fitted unmit coeffs: `a_u=-6.3667439733409756e-02`, `b_u=8.1275918329803433e-04`
+- fitted rem coeffs: `a_r=-1.9330007410570300e-02`, `b_r=9.4087354407854540e-04`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-6.2893081761006293e-03`, `x_rem=9.3110279150557945e-03`, `y_exact=3.4974968448312306e-02`
+  - train[1] t_remaining=29: `x_unmit=-1.5714285714285714e-01`, `x_rem=-4.5168869023489683e-01`, `y_exact=1.7253901752752020e-09`
+  - train[2] t_remaining=30: `x_unmit=-9.3525179856115109e-02`, `x_rem=-2.6420124867073635e-01`, `y_exact=5.2921485297153465e-09`
+  - train[3] t_remaining=31: `x_unmit=2.0408163265306121e-02`, `x_rem=5.9415187892824066e-03`, `y_exact=-7.9342918242070737e-03`
+  - train[4] t_remaining=30: `x_unmit=8.3870967741935490e-02`, `x_rem=2.8762896889005296e-01`, `y_exact=-1.3838902009983677e-08`
+  - train[5] t_remaining=31: `x_unmit=-4.7619047619047616e-02`, `x_rem=-1.1248512419794497e-01`, `y_exact=-1.1931402989626777e-08`
+  - train[6] t_remaining=31: `x_unmit=3.7593984962406013e-02`, `x_rem=1.0875152283027678e-01`, `y_exact=7.7583562902711071e-09`
+  - train[7] t_remaining=31: `x_unmit=6.2068965517241378e-02`, `x_rem=1.8548317563453112e-01`, `y_exact=-7.3388221249227396e-10`
+  - train[8] t_remaining=30: `x_unmit=-1.2500000000000001e-02`, `x_rem=-7.4963054708454074e-02`, `y_exact=-1.1973730015308678e-08`
+  - train[9] t_remaining=32: `x_unmit=1.4093959731543623e-01`, `x_rem=4.7093565067041998e-01`, `y_exact=-3.2125708320862143e-03`
+  - train[10] t_remaining=30: `x_unmit=-5.8823529411764705e-02`, `x_rem=-1.7781520556777142e-01`, `y_exact=1.6520959767624882e-08`
+  - train[11] t_remaining=29: `x_unmit=-5.8823529411764705e-02`, `x_rem=-1.7837362514009852e-01`, `y_exact=-6.0678372102521819e-09`
+  - train[12] t_remaining=30: `x_unmit=2.6315789473684209e-02`, `x_rem=1.5794759742545725e-01`, `y_exact=1.2444444900260083e-09`
+  - train[13] t_remaining=29: `x_unmit=-2.1582733812949641e-02`, `x_rem=-8.9394372276530965e-02`, `y_exact=9.7843616780881721e-09`
+  - train[14] t_remaining=32: `x_unmit=-3.4883720930232558e-02`, `x_rem=-1.0468188634135671e-01`, `y_exact=-9.1182100585300851e-03`
+  - train[15] t_remaining=32: `x_unmit=-1.3513513513513514e-02`, `x_rem=-3.8674171948151100e-02`, `y_exact=4.4937507133767235e-02`
+  - train[16] t_remaining=31: `x_unmit=-4.4117647058823532e-02`, `x_rem=-1.1509560643132384e-01`, `y_exact=-1.0455778611146763e-03`
+  - train[17] t_remaining=32: `x_unmit=-9.6296296296296297e-02`, `x_rem=-2.9182198349477312e-01`, `y_exact=3.5888775473100903e-02`
+  - train[18] t_remaining=30: `x_unmit=-2.0408163265306121e-02`, `x_rem=-8.3821089829817466e-02`, `y_exact=8.1451169471057756e-09`
+  - train[19] t_remaining=32: `x_unmit=5.0359712230215826e-02`, `x_rem=1.8291554037900415e-01`, `y_exact=-3.9852512189634225e-02`
+  - train[20] t_remaining=31: `x_unmit=-7.8125000000000000e-02`, `x_rem=-1.7001748854459653e-01`, `y_exact=1.1550486910768676e-08`
+  - train[21] t_remaining=31: `x_unmit=5.7324840764331211e-02`, `x_rem=8.0751290023158187e-02`, `y_exact=-1.2229107745165838e-02`
+  - train[22] t_remaining=30: `x_unmit=-8.0000000000000002e-03`, `x_rem=-6.6153132655139418e-02`, `y_exact=1.0039904806830827e-11`
+  - train[23] t_remaining=30: `x_unmit=-8.6956521739130432e-02`, `x_rem=-2.9624366914053318e-01`, `y_exact=-6.1560517830475593e-09`
+- target x values: `x_u_target=-3.1250000000000000e-02`, `x_r_target=-1.7409756694374767e-01`
+- target contribution to E_cdr_unmit: `-2.1430223695848479e-05`
+- target contribution to E_cdr_rem: `-3.2930172454961808e-05`
+
+### term 82
+- pauli term from int row: `(-7.6471876029928004e-03)*X(q(0, 0))*Z(q(0, 1))*Z(q(0, 2))*X(q(0, 3))*Y(q(1, 2))*Y(q(1, 3))`
+- int observable row: `[1, 3, 3, 1, 0, 0, 2, 2]`
+- Hamiltonian weight w_82: `-7.6471876029928004e-03`
+- OGM effective shots used for this term: `124`
+- fitted unmit coeffs: `a_u=4.2004370063400832e-02`, `b_u=1.8300573570502643e-03`
+- fitted rem coeffs: `a_r=1.2374751377056806e-02`, `b_r=1.7623478133680631e-03`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=8.1481481481481488e-02`, `x_rem=2.2943921853608623e-01`, `y_exact=3.4975020518373853e-02`
+  - train[1] t_remaining=29: `x_unmit=1.3698630136986301e-02`, `x_rem=3.7179857783737641e-02`, `y_exact=-1.3999034394203820e-09`
+  - train[2] t_remaining=30: `x_unmit=-1.3178294573643412e-01`, `x_rem=-4.3825127835893729e-01`, `y_exact=-5.4935607444441054e-10`
+  - train[3] t_remaining=31: `x_unmit=-4.4117647058823532e-02`, `x_rem=-1.2036787132248621e-01`, `y_exact=-7.9342928553321167e-03`
+  - train[4] t_remaining=30: `x_unmit=1.1450381679389313e-01`, `x_rem=4.3344157648525666e-01`, `y_exact=5.7470501463099435e-09`
+  - train[5] t_remaining=31: `x_unmit=-7.6335877862595417e-03`, `x_rem=5.7087557218414185e-04`, `y_exact=6.0036487039245874e-09`
+  - train[6] t_remaining=31: `x_unmit=2.2222222222222223e-02`, `x_rem=7.9769961947205814e-02`, `y_exact=1.3261456897491471e-08`
+  - train[7] t_remaining=31: `x_unmit=-4.0650406504065040e-02`, `x_rem=-1.3927406105513357e-01`, `y_exact=-1.7526696858126438e-09`
+  - train[8] t_remaining=30: `x_unmit=-6.9444444444444448e-02`, `x_rem=-1.7653296246794584e-01`, `y_exact=6.7563853453596035e-09`
+  - train[9] t_remaining=32: `x_unmit=-2.1538461538461540e-01`, `x_rem=-6.4874653161084017e-01`, `y_exact=-3.2125695984553232e-03`
+  - train[10] t_remaining=30: `x_unmit=5.6338028169014086e-02`, `x_rem=1.9515869592932550e-01`, `y_exact=-8.2045455719085465e-09`
+  - train[11] t_remaining=29: `x_unmit=2.5641025641025640e-02`, `x_rem=6.6780567391506188e-02`, `y_exact=-8.4244062175301412e-09`
+  - train[12] t_remaining=30: `x_unmit=1.6393442622950818e-01`, `x_rem=5.1625140244270173e-01`, `y_exact=2.6586592440216394e-08`
+  - train[13] t_remaining=29: `x_unmit=2.3255813953488372e-02`, `x_rem=4.0578092968586041e-02`, `y_exact=-9.4568925594290330e-09`
+  - train[14] t_remaining=32: `x_unmit=-1.0569105691056911e-01`, `x_rem=-3.4104332507392066e-01`, `y_exact=-9.1182541849907615e-03`
+  - train[15] t_remaining=32: `x_unmit=5.1094890510948905e-02`, `x_rem=1.7235811298674730e-01`, `y_exact=4.4937530807223056e-02`
+  - train[16] t_remaining=31: `x_unmit=-1.6666666666666666e-01`, `x_rem=-5.2128959483163206e-01`, `y_exact=-1.0455997958466494e-03`
+  - train[17] t_remaining=32: `x_unmit=8.1761006289308172e-02`, `x_rem=2.4799716622216128e-01`, `y_exact=3.5888747973782338e-02`
+  - train[18] t_remaining=30: `x_unmit=1.5625000000000000e-02`, `x_rem=-6.9355884722922534e-03`, `y_exact=-1.4608828323986983e-09`
+  - train[19] t_remaining=32: `x_unmit=-1.4084507042253521e-02`, `x_rem=-4.8849093706201448e-02`, `y_exact=-3.9852514121037540e-02`
+  - train[20] t_remaining=31: `x_unmit=1.1450381679389313e-01`, `x_rem=4.1277335605673654e-01`, `y_exact=1.1426700844373509e-08`
+  - train[21] t_remaining=31: `x_unmit=8.2191780821917804e-02`, `x_rem=2.8572447241422755e-01`, `y_exact=-1.2229131637538922e-02`
+  - train[22] t_remaining=30: `x_unmit=9.6296296296296297e-02`, `x_rem=3.1435206262668414e-01`, `y_exact=-1.5591079432949449e-08`
+  - train[23] t_remaining=30: `x_unmit=-1.8309859154929578e-01`, `x_rem=-5.8198514122452094e-01`, `y_exact=-2.6458190772372886e-09`
+- target x values: `x_u_target=2.9850746268656716e-02`, `x_r_target=1.0496847554621068e-01`
+- target contribution to E_cdr_unmit: `-2.3583308292417288e-05`
+- target contribution to E_cdr_rem: `-2.3410385885688442e-05`
+
+### term 83
+- pauli term from int row: `(-7.6471876029928004e-03)*X(q(0, 0))*Z(q(0, 1))*Z(q(0, 2))*X(q(0, 3))*X(q(1, 2))*X(q(1, 3))`
+- int observable row: `[1, 3, 3, 1, 0, 0, 1, 1]`
+- Hamiltonian weight w_83: `-7.6471876029928004e-03`
+- OGM effective shots used for this term: `204`
+- fitted unmit coeffs: `a_u=-5.1522342928499887e-02`, `b_u=1.4913629461424931e-03`
+- fitted rem coeffs: `a_r=-1.4742987385317726e-02`, `b_r=1.3837203530777239e-03`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=1.6574585635359115e-02`, `x_rem=-7.8554608350688854e-03`, `y_exact=3.4974999622212614e-02`
+  - train[1] t_remaining=29: `x_unmit=-1.5294117647058825e-01`, `x_rem=-4.8048995212688056e-01`, `y_exact=-2.4547480095857128e-10`
+  - train[2] t_remaining=30: `x_unmit=4.3478260869565216e-02`, `x_rem=1.1945117152100670e-01`, `y_exact=-5.4436489736600617e-09`
+  - train[3] t_remaining=31: `x_unmit=5.0279329608938550e-02`, `x_rem=7.1034160255419185e-02`, `y_exact=-7.9343027723233171e-03`
+  - train[4] t_remaining=30: `x_unmit=-1.6042780748663103e-02`, `x_rem=-2.3211684124098998e-02`, `y_exact=-3.7996130516855319e-09`
+  - train[5] t_remaining=31: `x_unmit=-1.0638297872340425e-02`, `x_rem=-6.8572364126348886e-02`, `y_exact=-5.1957187871144885e-09`
+  - train[6] t_remaining=31: `x_unmit=4.1916167664670656e-02`, `x_rem=1.5920732222485423e-01`, `y_exact=4.5640901510279946e-11`
+  - train[7] t_remaining=31: `x_unmit=1.0416666666666663e-02`, `x_rem=-2.0264978769433877e-02`, `y_exact=-1.3382084735337332e-08`
+  - train[8] t_remaining=30: `x_unmit=0.0000000000000000e+00`, `x_rem=-3.1984453334649776e-02`, `y_exact=2.0573183019469081e-09`
+  - train[9] t_remaining=32: `x_unmit=-1.0734463276836158e-01`, `x_rem=-2.8308391430631807e-01`, `y_exact=-3.2125756187217787e-03`
+  - train[10] t_remaining=30: `x_unmit=-2.9702970297029702e-02`, `x_rem=-9.0193914272819101e-02`, `y_exact=-1.7714974534501874e-10`
+  - train[11] t_remaining=29: `x_unmit=9.0909090909090912e-02`, `x_rem=2.8155070016710027e-01`, `y_exact=1.3727319102619092e-08`
+  - train[12] t_remaining=30: `x_unmit=-6.0109289617486336e-02`, `x_rem=-1.8018570881911875e-01`, `y_exact=-1.4977536043981042e-08`
+  - train[13] t_remaining=29: `x_unmit=0.0000000000000000e+00`, `x_rem=-3.2004472795127387e-02`, `y_exact=9.5499192296157561e-09`
+  - train[14] t_remaining=32: `x_unmit=1.0416666666666667e-01`, `x_rem=3.2948110652074697e-01`, `y_exact=-9.1181725668971828e-03`
+  - train[15] t_remaining=32: `x_unmit=-3.7037037037037035e-02`, `x_rem=-1.0073002845770061e-01`, `y_exact=4.4937532727486511e-02`
+  - train[16] t_remaining=31: `x_unmit=-2.6455026455026454e-02`, `x_rem=-7.1515261865062685e-02`, `y_exact=-1.0455902890201818e-03`
+  - train[17] t_remaining=32: `x_unmit=0.0000000000000000e+00`, `x_rem=3.4668862690776903e-02`, `y_exact=3.5888776364091331e-02`
+  - train[18] t_remaining=30: `x_unmit=6.1224489795918366e-02`, `x_rem=1.7842193168913245e-01`, `y_exact=6.7093135040305531e-09`
+  - train[19] t_remaining=32: `x_unmit=6.4327485380116955e-02`, `x_rem=1.6226625956145152e-01`, `y_exact=-3.9852505583263968e-02`
+  - train[20] t_remaining=31: `x_unmit=-7.1038251366120214e-02`, `x_rem=-2.4778253174383680e-01`, `y_exact=1.5533350745101677e-08`
+  - train[21] t_remaining=31: `x_unmit=4.9504950495049507e-02`, `x_rem=1.4657785294219838e-01`, `y_exact=-1.2229110864788437e-02`
+  - train[22] t_remaining=30: `x_unmit=-1.1764705882352940e-01`, `x_rem=-4.0602837110769457e-01`, `y_exact=8.7018830903665097e-10`
+  - train[23] t_remaining=30: `x_unmit=-3.2258064516129031e-02`, `x_rem=-6.2765581551885205e-02`, `y_exact=-6.4213034810343806e-09`
+- target x values: `x_u_target=-5.5865921787709499e-03`, `x_r_target=-5.8117795165500724e-02`
+- target contribution to E_cdr_unmit: `-1.3605855261906866e-05`
+- target contribution to E_cdr_rem: `-1.7133908279713370e-05`
+
+### term 84
+- pauli term from int row: `(9.0539041860436861e-02)*Z(q(0, 0))*Z(q(1, 3))`
+- int observable row: `[3, 0, 0, 0, 0, 0, 0, 3]`
+- Hamiltonian weight w_84: `9.0539041860436861e-02`
+- OGM effective shots used for this term: `1918`
+- fitted unmit coeffs: `a_u=3.1165651418045903e+00`, `b_u=3.2512067465990724e-02`
+- fitted rem coeffs: `a_r=2.2922033464291749e+00`, `b_r=5.4415077008202847e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-1.4256198347107438e-01`, `x_rem=-1.9367869061555404e-01`, `y_exact=-4.2435705888974540e-01`
+  - train[1] t_remaining=29: `x_unmit=-2.8790983606557374e-01`, `x_rem=-4.0016852666967045e-01`, `y_exact=-8.9378328281067110e-01`
+  - train[2] t_remaining=30: `x_unmit=-1.3326551373346898e-01`, `x_rem=-2.0283186259433625e-01`, `y_exact=-2.9556326984789322e-01`
+  - train[3] t_remaining=31: `x_unmit=-8.5742771684945165e-02`, `x_rem=-1.1819404366182644e-01`, `y_exact=-3.1929386073251037e-01`
+  - train[4] t_remaining=30: `x_unmit=-2.9618163054695562e-01`, `x_rem=-4.0767601131918224e-01`, `y_exact=-8.8292660196855022e-01`
+  - train[5] t_remaining=31: `x_unmit=-1.2600806451612903e-01`, `x_rem=-1.9349617233853922e-01`, `y_exact=-3.3984326549558302e-01`
+  - train[6] t_remaining=31: `x_unmit=-1.3951120162932790e-01`, `x_rem=-2.1027867363063690e-01`, `y_exact=-4.2434840591648137e-01`
+  - train[7] t_remaining=31: `x_unmit=-2.4833589349718382e-01`, `x_rem=-3.5055950134719838e-01`, `y_exact=-7.1935315603631811e-01`
+  - train[8] t_remaining=30: `x_unmit=-3.2254697286012524e-01`, `x_rem=-4.4166515865064199e-01`, `y_exact=-8.8700134608051284e-01`
+  - train[9] t_remaining=32: `x_unmit=-2.7661851257356873e-01`, `x_rem=-3.8171818600352708e-01`, `y_exact=-8.3556055076246183e-01`
+  - train[10] t_remaining=30: `x_unmit=-1.8214468958440225e-01`, `x_rem=-2.6159997483395292e-01`, `y_exact=-5.4571923422091706e-01`
+  - train[11] t_remaining=29: `x_unmit=-2.1578677601230140e-01`, `x_rem=-2.9370420979971251e-01`, `y_exact=-7.9255551731768958e-01`
+  - train[12] t_remaining=30: `x_unmit=-2.1424774056353005e-01`, `x_rem=-3.0936605399718786e-01`, `y_exact=-4.3034057953612570e-01`
+  - train[13] t_remaining=29: `x_unmit=-2.7742616033755274e-01`, `x_rem=-3.8325037243200338e-01`, `y_exact=-7.8914482784595086e-01`
+  - train[14] t_remaining=32: `x_unmit=-1.6334661354581673e-01`, `x_rem=-2.4210346773582206e-01`, `y_exact=-2.8109108034092989e-01`
+  - train[15] t_remaining=32: `x_unmit=-1.8800813008130082e-01`, `x_rem=-2.5939986936867265e-01`, `y_exact=-5.5657092377470907e-01`
+  - train[16] t_remaining=31: `x_unmit=-2.7068437180796734e-01`, `x_rem=-3.7518436856869536e-01`, `y_exact=-8.1967327585497207e-01`
+  - train[17] t_remaining=32: `x_unmit=-2.6310380267214800e-01`, `x_rem=-3.6452179241203847e-01`, `y_exact=-8.1012511333533455e-01`
+  - train[18] t_remaining=30: `x_unmit=-3.0601922104198281e-01`, `x_rem=-4.2483699970378169e-01`, `y_exact=-8.9378320357295382e-01`
+  - train[19] t_remaining=32: `x_unmit=-2.0816326530612245e-01`, `x_rem=-2.9430577727919927e-01`, `y_exact=-6.2183614163600387e-01`
+  - train[20] t_remaining=31: `x_unmit=-2.0519221168247628e-01`, `x_rem=-2.9457505074312429e-01`, `y_exact=-7.2131352751560329e-01`
+  - train[21] t_remaining=31: `x_unmit=-2.2371134020618558e-01`, `x_rem=-3.1753885050456621e-01`, `y_exact=-7.3537659193309601e-01`
+  - train[22] t_remaining=30: `x_unmit=-2.7179487179487177e-01`, `x_rem=-3.7691765598742355e-01`, `y_exact=-9.5151773595099054e-01`
+  - train[23] t_remaining=30: `x_unmit=-1.5273477812177502e-01`, `x_rem=-2.0329582817882924e-01`, `y_exact=-4.5803159515953507e-01`
+- target x values: `x_u_target=-2.0835405271009447e-01`, `x_r_target=-2.8832646659020217e-01`
+- target contribution to E_cdr_unmit: `-5.5847822848509268e-02`
+- target contribution to E_cdr_rem: `-5.4910825631556477e-02`
+
+### term 85
+- pauli term from int row: `(1.5038609069168565e-02)*Y(q(0, 0))*Z(q(0, 1))*Y(q(0, 2))*Z(q(1, 3))`
+- int observable row: `[2, 3, 2, 0, 0, 0, 0, 3]`
+- Hamiltonian weight w_85: `1.5038609069168565e-02`
+- OGM effective shots used for this term: `376`
+- fitted unmit coeffs: `a_u=1.9421909510395567e+00`, `b_u=-5.8947144405365800e-03`
+- fitted rem coeffs: `a_r=9.4428590994336037e-01`, `b_r=-9.0786303216337776e-03`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-1.4492753623188406e-02`, `x_rem=-2.2485174967357094e-02`, `y_exact=-5.2309650616508596e-01`
+  - train[1] t_remaining=29: `x_unmit=-2.4509803921568627e-02`, `x_rem=-5.2200058606251300e-02`, `y_exact=2.1460826744724235e-08`
+  - train[2] t_remaining=30: `x_unmit=-4.6831955922865015e-02`, `x_rem=-9.6331326887807003e-02`, `y_exact=-2.7663250093534098e-08`
+  - train[3] t_remaining=31: `x_unmit=1.8469656992084429e-02`, `x_rem=3.0936263545287761e-02`, `y_exact=-4.5372601379684319e-01`
+  - train[4] t_remaining=30: `x_unmit=1.7199017199017199e-02`, `x_rem=4.2646062550151569e-02`, `y_exact=1.9509045580984360e-01`
+  - train[5] t_remaining=31: `x_unmit=2.2670025188916875e-02`, `x_rem=4.2786951876821792e-02`, `y_exact=5.4631565446574722e-09`
+  - train[6] t_remaining=31: `x_unmit=-2.6109660574412533e-03`, `x_rem=-1.0604942277012069e-02`, `y_exact=-1.5081062830894496e-08`
+  - train[7] t_remaining=31: `x_unmit=-4.5333333333333337e-02`, `x_rem=-8.7457056714005166e-02`, `y_exact=-2.9750957505006598e-08`
+  - train[8] t_remaining=30: `x_unmit=1.4583333333333334e-01`, `x_rem=3.1349403102097362e-01`, `y_exact=3.9781690151805432e-01`
+  - train[9] t_remaining=32: `x_unmit=-7.6923076923076927e-02`, `x_rem=-1.5671064239210036e-01`, `y_exact=1.3792690073873404e-01`
+  - train[10] t_remaining=30: `x_unmit=2.9333333333333333e-02`, `x_rem=7.4650603068073224e-02`, `y_exact=1.0709824884580149e-01`
+  - train[11] t_remaining=29: `x_unmit=-1.6129032258064516e-02`, `x_rem=-4.5008523152449402e-02`, `y_exact=-5.3971309804452683e-01`
+  - train[12] t_remaining=30: `x_unmit=-3.7593984962406013e-02`, `x_rem=-6.5875366469449581e-02`, `y_exact=-1.6729221833926549e-09`
+  - train[13] t_remaining=29: `x_unmit=8.6486486486486491e-02`, `x_rem=1.8967871718864338e-01`, `y_exact=1.5487088749776939e-01`
+  - train[14] t_remaining=32: `x_unmit=8.6161879895561358e-02`, `x_rem=1.9044089750768520e-01`, `y_exact=6.9414459456554889e-03`
+  - train[15] t_remaining=32: `x_unmit=-2.6455026455026454e-02`, `x_rem=-4.9061559365964777e-02`, `y_exact=-2.4509587374632497e-01`
+  - train[16] t_remaining=31: `x_unmit=7.2538860103626937e-02`, `x_rem=1.6588811192921576e-01`, `y_exact=3.4947683231395071e-01`
+  - train[17] t_remaining=32: `x_unmit=1.3623978201634877e-02`, `x_rem=1.4693008904943260e-02`, `y_exact=2.4174707759055677e-01`
+  - train[18] t_remaining=30: `x_unmit=-6.0439560439560440e-02`, `x_rem=-1.1804354000784915e-01`, `y_exact=-6.2139063373003388e-08`
+  - train[19] t_remaining=32: `x_unmit=1.6949152542372881e-02`, `x_rem=4.1491949699261871e-02`, `y_exact=2.8351074828177764e-01`
+  - train[20] t_remaining=31: `x_unmit=3.6827195467422094e-02`, `x_rem=7.0039971881251259e-02`, `y_exact=-3.5683242141962438e-08`
+  - train[21] t_remaining=31: `x_unmit=0.0000000000000000e+00`, `x_rem=-1.3211246890925147e-02`, `y_exact=1.5582743512345920e-01`
+  - train[22] t_remaining=30: `x_unmit=5.4830287206266322e-02`, `x_rem=1.2807338320904818e-01`, `y_exact=1.7506341047773913e-01`
+  - train[23] t_remaining=30: `x_unmit=0.0000000000000000e+00`, `x_rem=6.4725943268749116e-03`, `y_exact=-1.0043378300068447e-01`
+- target x values: `x_u_target=7.5376884422110546e-02`, `x_r_target=1.5979366240598658e-01`
+- target contribution to E_cdr_unmit: `2.1129484615695082e-03`
+- target contribution to E_cdr_rem: `2.1326593436786371e-03`
+
+### term 86
+- pauli term from int row: `(1.5038609069168565e-02)*X(q(0, 0))*Z(q(0, 1))*X(q(0, 2))*Z(q(1, 3))`
+- int observable row: `[1, 3, 1, 0, 0, 0, 0, 3]`
+- Hamiltonian weight w_86: `1.5038609069168565e-02`
+- OGM effective shots used for this term: `368`
+- fitted unmit coeffs: `a_u=2.4888425297751904e+00`, `b_u=5.3519260431221264e-03`
+- fitted rem coeffs: `a_r=1.2149517182228549e+00`, `b_r=1.1813553165246316e-03`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-9.7744360902255634e-02`, `x_rem=-1.9603150462630428e-01`, `y_exact=-5.2309650131170393e-01`
+  - train[1] t_remaining=29: `x_unmit=5.5865921787709499e-03`, `x_rem=5.6145795410697443e-03`, `y_exact=-3.8969226159489730e-09`
+  - train[2] t_remaining=30: `x_unmit=8.8825214899713470e-02`, `x_rem=1.6743525638724135e-01`, `y_exact=-1.9460164300819585e-08`
+  - train[3] t_remaining=31: `x_unmit=5.4347826086956520e-03`, `x_rem=1.3280976177718347e-02`, `y_exact=-4.5372600150884435e-01`
+  - train[4] t_remaining=30: `x_unmit=4.8346055979643768e-02`, `x_rem=1.1497804184627898e-01`, `y_exact=1.9509045580983883e-01`
+  - train[5] t_remaining=31: `x_unmit=-1.8276762402088774e-02`, `x_rem=-2.7643450849503960e-02`, `y_exact=-4.1368781488981947e-10`
+  - train[6] t_remaining=31: `x_unmit=3.7037037037037035e-02`, `x_rem=9.6174442582808148e-02`, `y_exact=-2.3309833401822062e-08`
+  - train[7] t_remaining=31: `x_unmit=-3.1088082901554404e-02`, `x_rem=-7.8005352716675580e-02`, `y_exact=-5.6277724067352209e-08`
+  - train[8] t_remaining=30: `x_unmit=9.0909090909090912e-02`, `x_rem=1.6767721527170812e-01`, `y_exact=3.9781689116161500e-01`
+  - train[9] t_remaining=32: `x_unmit=8.2644628099173556e-03`, `x_rem=2.8826979057380756e-02`, `y_exact=1.3792696287152592e-01`
+  - train[10] t_remaining=30: `x_unmit=-2.4390243902439025e-02`, `x_rem=-5.1122744785155078e-02`, `y_exact=1.0709824884580224e-01`
+  - train[11] t_remaining=29: `x_unmit=-5.5555555555555552e-02`, `x_rem=-1.2075009295655927e-01`, `y_exact=-5.3971309804445933e-01`
+  - train[12] t_remaining=30: `x_unmit=-9.7112860892388450e-02`, `x_rem=-1.9339416462252004e-01`, `y_exact=-2.3922978597982218e-09`
+  - train[13] t_remaining=29: `x_unmit=-3.4666666666666665e-02`, `x_rem=-6.0340038105211213e-02`, `y_exact=1.5487088749777947e-01`
+  - train[14] t_remaining=32: `x_unmit=2.4271844660194174e-02`, `x_rem=6.5185525329036112e-02`, `y_exact=6.9414519959654294e-03`
+  - train[15] t_remaining=32: `x_unmit=-1.2919896640826873e-02`, `x_rem=-2.7823684223320200e-02`, `y_exact=-2.4509589630836634e-01`
+  - train[16] t_remaining=31: `x_unmit=8.9005235602094238e-02`, `x_rem=2.0315573493907654e-01`, `y_exact=3.4947681892721361e-01`
+  - train[17] t_remaining=32: `x_unmit=5.1490514905149054e-02`, `x_rem=1.1263168553264417e-01`, `y_exact=2.4174707233529763e-01`
+  - train[18] t_remaining=30: `x_unmit=-1.0638297872340426e-01`, `x_rem=-2.2169466325341836e-01`, `y_exact=-4.0244801215224653e-08`
+  - train[19] t_remaining=32: `x_unmit=3.2608695652173912e-02`, `x_rem=9.5889884528321825e-02`, `y_exact=2.8351078913958194e-01`
+  - train[20] t_remaining=31: `x_unmit=5.1490514905149054e-02`, `x_rem=1.1800854853854861e-01`, `y_exact=-3.5901570716789715e-08`
+  - train[21] t_remaining=31: `x_unmit=7.7519379844961239e-03`, `x_rem=1.1610744267816591e-02`, `y_exact=1.5582741218870669e-01`
+  - train[22] t_remaining=30: `x_unmit=3.4313725490196081e-02`, `x_rem=6.2266977218096570e-02`, `y_exact=1.7506334515946484e-01`
+  - train[23] t_remaining=30: `x_unmit=-1.0869565217391304e-02`, `x_rem=-2.6700579994126103e-02`, `y_exact=-1.0043381253791010e-01`
+- target x values: `x_u_target=-6.5359477124183010e-02`, `x_r_target=-1.3088528960538576e-01`
+- target contribution to E_cdr_unmit: `-2.3658366882357185e-03`
+- target contribution to E_cdr_rem: `-2.3736632591076496e-03`
+
+### term 87
+- pauli term from int row: `(4.7321087579006910e-02)*Z(q(0, 1))*Z(q(0, 2))`
+- int observable row: `[0, 3, 3, 0, 0, 0, 0, 0]`
+- Hamiltonian weight w_87: `4.7321087579006910e-02`
+- OGM effective shots used for this term: `2439`
+- fitted unmit coeffs: `a_u=4.4858453663720725e+00`, `b_u=8.4804060369544215e-02`
+- fitted rem coeffs: `a_r=2.8522008687720373e+00`, `b_r=1.0728089498245111e-01`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-1.1595959595959596e-01`, `x_rem=-2.0886791618498932e-01`, `y_exact=-5.9659874389190803e-01`
+  - train[1] t_remaining=29: `x_unmit=-2.2373300370828184e-01`, `x_rem=-3.5167838984655886e-01`, `y_exact=-8.9378325392435731e-01`
+  - train[2] t_remaining=30: `x_unmit=-9.6409842678499391e-02`, `x_rem=-1.3975253290870332e-01`, `y_exact=-2.9556314315764853e-01`
+  - train[3] t_remaining=31: `x_unmit=-8.3056478405315617e-02`, `x_rem=-1.5518835484802582e-01`, `y_exact=-3.1971370996247944e-01`
+  - train[4] t_remaining=30: `x_unmit=-1.9736299958796868e-01`, `x_rem=-3.4322646544902258e-01`, `y_exact=-8.8292660196856010e-01`
+  - train[5] t_remaining=31: `x_unmit=-9.8837209302325577e-02`, `x_rem=-1.4116380877583376e-01`, `y_exact=-3.3984325024739681e-01`
+  - train[6] t_remaining=31: `x_unmit=-1.2236628849270664e-01`, `x_rem=-1.9295284836653379e-01`, `y_exact=-4.2434841128184320e-01`
+  - train[7] t_remaining=31: `x_unmit=-2.0467365028203063e-01`, `x_rem=-3.1837585840062210e-01`, `y_exact=-7.1935317039772162e-01`
+  - train[8] t_remaining=30: `x_unmit=-1.7247029905776320e-01`, `x_rem=-2.8619689846096458e-01`, `y_exact=-8.8700134608049130e-01`
+  - train[9] t_remaining=32: `x_unmit=-1.9816053511705686e-01`, `x_rem=-3.0805833913754627e-01`, `y_exact=-8.4355750593875001e-01`
+  - train[10] t_remaining=30: `x_unmit=-1.6352990380593893e-01`, `x_rem=-2.7052457765191490e-01`, `y_exact=-5.4571923577258485e-01`
+  - train[11] t_remaining=29: `x_unmit=-1.6798009124844462e-01`, `x_rem=-3.0133723664391027e-01`, `y_exact=-7.9255551731771856e-01`
+  - train[12] t_remaining=30: `x_unmit=-1.3807531380753138e-01`, `x_rem=-2.2123659923435407e-01`, `y_exact=-4.3034053885291790e-01`
+  - train[13] t_remaining=29: `x_unmit=-2.0640131308986459e-01`, `x_rem=-3.5627108961976900e-01`, `y_exact=-7.8914484792196082e-01`
+  - train[14] t_remaining=32: `x_unmit=-1.0616302186878727e-01`, `x_rem=-1.5946348177352399e-01`, `y_exact=-2.8754439948476063e-01`
+  - train[15] t_remaining=32: `x_unmit=-1.7412140575079874e-01`, `x_rem=-2.7552363997466467e-01`, `y_exact=-5.9383727044288825e-01`
+  - train[16] t_remaining=31: `x_unmit=-1.8702442931517821e-01`, `x_rem=-3.1488042060729282e-01`, `y_exact=-8.2047783930899765e-01`
+  - train[17] t_remaining=32: `x_unmit=-1.7140468227424749e-01`, `x_rem=-2.7072313172321322e-01`, `y_exact=-8.1297306975839922e-01`
+  - train[18] t_remaining=30: `x_unmit=-2.2798552472858866e-01`, `x_rem=-3.5982078666476563e-01`, `y_exact=-8.9378323832852047e-01`
+  - train[19] t_remaining=32: `x_unmit=-1.7548978741142143e-01`, `x_rem=-2.7388105477553315e-01`, `y_exact=-6.5493239820877891e-01`
+  - train[20] t_remaining=31: `x_unmit=-2.1067761806981519e-01`, `x_rem=-3.2168976246704500e-01`, `y_exact=-7.2131348557883512e-01`
+  - train[21] t_remaining=31: `x_unmit=-1.8681318681318682e-01`, `x_rem=-2.9254751456127315e-01`, `y_exact=-7.4658590280501469e-01`
+  - train[22] t_remaining=30: `x_unmit=-1.9967333605553286e-01`, `x_rem=-3.1854535462777750e-01`, `y_exact=-9.5151773595101441e-01`
+  - train[23] t_remaining=30: `x_unmit=-1.2556607657472210e-01`, `x_rem=-2.2584308688195656e-01`, `y_exact=-4.5803159515952008e-01`
+- target x values: `x_u_target=-1.5154004106776181e-01`, `x_r_target=-2.4176301153313223e-01`
+- target contribution to E_cdr_unmit: `-2.8155154192486050e-02`
+- target contribution to E_cdr_rem: `-2.7553923017223338e-02`
+
+### term 88
+- pauli term from int row: `(1.3768860150438163e-02)*Y(q(0, 1))*Y(q(0, 3))`
+- int observable row: `[0, 2, 0, 2, 0, 0, 0, 0]`
+- Hamiltonian weight w_88: `1.3768860150438163e-02`
+- OGM effective shots used for this term: `1981`
+- fitted unmit coeffs: `a_u=4.3785345063794976e+00`, `b_u=4.3603826894053101e-03`
+- fitted rem coeffs: `a_r=2.8827466265614867e+00`, `b_r=1.7165370341789478e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=8.7855297157622744e-03`, `x_rem=9.8058702709865608e-03`, `y_exact=-1.5290970478988501e-02`
+  - train[1] t_remaining=29: `x_unmit=8.5642317380352651e-03`, `x_rem=7.7750405206324733e-03`, `y_exact=2.3594582616893420e-01`
+  - train[2] t_remaining=30: `x_unmit=-2.9964448958862366e-02`, `x_rem=-5.1236162968006517e-02`, `y_exact=-1.0720544513072905e-01`
+  - train[3] t_remaining=31: `x_unmit=-1.6360932077342589e-02`, `x_rem=-2.4717859125395050e-02`, `y_exact=-8.9721900698631323e-03`
+  - train[4] t_remaining=30: `x_unmit=-1.7107309486780714e-02`, `x_rem=-2.9359730759419715e-02`, `y_exact=4.3850306922365189e-08`
+  - train[5] t_remaining=31: `x_unmit=5.7259713701431493e-02`, `x_rem=8.3974421397734311e-02`, `y_exact=1.3151973379098933e-01`
+  - train[6] t_remaining=31: `x_unmit=1.1935651271406332e-02`, `x_rem=1.7556565558641327e-02`, `y_exact=2.3477335321473189e-01`
+  - train[7] t_remaining=31: `x_unmit=-4.0547656661400734e-02`, `x_rem=-6.7385893610222194e-02`, `y_exact=-3.8647136120799164e-01`
+  - train[8] t_remaining=30: `x_unmit=-2.4844720496894408e-02`, `x_rem=-4.4411075466976091e-02`, `y_exact=-2.8746952256672854e-08`
+  - train[9] t_remaining=32: `x_unmit=1.5166835187057633e-02`, `x_rem=1.7291550153026407e-02`, `y_exact=-1.4421362471269801e-02`
+  - train[10] t_remaining=30: `x_unmit=8.6190009794319289e-02`, `x_rem=1.2243975417334872e-01`, `y_exact=4.2899820066474226e-01`
+  - train[11] t_remaining=29: `x_unmit=-1.0060362173038230e-03`, `x_rem=-1.5649452269170523e-03`, `y_exact=-2.7743457198876155e-08`
+  - train[12] t_remaining=30: `x_unmit=7.0850202429149800e-02`, `x_rem=1.0072271408303801e-01`, `y_exact=3.2781921052800955e-01`
+  - train[13] t_remaining=29: `x_unmit=7.5025693730729703e-02`, `x_rem=1.1029418223662829e-01`, `y_exact=3.5651652616876134e-01`
+  - train[14] t_remaining=32: `x_unmit=7.9331941544885182e-02`, `x_rem=1.1755259354424284e-01`, `y_exact=3.4856616988917621e-01`
+  - train[15] t_remaining=32: `x_unmit=-3.1632653061224487e-02`, `x_rem=-5.3736512920186379e-02`, `y_exact=-1.7820558093951230e-01`
+  - train[16] t_remaining=31: `x_unmit=5.3984575835475578e-02`, `x_rem=7.9399606391894334e-02`, `y_exact=8.8641375175049636e-02`
+  - train[17] t_remaining=32: `x_unmit=1.1776251226692836e-02`, `x_rem=1.5847852943044308e-02`, `y_exact=1.7686176935559402e-02`
+  - train[18] t_remaining=30: `x_unmit=-2.5000000000000001e-02`, `x_rem=-4.8407610907610900e-02`, `y_exact=-5.9363136353618180e-02`
+  - train[19] t_remaining=32: `x_unmit=-3.8799793067770302e-02`, `x_rem=-6.2956414741205224e-02`, `y_exact=-1.4635258091430414e-01`
+  - train[20] t_remaining=31: `x_unmit=2.9000000000000001e-02`, `x_rem=4.2124542124542141e-02`, `y_exact=2.9587031783263629e-01`
+  - train[21] t_remaining=31: `x_unmit=-1.2946659761781460e-02`, `x_rem=-2.7237622266104908e-02`, `y_exact=-1.7611972719867716e-01`
+  - train[22] t_remaining=30: `x_unmit=2.0730503455083909e-02`, `x_rem=2.3084516667932275e-02`, `y_exact=-2.5339742660325380e-08`
+  - train[23] t_remaining=30: `x_unmit=-5.0276520864756154e-04`, `x_rem=-3.1577829466215551e-03`, `y_exact=1.8754260094630253e-08`
+- target x values: `x_u_target=3.3942558746736295e-02`, `x_r_target=4.9133344172508690e-02`
+- target contribution to E_cdr_unmit: `2.1063471095538375e-03`
+- target contribution to E_cdr_rem: `2.1865549209466469e-03`
+
+### term 89
+- pauli term from int row: `(1.3768860150438163e-02)*X(q(0, 1))*X(q(0, 3))`
+- int observable row: `[0, 1, 0, 1, 0, 0, 0, 0]`
+- Hamiltonian weight w_89: `1.3768860150438163e-02`
+- OGM effective shots used for this term: `1959`
+- fitted unmit coeffs: `a_u=4.6447123165943518e+00`, `b_u=-1.6147427808330262e-03`
+- fitted rem coeffs: `a_r=3.1026038496293644e+00`, `b_r=1.6099111822306007e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=7.5872534142640367e-03`, `x_rem=2.7223942246704055e-03`, `y_exact=-1.5290962507377100e-02`
+  - train[1] t_remaining=29: `x_unmit=2.8688524590163935e-02`, `x_rem=3.7410676754939073e-02`, `y_exact=2.3594581375616588e-01`
+  - train[2] t_remaining=30: `x_unmit=-5.0587634133878387e-02`, `x_rem=-7.8595792443518539e-02`, `y_exact=-1.0720544778007304e-01`
+  - train[3] t_remaining=31: `x_unmit=5.3380782918149468e-02`, `x_rem=6.9627485997592775e-02`, `y_exact=-8.9721938689849932e-03`
+  - train[4] t_remaining=30: `x_unmit=-2.5419420437214030e-03`, `x_rem=-1.4979766886223404e-02`, `y_exact=4.3850309493793905e-08`
+  - train[5] t_remaining=31: `x_unmit=-4.5385779122541605e-03`, `x_rem=-9.1547383529229070e-03`, `y_exact=1.3151977094193812e-01`
+  - train[6] t_remaining=31: `x_unmit=5.5214723926380369e-02`, `x_rem=7.7482390365825951e-02`, `y_exact=2.3477333984793863e-01`
+  - train[7] t_remaining=31: `x_unmit=-5.8521560574948665e-02`, `x_rem=-9.3021739838988288e-02`, `y_exact=-3.8647137684388377e-01`
+  - train[8] t_remaining=30: `x_unmit=-4.5941807044410417e-03`, `x_rem=-8.2671568123329139e-03`, `y_exact=-7.6753683243324070e-09`
+  - train[9] t_remaining=32: `x_unmit=9.8425196850393699e-03`, `x_rem=1.0051628161864388e-02`, `y_exact=-1.4421381426864017e-02`
+  - train[10] t_remaining=30: `x_unmit=3.7228541882109618e-02`, `x_rem=5.4128107902668414e-02`, `y_exact=4.2899820066475036e-01`
+  - train[11] t_remaining=29: `x_unmit=9.6495683087861866e-03`, `x_rem=9.2868025828919711e-03`, `y_exact=-2.7743462748778671e-08`
+  - train[12] t_remaining=30: `x_unmit=6.7831449126413160e-02`, `x_rem=9.8372793131272049e-02`, `y_exact=3.2781921153947613e-01`
+  - train[13] t_remaining=29: `x_unmit=7.8304239401496264e-02`, `x_rem=1.1523084839793071e-01`, `y_exact=3.5651652616876828e-01`
+  - train[14] t_remaining=32: `x_unmit=4.9180327868852458e-02`, `x_rem=7.5441862327108256e-02`, `y_exact=3.4856615448161615e-01`
+  - train[15] t_remaining=32: `x_unmit=-3.0681227249089962e-02`, `x_rem=-5.1626192031808259e-02`, `y_exact=-1.7820561175960251e-01`
+  - train[16] t_remaining=31: `x_unmit=2.8512182477967860e-02`, `x_rem=3.8684660768642111e-02`, `y_exact=8.8641419929217827e-02`
+  - train[17] t_remaining=32: `x_unmit=1.4242115971515769e-02`, `x_rem=1.6870435995563170e-02`, `y_exact=1.7686154073751348e-02`
+  - train[18] t_remaining=30: `x_unmit=-8.0080080080080079e-03`, `x_rem=-1.7849351182684506e-02`, `y_exact=-5.9363122049754906e-02`
+  - train[19] t_remaining=32: `x_unmit=-4.4221105527638194e-02`, `x_rem=-8.0279296359698382e-02`, `y_exact=-1.4635257239540983e-01`
+  - train[20] t_remaining=31: `x_unmit=5.5555555555555552e-02`, `x_rem=7.2340553822035303e-02`, `y_exact=2.9587034281216823e-01`
+  - train[21] t_remaining=31: `x_unmit=-1.9880715705765408e-02`, `x_rem=-3.4804603393072585e-02`, `y_exact=-1.7611978456320523e-01`
+  - train[22] t_remaining=30: `x_unmit=2.2176379577101599e-02`, `x_rem=2.3649263463600748e-02`, `y_exact=-1.6070717990195943e-08`
+  - train[23] t_remaining=30: `x_unmit=1.0330578512396695e-02`, `x_rem=5.5777555777555840e-03`, `y_exact=-1.8118495290628710e-08`
+- target x values: `x_u_target=-4.2406311637080869e-02`, `x_r_target=-7.2301575260155126e-02`
+- target contribution to E_cdr_unmit: `-2.7342183312627638e-03`
+- target contribution to E_cdr_rem: `-2.8670076029235908e-03`
+
+### term 90
+- pauli term from int row: `(4.9606291141792450e-02)*Z(q(0, 1))*Z(q(0, 3))`
+- int observable row: `[0, 3, 0, 3, 0, 0, 0, 0]`
+- Hamiltonian weight w_90: `4.9606291141792450e-02`
+- OGM effective shots used for this term: `2689`
+- fitted unmit coeffs: `a_u=3.6656991425721581e+00`, `b_u=5.8898710753121766e-02`
+- fitted rem coeffs: `a_r=2.1297165459798908e+00`, `b_r=-2.7496448267529974e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-1.6023306627822287e-01`, `x_rem=-2.4678631233620310e-01`, `y_exact=-5.5654425324269163e-01`
+  - train[1] t_remaining=29: `x_unmit=-3.7278320665942818e-02`, `x_rem=-2.6270749397785228e-02`, `y_exact=-6.1480273766511273e-02`
+  - train[2] t_remaining=30: `x_unmit=-2.9840208101077664e-01`, `x_rem=-4.5760820788691475e-01`, `y_exact=-9.3408634193710682e-01`
+  - train[3] t_remaining=31: `x_unmit=-2.6104417670682734e-01`, `x_rem=-4.0862484235978219e-01`, `y_exact=-8.9407059848706227e-01`
+  - train[4] t_remaining=30: `x_unmit=-2.9259525521207763e-01`, `x_rem=-4.6881355723915030e-01`, `y_exact=-1.0000001970204655e+00`
+  - train[5] t_remaining=31: `x_unmit=-1.7360114777618366e-01`, `x_rem=-2.5258608759326118e-01`, `y_exact=-7.6564161517279639e-01`
+  - train[6] t_remaining=31: `x_unmit=-2.2776572668112799e-01`, `x_rem=-3.5302915129379336e-01`, `y_exact=-8.4693855651478356e-01`
+  - train[7] t_remaining=31: `x_unmit=-1.2233850595452905e-01`, `x_rem=-1.6793327367127439e-01`, `y_exact=-4.3650217546391329e-01`
+  - train[8] t_remaining=30: `x_unmit=-1.5910727141828654e-01`, `x_rem=-2.3052573376547461e-01`, `y_exact=-5.2975041470223860e-01`
+  - train[9] t_remaining=32: `x_unmit=-1.7306245297215951e-02`, `x_rem=7.4105311125627184e-03`, `y_exact=2.9770800724071282e-02`
+  - train[10] t_remaining=30: `x_unmit=-2.8208955223880600e-01`, `x_rem=-4.4433510105151891e-01`, `y_exact=-1.0000001886277807e+00`
+  - train[11] t_remaining=29: `x_unmit=-3.0007336757153336e-01`, `x_rem=-4.8020195342278987e-01`, `y_exact=-1.0000001705798833e+00`
+  - train[12] t_remaining=30: `x_unmit=-3.0170228178196307e-01`, `x_rem=-4.7683878759575976e-01`, `y_exact=-9.7565717486496584e-01`
+  - train[13] t_remaining=29: `x_unmit=-2.8270676691729324e-01`, `x_rem=-4.5592920029010259e-01`, `y_exact=-1.0000001160748171e+00`
+  - train[14] t_remaining=32: `x_unmit=-2.1151795236402418e-01`, `x_rem=-3.1310586163056836e-01`, `y_exact=-7.7770363812041210e-01`
+  - train[15] t_remaining=32: `x_unmit=-7.6530612244897961e-02`, `x_rem=-8.3042322109377495e-02`, `y_exact=-1.3674952484724948e-01`
+  - train[16] t_remaining=31: `x_unmit=-2.5588128845457836e-01`, `x_rem=-4.0383985660858629e-01`, `y_exact=-8.3189781015305597e-01`
+  - train[17] t_remaining=32: `x_unmit=-7.6414401175606175e-02`, `x_rem=-9.6223149860181420e-02`, `y_exact=-2.6225537791260772e-01`
+  - train[18] t_remaining=30: `x_unmit=-2.7827972533429706e-02`, `x_rem=-6.4125730912865109e-03`, `y_exact=5.7332028860941187e-02`
+  - train[19] t_remaining=32: `x_unmit=-4.7860768672951415e-02`, `x_rem=-4.1910711961473383e-02`, `y_exact=-2.1793275205883930e-01`
+  - train[20] t_remaining=31: `x_unmit=-6.1015710632078918e-02`, `x_rem=-6.1229396998487250e-02`, `y_exact=-1.5047877330126030e-01`
+  - train[21] t_remaining=31: `x_unmit=-8.6257309941520463e-02`, `x_rem=-1.0704110704110703e-01`, `y_exact=-2.2162086559370622e-01`
+  - train[22] t_remaining=30: `x_unmit=-5.7206537890044575e-02`, `x_rem=-5.8706028988346981e-02`, `y_exact=-8.8252526859764258e-02`
+  - train[23] t_remaining=30: `x_unmit=-1.3438300988648846e-01`, `x_rem=-1.9357899108906071e-01`, `y_exact=-4.6965847782980152e-01`
+- target x values: `x_u_target=-9.4229364499634774e-02`, `x_r_target=-1.3434045866478300e-01`
+- target contribution to E_cdr_unmit: `-1.4213084902998425e-02`
+- target contribution to E_cdr_rem: `-1.5556708800043867e-02`
+
+### term 91
+- pauli term from int row: `(7.9683546165444930e-02)*Z(q(0, 1))*Z(q(1, 0))`
+- int observable row: `[0, 3, 0, 0, 3, 0, 0, 0]`
+- Hamiltonian weight w_91: `7.9683546165444930e-02`
+- OGM effective shots used for this term: `1912`
+- fitted unmit coeffs: `a_u=3.3812795686590560e+00`, `b_u=-4.6297118871598389e-02`
+- fitted rem coeffs: `a_r=2.3718649477911540e+00`, `b_r=2.5687920210287089e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=9.5238095238095233e-02`, `x_rem=1.1149089568542465e-01`, `y_exact=3.1683216980007567e-01`
+  - train[1] t_remaining=29: `x_unmit=1.0152284263959391e-03`, `x_rem=-3.1336965347117586e-02`, `y_exact=-4.4736583041401733e-02`
+  - train[2] t_remaining=30: `x_unmit=9.5946639302206260e-02`, `x_rem=1.0389974884587518e-01`, `y_exact=2.2964952385216267e-01`
+  - train[3] t_remaining=31: `x_unmit=8.8866189989785502e-02`, `x_rem=1.0302805808423796e-01`, `y_exact=2.1556346697083387e-01`
+  - train[4] t_remaining=30: `x_unmit=2.2857142857142856e-01`, `x_rem=2.9137076075851603e-01`, `y_exact=8.8292650677372264e-01`
+  - train[5] t_remaining=31: `x_unmit=3.9553752535496957e-02`, `x_rem=2.2998412450745170e-02`, `y_exact=1.0548470037889224e-01`
+  - train[6] t_remaining=31: `x_unmit=1.5357678839419711e-01`, `x_rem=1.8974566648403582e-01`, `y_exact=2.7128688418059088e-01`
+  - train[7] t_remaining=31: `x_unmit=8.3375442142496203e-02`, `x_rem=9.0454040934081423e-02`, `y_exact=1.5585533191053125e-01`
+  - train[8] t_remaining=30: `x_unmit=9.1370558375634514e-02`, `x_rem=9.7333011038594902e-02`, `y_exact=4.7037876822846714e-01`
+  - train[9] t_remaining=32: `x_unmit=-1.9895287958115182e-02`, `x_rem=-5.9503033325022811e-02`, `y_exact=-1.4160649190756247e-01`
+  - train[10] t_remaining=30: `x_unmit=1.8666666666666668e-01`, `x_rem=2.3706208321592953e-01`, `y_exact=5.4571926743566512e-01`
+  - train[11] t_remaining=29: `x_unmit=1.8450560652395515e-01`, `x_rem=2.3239100914941913e-01`, `y_exact=7.9255549168213413e-01`
+  - train[12] t_remaining=30: `x_unmit=1.6743946419371458e-01`, `x_rem=2.0471554320086024e-01`, `y_exact=4.0599771298408749e-01`
+  - train[13] t_remaining=29: `x_unmit=2.7919320594479830e-01`, `x_rem=3.6822389688631746e-01`, `y_exact=7.8914478804431187e-01`
+  - train[14] t_remaining=32: `x_unmit=8.8620342396777449e-02`, `x_rem=9.6691492461885312e-02`, `y_exact=6.7919449780543178e-02`
+  - train[15] t_remaining=32: `x_unmit=-2.0993343573988736e-02`, `x_rem=-5.3231401925718340e-02`, `y_exact=-1.1152706373932869e-01`
+  - train[16] t_remaining=31: `x_unmit=1.8334179786693752e-01`, `x_rem=2.2627155588049458e-01`, `y_exact=6.6959827162327479e-01`
+  - train[17] t_remaining=32: `x_unmit=5.8944131214761664e-02`, `x_rem=5.5418810928805878e-02`, `y_exact=2.4522870159857701e-01`
+  - train[18] t_remaining=30: `x_unmit=-3.1904287138584245e-02`, `x_rem=-8.0155138978668342e-02`, `y_exact=-1.6354887201869162e-01`
+  - train[19] t_remaining=32: `x_unmit=7.6962544894817863e-03`, `x_rem=-1.3752395486618127e-02`, `y_exact=-6.2511500695629468e-02`
+  - train[20] t_remaining=31: `x_unmit=-3.9433771486349849e-02`, `x_rem=-9.0954097020831057e-02`, `y_exact=-1.2820777961197760e-01`
+  - train[21] t_remaining=31: `x_unmit=1.1224489795918367e-02`, `x_rem=-1.6994343524955696e-02`, `y_exact=-9.3015418627649532e-03`
+  - train[22] t_remaining=30: `x_unmit=4.3108036189462483e-02`, `x_rem=3.1586177408423358e-02`, `y_exact=6.8253438835565935e-02`
+  - train[23] t_remaining=30: `x_unmit=-5.1229508196721308e-03`, `x_rem=-3.5464080546047688e-02`, `y_exact=-1.7906453309849857e-02`
+- target x values: `x_u_target=5.5416874687968048e-02`, `x_r_target=5.6481821833793931e-02`
+- target contribution to E_cdr_unmit: `1.1241979979901985e-02`
+- target contribution to E_cdr_rem: `1.2721890396525904e-02`
+
+### term 92
+- pauli term from int row: `(1.4979988785090322e-02)*Y(q(0, 1))*Z(q(0, 2))*Y(q(0, 3))*Z(q(1, 0))`
+- int observable row: `[0, 2, 3, 2, 3, 0, 0, 0]`
+- Hamiltonian weight w_92: `1.4979988785090322e-02`
+- OGM effective shots used for this term: `400`
+- fitted unmit coeffs: `a_u=6.6815676610506247e-01`, `b_u=-4.0613476235955584e-02`
+- fitted rem coeffs: `a_r=4.1158681511648032e-01`, `b_r=-3.9578805431739500e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-1.3623978201634877e-02`, `x_rem=-2.3838819384205717e-02`, `y_exact=-1.1228901330302413e-02`
+  - train[1] t_remaining=29: `x_unmit=-1.2594458438287154e-02`, `x_rem=-3.7822893350851282e-02`, `y_exact=-2.3594581375615986e-01`
+  - train[2] t_remaining=30: `x_unmit=1.8666666666666668e-02`, `x_rem=2.9510507559288034e-02`, `y_exact=1.0720544778006008e-01`
+  - train[3] t_remaining=31: `x_unmit=-7.3349633251833741e-03`, `x_rem=-2.2825336473820474e-02`, `y_exact=9.8363630271836519e-03`
+  - train[4] t_remaining=30: `x_unmit=4.9095607235142120e-02`, `x_rem=1.2454460900021776e-01`, `y_exact=-4.8961861804113097e-08`
+  - train[5] t_remaining=31: `x_unmit=-8.9058524173027995e-02`, `x_rem=-2.0888910236464572e-01`, `y_exact=-1.3151977094192258e-01`
+  - train[6] t_remaining=31: `x_unmit=-6.7750677506775062e-02`, `x_rem=-1.3514834692705008e-01`, `y_exact=-2.3477333984792190e-01`
+  - train[7] t_remaining=31: `x_unmit=-3.8043478260869568e-02`, `x_rem=-7.5211652851404451e-02`, `y_exact=3.8647137684385680e-01`
+  - train[8] t_remaining=30: `x_unmit=-2.5316455696202532e-03`, `x_rem=-5.3352901233640034e-03`, `y_exact=-1.6773566249775121e-09`
+  - train[9] t_remaining=32: `x_unmit=-7.8384798099762468e-02`, `x_rem=-1.4359209611926310e-01`, `y_exact=1.1501330062883085e-02`
+  - train[10] t_remaining=30: `x_unmit=7.6335877862595417e-03`, `x_rem=1.5471175546004226e-02`, `y_exact=-4.2899820762023194e-01`
+  - train[11] t_remaining=29: `x_unmit=-1.2345679012345678e-02`, `x_rem=-1.4917640761835715e-02`, `y_exact=3.8289719113372568e-08`
+  - train[12] t_remaining=30: `x_unmit=-1.2068965517241380e-01`, `x_rem=-2.5086879810737400e-01`, `y_exact=-3.2781921153946203e-01`
+  - train[13] t_remaining=29: `x_unmit=1.2658227848101266e-02`, `x_rem=3.2065737001122682e-02`, `y_exact=-3.5651652117048277e-01`
+  - train[14] t_remaining=32: `x_unmit=5.1813471502590676e-03`, `x_rem=4.1477287961373972e-03`, `y_exact=-3.4818962284918092e-01`
+  - train[15] t_remaining=32: `x_unmit=4.5918367346938778e-02`, `x_rem=1.4702673367254185e-01`, `y_exact=2.5491177589427838e-01`
+  - train[16] t_remaining=31: `x_unmit=-5.9139784946236562e-02`, `x_rem=-1.2932509219647212e-01`, `y_exact=-9.2362042806716463e-02`
+  - train[17] t_remaining=32: `x_unmit=-3.6319612590799029e-02`, `x_rem=-6.6279393577737530e-02`, `y_exact=5.6343736477677493e-02`
+  - train[18] t_remaining=30: `x_unmit=3.0303030303030304e-02`, `x_rem=5.9769942851630849e-02`, `y_exact=5.9363122049758923e-02`
+  - train[19] t_remaining=32: `x_unmit=1.8469656992084433e-02`, `x_rem=3.9400773480002781e-02`, `y_exact=1.9045675628864761e-01`
+  - train[20] t_remaining=31: `x_unmit=5.3140096618357488e-02`, `x_rem=1.1371754010074810e-01`, `y_exact=-2.9587034281218438e-01`
+  - train[21] t_remaining=31: `x_unmit=-2.5641025641025640e-02`, `x_rem=-3.4223748330779513e-02`, `y_exact=1.9052910513239044e-01`
+  - train[22] t_remaining=30: `x_unmit=-7.1942446043165445e-03`, `x_rem=-1.3769461174603240e-02`, `y_exact=1.8879757088068540e-08`
+  - train[23] t_remaining=30: `x_unmit=-2.4937655860349127e-03`, `x_rem=-3.0271519492717325e-03`, `y_exact=2.4357761124842471e-08`
+- target x values: `x_u_target=9.8039215686274508e-03`, `x_r_target=3.1417361607974474e-02`
+- target contribution to E_cdr_unmit: `-5.1026215517602886e-04`
+- target contribution to E_cdr_rem: `-3.9918424889664729e-04`
+
+### term 93
+- pauli term from int row: `(1.4979988785090322e-02)*X(q(0, 1))*Z(q(0, 2))*X(q(0, 3))*Z(q(1, 0))`
+- int observable row: `[0, 1, 3, 1, 3, 0, 0, 0]`
+- Hamiltonian weight w_93: `1.4979988785090322e-02`
+- OGM effective shots used for this term: `385`
+- fitted unmit coeffs: `a_u=1.8175284944013335e+00`, `b_u=-3.6074121759268635e-02`
+- fitted rem coeffs: `a_r=8.0339394768124950e-01`, `b_r=-3.7658710318503014e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=6.7669172932330823e-02`, `x_rem=1.5509321079867666e-01`, `y_exact=-1.1228878139357426e-02`
+  - train[1] t_remaining=29: `x_unmit=-2.9649595687331536e-02`, `x_rem=-8.0020430405959672e-02`, `y_exact=-2.3594582616893817e-01`
+  - train[2] t_remaining=30: `x_unmit=-4.9723756906077346e-02`, `x_rem=-1.0271970400563006e-01`, `y_exact=1.0720544513072372e-01`
+  - train[3] t_remaining=31: `x_unmit=2.3255813953488372e-02`, `x_rem=5.6131867384332089e-02`, `y_exact=9.8363575882356689e-03`
+  - train[4] t_remaining=30: `x_unmit=-5.3763440860215058e-03`, `x_rem=-6.4915123923778659e-03`, `y_exact=-4.8961856181722864e-08`
+  - train[5] t_remaining=31: `x_unmit=3.0612244897959183e-02`, `x_rem=9.0762103703865823e-02`, `y_exact=-1.3151973379099097e-01`
+  - train[6] t_remaining=31: `x_unmit=-1.3043478260869565e-01`, `x_rem=-2.9786469578420310e-01`, `y_exact=-2.3477335321473358e-01`
+  - train[7] t_remaining=31: `x_unmit=-3.3248081841432228e-02`, `x_rem=-7.4620467323890161e-02`, `y_exact=3.8647136120797948e-01`
+  - train[8] t_remaining=30: `x_unmit=5.5837563451776651e-02`, `x_rem=1.1607528655937724e-01`, `y_exact=2.5609891779026383e-08`
+  - train[9] t_remaining=32: `x_unmit=5.6790123456790124e-02`, `x_rem=1.1233218236272403e-01`, `y_exact=1.1501315599075256e-02`
+  - train[10] t_remaining=30: `x_unmit=-1.1688311688311688e-01`, `x_rem=-2.5044895925931271e-01`, `y_exact=-4.2899820762022717e-01`
+  - train[11] t_remaining=29: `x_unmit=-2.1686746987951807e-02`, `x_rem=-4.4065461302353108e-02`, `y_exact=3.8289722403288597e-08`
+  - train[12] t_remaining=30: `x_unmit=-1.0471204188481675e-01`, `x_rem=-2.2846686487527840e-01`, `y_exact=-3.2781921052799773e-01`
+  - train[13] t_remaining=29: `x_unmit=-7.0129870129870125e-02`, `x_rem=-1.6402394500951001e-01`, `y_exact=-3.5651652117049126e-01`
+  - train[14] t_remaining=32: `x_unmit=-1.5306122448979591e-02`, `x_rem=-2.4340030882020490e-02`, `y_exact=-3.4818963822241245e-01`
+  - train[15] t_remaining=32: `x_unmit=6.5326633165829151e-02`, `x_rem=1.5675843049645866e-01`, `y_exact=2.5491175042421033e-01`
+  - train[16] t_remaining=31: `x_unmit=8.0103359173126609e-02`, `x_rem=1.9956205159997412e-01`, `y_exact=-9.2362001706829802e-02`
+  - train[17] t_remaining=32: `x_unmit=2.0202020202020204e-02`, `x_rem=4.2606394909918036e-02`, `y_exact=5.6343717665119371e-02`
+  - train[18] t_remaining=30: `x_unmit=3.1941031941031942e-02`, `x_rem=6.3480593097317864e-02`, `y_exact=5.9363136353598911e-02`
+  - train[19] t_remaining=32: `x_unmit=-8.6956521739130436e-03`, `x_rem=-1.1658918491216598e-02`, `y_exact=1.9045675903501572e-01`
+  - train[20] t_remaining=31: `x_unmit=-2.6041666666666668e-02`, `x_rem=-6.4060079594342081e-02`, `y_exact=-2.9587031783266871e-01`
+  - train[21] t_remaining=31: `x_unmit=0.0000000000000000e+00`, `x_rem=6.7341738765057798e-03`, `y_exact=1.9052904253407510e-01`
+  - train[22] t_remaining=30: `x_unmit=2.3255813953488372e-02`, `x_rem=3.9817992117913883e-02`, `y_exact=2.1098835746496264e-08`
+  - train[23] t_remaining=30: `x_unmit=-2.5125628140703519e-02`, `x_rem=-5.5021740312304612e-02`, `y_exact=-1.8227779066723494e-08`
+- target x values: `x_u_target=2.5445292620865142e-03`, `x_r_target=3.2889873533187300e-02`
+- target contribution to E_cdr_unmit: `-4.7111116976060024e-04`
+- target contribution to E_cdr_rem: `-1.6830294502785578e-04`
+
+### term 94
+- pauli term from int row: `(1.7453323053332640e-02)*Y(q(0, 1))*Y(q(0, 2))*Y(q(1, 0))*Y(q(1, 1))`
+- int observable row: `[0, 2, 2, 0, 2, 2, 0, 0]`
+- Hamiltonian weight w_94: `1.7453323053332640e-02`
+- OGM effective shots used for this term: `496`
+- fitted unmit coeffs: `a_u=6.1440869276489241e-01`, `b_u=1.0304523313705868e-02`
+- fitted rem coeffs: `a_r=2.4884683568140106e-01`, `b_r=1.2011838165531160e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=2.4070021881838075e-02`, `x_rem=4.2703241309696827e-02`, `y_exact=9.5720187958323218e-04`
+  - train[1] t_remaining=29: `x_unmit=-1.2820512820512820e-02`, `x_rem=-4.0798235754420736e-02`, `y_exact=-8.1907813114455570e-08`
+  - train[2] t_remaining=30: `x_unmit=-6.0796645702306078e-02`, `x_rem=-1.4052703455505650e-01`, `y_exact=4.4080305691996308e-09`
+  - train[3] t_remaining=31: `x_unmit=2.6431718061674010e-02`, `x_rem=5.7473474787298709e-02`, `y_exact=2.0141877868303910e-02`
+  - train[4] t_remaining=30: `x_unmit=-5.4945054945054944e-02`, `x_rem=-1.2969117721550133e-01`, `y_exact=1.1751836672515736e-09`
+  - train[5] t_remaining=31: `x_unmit=-3.9832285115303984e-02`, `x_rem=-8.0195742254931715e-02`, `y_exact=1.7516578365236426e-08`
+  - train[6] t_remaining=31: `x_unmit=-4.7619047619047616e-02`, `x_rem=-9.0417273574991588e-02`, `y_exact=-5.1034769052062724e-08`
+  - train[7] t_remaining=31: `x_unmit=4.9462365591397849e-02`, `x_rem=1.1657975010993690e-01`, `y_exact=-1.1928334820203791e-08`
+  - train[8] t_remaining=30: `x_unmit=-1.4989293361884369e-02`, `x_rem=-3.6916378600029692e-02`, `y_exact=-1.7645672877697166e-01`
+  - train[9] t_remaining=32: `x_unmit=4.8888888888888891e-02`, `x_rem=1.1381595552425211e-01`, `y_exact=1.3286667182538747e-01`
+  - train[10] t_remaining=30: `x_unmit=2.6915113871635612e-02`, `x_rem=6.8466976620724748e-02`, `y_exact=4.2397848435179996e-09`
+  - train[11] t_remaining=29: `x_unmit=-2.7718550106609809e-02`, `x_rem=-7.8098934958585345e-02`, `y_exact=3.3259676009666893e-08`
+  - train[12] t_remaining=30: `x_unmit=-2.1956087824351298e-02`, `x_rem=-5.6628574825797827e-02`, `y_exact=1.2152439515942032e-08`
+  - train[13] t_remaining=29: `x_unmit=-1.9522776572668113e-02`, `x_rem=-5.9479281372940430e-02`, `y_exact=7.1393303335844143e-09`
+  - train[14] t_remaining=32: `x_unmit=2.5974025974025976e-02`, `x_rem=5.3965969754559702e-02`, `y_exact=3.0245731359796749e-02`
+  - train[15] t_remaining=32: `x_unmit=1.9780219780219779e-02`, `x_rem=3.0304919655944763e-02`, `y_exact=2.2727795692622840e-02`
+  - train[16] t_remaining=31: `x_unmit=-8.8495575221238937e-03`, `x_rem=-1.3393072562623582e-02`, `y_exact=-3.7648394708781154e-02`
+  - train[17] t_remaining=32: `x_unmit=7.6595744680851063e-02`, `x_rem=1.7283326828721696e-01`, `y_exact=-1.8365038754134422e-02`
+  - train[18] t_remaining=30: `x_unmit=6.4748201438848921e-02`, `x_rem=1.4416665014846478e-01`, `y_exact=1.6760053310151642e-08`
+  - train[19] t_remaining=32: `x_unmit=2.4498886414253896e-02`, `x_rem=4.0929380598884853e-02`, `y_exact=1.6215804579512455e-01`
+  - train[20] t_remaining=31: `x_unmit=2.2522522522522521e-02`, `x_rem=3.1005420367747727e-02`, `y_exact=1.5028484212071556e-08`
+  - train[21] t_remaining=31: `x_unmit=-2.9748283752860413e-02`, `x_rem=-8.9358729245059235e-02`, `y_exact=1.3573938172874542e-01`
+  - train[22] t_remaining=30: `x_unmit=2.8000000000000001e-02`, `x_rem=5.6421379254173835e-02`, `y_exact=-1.2168366158843762e-01`
+  - train[23] t_remaining=30: `x_unmit=1.0300429184549356e-01`, `x_rem=2.2115090278879118e-01`, `y_exact=2.2079396275998986e-01`
+- target x values: `x_u_target=-3.3816425120772944e-02`, `x_r_target=-7.6073735036202156e-02`
+- target contribution to E_cdr_unmit: `-1.8278136101515009e-04`
+- target contribution to E_cdr_rem: `-1.2075727461256073e-04`
+
+### term 95
+- pauli term from int row: `(1.7453323053332640e-02)*Y(q(0, 1))*Y(q(0, 2))*X(q(1, 0))*X(q(1, 1))`
+- int observable row: `[0, 2, 2, 0, 1, 1, 0, 0]`
+- Hamiltonian weight w_95: `1.7453323053332640e-02`
+- OGM effective shots used for this term: `430`
+- fitted unmit coeffs: `a_u=9.3203524764021062e-01`, `b_u=1.1783931351464664e-02`
+- fitted rem coeffs: `a_r=4.1596552369505313e-01`, `b_r=1.0983887407150646e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-4.5751633986928102e-02`, `x_rem=-1.1457181174789065e-01`, `y_exact=9.5723900616201656e-04`
+  - train[1] t_remaining=29: `x_unmit=-6.7720090293453723e-03`, `x_rem=2.0701302865692040e-03`, `y_exact=-2.1210915778389791e-08`
+  - train[2] t_remaining=30: `x_unmit=4.4052863436123352e-03`, `x_rem=1.2024241591052877e-02`, `y_exact=-4.7344160679881505e-08`
+  - train[3] t_remaining=31: `x_unmit=-5.5045871559633031e-02`, `x_rem=-1.2073779591377398e-01`, `y_exact=2.0141792260862799e-02`
+  - train[4] t_remaining=30: `x_unmit=-5.9602649006622516e-02`, `x_rem=-1.4022662710127809e-01`, `y_exact=-3.8973963074018510e-09`
+  - train[5] t_remaining=31: `x_unmit=4.5662100456621002e-02`, `x_rem=9.4892259823283615e-02`, `y_exact=3.2238883946685368e-08`
+  - train[6] t_remaining=31: `x_unmit=2.1739130434782608e-02`, `x_rem=4.5287914814802863e-02`, `y_exact=4.5230801710090010e-08`
+  - train[7] t_remaining=31: `x_unmit=8.2051282051282051e-02`, `x_rem=1.6491285914193310e-01`, `y_exact=2.1734433555140732e-08`
+  - train[8] t_remaining=30: `x_unmit=-4.8076923076923080e-02`, `x_rem=-8.9905422982572217e-02`, `y_exact=-1.7645667399016923e-01`
+  - train[9] t_remaining=32: `x_unmit=4.5751633986928102e-02`, `x_rem=1.0899101920288533e-01`, `y_exact=1.3286666476044001e-01`
+  - train[10] t_remaining=30: `x_unmit=-1.4736842105263158e-02`, `x_rem=-4.3500932685398459e-02`, `y_exact=1.9116198940277319e-08`
+  - train[11] t_remaining=29: `x_unmit=9.0497737556561094e-03`, `x_rem=3.5844488822497252e-02`, `y_exact=-3.6149413024345273e-09`
+  - train[12] t_remaining=30: `x_unmit=-3.5639412997903561e-02`, `x_rem=-7.3585672382146902e-02`, `y_exact=-4.4393284162543873e-08`
+  - train[13] t_remaining=29: `x_unmit=9.3896713615023476e-03`, `x_rem=3.2264029813830523e-02`, `y_exact=-2.2525776488697248e-08`
+  - train[14] t_remaining=32: `x_unmit=-4.5783132530120479e-02`, `x_rem=-9.5140648231648819e-02`, `y_exact=3.0245759792956739e-02`
+  - train[15] t_remaining=32: `x_unmit=5.7268722466960353e-02`, `x_rem=1.2665702654194283e-01`, `y_exact=2.2727769251901318e-02`
+  - train[16] t_remaining=31: `x_unmit=3.1674208144796379e-02`, `x_rem=6.6651405754645773e-02`, `y_exact=-3.7648349839143169e-02`
+  - train[17] t_remaining=32: `x_unmit=-7.1111111111111111e-02`, `x_rem=-1.7372622407395652e-01`, `y_exact=-1.8365128090421158e-02`
+  - train[18] t_remaining=30: `x_unmit=9.0090090090090089e-03`, `x_rem=2.1689513314549998e-02`, `y_exact=-2.4190455325907186e-08`
+  - train[19] t_remaining=32: `x_unmit=5.3117782909930716e-02`, `x_rem=1.3016546419012251e-01`, `y_exact=1.6215799706357006e-01`
+  - train[20] t_remaining=31: `x_unmit=0.0000000000000000e+00`, `x_rem=9.7496242885199754e-03`, `y_exact=-3.6624936670383807e-08`
+  - train[21] t_remaining=31: `x_unmit=7.3170731707317069e-02`, `x_rem=1.7068942364413364e-01`, `y_exact=1.3573930595901704e-01`
+  - train[22] t_remaining=30: `x_unmit=-1.3100436681222707e-02`, `x_rem=-2.4084255234011403e-02`, `y_exact=-1.2168366928876631e-01`
+  - train[23] t_remaining=30: `x_unmit=4.8458149779735685e-02`, `x_rem=1.1289801961676094e-01`, `y_exact=2.2079387706987846e-01`
+- target x values: `x_u_target=0.0000000000000000e+00`, `x_r_target=7.7528780374725697e-03`
+- target contribution to E_cdr_unmit: `2.0566876071540747e-04`
+- target contribution to E_cdr_rem: `2.4799107994159689e-04`
+
+### term 96
+- pauli term from int row: `(1.7453323053332640e-02)*X(q(0, 1))*X(q(0, 2))*Y(q(1, 0))*Y(q(1, 1))`
+- int observable row: `[0, 1, 1, 0, 2, 2, 0, 0]`
+- Hamiltonian weight w_96: `1.7453323053332640e-02`
+- OGM effective shots used for this term: `461`
+- fitted unmit coeffs: `a_u=9.7069372651139990e-02`, `b_u=1.4846339587682712e-02`
+- fitted rem coeffs: `a_r=3.8249464399485934e-02`, `b_r=1.4955962310848338e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-1.7467248908296942e-02`, `x_rem=-3.7679538607951445e-02`, `y_exact=9.5720656731660553e-04`
+  - train[1] t_remaining=29: `x_unmit=-8.4233261339092869e-02`, `x_rem=-1.7516086902202199e-01`, `y_exact=-8.4050238904501530e-08`
+  - train[2] t_remaining=30: `x_unmit=-4.1758241758241756e-02`, `x_rem=-8.0719436426908583e-02`, `y_exact=-9.3526658591876816e-09`
+  - train[3] t_remaining=31: `x_unmit=7.5921908893709325e-02`, `x_rem=1.7063617819107910e-01`, `y_exact=2.0141837775396035e-02`
+  - train[4] t_remaining=30: `x_unmit=4.5356371490280781e-02`, `x_rem=1.0023742959172190e-01`, `y_exact=-6.4874282479681190e-09`
+  - train[5] t_remaining=31: `x_unmit=6.2880324543610547e-02`, `x_rem=1.2937718250832378e-01`, `y_exact=1.9565802439792822e-08`
+  - train[6] t_remaining=31: `x_unmit=-6.7114093959731542e-03`, `x_rem=-2.9877257510987777e-02`, `y_exact=-5.4525238821929443e-09`
+  - train[7] t_remaining=31: `x_unmit=-4.3103448275862068e-03`, `x_rem=1.6725218727508664e-02`, `y_exact=-2.5392506750045444e-08`
+  - train[8] t_remaining=30: `x_unmit=4.0160642570281121e-03`, `x_rem=1.7576024288740492e-02`, `y_exact=-1.7645672569022383e-01`
+  - train[9] t_remaining=32: `x_unmit=-4.4967880085653104e-02`, `x_rem=-7.6112244881330837e-02`, `y_exact=1.3286668558996825e-01`
+  - train[10] t_remaining=30: `x_unmit=-3.4642032332563508e-02`, `x_rem=-8.7948342599346849e-02`, `y_exact=1.4221811460566432e-10`
+  - train[11] t_remaining=29: `x_unmit=2.0785219399538105e-02`, `x_rem=5.3854949121250613e-02`, `y_exact=3.7992061014277114e-08`
+  - train[12] t_remaining=30: `x_unmit=6.8041237113402056e-02`, `x_rem=1.2044867384758511e-01`, `y_exact=2.8053254586049379e-10`
+  - train[13] t_remaining=29: `x_unmit=-2.2869022869022870e-02`, `x_rem=-6.1871507428595103e-02`, `y_exact=4.8951631973398790e-09`
+  - train[14] t_remaining=32: `x_unmit=2.7368421052631580e-02`, `x_rem=4.5859202207316124e-02`, `y_exact=3.0245751425346207e-02`
+  - train[15] t_remaining=32: `x_unmit=-1.1337868480725623e-02`, `x_rem=-4.5359463559891004e-02`, `y_exact=2.2727783573107334e-02`
+  - train[16] t_remaining=31: `x_unmit=6.1052631578947365e-02`, `x_rem=1.6070224462200577e-01`, `y_exact=-3.7648392394289645e-02`
+  - train[17] t_remaining=32: `x_unmit=2.7484143763213530e-02`, `x_rem=5.1130885893646484e-02`, `y_exact=-1.8365041584367494e-02`
+  - train[18] t_remaining=30: `x_unmit=-1.0615711252653927e-02`, `x_rem=-2.6520041119373720e-02`, `y_exact=1.2659525512187734e-08`
+  - train[19] t_remaining=32: `x_unmit=-4.5662100456621002e-03`, `x_rem=-6.5027268260515808e-03`, `y_exact=1.6215803234709117e-01`
+  - train[20] t_remaining=31: `x_unmit=-8.8495575221238937e-03`, `x_rem=-1.4098927031035366e-02`, `y_exact=1.4010504677982619e-08`
+  - train[21] t_remaining=31: `x_unmit=3.1111111111111110e-02`, `x_rem=6.4511537917356282e-02`, `y_exact=1.3573938746712688e-01`
+  - train[22] t_remaining=30: `x_unmit=-1.3157894736842105e-02`, `x_rem=-3.4583231916854001e-02`, `y_exact=-1.2168366433903705e-01`
+  - train[23] t_remaining=30: `x_unmit=3.7694013303769404e-02`, `x_rem=7.3056932786153064e-02`, `y_exact=2.2079397028890865e-01`
+- target x values: `x_u_target=-9.2165898617511521e-03`, `x_r_target=-3.0560158341148572e-02`
+- target contribution to E_cdr_unmit: `2.4350337002049959e-04`
+- target contribution to E_cdr_rem: `2.4062988337092580e-04`
+
+### term 97
+- pauli term from int row: `(1.7453323053332640e-02)*X(q(0, 1))*X(q(0, 2))*X(q(1, 0))*X(q(1, 1))`
+- int observable row: `[0, 1, 1, 0, 1, 1, 0, 0]`
+- Hamiltonian weight w_97: `1.7453323053332640e-02`
+- OGM effective shots used for this term: `457`
+- fitted unmit coeffs: `a_u=5.4444755794808763e-01`, `b_u=3.0018493477158983e-02`
+- fitted rem coeffs: `a_r=2.3327875479633969e-01`, `b_r=2.8567336704279075e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-3.8297872340425532e-02`, `x_rem=-8.4603541878412070e-02`, `y_exact=9.5725979376958589e-04`
+  - train[1] t_remaining=29: `x_unmit=-2.7649769585253458e-02`, `x_rem=-4.6469446226505305e-02`, `y_exact=-9.3407587810248489e-09`
+  - train[2] t_remaining=30: `x_unmit=1.1286681715575621e-02`, `x_rem=4.1648113373433347e-02`, `y_exact=-3.2486482379135465e-09`
+  - train[3] t_remaining=31: `x_unmit=-2.3255813953488372e-02`, `x_rem=-2.1796768853059895e-02`, `y_exact=2.0141791145500864e-02`
+  - train[4] t_remaining=30: `x_unmit=3.4782608695652174e-02`, `x_rem=7.8726646844292411e-02`, `y_exact=2.3589033153498045e-09`
+  - train[5] t_remaining=31: `x_unmit=-1.4354066985645933e-02`, `x_rem=-4.5772485570187316e-02`, `y_exact=3.5592959972278908e-08`
+  - train[6] t_remaining=31: `x_unmit=-1.7241379310344827e-02`, `x_rem=-5.9993019704025201e-02`, `y_exact=3.0503993992749707e-08`
+  - train[7] t_remaining=31: `x_unmit=1.8181818181818181e-02`, `x_rem=3.7728295148218752e-02`, `y_exact=1.5142083838875660e-08`
+  - train[8] t_remaining=30: `x_unmit=-7.1593533487297925e-02`, `x_rem=-1.4629459052563526e-01`, `y_exact=-1.7645667592398595e-01`
+  - train[9] t_remaining=32: `x_unmit=-6.8965517241379309e-02`, `x_rem=-1.4765779446031163e-01`, `y_exact=1.3286667119448597e-01`
+  - train[10] t_remaining=30: `x_unmit=-6.4814814814814811e-02`, `x_rem=-1.5159054209565201e-01`, `y_exact=2.1215793181485312e-08`
+  - train[11] t_remaining=29: `x_unmit=3.5398230088495575e-02`, `x_rem=8.3741456450076385e-02`, `y_exact=-1.0584095091551969e-08`
+  - train[12] t_remaining=30: `x_unmit=-1.1453744493392071e-01`, `x_rem=-2.5005348077371869e-01`, `y_exact=-1.8267937296053571e-08`
+  - train[13] t_remaining=29: `x_unmit=-1.9522776572668113e-02`, `x_rem=-3.0688931167837493e-02`, `y_exact=-1.5405489809138290e-08`
+  - train[14] t_remaining=32: `x_unmit=4.5045045045045045e-03`, `x_rem=2.0482195034060988e-02`, `y_exact=3.0245734178583918e-02`
+  - train[15] t_remaining=32: `x_unmit=1.4084507042253521e-02`, `x_rem=2.3187533131120590e-02`, `y_exact=2.2727793785278762e-02`
+  - train[16] t_remaining=31: `x_unmit=-1.0185185185185185e-01`, `x_rem=-2.2241661285642092e-01`, `y_exact=-3.7648348869035439e-02`
+  - train[17] t_remaining=32: `x_unmit=-2.4070021881838075e-02`, `x_rem=-5.2528464593761641e-02`, `y_exact=-1.8365130152739464e-02`
+  - train[18] t_remaining=30: `x_unmit=-1.5250544662309368e-02`, `x_rem=-1.5811213696970104e-02`, `y_exact=-2.5215855795402986e-08`
+  - train[19] t_remaining=32: `x_unmit=-1.4018691588785047e-02`, `x_rem=-3.7040780420041733e-02`, `y_exact=1.6215799325194308e-01`
+  - train[20] t_remaining=31: `x_unmit=-2.4719101123595506e-02`, `x_rem=-4.4453641048846235e-02`, `y_exact=-1.1353210476443650e-08`
+  - train[21] t_remaining=31: `x_unmit=-5.3763440860215055e-02`, `x_rem=-1.1201857390704051e-01`, `y_exact=1.3573930093704886e-01`
+  - train[22] t_remaining=30: `x_unmit=-7.9439252336448593e-02`, `x_rem=-1.8971681913396354e-01`, `y_exact=-1.2168366539260649e-01`
+  - train[23] t_remaining=30: `x_unmit=1.4150943396226415e-02`, `x_rem=2.6765367114337739e-02`, `y_exact=2.2079385253643455e-01`
+- target x values: `x_u_target=-1.7094017094017096e-02`, `x_r_target=-2.2660057470970971e-02`
+- target contribution to E_cdr_unmit: `3.6148794945401754e-04`
+- target contribution to E_cdr_rem: `4.0633477091448324e-04`
+
+### term 98
+- pauli term from int row: `(-4.3868561231028644e-03)*Z(q(0, 1))*Y(q(1, 0))*Z(q(1, 1))*Y(q(1, 2))`
+- int observable row: `[0, 3, 0, 0, 2, 3, 2, 0]`
+- Hamiltonian weight w_98: `-4.3868561231028644e-03`
+- OGM effective shots used for this term: `368`
+- fitted unmit coeffs: `a_u=2.2852582809004605e+00`, `b_u=-1.8028387837061604e-02`
+- fitted rem coeffs: `a_r=8.2452085566650379e-01`, `b_r=-2.1213092683990280e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=1.0582010582010581e-02`, `x_rem=2.5259009356944371e-03`, `y_exact=3.1844476743568151e-01`
+  - train[1] t_remaining=29: `x_unmit=-4.1095890410958902e-02`, `x_rem=-9.1851669481766818e-02`, `y_exact=8.8243480108937389e-09`
+  - train[2] t_remaining=30: `x_unmit=3.3898305084745763e-02`, `x_rem=9.6774784971898717e-02`, `y_exact=-2.5192555224772497e-09`
+  - train[3] t_remaining=31: `x_unmit=2.1052631578947368e-02`, `x_rem=3.4782211724491252e-02`, `y_exact=4.7056223234104883e-01`
+  - train[4] t_remaining=30: `x_unmit=-7.3170731707317069e-02`, `x_rem=-1.6082569525733972e-01`, `y_exact=-1.9509047992039918e-01`
+  - train[5] t_remaining=31: `x_unmit=8.5574572127139370e-02`, `x_rem=2.2318435541132278e-01`, `y_exact=-1.6524750923604101e-08`
+  - train[6] t_remaining=31: `x_unmit=-4.8991354466858789e-02`, `x_rem=-1.0456413315139650e-01`, `y_exact=6.5265378051215044e-08`
+  - train[7] t_remaining=31: `x_unmit=4.5333333333333337e-02`, `x_rem=1.0301225613106052e-01`, `y_exact=2.1994639675030966e-08`
+  - train[8] t_remaining=30: `x_unmit=1.9900497512437811e-02`, `x_rem=6.8564790554961688e-02`, `y_exact=-2.1930112814517783e-01`
+  - train[9] t_remaining=32: `x_unmit=-2.9177718832891247e-02`, `x_rem=-4.9989849863554835e-02`, `y_exact=-1.7814768676430487e-01`
+  - train[10] t_remaining=30: `x_unmit=-6.7024128686327081e-02`, `x_rem=-1.6090913999581280e-01`, `y_exact=-1.0709825473481825e-01`
+  - train[11] t_remaining=29: `x_unmit=1.0169491525423729e-01`, `x_rem=2.1937000324698305e-01`, `y_exact=5.3971339785211925e-01`
+  - train[12] t_remaining=30: `x_unmit=1.1876484560570071e-02`, `x_rem=3.1134702463814608e-02`, `y_exact=2.8443432629591573e-08`
+  - train[13] t_remaining=29: `x_unmit=1.3054830287206266e-02`, `x_rem=4.4501792140793112e-02`, `y_exact=-1.5487079739187432e-01`
+  - train[14] t_remaining=32: `x_unmit=5.0251256281407038e-02`, `x_rem=1.0725301944245533e-01`, `y_exact=-5.9689311176772822e-03`
+  - train[15] t_remaining=32: `x_unmit=1.0309278350515464e-02`, `x_rem=2.7368281567382573e-02`, `y_exact=-1.8320838264053924e-02`
+  - train[16] t_remaining=31: `x_unmit=-7.6923076923076913e-02`, `x_rem=-1.4977620707257863e-01`, `y_exact=-3.3456435608121876e-01`
+  - train[17] t_remaining=32: `x_unmit=-5.2631578947368418e-02`, `x_rem=-1.2515252585600953e-01`, `y_exact=-2.0029528114128359e-01`
+  - train[18] t_remaining=30: `x_unmit=-3.4120734908136482e-02`, `x_rem=-9.1669383488308734e-02`, `y_exact=-1.4330552664653546e-08`
+  - train[19] t_remaining=32: `x_unmit=1.0695187165775400e-02`, `x_rem=4.6548966876591567e-02`, `y_exact=-2.3645000582659817e-01`
+  - train[20] t_remaining=31: `x_unmit=-5.5865921787709499e-03`, `x_rem=-3.0845156315569118e-02`, `y_exact=-1.4178896185568515e-08`
+  - train[21] t_remaining=31: `x_unmit=-1.0928961748633880e-02`, `x_rem=-9.5290379481720328e-03`, `y_exact=-1.5489857808001892e-01`
+  - train[22] t_remaining=30: `x_unmit=4.6153846153846156e-02`, `x_rem=1.0842250961442429e-01`, `y_exact=-1.4102993614677432e-02`
+  - train[23] t_remaining=30: `x_unmit=-3.8461538461538464e-02`, `x_rem=-9.4786095989406960e-02`, `y_exact=1.7178129422265903e-02`
+- target x values: `x_u_target=2.9325513196480990e-03`, `x_r_target=9.7255815104753517e-03`
+- target contribution to E_cdr_unmit: `4.9688825442365125e-05`
+- target contribution to E_cdr_rem: `5.7880828482826750e-05`
+
+### term 99
+- pauli term from int row: `(-4.3868561231028644e-03)*Z(q(0, 1))*X(q(1, 0))*Z(q(1, 1))*X(q(1, 2))`
+- int observable row: `[0, 3, 0, 0, 1, 3, 1, 0]`
+- Hamiltonian weight w_99: `-4.3868561231028644e-03`
+- OGM effective shots used for this term: `376`
+- fitted unmit coeffs: `a_u=1.9152541035859811e+00`, `b_u=-2.0891846771961535e-02`
+- fitted rem coeffs: `a_r=7.8263328368413065e-01`, `b_r=-1.7555260647171420e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=8.7431693989071038e-02`, `x_rem=1.9021077431936059e-01`, `y_exact=3.1844469323978081e-01`
+  - train[1] t_remaining=29: `x_unmit=-5.2369077306733167e-02`, `x_rem=-1.1865192371300902e-01`, `y_exact=-2.6621615296106050e-08`
+  - train[2] t_remaining=30: `x_unmit=-2.7932960893854747e-02`, `x_rem=-4.6726870122567384e-02`, `y_exact=1.3496704795611882e-09`
+  - train[3] t_remaining=31: `x_unmit=5.1771117166212535e-02`, `x_rem=1.0016839571459951e-01`, `y_exact=4.7056225647070871e-01`
+  - train[4] t_remaining=30: `x_unmit=-2.5641025641025640e-02`, `x_rem=-6.0385661211554864e-02`, `y_exact=-1.9509047992039094e-01`
+  - train[5] t_remaining=31: `x_unmit=-7.2776280323450140e-02`, `x_rem=-1.7790265458751681e-01`, `y_exact=-4.3217084237571529e-08`
+  - train[6] t_remaining=31: `x_unmit=1.8087855297157621e-02`, `x_rem=4.6111921579644728e-02`, `y_exact=7.4819157711709922e-09`
+  - train[7] t_remaining=31: `x_unmit=6.2176165803108807e-02`, `x_rem=1.4716010309850225e-01`, `y_exact=2.8828002153413266e-08`
+  - train[8] t_remaining=30: `x_unmit=1.3623978201634877e-02`, `x_rem=2.3414989636582808e-02`, `y_exact=-2.1930113393853529e-01`
+  - train[9] t_remaining=32: `x_unmit=-8.0118694362017809e-02`, `x_rem=-1.7624815885582351e-01`, `y_exact=-1.7814758601261946e-01`
+  - train[10] t_remaining=30: `x_unmit=0.0000000000000000e+00`, `x_rem=6.9316525012727975e-03`, `y_exact=-1.0709825473479050e-01`
+  - train[11] t_remaining=29: `x_unmit=1.1111111111111110e-01`, `x_rem=2.4683541003189707e-01`, `y_exact=5.3971339785210026e-01`
+  - train[12] t_remaining=30: `x_unmit=8.3565459610027860e-03`, `x_rem=2.9323163119234024e-03`, `y_exact=2.4483633448640826e-08`
+  - train[13] t_remaining=29: `x_unmit=-1.1049723756906077e-02`, `x_rem=-3.4720258815464734e-02`, `y_exact=-1.5487079739186571e-01`
+  - train[14] t_remaining=32: `x_unmit=-8.8161209068010074e-02`, `x_rem=-2.1833844030131649e-01`, `y_exact=-5.9689636994998485e-03`
+  - train[15] t_remaining=32: `x_unmit=-2.9177718832891247e-02`, `x_rem=-9.5343924705624958e-02`, `y_exact=-1.8320781918574156e-02`
+  - train[16] t_remaining=31: `x_unmit=6.3492063492063489e-02`, `x_rem=1.3429010405463548e-01`, `y_exact=-3.3456437764746155e-01`
+  - train[17] t_remaining=32: `x_unmit=2.6666666666666666e-03`, `x_rem=1.8424201434724580e-02`, `y_exact=-2.0029520023129169e-01`
+  - train[18] t_remaining=30: `x_unmit=-1.3927576601671309e-02`, `x_rem=-3.1656691850586144e-02`, `y_exact=8.5883553615343095e-09`
+  - train[19] t_remaining=32: `x_unmit=-7.3710073710073713e-03`, `x_rem=-9.3794816991401523e-03`, `y_exact=-2.3644993723555224e-01`
+  - train[20] t_remaining=31: `x_unmit=-5.4945054945054949e-03`, `x_rem=-2.4827668047647723e-02`, `y_exact=3.4500164692553067e-08`
+  - train[21] t_remaining=31: `x_unmit=-5.6300268096514748e-02`, `x_rem=-1.3513281310093839e-01`, `y_exact=-1.5489858498343884e-01`
+  - train[22] t_remaining=30: `x_unmit=2.4937655860349127e-03`, `x_rem=-1.2662139258109347e-02`, `y_exact=-1.4102973630910381e-02`
+  - train[23] t_remaining=30: `x_unmit=6.3829787234042548e-02`, `x_rem=1.5920244740183806e-01`, `y_exact=1.7178252230059424e-02`
+- target x values: `x_u_target=4.6831955922865015e-02`, `x_r_target=1.1463019490526527e-01`
+- target contribution to E_cdr_unmit: `-3.0182995411353464e-04`
+- target contribution to E_cdr_rem: `-3.1654740110626217e-04`
+
+### term 100
+- pauli term from int row: `(3.2265354441004174e-02)*Y(q(0, 1))*Z(q(0, 2))*Y(q(0, 3))*Y(q(1, 0))*Z(q(1, 1))*Y(q(1, 2))`
+- int observable row: `[0, 2, 3, 2, 2, 3, 2, 0]`
+- Hamiltonian weight w_100: `3.2265354441004174e-02`
+- OGM effective shots used for this term: `208`
+- fitted unmit coeffs: `a_u=1.0564308223656402e-01`, `b_u=2.7763317053960670e-03`
+- fitted rem coeffs: `a_r=3.0430735760013750e-02`, `b_r=2.9851187640104783e-03`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=1.0638297872340425e-02`, `x_rem=6.5693556171786500e-03`, `y_exact=-2.6947868400977921e-02`
+  - train[1] t_remaining=29: `x_unmit=-1.0614525139664804e-01`, `x_rem=-3.6457151076674726e-01`, `y_exact=-1.9584779597874466e-08`
+  - train[2] t_remaining=30: `x_unmit=9.1954022988505746e-02`, `x_rem=3.1577357085266294e-01`, `y_exact=2.7315738098429226e-08`
+  - train[3] t_remaining=31: `x_unmit=-5.1020408163265307e-02`, `x_rem=-1.6979006380942854e-01`, `y_exact=-5.8725537333539461e-02`
+  - train[4] t_remaining=30: `x_unmit=-1.5706806282722512e-02`, `x_rem=-3.9863527778225376e-02`, `y_exact=-2.9382387480514776e-09`
+  - train[5] t_remaining=31: `x_unmit=8.9947089947089942e-02`, `x_rem=3.1692131468028245e-01`, `y_exact=1.6289246612723871e-08`
+  - train[6] t_remaining=31: `x_unmit=-1.7575757575757575e-01`, `x_rem=-6.7824791951307295e-01`, `y_exact=-1.8694482435740439e-10`
+  - train[7] t_remaining=31: `x_unmit=-9.7087378640776691e-03`, `x_rem=3.5445956615921224e-03`, `y_exact=-4.8147326193952776e-08`
+  - train[8] t_remaining=30: `x_unmit=-5.3475935828877002e-03`, `x_rem=6.7190722063501353e-03`, `y_exact=-1.7886304994265451e-08`
+  - train[9] t_remaining=32: `x_unmit=4.3956043956043959e-02`, `x_rem=1.5708534978371555e-01`, `y_exact=3.3351162722130484e-02`
+  - train[10] t_remaining=30: `x_unmit=-2.8571428571428571e-02`, `x_rem=-1.0349060685532695e-01`, `y_exact=8.4191576302220128e-02`
+  - train[11] t_remaining=29: `x_unmit=-6.9306930693069313e-02`, `x_rem=-2.7246695638361190e-01`, `y_exact=1.7491072627854213e-08`
+  - train[12] t_remaining=30: `x_unmit=4.3902439024390241e-02`, `x_rem=1.4383374868678062e-01`, `y_exact=1.2749305087691807e-08`
+  - train[13] t_remaining=29: `x_unmit=-1.0869565217391304e-02`, `x_rem=-2.3665611271317707e-02`, `y_exact=6.9966952329145626e-02`
+  - train[14] t_remaining=32: `x_unmit=-4.3956043956043959e-02`, `x_rem=-1.1328293158495804e-01`, `y_exact=-5.2631387127927750e-04`
+  - train[15] t_remaining=32: `x_unmit=-8.6021505376344093e-02`, `x_rem=-2.7047849187141149e-01`, `y_exact=-8.9135718461307842e-02`
+  - train[16] t_remaining=31: `x_unmit=4.1237113402061855e-02`, `x_rem=8.7627513731060244e-02`, `y_exact=3.0718629366500078e-02`
+  - train[17] t_remaining=32: `x_unmit=7.4235807860262015e-02`, `x_rem=3.0244509807087472e-01`, `y_exact=7.3582379827280095e-02`
+  - train[18] t_remaining=30: `x_unmit=-7.6923076923076927e-02`, `x_rem=-3.2918040120063413e-01`, `y_exact=1.0635934835682245e-08`
+  - train[19] t_remaining=32: `x_unmit=1.5306122448979592e-01`, `x_rem=5.1618547583637098e-01`, `y_exact=-4.2381702955021631e-02`
+  - train[20] t_remaining=31: `x_unmit=3.1674208144796379e-02`, `x_rem=1.2462112611426194e-02`, `y_exact=1.2777671377002073e-08`
+  - train[21] t_remaining=31: `x_unmit=-1.3812154696132597e-01`, `x_rem=-5.1819334660667804e-01`, `y_exact=-3.8928635921638172e-02`
+  - train[22] t_remaining=30: `x_unmit=-7.6086956521739135e-02`, `x_rem=-2.1212859192657951e-01`, `y_exact=3.2410224146581227e-09`
+  - train[23] t_remaining=30: `x_unmit=1.5075376884422110e-02`, `x_rem=2.7472858496642938e-02`, `y_exact=-1.3347947336704227e-08`
+- target x values: `x_u_target=2.5641025641025640e-02`, `x_r_target=7.0305925624849802e-02`
+- target contribution to E_cdr_unmit: `1.7697962120252707e-04`
+- target contribution to E_cdr_rem: `1.6534638390064611e-04`
+
+### term 101
+- pauli term from int row: `(3.2265354441004174e-02)*Y(q(0, 1))*Z(q(0, 2))*Y(q(0, 3))*X(q(1, 0))*Z(q(1, 1))*X(q(1, 2))`
+- int observable row: `[0, 2, 3, 2, 1, 3, 1, 0]`
+- Hamiltonian weight w_101: `3.2265354441004174e-02`
+- OGM effective shots used for this term: `184`
+- fitted unmit coeffs: `a_u=-3.3342863140774094e-02`, `b_u=2.8128287341988305e-03`
+- fitted rem coeffs: `a_r=-3.3070252520822877e-03`, `b_r=1.8897384532710235e-03`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=0.0000000000000000e+00`, `x_rem=-3.5084668101318980e-02`, `y_exact=-2.6947881803094435e-02`
+  - train[1] t_remaining=29: `x_unmit=1.6494845360824742e-01`, `x_rem=5.1984928820388365e-01`, `y_exact=-4.7485687615803946e-08`
+  - train[2] t_remaining=30: `x_unmit=7.2463768115942032e-02`, `x_rem=2.7483824799231499e-01`, `y_exact=3.5029268321147276e-08`
+  - train[3] t_remaining=31: `x_unmit=9.2592592592592587e-02`, `x_rem=2.9067646223912497e-01`, `y_exact=-5.8725516397520335e-02`
+  - train[4] t_remaining=30: `x_unmit=-8.1967213114754092e-02`, `x_rem=-3.1668369279431163e-01`, `y_exact=-2.9382438415290604e-09`
+  - train[5] t_remaining=31: `x_unmit=3.8095238095238099e-02`, `x_rem=1.5024827398427892e-01`, `y_exact=-3.7231625223304833e-08`
+  - train[6] t_remaining=31: `x_unmit=1.6042780748663103e-02`, `x_rem=5.0964351552852796e-02`, `y_exact=-5.7578268473515393e-09`
+  - train[7] t_remaining=31: `x_unmit=1.7277486910994763e-01`, `x_rem=5.2675521788637203e-01`, `y_exact=-2.7607427266194613e-08`
+  - train[8] t_remaining=30: `x_unmit=0.0000000000000000e+00`, `x_rem=-2.9727049593347477e-02`, `y_exact=-1.2508577959653684e-08`
+  - train[9] t_remaining=32: `x_unmit=2.3255813953488372e-02`, `x_rem=7.7624726188157647e-02`, `y_exact=3.3351110751322514e-02`
+  - train[10] t_remaining=30: `x_unmit=7.3684210526315783e-02`, `x_rem=2.1422315475276160e-01`, `y_exact=8.4191576302214549e-02`
+  - train[11] t_remaining=29: `x_unmit=3.1250000000000000e-02`, `x_rem=7.7093235683358532e-02`, `y_exact=1.7491074758396218e-08`
+  - train[12] t_remaining=30: `x_unmit=-3.7433155080213901e-02`, `x_rem=-1.1280676755301466e-01`, `y_exact=2.1495163777799059e-08`
+  - train[13] t_remaining=29: `x_unmit=-5.0251256281407036e-03`, `x_rem=5.9688116174525917e-03`, `y_exact=6.9966952329142268e-02`
+  - train[14] t_remaining=32: `x_unmit=-3.4482758620689655e-02`, `x_rem=-7.2816717562173866e-02`, `y_exact=-5.2632782107496501e-04`
+  - train[15] t_remaining=32: `x_unmit=9.1836734693877556e-02`, `x_rem=2.5370643374393059e-01`, `y_exact=-8.9135664969277481e-02`
+  - train[16] t_remaining=31: `x_unmit=5.8201058201058198e-02`, `x_rem=1.9894185756647931e-01`, `y_exact=3.0718625407574331e-02`
+  - train[17] t_remaining=32: `x_unmit=6.3583815028901730e-02`, `x_rem=2.1777619324740416e-01`, `y_exact=7.3582391855174498e-02`
+  - train[18] t_remaining=30: `x_unmit=-4.7058823529411764e-02`, `x_rem=-1.6547275055077870e-01`, `y_exact=-2.7925468740029482e-08`
+  - train[19] t_remaining=32: `x_unmit=6.8627450980392163e-02`, `x_rem=1.4300922260322321e-01`, `y_exact=-4.2381669480786657e-02`
+  - train[20] t_remaining=31: `x_unmit=1.1224489795918367e-01`, `x_rem=4.3823030558107801e-01`, `y_exact=1.3428754826776176e-08`
+  - train[21] t_remaining=31: `x_unmit=-4.1420118343195270e-02`, `x_rem=-7.0120714266214038e-02`, `y_exact=-3.8928616514245312e-02`
+  - train[22] t_remaining=30: `x_unmit=5.2083333333333336e-02`, `x_rem=1.5812577947945158e-01`, `y_exact=2.0491105483042710e-09`
+  - train[23] t_remaining=30: `x_unmit=8.5714285714285715e-02`, `x_rem=2.8564131533740711e-01`, `y_exact=9.4938509109964027e-10`
+- target x values: `x_u_target=-1.0638297872340426e-01`, `x_r_target=-3.4755076164728910e-01`
+- target contribution to E_cdr_unmit: `2.0520577750725256e-04`
+- target contribution to E_cdr_rem: `9.8057561193794926e-05`
+
+### term 102
+- pauli term from int row: `(3.2265354441004174e-02)*X(q(0, 1))*Z(q(0, 2))*X(q(0, 3))*Y(q(1, 0))*Z(q(1, 1))*Y(q(1, 2))`
+- int observable row: `[0, 1, 3, 1, 2, 3, 2, 0]`
+- Hamiltonian weight w_102: `3.2265354441004174e-02`
+- OGM effective shots used for this term: `195`
+- fitted unmit coeffs: `a_u=2.6650524518758639e-01`, `b_u=5.3251253909598938e-03`
+- fitted rem coeffs: `a_r=8.1771096890298822e-02`, `b_r=4.8501121370600605e-03`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=2.1052631578947368e-02`, `x_rem=8.3813604587197915e-02`, `y_exact=-2.6947871579917935e-02`
+  - train[1] t_remaining=29: `x_unmit=1.0000000000000000e-02`, `x_rem=4.4588913855952372e-02`, `y_exact=-7.9689495259747105e-10`
+  - train[2] t_remaining=30: `x_unmit=-5.7142857142857141e-02`, `x_rem=-2.1047758258675767e-01`, `y_exact=2.9854545974921253e-08`
+  - train[3] t_remaining=31: `x_unmit=-7.4468085106382975e-02`, `x_rem=-1.8268841079327486e-01`, `y_exact=-5.8725542141339168e-02`
+  - train[4] t_remaining=30: `x_unmit=5.4945054945054944e-02`, `x_rem=1.4563260934284206e-01`, `y_exact=-2.9382410798892110e-09`
+  - train[5] t_remaining=31: `x_unmit=6.7307692307692304e-02`, `x_rem=2.5251526157013771e-01`, `y_exact=2.0236917517575401e-08`
+  - train[6] t_remaining=31: `x_unmit=-2.6455026455026454e-02`, `x_rem=-8.3113690216669950e-02`, `y_exact=-1.5867553139912512e-08`
+  - train[7] t_remaining=31: `x_unmit=2.2988505747126436e-02`, `x_rem=1.1435823171703102e-01`, `y_exact=-5.0818085923813324e-08`
+  - train[8] t_remaining=30: `x_unmit=5.5248618784530384e-03`, `x_rem=-2.1756376568557892e-03`, `y_exact=-1.3578094175088107e-08`
+  - train[9] t_remaining=32: `x_unmit=-1.5025906735751296e-01`, `x_rem=-4.5005238349565263e-01`, `y_exact=3.3351165386680891e-02`
+  - train[10] t_remaining=30: `x_unmit=8.8888888888888892e-02`, `x_rem=2.8864024237157343e-01`, `y_exact=8.4191576302207902e-02`
+  - train[11] t_remaining=29: `x_unmit=-1.5544041450777202e-02`, `x_rem=-3.8499219102484820e-02`, `y_exact=1.7491073226455772e-08`
+  - train[12] t_remaining=30: `x_unmit=-3.4883720930232558e-02`, `x_rem=-1.4132849809798007e-01`, `y_exact=1.3748915147412968e-08`
+  - train[13] t_remaining=29: `x_unmit=4.8648648648648651e-02`, `x_rem=1.8543459279454913e-01`, `y_exact=6.9966952329144821e-02`
+  - train[14] t_remaining=32: `x_unmit=5.7142857142857143e-03`, `x_rem=5.5758789400060363e-02`, `y_exact=-5.2631147524273905e-04`
+  - train[15] t_remaining=32: `x_unmit=-1.0344827586206896e-01`, `x_rem=-3.7775001898671445e-01`, `y_exact=-8.9135737460581801e-02`
+  - train[16] t_remaining=31: `x_unmit=-6.8062827225130892e-02`, `x_rem=-2.2221730328125486e-01`, `y_exact=3.0718634187885327e-02`
+  - train[17] t_remaining=32: `x_unmit=1.7142857142857144e-02`, `x_rem=1.0094677803576327e-02`, `y_exact=7.3582351756295919e-02`
+  - train[18] t_remaining=30: `x_unmit=-8.7719298245614030e-02`, `x_rem=-2.3360785151612198e-01`, `y_exact=-5.9789175696818796e-09`
+  - train[19] t_remaining=32: `x_unmit=-2.6178010471204188e-02`, `x_rem=-5.9136810462541552e-02`, `y_exact=-4.2381665737735136e-02`
+  - train[20] t_remaining=31: `x_unmit=-2.9239766081871343e-02`, `x_rem=-1.3315423068530571e-01`, `y_exact=4.3093134084544169e-08`
+  - train[21] t_remaining=31: `x_unmit=-4.3478260869565216e-02`, `x_rem=-1.3543685652701778e-01`, `y_exact=-3.8928610213004755e-02`
+  - train[22] t_remaining=30: `x_unmit=-3.9603960396039604e-02`, `x_rem=-9.3078599308580354e-02`, `y_exact=-1.1751534038712789e-08`
+  - train[23] t_remaining=30: `x_unmit=6.6666666666666666e-02`, `x_rem=1.8840282244304946e-01`, `y_exact=-5.1462715014601325e-09`
+- target x values: `x_u_target=-5.1643192488262914e-02`, `x_r_target=-1.6246145471769588e-01`
+- target contribution to E_cdr_unmit: `-2.7225687684139123e-04`
+- target contribution to E_cdr_rem: `-2.7214339740239932e-04`
+
+### term 103
+- pauli term from int row: `(3.2265354441004174e-02)*X(q(0, 1))*Z(q(0, 2))*X(q(0, 3))*X(q(1, 0))*Z(q(1, 1))*X(q(1, 2))`
+- int observable row: `[0, 1, 3, 1, 1, 3, 1, 0]`
+- Hamiltonian weight w_103: `3.2265354441004174e-02`
+- OGM effective shots used for this term: `181`
+- fitted unmit coeffs: `a_u=-2.2882454807108810e-01`, `b_u=2.8090967004869372e-03`
+- fitted rem coeffs: `a_r=-5.8156068599581910e-02`, `b_r=2.5869339703912643e-03`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=1.2048192771084338e-02`, `x_rem=5.0470154262740249e-02`, `y_exact=-2.6947871449629929e-02`
+  - train[1] t_remaining=29: `x_unmit=3.7837837837837840e-02`, `x_rem=1.6021841057616848e-01`, `y_exact=-3.3336456557701496e-08`
+  - train[2] t_remaining=30: `x_unmit=-2.8571428571428571e-02`, `x_rem=-1.1903896279222322e-01`, `y_exact=3.2482363793627029e-08`
+  - train[3] t_remaining=31: `x_unmit=1.1219512195121951e-01`, `x_rem=3.8221546604688095e-01`, `y_exact=-5.8725523872783993e-02`
+  - train[4] t_remaining=30: `x_unmit=2.9999999999999999e-02`, `x_rem=1.0896915164982016e-01`, `y_exact=-2.9382436926740881e-09`
+  - train[5] t_remaining=31: `x_unmit=-5.2910052910052907e-03`, `x_rem=2.1280047191383527e-02`, `y_exact=-2.9571902467695009e-08`
+  - train[6] t_remaining=31: `x_unmit=-7.6923076923076927e-02`, `x_rem=-2.7653004471439929e-01`, `y_exact=-1.1932874108794160e-08`
+  - train[7] t_remaining=31: `x_unmit=-5.0761421319796950e-03`, `x_rem=-1.7503807799213997e-02`, `y_exact=-2.9947568273063165e-08`
+  - train[8] t_remaining=30: `x_unmit=-1.1111111111111110e-01`, `x_rem=-3.9008860465019896e-01`, `y_exact=-6.3695970355060444e-09`
+  - train[9] t_remaining=32: `x_unmit=-1.4736842105263157e-01`, `x_rem=-4.5323401789982004e-01`, `y_exact=3.3351109042061705e-02`
+  - train[10] t_remaining=30: `x_unmit=-9.2592592592592587e-03`, `x_rem=-4.5321641731440938e-02`, `y_exact=8.4191576302207444e-02`
+  - train[11] t_remaining=29: `x_unmit=-6.7357512953367879e-02`, `x_rem=-2.0732571899820168e-01`, `y_exact=1.7491065593360713e-08`
+  - train[12] t_remaining=30: `x_unmit=8.3333333333333329e-02`, `x_rem=2.9376184620116552e-01`, `y_exact=2.1553686878161469e-08`
+  - train[13] t_remaining=29: `x_unmit=-2.8571428571428571e-02`, `x_rem=-4.9204179290439860e-02`, `y_exact=6.9966952329154578e-02`
+  - train[14] t_remaining=32: `x_unmit=2.6455026455026454e-02`, `x_rem=1.0218241728600298e-01`, `y_exact=-5.2632547576724007e-04`
+  - train[15] t_remaining=32: `x_unmit=1.0270270270270271e-01`, `x_rem=2.9998057990590915e-01`, `y_exact=-8.9135671966425856e-02`
+  - train[16] t_remaining=31: `x_unmit=-5.2356020942408380e-03`, `x_rem=-3.6104687499179056e-02`, `y_exact=3.0718629897816135e-02`
+  - train[17] t_remaining=32: `x_unmit=2.3255813953488372e-02`, `x_rem=1.0037132870532994e-01`, `y_exact=7.3582323330508986e-02`
+  - train[18] t_remaining=30: `x_unmit=1.2820512820512819e-01`, `x_rem=4.3055986113165762e-01`, `y_exact=-4.0022951301986864e-09`
+  - train[19] t_remaining=32: `x_unmit=-5.5248618784530384e-03`, `x_rem=-1.0475938103385633e-01`, `y_exact=-4.2381688522319834e-02`
+  - train[20] t_remaining=31: `x_unmit=3.0303030303030304e-02`, `x_rem=5.1976072271842415e-02`, `y_exact=2.8343228427121854e-08`
+  - train[21] t_remaining=31: `x_unmit=5.3475935828877002e-03`, `x_rem=1.8114153126393498e-03`, `y_exact=-3.8928611189627774e-02`
+  - train[22] t_remaining=30: `x_unmit=5.0761421319796950e-03`, `x_rem=7.9550902271095916e-02`, `y_exact=-1.0944971117182654e-08`
+  - train[23] t_remaining=30: `x_unmit=3.4482758620689655e-02`, `x_rem=7.8682624729214667e-02`, `y_exact=-1.6524069492929892e-08`
+- target x values: `x_u_target=-5.3140096618357488e-02`, `x_r_target=-1.7205859405175261e-01`
+- target contribution to E_cdr_unmit: `4.8297542162528472e-04`
+- target contribution to E_cdr_rem: `4.0632358947891272e-04`
+
+### term 104
+- pauli term from int row: `(2.5997720777610030e-02)*Y(q(0, 1))*Y(q(0, 2))*Y(q(1, 0))*Z(q(1, 1))*Z(q(1, 2))*Y(q(1, 3))`
+- int observable row: `[0, 2, 2, 0, 2, 3, 3, 2]`
+- Hamiltonian weight w_104: `2.5997720777610030e-02`
+- OGM effective shots used for this term: `138`
+- fitted unmit coeffs: `a_u=2.0518465874319009e-02`, `b_u=-5.5114059654858992e-03`
+- fitted rem coeffs: `a_r=5.9879996551733539e-03`, `b_r=-5.4566632629017182e-03`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-7.6923076923076927e-02`, `x_rem=-2.6616965090892453e-01`, `y_exact=-1.2048006974892332e-01`
+  - train[1] t_remaining=29: `x_unmit=-1.8404907975460124e-02`, `x_rem=-1.1382916757915260e-01`, `y_exact=1.9167400501849929e-08`
+  - train[2] t_remaining=30: `x_unmit=9.4594594594594600e-02`, `x_rem=2.6923333337672267e-01`, `y_exact=-3.0115284103428539e-08`
+  - train[3] t_remaining=31: `x_unmit=-5.9602649006622516e-02`, `x_rem=-2.2598096442445728e-01`, `y_exact=1.5174364387422229e-02`
+  - train[4] t_remaining=30: `x_unmit=2.3255813953488372e-02`, `x_rem=7.0946276650351733e-02`, `y_exact=-2.0876755380286520e-08`
+  - train[5] t_remaining=31: `x_unmit=-5.6000000000000001e-02`, `x_rem=-1.8910281357094691e-01`, `y_exact=9.0301799768836519e-09`
+  - train[6] t_remaining=31: `x_unmit=-2.1276595744680851e-02`, `x_rem=-4.9424367670864368e-02`, `y_exact=1.3330209044756374e-08`
+  - train[7] t_remaining=31: `x_unmit=-1.2162162162162163e-01`, `x_rem=-4.0912350650308066e-01`, `y_exact=2.6764237976776630e-08`
+  - train[8] t_remaining=30: `x_unmit=-2.8169014084507043e-02`, `x_rem=-4.9646043507086977e-02`, `y_exact=1.5632004682539627e-09`
+  - train[9] t_remaining=32: `x_unmit=-2.1897810218978103e-02`, `x_rem=-1.6709089152833201e-01`, `y_exact=4.6861460312033296e-02`
+  - train[10] t_remaining=30: `x_unmit=7.6923076923076927e-02`, `x_rem=2.0552531477230582e-01`, `y_exact=-1.4198205001204458e-08`
+  - train[11] t_remaining=29: `x_unmit=1.2230215827338130e-01`, `x_rem=3.9870584546975124e-01`, `y_exact=1.6698643724591042e-09`
+  - train[12] t_remaining=30: `x_unmit=1.6129032258064516e-02`, `x_rem=5.7406858341386445e-02`, `y_exact=7.5482063250818832e-10`
+  - train[13] t_remaining=29: `x_unmit=2.1582733812949641e-02`, `x_rem=4.1315388261630052e-02`, `y_exact=4.8927380527843243e-09`
+  - train[14] t_remaining=32: `x_unmit=-1.7647058823529413e-01`, `x_rem=-5.7909603141540988e-01`, `y_exact=-2.2960505290698877e-03`
+  - train[15] t_remaining=32: `x_unmit=-3.9473684210526314e-02`, `x_rem=-1.2101475379066988e-01`, `y_exact=-9.2496003048631287e-02`
+  - train[16] t_remaining=31: `x_unmit=4.3478260869565216e-02`, `x_rem=1.1019841506620930e-01`, `y_exact=-6.2675579308982994e-03`
+  - train[17] t_remaining=32: `x_unmit=-9.9337748344370855e-02`, `x_rem=-3.0072230166343206e-01`, `y_exact=8.7227343571976729e-02`
+  - train[18] t_remaining=30: `x_unmit=7.4074074074074077e-03`, `x_rem=9.5676371933372598e-03`, `y_exact=5.0826281276751824e-08`
+  - train[19] t_remaining=32: `x_unmit=-9.7744360902255634e-02`, `x_rem=-3.4447452911719068e-01`, `y_exact=-4.9024790003567201e-02`
+  - train[20] t_remaining=31: `x_unmit=-1.3385826771653545e-01`, `x_rem=-4.1943297465639690e-01`, `y_exact=2.0565848424572394e-08`
+  - train[21] t_remaining=31: `x_unmit=1.2698412698412698e-01`, `x_rem=3.5576756663592590e-01`, `y_exact=-1.7584276930128838e-02`
+  - train[22] t_remaining=30: `x_unmit=0.0000000000000000e+00`, `x_rem=6.5451647131079205e-02`, `y_exact=1.2618656655763757e-08`
+  - train[23] t_remaining=30: `x_unmit=9.5890410958904104e-02`, `x_rem=3.2741821033610063e-01`, `y_exact=1.9912785650589167e-08`
+- target x values: `x_u_target=5.4263565891472867e-02`, `x_r_target=1.4838685165564977e-01`
+- target contribution to E_cdr_unmit: `-1.1433799783160733e-04`
+- target contribution to E_cdr_rem: `-1.1876078223736957e-04`
+
+### term 105
+- pauli term from int row: `(2.5997720777610030e-02)*Y(q(0, 1))*Y(q(0, 2))*X(q(1, 0))*Z(q(1, 1))*Z(q(1, 2))*X(q(1, 3))`
+- int observable row: `[0, 2, 2, 0, 1, 3, 3, 1]`
+- Hamiltonian weight w_105: `2.5997720777610030e-02`
+- OGM effective shots used for this term: `125`
+- fitted unmit coeffs: `a_u=7.4542473289848296e-02`, `b_u=-6.7130698848260253e-03`
+- fitted rem coeffs: `a_r=2.3965657143596122e-02`, `b_r=-6.6760354154771244e-03`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-3.3112582781456956e-02`, `x_rem=-1.5375499406436641e-01`, `y_exact=-1.2048003313816753e-01`
+  - train[1] t_remaining=29: `x_unmit=-3.5460992907801421e-02`, `x_rem=-8.8815235918245680e-02`, `y_exact=5.0941711682998364e-08`
+  - train[2] t_remaining=30: `x_unmit=-1.1940298507462686e-01`, `x_rem=-3.8697161225546411e-01`, `y_exact=-4.4964762993997885e-09`
+  - train[3] t_remaining=31: `x_unmit=6.4516129032258064e-03`, `x_rem=-1.7657226001798764e-02`, `y_exact=1.5174370583366245e-02`
+  - train[4] t_remaining=30: `x_unmit=1.4503816793893129e-01`, `x_rem=3.9555350013861251e-01`, `y_exact=-1.7252069175822679e-08`
+  - train[5] t_remaining=31: `x_unmit=1.6129032258064516e-02`, `x_rem=9.3296553783529204e-02`, `y_exact=-2.4072700494091183e-08`
+  - train[6] t_remaining=31: `x_unmit=4.8951048951048952e-02`, `x_rem=1.7250863843018832e-01`, `y_exact=-3.2533623827016388e-08`
+  - train[7] t_remaining=31: `x_unmit=-2.2900763358778626e-02`, `x_rem=-6.4423957631233236e-02`, `y_exact=3.0558813729226651e-08`
+  - train[8] t_remaining=30: `x_unmit=6.3694267515923570e-03`, `x_rem=2.7775990222949281e-02`, `y_exact=1.7147914498638702e-08`
+  - train[9] t_remaining=32: `x_unmit=6.3694267515923570e-03`, `x_rem=2.9948046332982009e-02`, `y_exact=4.6861386286643797e-02`
+  - train[10] t_remaining=30: `x_unmit=1.2162162162162163e-01`, `x_rem=4.3526610047293335e-01`, `y_exact=-2.7386294755202696e-09`
+  - train[11] t_remaining=29: `x_unmit=-6.4748201438848921e-02`, `x_rem=-2.4437501048939175e-01`, `y_exact=-5.8473472309806275e-10`
+  - train[12] t_remaining=30: `x_unmit=1.1940298507462686e-01`, `x_rem=3.8842159505639812e-01`, `y_exact=-1.7208152429874872e-08`
+  - train[13] t_remaining=29: `x_unmit=1.8309859154929578e-01`, `x_rem=5.8112063759282961e-01`, `y_exact=1.0257863609272749e-08`
+  - train[14] t_remaining=32: `x_unmit=4.5454545454545456e-02`, `x_rem=1.1206892063460211e-01`, `y_exact=-2.2960937344267546e-03`
+  - train[15] t_remaining=32: `x_unmit=-7.1999999999999995e-02`, `x_rem=-2.3490907591699728e-01`, `y_exact=-9.2496009896972861e-02`
+  - train[16] t_remaining=31: `x_unmit=-2.5316455696202531e-02`, `x_rem=-1.2564548528835096e-01`, `y_exact=-6.2675478818549485e-03`
+  - train[17] t_remaining=32: `x_unmit=-6.5789473684210523e-02`, `x_rem=-2.3940657989048181e-01`, `y_exact=8.7227386153468686e-02`
+  - train[18] t_remaining=30: `x_unmit=8.0000000000000002e-02`, `x_rem=2.6458708086401411e-01`, `y_exact=3.4731867786537335e-08`
+  - train[19] t_remaining=32: `x_unmit=-5.0359712230215826e-02`, `x_rem=-1.3115130373632589e-01`, `y_exact=-4.9024741861864438e-02`
+  - train[20] t_remaining=31: `x_unmit=1.4925373134328358e-02`, `x_rem=1.1344103345972380e-02`, `y_exact=-3.0134695746650143e-08`
+  - train[21] t_remaining=31: `x_unmit=0.0000000000000000e+00`, `x_rem=2.3808295688513413e-02`, `y_exact=-1.7584309818014312e-02`
+  - train[22] t_remaining=30: `x_unmit=3.4013605442176874e-02`, `x_rem=1.3685171338081675e-01`, `y_exact=1.7006825798708234e-08`
+  - train[23] t_remaining=30: `x_unmit=-4.0540540540540543e-02`, `x_rem=-9.5030272441310196e-02`, `y_exact=-1.7389368757357168e-08`
+- target x values: `x_u_target=6.6666666666666666e-02`, `x_r_target=2.3892812096924432e-01`
+- target contribution to E_cdr_unmit: `-4.5328889315494418e-05`
+- target contribution to E_cdr_rem: `-2.4696950461732616e-05`
+
+### term 106
+- pauli term from int row: `(2.5997720777610030e-02)*X(q(0, 1))*X(q(0, 2))*Y(q(1, 0))*Z(q(1, 1))*Z(q(1, 2))*Y(q(1, 3))`
+- int observable row: `[0, 1, 1, 0, 2, 3, 3, 2]`
+- Hamiltonian weight w_106: `2.5997720777610030e-02`
+- OGM effective shots used for this term: `140`
+- fitted unmit coeffs: `a_u=-1.6087151629827698e-02`, `b_u=-5.8768959257007062e-03`
+- fitted rem coeffs: `a_r=-2.8968600221668814e-03`, `b_r=-5.8293620237710861e-03`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=3.7974683544303799e-02`, `x_rem=1.1464347972717361e-01`, `y_exact=-1.2048007439821634e-01`
+  - train[1] t_remaining=29: `x_unmit=-1.6883116883116883e-01`, `x_rem=-5.1543913842274280e-01`, `y_exact=2.0527676709317903e-08`
+  - train[2] t_remaining=30: `x_unmit=-9.3333333333333338e-02`, `x_rem=-3.2893766957054726e-01`, `y_exact=1.6411133232230646e-08`
+  - train[3] t_remaining=31: `x_unmit=-7.5949367088607597e-02`, `x_rem=-2.6539868455320687e-01`, `y_exact=1.5174344150434699e-02`
+  - train[4] t_remaining=30: `x_unmit=-4.5751633986928102e-02`, `x_rem=-1.6208507724651292e-01`, `y_exact=-1.8066419117777227e-08`
+  - train[5] t_remaining=31: `x_unmit=-4.4585987261146494e-02`, `x_rem=-1.6392995125941451e-01`, `y_exact=2.1151970644047457e-08`
+  - train[6] t_remaining=31: `x_unmit=-3.7037037037037035e-02`, `x_rem=-9.9970994750334316e-02`, `y_exact=1.7176818888437189e-08`
+  - train[7] t_remaining=31: `x_unmit=6.8027210884353739e-03`, `x_rem=1.8350973718481940e-02`, `y_exact=1.5918019735647652e-08`
+  - train[8] t_remaining=30: `x_unmit=-9.3750000000000000e-02`, `x_rem=-2.6510294451138883e-01`, `y_exact=2.8824301556363520e-11`
+  - train[9] t_remaining=32: `x_unmit=2.4390243902439025e-02`, `x_rem=1.1517390329848726e-01`, `y_exact=4.6861459349333036e-02`
+  - train[10] t_remaining=30: `x_unmit=6.5789473684210523e-02`, `x_rem=2.1822163185513102e-01`, `y_exact=4.4191824322669963e-09`
+  - train[11] t_remaining=29: `x_unmit=-6.1538461538461542e-02`, `x_rem=-2.1377134423728952e-01`, `y_exact=7.2300953394416254e-10`
+  - train[12] t_remaining=30: `x_unmit=1.0791366906474820e-01`, `x_rem=3.9102822174778107e-01`, `y_exact=2.1802329362435083e-08`
+  - train[13] t_remaining=29: `x_unmit=3.5971223021582732e-02`, `x_rem=1.6821548043011014e-01`, `y_exact=5.4974310735345048e-09`
+  - train[14] t_remaining=32: `x_unmit=6.2500000000000000e-02`, `x_rem=1.9867954046276526e-01`, `y_exact=-2.2960670413087391e-03`
+  - train[15] t_remaining=32: `x_unmit=8.4507042253521125e-02`, `x_rem=2.5797988089934476e-01`, `y_exact=-9.2496012322109356e-02`
+  - train[16] t_remaining=31: `x_unmit=-1.5151515151515152e-01`, `x_rem=-4.8646395616734966e-01`, `y_exact=-6.2675485589317303e-03`
+  - train[17] t_remaining=32: `x_unmit=1.2582781456953643e-01`, `x_rem=4.0179751894999866e-01`, `y_exact=8.7227338019713857e-02`
+  - train[18] t_remaining=30: `x_unmit=-7.6923076923076927e-02`, `x_rem=-1.9053202972969552e-01`, `y_exact=4.8538362580708885e-08`
+  - train[19] t_remaining=32: `x_unmit=2.8169014084507043e-02`, `x_rem=8.4460185240443131e-02`, `y_exact=-4.9024794450881592e-02`
+  - train[20] t_remaining=31: `x_unmit=-7.0967741935483872e-02`, `x_rem=-2.4788782544512578e-01`, `y_exact=-1.4503120471122823e-08`
+  - train[21] t_remaining=31: `x_unmit=-5.9880239520958087e-03`, `x_rem=5.5885868726126371e-03`, `y_exact=-1.7584285123265542e-02`
+  - train[22] t_remaining=30: `x_unmit=7.1428571428571425e-02`, `x_rem=1.7671635046225953e-01`, `y_exact=1.3870500454164797e-08`
+  - train[23] t_remaining=30: `x_unmit=1.4062500000000000e-01`, `x_rem=4.3682333267052686e-01`, `y_exact=3.1073262250293048e-08`
+- target x values: `x_u_target=6.3694267515923570e-03`, `x_r_target=1.0780308446631647e-03`
+- target contribution to E_cdr_unmit: `-1.5544978005543674e-04`
+- target contribution to E_cdr_rem: `-1.5163131460368140e-04`
+
+### term 107
+- pauli term from int row: `(2.5997720777610030e-02)*X(q(0, 1))*X(q(0, 2))*X(q(1, 0))*Z(q(1, 1))*Z(q(1, 2))*X(q(1, 3))`
+- int observable row: `[0, 1, 1, 0, 1, 3, 3, 1]`
+- Hamiltonian weight w_107: `2.5997720777610030e-02`
+- OGM effective shots used for this term: `140`
+- fitted unmit coeffs: `a_u=1.1448735424462296e-01`, `b_u=-4.0935717866624321e-03`
+- fitted rem coeffs: `a_r=3.3556498481988897e-02`, `b_r=-4.1320020600687599e-03`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-2.9411764705882353e-02`, `x_rem=-1.1102915462086876e-01`, `y_exact=-1.2048005130403983e-01`
+  - train[1] t_remaining=29: `x_unmit=8.9655172413793102e-02`, `x_rem=2.8964586999874115e-01`, `y_exact=4.9557525615610606e-08`
+  - train[2] t_remaining=30: `x_unmit=3.9370078740157480e-02`, `x_rem=1.6352971007295700e-01`, `y_exact=6.0382175894629580e-09`
+  - train[3] t_remaining=31: `x_unmit=2.8985507246376812e-02`, `x_rem=8.2139232861378919e-02`, `y_exact=1.5174351217299245e-02`
+  - train[4] t_remaining=30: `x_unmit=-3.1386861313868614e-01`, `x_rem=-1.0173105661057282e+00`, `y_exact=-1.3881246450036158e-08`
+  - train[5] t_remaining=31: `x_unmit=0.0000000000000000e+00`, `x_rem=-4.7865216519511937e-03`, `y_exact=-1.4986863315290657e-08`
+  - train[6] t_remaining=31: `x_unmit=-1.2500000000000000e-01`, `x_rem=-4.5027198560696741e-01`, `y_exact=6.6562274234829196e-09`
+  - train[7] t_remaining=31: `x_unmit=-8.1481481481481488e-02`, `x_rem=-2.9307208604032170e-01`, `y_exact=1.9936455085941985e-08`
+  - train[8] t_remaining=30: `x_unmit=-4.8275862068965517e-02`, `x_rem=-1.5678737225528563e-01`, `y_exact=1.5876470638181470e-08`
+  - train[9] t_remaining=32: `x_unmit=6.7114093959731542e-03`, `x_rem=8.7828463222585397e-03`, `y_exact=4.6861381551941833e-02`
+  - train[10] t_remaining=30: `x_unmit=-8.8235294117647065e-02`, `x_rem=-2.5621619789765065e-01`, `y_exact=-4.1575106960734318e-09`
+  - train[11] t_remaining=29: `x_unmit=1.2418300653594772e-01`, `x_rem=3.9932236015956091e-01`, `y_exact=-1.2294997244855305e-09`
+  - train[12] t_remaining=30: `x_unmit=5.4794520547945202e-02`, `x_rem=1.3238078574535109e-01`, `y_exact=-1.7598729794137947e-08`
+  - train[13] t_remaining=29: `x_unmit=-2.7932960893854747e-02`, `x_rem=-8.3528976886657585e-02`, `y_exact=1.0979450213413210e-08`
+  - train[14] t_remaining=32: `x_unmit=6.0402684563758392e-02`, `x_rem=2.8650150148938458e-01`, `y_exact=-2.2961037898029677e-03`
+  - train[15] t_remaining=32: `x_unmit=-4.4585987261146494e-02`, `x_rem=-1.4751716111376040e-01`, `y_exact=-9.2496001353277874e-02`
+  - train[16] t_remaining=31: `x_unmit=-1.4049586776859505e-01`, `x_rem=-4.7665077113000337e-01`, `y_exact=-6.2675241115951515e-03`
+  - train[17] t_remaining=32: `x_unmit=1.5492957746478872e-01`, `x_rem=4.5890470520108118e-01`, `y_exact=8.7227367226775016e-02`
+  - train[18] t_remaining=30: `x_unmit=6.0606060606060606e-03`, `x_rem=9.0733123310743721e-02`, `y_exact=3.6557918876007743e-08`
+  - train[19] t_remaining=32: `x_unmit=-1.4666666666666667e-01`, `x_rem=-4.9832538272364929e-01`, `y_exact=-4.9024749893823050e-02`
+  - train[20] t_remaining=31: `x_unmit=7.9136690647482008e-02`, `x_rem=2.4092401233450647e-01`, `y_exact=-2.6898114835573948e-08`
+  - train[21] t_remaining=31: `x_unmit=2.8985507246376812e-02`, `x_rem=9.7822525400540025e-02`, `y_exact=-1.7584317965794054e-02`
+  - train[22] t_remaining=30: `x_unmit=5.4263565891472867e-02`, `x_rem=1.9302821202121798e-01`, `y_exact=1.8046684205067823e-08`
+  - train[23] t_remaining=30: `x_unmit=-3.6496350364963501e-02`, `x_rem=-1.3182069584587405e-01`, `y_exact=-2.4195054006105787e-08`
+- target x values: `x_u_target=-1.7948717948717949e-01`, `x_r_target=-5.8623459225121954e-01`
+- target contribution to E_cdr_unmit: `-6.4065102033206600e-04`
+- target contribution to E_cdr_rem: `-6.1884928432159197e-04`
+
+### term 108
+- pauli term from int row: `(8.3079210791710406e-02)*Z(q(0, 1))*Z(q(1, 1))`
+- int observable row: `[0, 3, 0, 0, 0, 3, 0, 0]`
+- Hamiltonian weight w_108: `8.3079210791710406e-02`
+- OGM effective shots used for this term: `2577`
+- fitted unmit coeffs: `a_u=4.0705594437753829e+00`, `b_u=-1.0221473488844154e-02`
+- fitted rem coeffs: `a_r=2.9406698817612082e+00`, `b_r=1.4386440496215385e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=5.7515337423312884e-02`, `x_rem=5.5031357141638725e-02`, `y_exact=3.3608943756847637e-01`
+  - train[1] t_remaining=29: `x_unmit=-1.1560693641618498e-03`, `x_rem=-2.3095196853815405e-03`, `y_exact=2.0013789135128611e-03`
+  - train[2] t_remaining=30: `x_unmit=-4.4400785854616896e-02`, `x_rem=-8.8077866855058140e-02`, `y_exact=-1.5656054875894099e-01`
+  - train[3] t_remaining=31: `x_unmit=7.0444706808343166e-02`, `x_rem=7.1628505363445089e-02`, `y_exact=2.8206960100279110e-01`
+  - train[4] t_remaining=30: `x_unmit=2.5877862595419848e-01`, `x_rem=3.3585899676215136e-01`, `y_exact=1.0000001970203645e+00`
+  - train[5] t_remaining=31: `x_unmit=2.1011673151750974e-02`, `x_rem=2.6938042502244817e-02`, `y_exact=8.1426412185846633e-02`
+  - train[6] t_remaining=31: `x_unmit=-3.2233598786499812e-02`, `x_rem=-7.2842345139725817e-02`, `y_exact=-9.7612194381378165e-02`
+  - train[7] t_remaining=31: `x_unmit=1.2462006079027356e-01`, `x_rem=1.8896253707840477e-01`, `y_exact=6.3828076769422437e-01`
+  - train[8] t_remaining=30: `x_unmit=1.0278207109737249e-01`, `x_rem=1.3033706577588439e-01`, `y_exact=3.4413922094664734e-01`
+  - train[9] t_remaining=32: `x_unmit=1.6967509025270758e-01`, `x_rem=2.6728903332791804e-01`, `y_exact=8.8322283045649197e-01`
+  - train[10] t_remaining=30: `x_unmit=1.3022312373225153e-01`, `x_rem=1.6019139751391268e-01`, `y_exact=3.8202293354031808e-01`
+  - train[11] t_remaining=29: `x_unmit=2.5561580170410536e-01`, `x_rem=3.3058648225745735e-01`, `y_exact=1.0000001705798489e+00`
+  - train[12] t_remaining=30: `x_unmit=6.7337461300309598e-02`, `x_rem=6.8282178487706444e-02`, `y_exact=9.9286819538490112e-02`
+  - train[13] t_remaining=29: `x_unmit=2.3570324574961360e-01`, `x_rem=3.0456864910599479e-01`, `y_exact=7.9884836032469175e-01`
+  - train[14] t_remaining=32: `x_unmit=2.2288261515601782e-03`, `x_rem=-3.9338976663311287e-03`, `y_exact=7.4666555062169127e-02`
+  - train[15] t_remaining=32: `x_unmit=-6.1532653831634580e-02`, `x_rem=-9.1099362749951535e-02`, `y_exact=-2.3599187723157802e-01`
+  - train[16] t_remaining=31: `x_unmit=1.8764302059496568e-01`, `x_rem=2.4080597458778374e-01`, `y_exact=5.6247941371802046e-01`
+  - train[17] t_remaining=32: `x_unmit=2.7899561578318055e-03`, `x_rem=-2.3837570596947927e-03`, `y_exact=4.9644479884881618e-02`
+  - train[18] t_remaining=30: `x_unmit=1.1638591117917305e-01`, `x_rem=1.8423558765631495e-01`, `y_exact=7.3961053502851515e-01`
+  - train[19] t_remaining=32: `x_unmit=6.4291247095274978e-02`, `x_rem=1.0061338124948101e-01`, `y_exact=3.7718501026086759e-01`
+  - train[20] t_remaining=31: `x_unmit=-8.8006230529595011e-02`, `x_rem=-1.3063516948214621e-01`, `y_exact=-4.4470040183269433e-01`
+  - train[21] t_remaining=31: `x_unmit=7.7643386656262192e-02`, `x_rem=1.1959118324493988e-01`, `y_exact=2.2404840777751234e-01`
+  - train[22] t_remaining=30: `x_unmit=-7.0668693009118544e-02`, `x_rem=-1.1690202474616732e-01`, `y_exact=-5.4809567326316522e-01`
+  - train[23] t_remaining=30: `x_unmit=1.6841695838195256e-01`, `x_rem=2.3495351720738683e-01`, `y_exact=7.5112973568750674e-01`
+- target x values: `x_u_target=9.9843993759750393e-02`, `x_r_target=1.4621548717370378e-01`
+- target contribution to E_cdr_unmit: `3.2915936642951296e-02`
+- target contribution to E_cdr_rem: `3.6916905292258460e-02`
+
+### term 109
+- pauli term from int row: `(-3.8089729448454726e-03)*Y(q(0, 1))*Z(q(0, 2))*Y(q(0, 3))*Z(q(1, 1))`
+- int observable row: `[0, 2, 3, 2, 0, 3, 0, 0]`
+- Hamiltonian weight w_109: `-3.8089729448454726e-03`
+- OGM effective shots used for this term: `392`
+- fitted unmit coeffs: `a_u=2.9961611939871755e+00`, `b_u=-1.1298398279055363e-01`
+- fitted rem coeffs: `a_r=1.2977895355368940e+00`, `b_r=-1.1077422541091786e-01`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=3.1250000000000000e-02`, `x_rem=5.1880180718705614e-02`, `y_exact=4.9203148513906066e-02`
+  - train[1] t_remaining=29: `x_unmit=9.9195710455764072e-02`, `x_rem=2.1685961472571463e-01`, `y_exact=7.1766120415074935e-02`
+  - train[2] t_remaining=30: `x_unmit=-8.1364829396325458e-02`, `x_rem=-2.0607003153667630e-01`, `y_exact=-5.3283365083421619e-01`
+  - train[3] t_remaining=31: `x_unmit=-1.1165048543689321e-01`, `x_rem=-2.5021124781758602e-01`, `y_exact=-1.5122669220508217e-01`
+  - train[4] t_remaining=30: `x_unmit=1.0695187165775399e-02`, `x_rem=3.7095001054137502e-02`, `y_exact=-5.4387341202907214e-08`
+  - train[5] t_remaining=31: `x_unmit=-1.8295739348370926e-01`, `x_rem=-4.5361390870329260e-01`, `y_exact=-8.0696932578436897e-01`
+  - train[6] t_remaining=31: `x_unmit=-1.5340909090909091e-01`, `x_rem=-3.4592436002956134e-01`, `y_exact=-7.9710475109328305e-01`
+  - train[7] t_remaining=31: `x_unmit=-8.3123425692695208e-02`, `x_rem=-1.9316046250348554e-01`, `y_exact=2.9593773284630498e-01`
+  - train[8] t_remaining=30: `x_unmit=9.2957746478873240e-02`, `x_rem=2.3463854019329103e-01`, `y_exact=2.5082745206059477e-08`
+  - train[9] t_remaining=32: `x_unmit=-2.8248587570621469e-02`, `x_rem=-3.8441699986598077e-02`, `y_exact=3.5952214850213144e-03`
+  - train[10] t_remaining=30: `x_unmit=-2.0999999999999999e-01`, `x_rem=-4.8588421406523091e-01`, `y_exact=-7.8611535066478855e-01`
+  - train[11] t_remaining=29: `x_unmit=-5.0761421319796950e-03`, `x_rem=4.8384644239899133e-03`, `y_exact=2.7480833862510522e-08`
+  - train[12] t_remaining=30: `x_unmit=-1.4285714285714285e-01`, `x_rem=-3.5643867275021057e-01`, `y_exact=-8.2366118240587316e-01`
+  - train[13] t_remaining=29: `x_unmit=-2.3498694516971282e-02`, `x_rem=-3.1774216862017576e-02`, `y_exact=-3.9279988544324601e-01`
+  - train[14] t_remaining=32: `x_unmit=-1.1688311688311688e-01`, `x_rem=-2.6337049132061940e-01`, `y_exact=-6.1635085195675843e-01`
+  - train[15] t_remaining=32: `x_unmit=5.2356020942408389e-03`, `x_rem=1.0162871666349519e-02`, `y_exact=-4.4680800446805180e-01`
+  - train[16] t_remaining=31: `x_unmit=3.9164490861618793e-02`, `x_rem=1.0497334072216934e-01`, `y_exact=-6.4025938070955708e-03`
+  - train[17] t_remaining=32: `x_unmit=-7.4626865671641784e-02`, `x_rem=-1.8073759171385945e-01`, `y_exact=-5.3771536728933200e-02`
+  - train[18] t_remaining=30: `x_unmit=-3.7037037037037035e-02`, `x_rem=-7.0836853787471593e-02`, `y_exact=-1.4355689842117247e-01`
+  - train[19] t_remaining=32: `x_unmit=5.9999999999999998e-02`, `x_rem=1.2382129249599132e-01`, `y_exact=2.8788979385271679e-01`
+  - train[20] t_remaining=31: `x_unmit=1.3189448441247004e-01`, `x_rem=3.1560995188095281e-01`, `y_exact=3.7233859312756534e-01`
+  - train[21] t_remaining=31: `x_unmit=6.8571428571428575e-02`, `x_rem=1.3717777774702344e-01`, `y_exact=1.7547883408389328e-01`
+  - train[22] t_remaining=30: `x_unmit=1.2234042553191489e-01`, `x_rem=2.6373839364254587e-01`, `y_exact=-1.8207676221041902e-08`
+  - train[23] t_remaining=30: `x_unmit=5.8823529411764705e-02`, `x_rem=1.0981598957606294e-01`, `y_exact=-2.0644846383357088e-08`
+- target x values: `x_u_target=4.9608355091383810e-02`, `x_r_target=1.4144723784275431e-01`
+- target contribution to E_cdr_unmit: `-1.3579234467774880e-04`
+- target contribution to E_cdr_rem: `-2.7727235603987506e-04`
+
+### term 110
+- pauli term from int row: `(-3.8089729448454726e-03)*X(q(0, 1))*Z(q(0, 2))*X(q(0, 3))*Z(q(1, 1))`
+- int observable row: `[0, 1, 3, 1, 0, 3, 0, 0]`
+- Hamiltonian weight w_110: `-3.8089729448454726e-03`
+- OGM effective shots used for this term: `376`
+- fitted unmit coeffs: `a_u=2.6991248245651875e+00`, `b_u=-9.9616730227735151e-02`
+- fitted rem coeffs: `a_r=1.1737202935890236e+00`, `b_r=-9.1763272100471555e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-5.0561797752808987e-02`, `x_rem=-1.1774624832501723e-01`, `y_exact=4.9203148250885009e-02`
+  - train[1] t_remaining=29: `x_unmit=-1.2987012987012988e-02`, `x_rem=-2.3107556796318818e-02`, `y_exact=7.1766128770528598e-02`
+  - train[2] t_remaining=30: `x_unmit=-9.5238095238095247e-03`, `x_rem=-5.4086067267713714e-02`, `y_exact=-5.3283364914397180e-01`
+  - train[3] t_remaining=31: `x_unmit=-1.3994910941475827e-01`, `x_rem=-3.2164525667115446e-01`, `y_exact=-1.5122669189187951e-01`
+  - train[4] t_remaining=30: `x_unmit=5.2356020942408380e-03`, `x_rem=2.5072479435968419e-02`, `y_exact=-5.4387338203889775e-08`
+  - train[5] t_remaining=31: `x_unmit=-2.1410579345088160e-01`, `x_rem=-5.0339589318013322e-01`, `y_exact=-8.0696932181778347e-01`
+  - train[6] t_remaining=31: `x_unmit=-2.5000000000000000e-01`, `x_rem=-5.8480695317677400e-01`, `y_exact=-7.9710477588894013e-01`
+  - train[7] t_remaining=31: `x_unmit=5.6603773584905662e-02`, `x_rem=1.1152039327590790e-01`, `y_exact=2.9593776085219531e-01`
+  - train[8] t_remaining=30: `x_unmit=1.9390581717451522e-02`, `x_rem=2.1740861198957087e-02`, `y_exact=4.0637108139348484e-08`
+  - train[9] t_remaining=32: `x_unmit=8.0939947780678853e-02`, `x_rem=1.7875790108707007e-01`, `y_exact=3.5952522271038463e-03`
+  - train[10] t_remaining=30: `x_unmit=-2.4747474747474749e-01`, `x_rem=-5.9072586842201902e-01`, `y_exact=-7.8611535066480509e-01`
+  - train[11] t_remaining=29: `x_unmit=1.2953367875647667e-01`, `x_rem=2.8438310271316514e-01`, `y_exact=2.7480832186997775e-08`
+  - train[12] t_remaining=30: `x_unmit=-1.9411764705882353e-01`, `x_rem=-4.7825084056091316e-01`, `y_exact=-8.2366118579126524e-01`
+  - train[13] t_remaining=29: `x_unmit=-8.3333333333333329e-02`, `x_rem=-1.8060907178352567e-01`, `y_exact=-3.9279988544326239e-01`
+  - train[14] t_remaining=32: `x_unmit=-1.4285714285714285e-01`, `x_rem=-3.2959072307029669e-01`, `y_exact=-6.1635085081996666e-01`
+  - train[15] t_remaining=32: `x_unmit=3.6211699164345405e-02`, `x_rem=6.4969961530181655e-02`, `y_exact=-4.4680801577304680e-01`
+  - train[16] t_remaining=31: `x_unmit=3.6649214659685861e-02`, `x_rem=7.3069401303035672e-02`, `y_exact=-6.4025484380115603e-03`
+  - train[17] t_remaining=32: `x_unmit=-6.6282420749279536e-02`, `x_rem=-1.5350417990570225e-01`, `y_exact=-5.3771503916976007e-02`
+  - train[18] t_remaining=30: `x_unmit=1.6393442622950821e-02`, `x_rem=4.2352958439535890e-02`, `y_exact=-1.4355687112120266e-01`
+  - train[19] t_remaining=32: `x_unmit=1.1290322580645161e-01`, `x_rem=2.7756854446776996e-01`, `y_exact=2.8788977565016238e-01`
+  - train[20] t_remaining=31: `x_unmit=1.0569105691056911e-01`, `x_rem=2.2473232108919422e-01`, `y_exact=3.7233857451109947e-01`
+  - train[21] t_remaining=31: `x_unmit=6.5989847715736044e-02`, `x_rem=1.6522670460447070e-01`, `y_exact=1.7547880860154882e-01`
+  - train[22] t_remaining=30: `x_unmit=-4.2606516290726815e-02`, `x_rem=-1.0662704031447667e-01`, `y_exact=4.1874235286450767e-09`
+  - train[23] t_remaining=30: `x_unmit=8.0402010050251257e-02`, `x_rem=1.8630848303749989e-01`, `y_exact=-1.9089719879012247e-08`
+- target x values: `x_u_target=-5.2380952380952382e-02`, `x_r_target=-1.1936110042822609e-01`
+- target contribution to E_cdr_unmit: `9.1796041956201046e-04`
+- target contribution to E_cdr_rem: `8.8314777352339327e-04`
+
+### term 111
+- pauli term from int row: `(3.6517958336113411e-02)*Y(q(0, 1))*Y(q(0, 2))*Y(q(1, 1))*Y(q(1, 2))`
+- int observable row: `[0, 2, 2, 0, 0, 2, 2, 0]`
+- Hamiltonian weight w_111: `3.6517958336113411e-02`
+- OGM effective shots used for this term: `530`
+- fitted unmit coeffs: `a_u=3.0315802378782055e+00`, `b_u=1.3759657197712202e-01`
+- fitted rem coeffs: `a_r=1.2474447869303915e+00`, `b_r=1.3396185137491062e-01`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=1.1885245901639344e-01`, `x_rem=2.7974572108878121e-01`, `y_exact=2.8522420732577580e-01`
+  - train[1] t_remaining=29: `x_unmit=0.0000000000000000e+00`, `x_rem=9.1537508262140369e-03`, `y_exact=6.0870172929804200e-01`
+  - train[2] t_remaining=30: `x_unmit=5.0781250000000000e-02`, `x_rem=1.2020639078984377e-01`, `y_exact=8.6634318706099514e-02`
+  - train[3] t_remaining=31: `x_unmit=-2.0408163265306121e-02`, `x_rem=-3.8121060896943740e-02`, `y_exact=1.0781052327748147e-01`
+  - train[4] t_remaining=30: `x_unmit=1.6194331983805668e-02`, `x_rem=3.8060254234469550e-02`, `y_exact=-6.9866289301383396e-09`
+  - train[5] t_remaining=31: `x_unmit=-3.8610038610038594e-03`, `x_rem=5.3709000022192878e-03`, `y_exact=7.4160450643507694e-02`
+  - train[6] t_remaining=31: `x_unmit=-8.5828343313373259e-02`, `x_rem=-2.0856848133639574e-01`, `y_exact=2.2111228761182297e-01`
+  - train[7] t_remaining=31: `x_unmit=-2.3622047244094488e-02`, `x_rem=-5.4179616512252698e-02`, `y_exact=1.0436340342292558e-01`
+  - train[8] t_remaining=30: `x_unmit=1.0000000000000001e-01`, `x_rem=2.3779159671912520e-01`, `y_exact=5.9210386467219500e-01`
+  - train[9] t_remaining=32: `x_unmit=-6.1728395061728392e-02`, `x_rem=-1.2501545229830682e-01`, `y_exact=-3.6919417943511346e-01`
+  - train[10] t_remaining=30: `x_unmit=-3.8610038610038611e-03`, `x_rem=-1.2296049671857292e-02`, `y_exact=3.1570787336144244e-08`
+  - train[11] t_remaining=29: `x_unmit=-1.4173228346456693e-01`, `x_rem=-3.5318442396419203e-01`, `y_exact=7.7089762437573853e-08`
+  - train[12] t_remaining=30: `x_unmit=-7.3529411764705899e-03`, `x_rem=-1.8451040586638229e-02`, `y_exact=3.4658394514573206e-02`
+  - train[13] t_remaining=29: `x_unmit=-7.8740157480314960e-03`, `x_rem=-1.3094967848893531e-02`, `y_exact=-2.8848108587146889e-10`
+  - train[14] t_remaining=32: `x_unmit=2.8688524590163935e-02`, `x_rem=6.7845051809678508e-02`, `y_exact=8.4553868674534932e-02`
+  - train[15] t_remaining=32: `x_unmit=1.7964071856287425e-02`, `x_rem=4.1438650899019089e-02`, `y_exact=4.8230306694272018e-01`
+  - train[16] t_remaining=31: `x_unmit=-2.9166666666666667e-02`, `x_rem=-6.1683867856381372e-02`, `y_exact=2.6091538507234008e-01`
+  - train[17] t_remaining=32: `x_unmit=1.3806706114398421e-02`, `x_rem=3.2995454602524593e-02`, `y_exact=3.6637974606866835e-01`
+  - train[18] t_remaining=30: `x_unmit=-6.9868995633187769e-02`, `x_rem=-1.6968389950619264e-01`, `y_exact=-4.6256037967105168e-01`
+  - train[19] t_remaining=32: `x_unmit=-5.2845528455284556e-02`, `x_rem=-1.1161729394837740e-01`, `y_exact=-4.0542674867032852e-01`
+  - train[20] t_remaining=31: `x_unmit=1.0000000000000001e-01`, `x_rem=2.3261680599584234e-01`, `y_exact=6.9756210460146451e-01`
+  - train[21] t_remaining=31: `x_unmit=7.9831932773109238e-02`, `x_rem=1.9976499971266096e-01`, `y_exact=-1.6665725025636668e-01`
+  - train[22] t_remaining=30: `x_unmit=6.5913370998116755e-02`, `x_rem=1.7046062821516322e-01`, `y_exact=9.0048592516744508e-01`
+  - train[23] t_remaining=30: `x_unmit=-1.1857707509881422e-01`, `x_rem=-2.8393848754691298e-01`, `y_exact=-3.0599017739995532e-01`
+- target x values: `x_u_target=-1.2418300653594770e-01`, `x_r_target=-2.7985348041155611e-01`
+- target contribution to E_cdr_unmit: `-8.7231972256415491e-03`
+- target contribution to E_cdr_rem: `-7.8564704110962863e-03`
+
+### term 112
+- pauli term from int row: `(3.6517958336113411e-02)*Y(q(0, 1))*Y(q(0, 2))*X(q(1, 1))*X(q(1, 2))`
+- int observable row: `[0, 2, 2, 0, 0, 1, 1, 0]`
+- Hamiltonian weight w_112: `3.6517958336113411e-02`
+- OGM effective shots used for this term: `430`
+- fitted unmit coeffs: `a_u=3.0771382128695381e+00`, `b_u=1.2556514953285905e-01`
+- fitted rem coeffs: `a_r=1.2805711680149507e+00`, `b_r=1.2511475954500920e-01`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=5.4466230936819175e-02`, `x_rem=1.2670877742773842e-01`, `y_exact=2.8522423557370818e-01`
+  - train[1] t_remaining=29: `x_unmit=-6.7720090293453723e-03`, `x_rem=-3.8240472042484472e-02`, `y_exact=6.0870176675514853e-01`
+  - train[2] t_remaining=30: `x_unmit=0.0000000000000000e+00`, `x_rem=1.3824876886930126e-02`, `y_exact=8.6634322817869064e-02`
+  - train[3] t_remaining=31: `x_unmit=4.1284403669724773e-02`, `x_rem=8.8984930565380038e-02`, `y_exact=1.0781048780317129e-01`
+  - train[4] t_remaining=30: `x_unmit=7.7262693156732898e-02`, `x_rem=1.9204532865990542e-01`, `y_exact=4.7500305593113209e-09`
+  - train[5] t_remaining=31: `x_unmit=-6.3926940639269403e-02`, `x_rem=-1.4959308933897908e-01`, `y_exact=7.4160568859898135e-02`
+  - train[6] t_remaining=31: `x_unmit=-3.0434782608695653e-02`, `x_rem=-7.2168284189759596e-02`, `y_exact=2.2111231007120133e-01`
+  - train[7] t_remaining=31: `x_unmit=5.1282051282051282e-03`, `x_rem=-8.4191512168602343e-03`, `y_exact=1.0436343953650157e-01`
+  - train[8] t_remaining=30: `x_unmit=1.5384615384615385e-01`, `x_rem=3.5812685386984200e-01`, `y_exact=5.9210384856473941e-01`
+  - train[9] t_remaining=32: `x_unmit=-7.1895424836601302e-02`, `x_rem=-1.6506249671662901e-01`, `y_exact=-3.6919412511919542e-01`
+  - train[10] t_remaining=30: `x_unmit=-6.9473684210526312e-02`, `x_rem=-1.6694672790530532e-01`, `y_exact=5.2771405633095496e-08`
+  - train[11] t_remaining=29: `x_unmit=3.6199095022624438e-02`, `x_rem=9.8604979592511993e-02`, `y_exact=6.2246126052503014e-08`
+  - train[12] t_remaining=30: `x_unmit=-7.3375262054507340e-02`, `x_rem=-1.6852292685281484e-01`, `y_exact=3.4658354714413718e-02`
+  - train[13] t_remaining=29: `x_unmit=-3.2863849765258218e-02`, `x_rem=-6.5450700614884894e-02`, `y_exact=-7.2258785593608877e-09`
+  - train[14] t_remaining=32: `x_unmit=-4.5783132530120479e-02`, `x_rem=-1.1900227652407135e-01`, `y_exact=8.4553951830599355e-02`
+  - train[15] t_remaining=32: `x_unmit=1.1453744493392071e-01`, `x_rem=2.7744349857618333e-01`, `y_exact=4.8230310731733217e-01`
+  - train[16] t_remaining=31: `x_unmit=-1.8099547511312219e-02`, `x_rem=-3.9406611497755817e-02`, `y_exact=2.6091537525138364e-01`
+  - train[17] t_remaining=32: `x_unmit=2.6666666666666668e-02`, `x_rem=6.1362127446780934e-02`, `y_exact=3.6637979043315122e-01`
+  - train[18] t_remaining=30: `x_unmit=-1.8018018018018018e-02`, `x_rem=-4.1544287871988356e-02`, `y_exact=-4.6256036756621521e-01`
+  - train[19] t_remaining=32: `x_unmit=-1.1316397228637413e-01`, `x_rem=-2.7009885499049091e-01`, `y_exact=-4.0542677437717817e-01`
+  - train[20] t_remaining=31: `x_unmit=0.0000000000000000e+00`, `x_rem=2.9696142088562615e-03`, `y_exact=6.9756210808621588e-01`
+  - train[21] t_remaining=31: `x_unmit=2.2172949002217295e-03`, `x_rem=6.8251443347985838e-03`, `y_exact=-1.6665726259121236e-01`
+  - train[22] t_remaining=30: `x_unmit=7.4235807860262015e-02`, `x_rem=1.9430468770780221e-01`, `y_exact=9.0048594213691446e-01`
+  - train[23] t_remaining=30: `x_unmit=1.7621145374449341e-02`, `x_rem=3.5052063293337987e-02`, `y_exact=-3.0599009837284397e-01`
+- target x values: `x_u_target=-4.4843049327354259e-03`, `x_r_target=6.8340824573812960e-03`
+- target contribution to E_cdr_unmit: `4.0814779437185183e-03`
+- target contribution to E_cdr_rem: `4.8885235460446822e-03`
+
+### term 113
+- pauli term from int row: `(3.6517958336113411e-02)*X(q(0, 1))*X(q(0, 2))*Y(q(1, 1))*Y(q(1, 2))`
+- int observable row: `[0, 1, 1, 0, 0, 2, 2, 0]`
+- Hamiltonian weight w_113: `3.6517958336113411e-02`
+- OGM effective shots used for this term: `506`
+- fitted unmit coeffs: `a_u=3.3378896252529064e+00`, `b_u=1.2848031295806245e-01`
+- fitted rem coeffs: `a_r=1.4436213569174732e+00`, `b_r=1.3092012429908906e-01`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=1.4198782961460446e-02`, `x_rem=1.9108329795032606e-02`, `y_exact=2.8522422772466488e-01`
+  - train[1] t_remaining=29: `x_unmit=4.0485829959514170e-02`, `x_rem=1.0015125955448834e-01`, `y_exact=6.0870172516468635e-01`
+  - train[2] t_remaining=30: `x_unmit=8.6065573770491802e-02`, `x_rem=1.9816699966814696e-01`, `y_exact=8.6634313620707282e-02`
+  - train[3] t_remaining=31: `x_unmit=-6.0240963855421686e-02`, `x_rem=-1.5258066633847664e-01`, `y_exact=1.0781049514443462e-01`
+  - train[4] t_remaining=30: `x_unmit=3.8383838383838381e-02`, `x_rem=8.6462195472487888e-02`, `y_exact=-2.4313247937509265e-09`
+  - train[5] t_remaining=31: `x_unmit=-5.6285178236397749e-03`, `x_rem=-2.0430023314869830e-02`, `y_exact=7.4160429329994393e-02`
+  - train[6] t_remaining=31: `x_unmit=7.6923076923076927e-02`, `x_rem=1.9731148555367692e-01`, `y_exact=2.2111232145467047e-01`
+  - train[7] t_remaining=31: `x_unmit=2.9821073558648110e-02`, `x_rem=8.3249961230004402e-02`, `y_exact=1.0436338669062002e-01`
+  - train[8] t_remaining=30: `x_unmit=1.3133208255159476e-02`, `x_rem=1.3906267615132847e-02`, `y_exact=5.9210387325590563e-01`
+  - train[9] t_remaining=32: `x_unmit=2.3529411764705882e-02`, `x_rem=4.0337988786523872e-02`, `y_exact=-3.6919416867759797e-01`
+  - train[10] t_remaining=30: `x_unmit=-5.2854122621564484e-02`, `x_rem=-1.3537879245560167e-01`, `y_exact=3.5898465189604984e-08`
+  - train[11] t_remaining=29: `x_unmit=-2.1929824561403504e-02`, `x_rem=-5.6160208491801353e-02`, `y_exact=7.5124225150996183e-08`
+  - train[12] t_remaining=30: `x_unmit=3.6893203883495145e-02`, `x_rem=8.0207554307336323e-02`, `y_exact=3.4658381619073378e-02`
+  - train[13] t_remaining=29: `x_unmit=-2.0793950850661626e-02`, `x_rem=-5.6684976220023421e-02`, `y_exact=-2.4810149267028814e-10`
+  - train[14] t_remaining=32: `x_unmit=2.3529411764705882e-02`, `x_rem=6.0842674899869845e-02`, `y_exact=8.4553864939784340e-02`
+  - train[15] t_remaining=32: `x_unmit=1.6949152542372881e-02`, `x_rem=3.5803858840601603e-02`, `y_exact=4.8230309456669673e-01`
+  - train[16] t_remaining=31: `x_unmit=-4.1257367387033402e-02`, `x_rem=-9.7053576565372862e-02`, `y_exact=2.6091538574381484e-01`
+  - train[17] t_remaining=32: `x_unmit=-6.1143984220907298e-02`, `x_rem=-1.3234395226448534e-01`, `y_exact=3.6637973867503509e-01`
+  - train[18] t_remaining=30: `x_unmit=-5.6974459724950882e-02`, `x_rem=-1.3280218478140324e-01`, `y_exact=-4.6256039118159370e-01`
+  - train[19] t_remaining=32: `x_unmit=-5.6367432150313153e-02`, `x_rem=-1.2858137886642523e-01`, `y_exact=-4.0542673536277940e-01`
+  - train[20] t_remaining=31: `x_unmit=2.8571428571428571e-02`, `x_rem=7.0280438363275591e-02`, `y_exact=6.9756210989966472e-01`
+  - train[21] t_remaining=31: `x_unmit=-4.4897959183673466e-02`, `x_rem=-9.5426837759818098e-02`, `y_exact=-1.6665726310906562e-01`
+  - train[22] t_remaining=30: `x_unmit=5.1546391752577317e-02`, `x_rem=1.3483382658641541e-01`, `y_exact=9.0048593187606629e-01`
+  - train[23] t_remaining=30: `x_unmit=-2.3904382470119521e-02`, `x_rem=-7.5081658237683452e-02`, `y_exact=-3.0599017016700553e-01`
+- target x values: `x_u_target=-2.7027027027027029e-02`, `x_r_target=-8.5586972923051077e-02`
+- target contribution to E_cdr_unmit: `1.3974356273557460e-03`
+- target contribution to E_cdr_rem: `2.6895265655062933e-04`
+
+### term 114
+- pauli term from int row: `(3.6517958336113411e-02)*X(q(0, 1))*X(q(0, 2))*X(q(1, 1))*X(q(1, 2))`
+- int observable row: `[0, 1, 1, 0, 0, 1, 1, 0]`
+- Hamiltonian weight w_114: `3.6517958336113411e-02`
+- OGM effective shots used for this term: `457`
+- fitted unmit coeffs: `a_u=4.1625042534369188e+00`, `b_u=8.0322665815102320e-02`
+- fitted rem coeffs: `a_r=1.7263745737842968e+00`, `b_r=8.0068232163919173e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=4.6808510638297871e-02`, `x_rem=1.1597529591308781e-01`, `y_exact=2.8522425379125871e-01`
+  - train[1] t_remaining=29: `x_unmit=4.6082949308755760e-03`, `x_rem=1.4385709867094598e-02`, `y_exact=6.0870175679112981e-01`
+  - train[2] t_remaining=30: `x_unmit=1.1286681715575621e-02`, `x_rem=3.7183610817826243e-02`, `y_exact=8.6634303956932335e-02`
+  - train[3] t_remaining=31: `x_unmit=1.1627906976744186e-01`, `x_rem=2.8957368831595370e-01`, `y_exact=1.0781048179887377e-01`
+  - train[4] t_remaining=30: `x_unmit=7.3913043478260873e-02`, `x_rem=1.7066327182154603e-01`, `y_exact=5.8346299963191358e-09`
+  - train[5] t_remaining=31: `x_unmit=-2.3923444976076555e-02`, `x_rem=-6.1858848468539437e-02`, `y_exact=7.4160564451181743e-02`
+  - train[6] t_remaining=31: `x_unmit=6.8965517241379309e-02`, `x_rem=1.4222521486408987e-01`, `y_exact=2.2111232766385472e-01`
+  - train[7] t_remaining=31: `x_unmit=4.5454545454545452e-03`, `x_rem=1.3563994154463455e-02`, `y_exact=1.0436341829064463e-01`
+  - train[8] t_remaining=30: `x_unmit=3.4642032332563508e-02`, `x_rem=7.6434809073827284e-02`, `y_exact=5.9210385839380475e-01`
+  - train[9] t_remaining=32: `x_unmit=-3.4482758620689655e-02`, `x_rem=-6.2340397316802118e-02`, `y_exact=-3.6919411459788187e-01`
+  - train[10] t_remaining=30: `x_unmit=4.6296296296296294e-03`, `x_rem=1.1827351256075721e-02`, `y_exact=4.4936107167184978e-08`
+  - train[11] t_remaining=29: `x_unmit=-2.2123893805309734e-02`, `x_rem=-5.5393828218503652e-02`, `y_exact=5.6329390447949271e-08`
+  - train[12] t_remaining=30: `x_unmit=6.6079295154185022e-02`, `x_rem=1.6099418166396207e-01`, `y_exact=3.4658357279612764e-02`
+  - train[13] t_remaining=29: `x_unmit=1.5184381778741865e-02`, `x_rem=3.6267732714878695e-02`, `y_exact=-1.0275868370352399e-08`
+  - train[14] t_remaining=32: `x_unmit=4.0540540540540543e-02`, `x_rem=7.4860625863649971e-02`, `y_exact=8.4553894478918507e-02`
+  - train[15] t_remaining=32: `x_unmit=1.4084507042253521e-02`, `x_rem=2.5977005074292483e-02`, `y_exact=4.8230315243966237e-01`
+  - train[16] t_remaining=31: `x_unmit=0.0000000000000000e+00`, `x_rem=5.1961800313651317e-03`, `y_exact=2.6091538203754022e-01`
+  - train[17] t_remaining=32: `x_unmit=1.5317286652078774e-02`, `x_rem=5.1639849151961181e-02`, `y_exact=3.6637979401236076e-01`
+  - train[18] t_remaining=30: `x_unmit=-9.3681917211328972e-02`, `x_rem=-2.1230827512088260e-01`, `y_exact=-4.6256037989360249e-01`
+  - train[19] t_remaining=32: `x_unmit=-6.0747663551401869e-02`, `x_rem=-1.4985611340961164e-01`, `y_exact=-4.0542676302678660e-01`
+  - train[20] t_remaining=31: `x_unmit=3.8202247191011236e-02`, `x_rem=7.4612068229352610e-02`, `y_exact=6.9756211984746042e-01`
+  - train[21] t_remaining=31: `x_unmit=-1.9354838709677420e-02`, `x_rem=-3.9743945050758289e-02`, `y_exact=-1.6665727178954370e-01`
+  - train[22] t_remaining=30: `x_unmit=5.6074766355140186e-02`, `x_rem=1.3006798182257487e-01`, `y_exact=9.0048594759242229e-01`
+  - train[23] t_remaining=30: `x_unmit=-5.1886792452830191e-02`, `x_rem=-1.1111358972877933e-01`, `y_exact=-3.0599011316653296e-01`
+- target x values: `x_u_target=-8.1196581196581200e-02`, `x_r_target=-1.9564520083994147e-01`
+- target contribution to E_cdr_unmit: `-9.4091604975030663e-03`
+- target contribution to E_cdr_rem: `-9.4102640435047864e-03`
+
+### term 115
+- pauli term from int row: `(-3.8089729448454726e-03)*Z(q(0, 1))*Y(q(1, 1))*Z(q(1, 2))*Y(q(1, 3))`
+- int observable row: `[0, 3, 0, 0, 0, 2, 3, 2]`
+- Hamiltonian weight w_115: `-3.8089729448454726e-03`
+- OGM effective shots used for this term: `348`
+- fitted unmit coeffs: `a_u=3.7758837397879486e+00`, `b_u=2.2156336342815785e-02`
+- fitted rem coeffs: `a_r=1.6755895603259299e+00`, `b_r=3.1698287388173312e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=0.0000000000000000e+00`, `x_rem=4.5661689351550192e-03`, `y_exact=4.9203061058882253e-02`
+  - train[1] t_remaining=29: `x_unmit=1.9047619047619049e-02`, `x_rem=3.8179808423574171e-02`, `y_exact=7.1765953374856917e-02`
+  - train[2] t_remaining=30: `x_unmit=-5.0251256281407038e-02`, `x_rem=-1.3095226985434105e-01`, `y_exact=-5.3283361677303553e-01`
+  - train[3] t_remaining=31: `x_unmit=-9.0425531914893623e-02`, `x_rem=-2.0683717638152985e-01`, `y_exact=-1.5122672537147372e-01`
+  - train[4] t_remaining=30: `x_unmit=1.5151515151515152e-02`, `x_rem=2.7288306457381933e-02`, `y_exact=3.3680269710983327e-08`
+  - train[5] t_remaining=31: `x_unmit=-1.4062500000000000e-01`, `x_rem=-3.2794178760587828e-01`, `y_exact=-8.0696927245375294e-01`
+  - train[6] t_remaining=31: `x_unmit=-1.8441558441558442e-01`, `x_rem=-4.4597485713140567e-01`, `y_exact=-7.9710480695073027e-01`
+  - train[7] t_remaining=31: `x_unmit=8.4832904884318772e-02`, `x_rem=1.7479792799647054e-01`, `y_exact=2.9593798167956814e-01`
+  - train[8] t_remaining=30: `x_unmit=-4.3478260869565216e-02`, `x_rem=-9.7769799971142948e-02`, `y_exact=-1.2629699558468997e-08`
+  - train[9] t_remaining=32: `x_unmit=-4.1176470588235294e-02`, `x_rem=-1.2050648189551764e-01`, `y_exact=3.5951091566402277e-03`
+  - train[10] t_remaining=30: `x_unmit=-2.3979591836734693e-01`, `x_rem=-5.3952410734769574e-01`, `y_exact=-7.8611536502189239e-01`
+  - train[11] t_remaining=29: `x_unmit=-5.1020408163265307e-02`, `x_rem=-1.0909231232215419e-01`, `y_exact=-1.1513166696623671e-07`
+  - train[12] t_remaining=30: `x_unmit=-2.3350253807106600e-01`, `x_rem=-5.3259074462078260e-01`, `y_exact=-8.2366115070436230e-01`
+  - train[13] t_remaining=29: `x_unmit=1.1428571428571429e-02`, `x_rem=3.0379112843796387e-02`, `y_exact=-3.9279992362762112e-01`
+  - train[14] t_remaining=32: `x_unmit=-9.4850948509485097e-02`, `x_rem=-2.2725931789355799e-01`, `y_exact=-6.1635086193163235e-01`
+  - train[15] t_remaining=32: `x_unmit=-1.2222222222222222e-01`, `x_rem=-2.9839801324917536e-01`, `y_exact=-4.4680792292435012e-01`
+  - train[16] t_remaining=31: `x_unmit=-4.9095607235142120e-02`, `x_rem=-1.0584848666148135e-01`, `y_exact=-6.4024466944545121e-03`
+  - train[17] t_remaining=32: `x_unmit=-4.8913043478260872e-02`, `x_rem=-1.1122067048605624e-01`, `y_exact=-5.3771751866369247e-02`
+  - train[18] t_remaining=30: `x_unmit=1.9073569482288829e-02`, `x_rem=3.1377814649082264e-02`, `y_exact=-1.4355692032209838e-01`
+  - train[19] t_remaining=32: `x_unmit=4.7120418848167540e-02`, `x_rem=1.0681027481299173e-01`, `y_exact=2.8788982636185867e-01`
+  - train[20] t_remaining=31: `x_unmit=-2.5641025641025640e-02`, `x_rem=-4.0291041173263979e-02`, `y_exact=3.7233867777067964e-01`
+  - train[21] t_remaining=31: `x_unmit=0.0000000000000000e+00`, `x_rem=-6.5967201199409273e-03`, `y_exact=1.7547873989704438e-01`
+  - train[22] t_remaining=30: `x_unmit=-4.5454545454545456e-02`, `x_rem=-1.0460403033048639e-01`, `y_exact=1.4007734201246847e-07`
+  - train[23] t_remaining=30: `x_unmit=-1.5789473684210527e-02`, `x_rem=-2.9107478218176618e-02`, `y_exact=3.5682173048132992e-08`
+- target x values: `x_u_target=-4.6153846153846156e-02`, `x_r_target=-1.0439422644980462e-01`
+- target contribution to E_cdr_unmit: `5.7940276082412930e-04`
+- target contribution to E_cdr_rem: `5.4553477407696038e-04`
+
+### term 116
+- pauli term from int row: `(-3.8089729448454726e-03)*Z(q(0, 1))*X(q(1, 1))*Z(q(1, 2))*X(q(1, 3))`
+- int observable row: `[0, 3, 0, 0, 0, 1, 3, 1]`
+- Hamiltonian weight w_116: `-3.8089729448454726e-03`
+- OGM effective shots used for this term: `414`
+- fitted unmit coeffs: `a_u=3.7743567317935525e+00`, `b_u=-4.1244780822869177e-02`
+- fitted rem coeffs: `a_r=1.6296795959811743e+00`, `b_r=-4.1978250064944600e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=5.2910052910052907e-03`, `x_rem=1.4073017065262769e-02`, `y_exact=4.9203085761942919e-02`
+  - train[1] t_remaining=29: `x_unmit=1.1235955056179775e-02`, `x_rem=3.6540468814958760e-02`, `y_exact=7.1766132029611684e-02`
+  - train[2] t_remaining=30: `x_unmit=-5.1813471502590670e-02`, `x_rem=-1.3505517793432595e-01`, `y_exact=-5.3283361775320770e-01`
+  - train[3] t_remaining=31: `x_unmit=-3.9370078740157480e-02`, `x_rem=-7.9072828850063018e-02`, `y_exact=-1.5122671861880344e-01`
+  - train[4] t_remaining=30: `x_unmit=2.0942408376963352e-02`, `x_rem=4.5034860107346496e-02`, `y_exact=3.3680335799995631e-08`
+  - train[5] t_remaining=31: `x_unmit=-1.4999999999999999e-01`, `x_rem=-3.3359815476211596e-01`, `y_exact=-8.0696926275234704e-01`
+  - train[6] t_remaining=31: `x_unmit=-1.5544041450777202e-01`, `x_rem=-3.6326349488506821e-01`, `y_exact=-7.9710473810219384e-01`
+  - train[7] t_remaining=31: `x_unmit=8.6419753086419748e-02`, `x_rem=1.8151144915094050e-01`, `y_exact=2.9593789183442476e-01`
+  - train[8] t_remaining=30: `x_unmit=3.4300791556728230e-02`, `x_rem=7.3299844108089804e-02`, `y_exact=5.9469330912923568e-08`
+  - train[9] t_remaining=32: `x_unmit=-1.3698630136986301e-02`, `x_rem=-3.2041944464014559e-02`, `y_exact=3.5951803403155725e-03`
+  - train[10] t_remaining=30: `x_unmit=-1.3580246913580246e-01`, `x_rem=-3.2363830044987413e-01`, `y_exact=-7.8611536502189305e-01`
+  - train[11] t_remaining=29: `x_unmit=3.7593984962406013e-02`, `x_rem=8.7452464937242541e-02`, `y_exact=-1.1513168617492193e-07`
+  - train[12] t_remaining=30: `x_unmit=-2.1608040201005024e-01`, `x_rem=-5.0815125104112457e-01`, `y_exact=-8.2366114311637162e-01`
+  - train[13] t_remaining=29: `x_unmit=-1.0236220472440945e-01`, `x_rem=-2.3548014479705107e-01`, `y_exact=-3.9279992362762417e-01`
+  - train[14] t_remaining=32: `x_unmit=-8.9385474860335198e-02`, `x_rem=-2.0512148257551305e-01`, `y_exact=-6.1635083469449747e-01`
+  - train[15] t_remaining=32: `x_unmit=-1.6939890710382513e-01`, `x_rem=-3.8269105661410951e-01`, `y_exact=-4.4680806051875227e-01`
+  - train[16] t_remaining=31: `x_unmit=2.8277634961439587e-02`, `x_rem=7.8011938706542966e-02`, `y_exact=-6.4024356862080120e-03`
+  - train[17] t_remaining=32: `x_unmit=-8.8082901554404139e-02`, `x_rem=-2.0148435469857121e-01`, `y_exact=-5.3771778788218566e-02`
+  - train[18] t_remaining=30: `x_unmit=9.8522167487684730e-03`, `x_rem=1.9978800640003774e-02`, `y_exact=-1.4355682701263245e-01`
+  - train[19] t_remaining=32: `x_unmit=8.1794195250659632e-02`, `x_rem=2.0278363633913477e-01`, `y_exact=2.8788992592549995e-01`
+  - train[20] t_remaining=31: `x_unmit=1.1707317073170732e-01`, `x_rem=2.8249511834749919e-01`, `y_exact=3.7233860665850349e-01`
+  - train[21] t_remaining=31: `x_unmit=-5.9701492537313432e-02`, `x_rem=-1.3768866511724287e-01`, `y_exact=1.7547875621471046e-01`
+  - train[22] t_remaining=30: `x_unmit=-3.4090909090909088e-02`, `x_rem=-8.2729000697016428e-02`, `y_exact=1.3345983292000688e-07`
+  - train[23] t_remaining=30: `x_unmit=-4.9261083743842365e-03`, `x_rem=-2.2368544167208439e-02`, `y_exact=4.6769015636221165e-08`
+- target x values: `x_u_target=4.6913580246913583e-02`, `x_r_target=1.1424084227908689e-01`
+- target contribution to E_cdr_unmit: `-5.1734920458477887e-04`
+- target contribution to E_cdr_rem: `-5.4924521275998776e-04`
+
+### term 117
+- pauli term from int row: `(3.3044849883259370e-02)*Y(q(0, 1))*Z(q(0, 2))*Y(q(0, 3))*Y(q(1, 1))*Z(q(1, 2))*Y(q(1, 3))`
+- int observable row: `[0, 2, 3, 2, 0, 2, 3, 2]`
+- Hamiltonian weight w_117: `3.3044849883259370e-02`
+- OGM effective shots used for this term: `206`
+- fitted unmit coeffs: `a_u=-1.1410419462799710e-01`, `b_u=7.4987369692632866e-02`
+- fitted rem coeffs: `a_r=-1.9510553293051323e-02`, `b_r=7.4760988519363192e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=6.2500000000000000e-02`, `x_rem=1.9294642651615859e-01`, `y_exact=1.6594952636331803e-02`
+  - train[1] t_remaining=29: `x_unmit=8.6021505376344093e-02`, `x_rem=2.4825159568692876e-01`, `y_exact=1.6561845122548990e-02`
+  - train[2] t_remaining=30: `x_unmit=3.2258064516129031e-02`, `x_rem=8.8968391605283012e-02`, `y_exact=3.7633008511847205e-01`
+  - train[3] t_remaining=31: `x_unmit=6.4935064935064929e-02`, `x_rem=1.9650727121742584e-01`, `y_exact=7.2114417891998642e-06`
+  - train[4] t_remaining=30: `x_unmit=-6.9518716577540107e-02`, `x_rem=-2.1071098928390369e-01`, `y_exact=3.6789470971634768e-09`
+  - train[5] t_remaining=31: `x_unmit=-1.3043478260869565e-01`, `x_rem=-4.1231080787968083e-01`, `y_exact=5.7912903716508465e-02`
+  - train[6] t_remaining=31: `x_unmit=4.9723756906077346e-02`, `x_rem=2.0492492484652955e-01`, `y_exact=1.1872025217610144e-01`
+  - train[7] t_remaining=31: `x_unmit=1.1363636363636364e-02`, `x_rem=-3.4986518064230991e-03`, `y_exact=1.2399014874187696e-01`
+  - train[8] t_remaining=30: `x_unmit=1.0497237569060773e-01`, `x_rem=3.5628180498436096e-01`, `y_exact=-1.6909387165945494e-08`
+  - train[9] t_remaining=32: `x_unmit=5.3658536585365853e-02`, `x_rem=1.7835984237941377e-01`, `y_exact=5.8866579882114245e-02`
+  - train[10] t_remaining=30: `x_unmit=1.0000000000000001e-01`, `x_rem=3.5431502001559606e-01`, `y_exact=2.5596367320916164e-08`
+  - train[11] t_remaining=29: `x_unmit=-2.0618556701030927e-02`, `x_rem=-1.0321296084969671e-01`, `y_exact=-5.9103392297864316e-09`
+  - train[12] t_remaining=30: `x_unmit=-2.1505376344086023e-02`, `x_rem=-4.3668699050870174e-02`, `y_exact=1.2620717798487219e-01`
+  - train[13] t_remaining=29: `x_unmit=-2.2222222222222223e-02`, `x_rem=-5.7037395964966570e-02`, `y_exact=8.8379083950621773e-02`
+  - train[14] t_remaining=32: `x_unmit=-5.0505050505050504e-02`, `x_rem=-1.2516646937325415e-01`, `y_exact=3.4361458004561107e-01`
+  - train[15] t_remaining=32: `x_unmit=4.7120418848167540e-02`, `x_rem=1.2856291558271257e-01`, `y_exact=2.5991775362173262e-08`
+  - train[16] t_remaining=31: `x_unmit=1.0526315789473684e-02`, `x_rem=5.8422527917348116e-02`, `y_exact=6.9593557833944469e-02`
+  - train[17] t_remaining=32: `x_unmit=-1.2315270935960591e-01`, `x_rem=-3.9916127207641822e-01`, `y_exact=1.7155346821462786e-03`
+  - train[18] t_remaining=30: `x_unmit=-3.0927835051546393e-02`, `x_rem=-1.2240950359220777e-01`, `y_exact=5.9011583877061305e-02`
+  - train[19] t_remaining=32: `x_unmit=0.0000000000000000e+00`, `x_rem=5.0618291249562818e-02`, `y_exact=1.0309281414254982e-01`
+  - train[20] t_remaining=31: `x_unmit=5.4726368159203981e-02`, `x_rem=2.3171133071896483e-01`, `y_exact=1.2861043519933679e-01`
+  - train[21] t_remaining=31: `x_unmit=2.4390243902439025e-02`, `x_rem=1.3487403500668149e-01`, `y_exact=8.9268275562655819e-02`
+  - train[22] t_remaining=30: `x_unmit=-9.0909090909090905e-03`, `x_rem=-1.9979555430750796e-02`, `y_exact=6.1431226204138218e-09`
+  - train[23] t_remaining=30: `x_unmit=-3.8251366120218580e-02`, `x_rem=-1.1845326857803373e-01`, `y_exact=-3.9519091155685735e-09`
+- target x values: `x_u_target=-1.6666666666666666e-01`, `x_r_target=-4.9502261958364357e-01`
+- target contribution to E_cdr_unmit: `3.1063723717222554e-03`
+- target contribution to E_cdr_rem: `2.7896182619497169e-03`
+
+### term 118
+- pauli term from int row: `(3.3044849883259370e-02)*Y(q(0, 1))*Z(q(0, 2))*Y(q(0, 3))*X(q(1, 1))*Z(q(1, 2))*X(q(1, 3))`
+- int observable row: `[0, 2, 3, 2, 0, 1, 3, 1]`
+- Hamiltonian weight w_118: `3.3044849883259370e-02`
+- OGM effective shots used for this term: `194`
+- fitted unmit coeffs: `a_u=4.6040801979465268e-01`, `b_u=7.0263362236606772e-02`
+- fitted rem coeffs: `a_r=1.2175691195247912e-01`, `b_r=6.9535691880111480e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-5.1428571428571428e-02`, `x_rem=-1.2391016607838988e-01`, `y_exact=1.6594934065396465e-02`
+  - train[1] t_remaining=29: `x_unmit=-1.4218009478672985e-02`, `x_rem=-7.4322957833000539e-02`, `y_exact=1.6561793761043379e-02`
+  - train[2] t_remaining=30: `x_unmit=8.9947089947089942e-02`, `x_rem=2.8784524490913604e-01`, `y_exact=3.7633004442513962e-01`
+  - train[3] t_remaining=31: `x_unmit=-4.4943820224719100e-02`, `x_rem=-1.5953578106374738e-01`, `y_exact=7.2138926821693414e-06`
+  - train[4] t_remaining=30: `x_unmit=-5.0000000000000003e-02`, `x_rem=-1.2302538191355927e-01`, `y_exact=3.6789410102432451e-09`
+  - train[5] t_remaining=31: `x_unmit=3.2258064516129031e-02`, `x_rem=2.0893042621564392e-01`, `y_exact=5.7912896172661682e-02`
+  - train[6] t_remaining=31: `x_unmit=6.3829787234042548e-02`, `x_rem=2.5149670795257395e-01`, `y_exact=1.1872024701288206e-01`
+  - train[7] t_remaining=31: `x_unmit=1.4583333333333334e-01`, `x_rem=5.2485486989069230e-01`, `y_exact=1.2399016075229422e-01`
+  - train[8] t_remaining=30: `x_unmit=3.7383177570093455e-02`, `x_rem=3.8345619594524018e-02`, `y_exact=-7.8136072440770206e-09`
+  - train[9] t_remaining=32: `x_unmit=9.2592592592592587e-03`, `x_rem=7.9232977801459034e-02`, `y_exact=5.8866589934342281e-02`
+  - train[10] t_remaining=30: `x_unmit=-5.1643192488262914e-02`, `x_rem=-1.4566189231749951e-01`, `y_exact=2.5596353884090218e-08`
+  - train[11] t_remaining=29: `x_unmit=5.2132701421800945e-02`, `x_rem=1.8115017244743617e-01`, `y_exact=-5.9103398696962867e-09`
+  - train[12] t_remaining=30: `x_unmit=-1.1111111111111110e-01`, `x_rem=-3.6667041187488775e-01`, `y_exact=1.2620717422514494e-01`
+  - train[13] t_remaining=29: `x_unmit=-6.0465116279069767e-02`, `x_rem=-2.1854646635486316e-01`, `y_exact=8.8379083950631182e-02`
+  - train[14] t_remaining=32: `x_unmit=2.1276595744680851e-02`, `x_rem=4.0172426796367754e-02`, `y_exact=3.4361456797277268e-01`
+  - train[15] t_remaining=32: `x_unmit=-2.4875621890547265e-02`, `x_rem=-9.0960217840552096e-02`, `y_exact=-2.4193436901659092e-08`
+  - train[16] t_remaining=31: `x_unmit=-6.5934065934065936e-02`, `x_rem=-1.7946583619952647e-01`, `y_exact=6.9593560780664282e-02`
+  - train[17] t_remaining=32: `x_unmit=4.7619047619047616e-02`, `x_rem=1.1240513198392886e-01`, `y_exact=1.7155233853580940e-03`
+  - train[18] t_remaining=30: `x_unmit=-7.9207920792079209e-02`, `x_rem=-2.9018279841971995e-01`, `y_exact=5.9011520250141766e-02`
+  - train[19] t_remaining=32: `x_unmit=1.4917127071823205e-01`, `x_rem=5.1936117429594042e-01`, `y_exact=1.0309283981834098e-01`
+  - train[20] t_remaining=31: `x_unmit=5.1643192488262914e-02`, `x_rem=1.4451040735320914e-01`, `y_exact=1.2861040977523730e-01`
+  - train[21] t_remaining=31: `x_unmit=8.9285714285714281e-03`, `x_rem=6.1493111918373665e-02`, `y_exact=8.9268291400476901e-02`
+  - train[22] t_remaining=30: `x_unmit=3.5532994923857870e-02`, `x_rem=1.7284204906069500e-01`, `y_exact=2.1272961223742243e-08`
+  - train[23] t_remaining=30: `x_unmit=9.1743119266055051e-03`, `x_rem=4.9962256117714994e-02`, `y_exact=5.0295635952856819e-09`
+- target x values: `x_u_target=4.4444444444444446e-02`, `x_r_target=1.6147405163538495e-01`
+- target contribution to E_cdr_unmit: `2.9980250973645462e-03`
+- target contribution to E_cdr_rem: `2.9474774767994584e-03`
+
+### term 119
+- pauli term from int row: `(3.3044849883259370e-02)*X(q(0, 1))*Z(q(0, 2))*X(q(0, 3))*Y(q(1, 1))*Z(q(1, 2))*Y(q(1, 3))`
+- int observable row: `[0, 1, 3, 1, 0, 2, 3, 2]`
+- Hamiltonian weight w_119: `3.3044849883259370e-02`
+- OGM effective shots used for this term: `186`
+- fitted unmit coeffs: `a_u=1.8524088458439539e-01`, `b_u=7.2467912216150246e-02`
+- fitted rem coeffs: `a_r=7.1325282046777835e-02`, `b_r=7.1650236050677427e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=7.7720207253886009e-02`, `x_rem=2.6071250396490503e-01`, `y_exact=1.6594919764514701e-02`
+  - train[1] t_remaining=29: `x_unmit=-1.2041884816753927e-01`, `x_rem=-4.1974594383232061e-01`, `y_exact=1.6561811016289334e-02`
+  - train[2] t_remaining=30: `x_unmit=5.7142857142857143e-03`, `x_rem=2.1776570712835824e-02`, `y_exact=3.7633009176715637e-01`
+  - train[3] t_remaining=31: `x_unmit=-6.2857142857142861e-02`, `x_rem=-1.9377774998914446e-01`, `y_exact=7.2095870056491582e-06`
+  - train[4] t_remaining=30: `x_unmit=2.0202020202020204e-02`, `x_rem=-2.3312631889344801e-03`, `y_exact=3.6789565002636345e-09`
+  - train[5] t_remaining=31: `x_unmit=5.1643192488262914e-02`, `x_rem=2.3547775682253022e-01`, `y_exact=5.7912939221294341e-02`
+  - train[6] t_remaining=31: `x_unmit=9.3750000000000000e-02`, `x_rem=3.8786949464907622e-01`, `y_exact=1.1872027914064870e-01`
+  - train[7] t_remaining=31: `x_unmit=7.6142131979695438e-02`, `x_rem=2.3162299331513869e-01`, `y_exact=1.2399014261357919e-01`
+  - train[8] t_remaining=30: `x_unmit=-1.4136125654450263e-01`, `x_rem=-4.0928310612551089e-01`, `y_exact=-9.7987093078798885e-09`
+  - train[9] t_remaining=32: `x_unmit=1.4354066985645933e-02`, `x_rem=1.0483822451823945e-01`, `y_exact=5.8866607099860128e-02`
+  - train[10] t_remaining=30: `x_unmit=-7.4468085106382975e-02`, `x_rem=-2.8016194482325713e-01`, `y_exact=2.5596369363709371e-08`
+  - train[11] t_remaining=29: `x_unmit=1.9811320754716982e-01`, `x_rem=6.5547317059491406e-01`, `y_exact=-5.9103380862190733e-09`
+  - train[12] t_remaining=30: `x_unmit=9.5744680851063829e-02`, `x_rem=3.3336955546662728e-01`, `y_exact=1.2620718675971387e-01`
+  - train[13] t_remaining=29: `x_unmit=-2.9702970297029702e-02`, `x_rem=-5.8549481575814806e-02`, `y_exact=8.8379083950630433e-02`
+  - train[14] t_remaining=32: `x_unmit=7.0270270270270274e-02`, `x_rem=2.5807228875120541e-01`, `y_exact=3.4361455968869414e-01`
+  - train[15] t_remaining=32: `x_unmit=7.1770334928229665e-02`, `x_rem=2.0103187495108940e-01`, `y_exact=1.1214621656572048e-08`
+  - train[16] t_remaining=31: `x_unmit=-8.8372093023255813e-02`, `x_rem=-2.7583555811336902e-01`, `y_exact=6.9593555764168730e-02`
+  - train[17] t_remaining=32: `x_unmit=1.0552763819095477e-01`, `x_rem=2.7953168401949746e-01`, `y_exact=1.7155419668269923e-03`
+  - train[18] t_remaining=30: `x_unmit=2.2831050228310501e-02`, `x_rem=1.2436963598878700e-01`, `y_exact=5.9011543937886955e-02`
+  - train[19] t_remaining=32: `x_unmit=-1.0084033613445378e-01`, `x_rem=-2.9987132447853826e-01`, `y_exact=1.0309284522167873e-01`
+  - train[20] t_remaining=31: `x_unmit=1.0526315789473684e-02`, `x_rem=5.3198906738352952e-02`, `y_exact=1.2861039554296289e-01`
+  - train[21] t_remaining=31: `x_unmit=-4.9261083743842365e-03`, `x_rem=-3.1279952769894502e-02`, `y_exact=8.9268271964735052e-02`
+  - train[22] t_remaining=30: `x_unmit=-1.0526315789473684e-02`, `x_rem=-6.5261122928400514e-02`, `y_exact=-6.7030295993362430e-09`
+  - train[23] t_remaining=30: `x_unmit=-6.8965517241379309e-02`, `x_rem=-2.8585476387892206e-01`, `y_exact=1.1339904392736656e-08`
+- target x values: `x_u_target=-4.6153846153846156e-02`, `x_r_target=-2.1761336173858037e-01`
+- target contribution to E_cdr_unmit: `2.1121717163820478e-03`
+- target contribution to E_cdr_rem: `1.8547711290547158e-03`
+
+### term 120
+- pauli term from int row: `(3.3044849883259370e-02)*X(q(0, 1))*Z(q(0, 2))*X(q(0, 3))*X(q(1, 1))*Z(q(1, 2))*X(q(1, 3))`
+- int observable row: `[0, 1, 3, 1, 0, 1, 3, 1]`
+- Hamiltonian weight w_120: `3.3044849883259370e-02`
+- OGM effective shots used for this term: `199`
+- fitted unmit coeffs: `a_u=2.2922199819464539e-02`, `b_u=7.3996658003901455e-02`
+- fitted rem coeffs: `a_r=2.3153684724890136e-03`, `b_r=7.4062478759732014e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-3.8834951456310676e-02`, `x_rem=-6.1247520680781577e-02`, `y_exact=1.6594924573652900e-02`
+  - train[1] t_remaining=29: `x_unmit=-4.4444444444444446e-02`, `x_rem=-1.6681178163051294e-01`, `y_exact=1.6561816778690827e-02`
+  - train[2] t_remaining=30: `x_unmit=-5.3475935828877002e-03`, `x_rem=-2.9263295412693641e-02`, `y_exact=3.7633005191437241e-01`
+  - train[3] t_remaining=31: `x_unmit=6.6037735849056603e-02`, `x_rem=1.7233000290832967e-01`, `y_exact=7.2102803943740676e-06`
+  - train[4] t_remaining=30: `x_unmit=3.4482758620689655e-02`, `x_rem=1.5295521058696712e-01`, `y_exact=3.6789380972164383e-09`
+  - train[5] t_remaining=31: `x_unmit=7.2625698324022353e-02`, `x_rem=2.3166537409048890e-01`, `y_exact=5.7912922549664292e-02`
+  - train[6] t_remaining=31: `x_unmit=-8.1081081081081086e-02`, `x_rem=-3.0278537875991890e-01`, `y_exact=1.1872026337622335e-01`
+  - train[7] t_remaining=31: `x_unmit=-1.7525773195876287e-01`, `x_rem=-6.2474712570144353e-01`, `y_exact=1.2399014142745200e-01`
+  - train[8] t_remaining=30: `x_unmit=5.4187192118226604e-02`, `x_rem=1.7571081343463393e-01`, `y_exact=-2.8400741896114931e-08`
+  - train[9] t_remaining=32: `x_unmit=-2.0408163265306121e-02`, `x_rem=-5.9484915027640167e-02`, `y_exact=5.8866542427135085e-02`
+  - train[10] t_remaining=30: `x_unmit=-2.5380710659898477e-02`, `x_rem=-1.1617866566972025e-01`, `y_exact=2.5596365104575052e-08`
+  - train[11] t_remaining=29: `x_unmit=1.5270935960591134e-01`, `x_rem=4.6227668063668353e-01`, `y_exact=-5.9103439305641500e-09`
+  - train[12] t_remaining=30: `x_unmit=-5.1546391752577317e-02`, `x_rem=-1.7507857974437302e-01`, `y_exact=1.2620718241071111e-01`
+  - train[13] t_remaining=29: `x_unmit=-2.7322404371584699e-02`, `x_rem=-1.0096693001847734e-01`, `y_exact=8.8379083950625520e-02`
+  - train[14] t_remaining=32: `x_unmit=1.4009661835748793e-01`, `x_rem=4.7043501946347216e-01`, `y_exact=3.4361455432866583e-01`
+  - train[15] t_remaining=32: `x_unmit=-6.8783068783068779e-02`, `x_rem=-1.9152265767144439e-01`, `y_exact=-3.9885255241042404e-08`
+  - train[16] t_remaining=31: `x_unmit=6.9767441860465115e-02`, `x_rem=2.8452442258115690e-01`, `y_exact=6.9593557107088672e-02`
+  - train[17] t_remaining=32: `x_unmit=1.4720812182741116e-01`, `x_rem=4.7596870486990028e-01`, `y_exact=1.7155354491803594e-03`
+  - train[18] t_remaining=30: `x_unmit=1.0638297872340425e-02`, `x_rem=6.2026785817377313e-02`, `y_exact=5.9011580084258899e-02`
+  - train[19] t_remaining=32: `x_unmit=3.6036036036036036e-02`, `x_rem=1.4575532988998879e-01`, `y_exact=1.0309281813647386e-01`
+  - train[20] t_remaining=31: `x_unmit=-5.1546391752577317e-02`, `x_rem=-2.0466591935001399e-01`, `y_exact=1.2861037118796037e-01`
+  - train[21] t_remaining=31: `x_unmit=1.5384615384615385e-02`, `x_rem=1.1076756420775637e-01`, `y_exact=8.9268286374840841e-02`
+  - train[22] t_remaining=30: `x_unmit=-1.0659898477157360e-01`, `x_rem=-3.6504916039365060e-01`, `y_exact=-2.0782557441424936e-08`
+  - train[23] t_remaining=30: `x_unmit=8.9285714285714281e-03`, `x_rem=7.5472353257245883e-02`, `y_exact=-1.0351783697928770e-09`
+- target x values: `x_u_target=-5.0505050505050504e-02`, `x_r_target=-1.2106994328693294e-01`
+- target contribution to E_cdr_unmit: `2.4069528671155295e-03`
+- target contribution to E_cdr_rem: `2.4381203097310141e-03`
+
+### term 121
+- pauli term from int row: `(8.3839045915120314e-02)*Z(q(0, 1))*Z(q(1, 2))`
+- int observable row: `[0, 3, 0, 0, 0, 0, 3, 0]`
+- Hamiltonian weight w_121: `8.3839045915120314e-02`
+- OGM effective shots used for this term: `2595`
+- fitted unmit coeffs: `a_u=5.0585392771147930e+00`, `b_u=-2.3288026056618089e-02`
+- fitted rem coeffs: `a_r=3.0759919984485093e+00`, `b_r=-1.8299566243716918e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-2.3467070401211203e-02`, `x_rem=-5.3240773159515149e-02`, `y_exact=-1.0140386849638350e-01`
+  - train[1] t_remaining=29: `x_unmit=-2.7255278310940500e-02`, `x_rem=-4.4766979337790065e-02`, `y_exact=2.7504426648084761e-03`
+  - train[2] t_remaining=30: `x_unmit=-6.2285059228123808e-02`, `x_rem=-8.7471414094322741e-02`, `y_exact=-1.7852835049488097e-01`
+  - train[3] t_remaining=31: `x_unmit=-1.4504116032928263e-02`, `x_rem=-3.7487765010850993e-02`, `y_exact=-1.5749074496003740e-01`
+  - train[4] t_remaining=30: `x_unmit=-1.4318706697459585e-01`, `x_rem=-2.4576616122206205e-01`, `y_exact=-8.8292650677369833e-01`
+  - train[5] t_remaining=31: `x_unmit=-5.3613053613053616e-02`, `x_rem=-7.3672585843958763e-02`, `y_exact=-1.4855268805445926e-01`
+  - train[6] t_remaining=31: `x_unmit=-8.7509349289454003e-02`, `x_rem=-1.3596494741699858e-01`, `y_exact=-1.6276959181763348e-01`
+  - train[7] t_remaining=31: `x_unmit=-4.6904315196998121e-02`, `x_rem=-7.1149629180360413e-02`, `y_exact=-6.0254161021620944e-01`
+  - train[8] t_remaining=30: `x_unmit=-3.8238702201622246e-02`, `x_rem=-7.0099084722784782e-02`, `y_exact=-2.8476757447285594e-01`
+  - train[9] t_remaining=32: `x_unmit=-8.9558075870160347e-02`, `x_rem=-1.4482902449912838e-01`, `y_exact=-7.7138756284065713e-01`
+  - train[10] t_remaining=30: `x_unmit=-9.5740523642047673e-02`, `x_rem=-1.5704162676130562e-01`, `y_exact=-5.4571926743565580e-01`
+  - train[11] t_remaining=29: `x_unmit=-1.4653540325634229e-01`, `x_rem=-2.5621976666603985e-01`, `y_exact=-7.9255549168213846e-01`
+  - train[12] t_remaining=30: `x_unmit=-1.1941448382126348e-01`, `x_rem=-1.9267152071271357e-01`, `y_exact=-3.8512792306611543e-01`
+  - train[13] t_remaining=29: `x_unmit=-1.6705516705516704e-01`, `x_rem=-2.8707669408740477e-01`, `y_exact=-7.8914478804431054e-01`
+  - train[14] t_remaining=32: `x_unmit=-3.6585365853658534e-02`, `x_rem=-4.7592047244717793e-02`, `y_exact=-1.3832070713502453e-01`
+  - train[15] t_remaining=32: `x_unmit=3.2183908045977011e-02`, `x_rem=4.8262680301091494e-02`, `y_exact=3.4185580329016502e-01`
+  - train[16] t_remaining=31: `x_unmit=-9.4296577946768059e-02`, `x_rem=-1.6213687966106502e-01`, `y_exact=-5.4348091901785445e-01`
+  - train[17] t_remaining=32: `x_unmit=-2.3347843292441630e-02`, `x_rem=-4.0109498365397914e-02`, `y_exact=-5.1152459866286686e-02`
+  - train[18] t_remaining=30: `x_unmit=-8.1285444234404536e-02`, `x_rem=-1.3163182601578427e-01`, `y_exact=-6.3929706785645102e-01`
+  - train[19] t_remaining=32: `x_unmit=-1.1163153786104606e-01`, `x_rem=-1.7980313477304555e-01`, `y_exact=-4.6694215705170361e-01`
+  - train[20] t_remaining=31: `x_unmit=1.3310318373609512e-01`, `x_rem=2.2356606878318144e-01`, `y_exact=6.4299191724575799e-01`
+  - train[21] t_remaining=31: `x_unmit=-2.1638330757341576e-02`, `x_rem=-3.3563140893956921e-02`, `y_exact=-3.6600037955804199e-01`
+  - train[22] t_remaining=30: `x_unmit=1.0962671905697446e-01`, `x_rem=1.7272987554751257e-01`, `y_exact=5.6809476128743497e-01`
+  - train[23] t_remaining=30: `x_unmit=-8.0244554833779139e-03`, `x_rem=-3.2838987386420632e-02`, `y_exact=-2.6356480454786441e-01`
+- target x values: `x_u_target=-1.3295668549905837e-01`, `x_r_target=-2.1542642439445692e-01`
+- target contribution to E_cdr_unmit: `-5.8339789264841124e-02`
+- target contribution to E_cdr_rem: `-5.7090158403102595e-02`
+
+### term 122
+- pauli term from int row: `(-4.4605985966505090e-03)*Y(q(0, 1))*Z(q(0, 2))*Y(q(0, 3))*Z(q(1, 2))`
+- int observable row: `[0, 2, 3, 2, 0, 0, 3, 0]`
+- Hamiltonian weight w_122: `-4.4605985966505090e-03`
+- OGM effective shots used for this term: `400`
+- fitted unmit coeffs: `a_u=1.5130209185271255e+00`, `b_u=2.1185785740661236e-02`
+- fitted rem coeffs: `a_r=7.5980088178194249e-01`, `b_r=1.0145167842905383e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=2.4523160762942781e-02`, `x_rem=5.4040818262291387e-02`, `y_exact=-8.2912033833196938e-02`
+  - train[1] t_remaining=29: `x_unmit=-7.8085642317380355e-02`, `x_rem=-1.4434026162931524e-01`, `y_exact=-6.3006370661392155e-02`
+  - train[2] t_remaining=30: `x_unmit=-1.3333333333333334e-02`, `x_rem=-2.1437951663329877e-02`, `y_exact=-7.6929264380045465e-02`
+  - train[3] t_remaining=31: `x_unmit=4.6454767726161368e-02`, `x_rem=1.1729337641905359e-01`, `y_exact=6.9841098083057412e-02`
+  - train[4] t_remaining=30: `x_unmit=-2.3255813953488372e-02`, `x_rem=-7.1167225543037754e-02`, `y_exact=4.8961860152635529e-08`
+  - train[5] t_remaining=31: `x_unmit=7.3791348600508899e-02`, `x_rem=1.8964976408726134e-01`, `y_exact=3.1730766412770839e-01`
+  - train[6] t_remaining=31: `x_unmit=2.9810298102981029e-02`, `x_rem=7.7367968290841721e-02`, `y_exact=3.0055990030436219e-01`
+  - train[7] t_remaining=31: `x_unmit=3.2608695652173912e-02`, `x_rem=6.2573341900026197e-02`, `y_exact=-2.6589248153721579e-01`
+  - train[8] t_remaining=30: `x_unmit=-2.5316455696202536e-03`, `x_rem=5.9650744148615886e-03`, `y_exact=-1.8397556106262614e-08`
+  - train[9] t_remaining=32: `x_unmit=-4.5130641330166268e-02`, `x_rem=-9.2870480068077063e-02`, `y_exact=-1.7922117029141829e-02`
+  - train[10] t_remaining=30: `x_unmit=6.3613231552162849e-02`, `x_rem=1.6692479374157115e-01`, `y_exact=4.2899820762023566e-01`
+  - train[11] t_remaining=29: `x_unmit=7.1604938271604940e-02`, `x_rem=1.7858537291832896e-01`, `y_exact=-3.8289714523138066e-08`
+  - train[12] t_remaining=30: `x_unmit=6.3218390804597707e-02`, `x_rem=1.5842217106975284e-01`, `y_exact=3.3923127252363916e-01`
+  - train[13] t_remaining=29: `x_unmit=3.7974683544303799e-02`, `x_rem=1.0708503421913172e-01`, `y_exact=3.5651652117048432e-01`
+  - train[14] t_remaining=32: `x_unmit=6.2176165803108807e-02`, `x_rem=1.4353369597983895e-01`, `y_exact=5.5206818771702870e-01`
+  - train[15] t_remaining=32: `x_unmit=6.6326530612244902e-02`, `x_rem=1.5666714049308827e-01`, `y_exact=2.7638401651751926e-01`
+  - train[16] t_remaining=31: `x_unmit=8.0645161290322578e-02`, `x_rem=2.0362825121362707e-01`, `y_exact=2.8801658870643232e-02`
+  - train[17] t_remaining=32: `x_unmit=-4.1162227602905568e-02`, `x_rem=-7.4418124379737868e-02`, `y_exact=-1.8830634923617712e-02`
+  - train[18] t_remaining=30: `x_unmit=-2.0202020202020193e-02`, `x_rem=-4.9823175273417133e-02`, `y_exact=1.5169189627821913e-01`
+  - train[19] t_remaining=32: `x_unmit=5.5408970976253295e-02`, `x_rem=1.0946841235025888e-01`, `y_exact=-1.8218500563434670e-01`
+  - train[20] t_remaining=31: `x_unmit=-6.2801932367149760e-02`, `x_rem=-1.6542189730371809e-01`, `y_exact=-3.6077412943196335e-01`
+  - train[21] t_remaining=31: `x_unmit=9.0909090909090912e-02`, `x_rem=2.0253170180735672e-01`, `y_exact=-1.7305833765951475e-01`
+  - train[22] t_remaining=30: `x_unmit=9.8321342925659472e-02`, `x_rem=2.3222472090916696e-01`, `y_exact=1.6328168480018322e-08`
+  - train[23] t_remaining=30: `x_unmit=9.7256857855361589e-02`, `x_rem=2.1240729725769056e-01`, `y_exact=7.2977658365500656e-09`
+- target x values: `x_u_target=4.4117647058823518e-02`, `x_r_target=8.7520498867501420e-02`
+- target contribution to E_cdr_unmit: `-3.9225035905042125e-04`
+- target contribution to E_cdr_rem: `-3.4187508588634058e-04`
+
+### term 123
+- pauli term from int row: `(-4.4605985966505090e-03)*X(q(0, 1))*Z(q(0, 2))*X(q(0, 3))*Z(q(1, 2))`
+- int observable row: `[0, 1, 3, 1, 0, 0, 3, 0]`
+- Hamiltonian weight w_123: `-4.4605985966505090e-03`
+- OGM effective shots used for this term: `385`
+- fitted unmit coeffs: `a_u=2.3097152616550471e+00`, `b_u=5.0009638620151543e-02`
+- fitted rem coeffs: `a_r=1.0433346123222758e+00`, `b_r=5.1435647820056683e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-4.2606516290726815e-02`, `x_rem=-1.0770292686877922e-01`, `y_exact=-8.2912084966127550e-02`
+  - train[1] t_remaining=29: `x_unmit=9.4339622641509441e-02`, `x_rem=2.2202685089053961e-01`, `y_exact=-6.3006383165529825e-02`
+  - train[2] t_remaining=30: `x_unmit=-1.6574585635359115e-02`, `x_rem=-2.2109769371645115e-02`, `y_exact=-7.6929265278242592e-02`
+  - train[3] t_remaining=31: `x_unmit=4.3927648578811367e-02`, `x_rem=7.6570948334891212e-02`, `y_exact=6.9841101242973228e-02`
+  - train[4] t_remaining=30: `x_unmit=-4.8387096774193547e-02`, `x_rem=-1.0556745580498429e-01`, `y_exact=4.8961853663316413e-08`
+  - train[5] t_remaining=31: `x_unmit=2.5510204081632654e-02`, `x_rem=5.6918754709078090e-02`, `y_exact=3.1730762796491274e-01`
+  - train[6] t_remaining=31: `x_unmit=2.4154589371980676e-02`, `x_rem=8.2240812382070885e-02`, `y_exact=3.0055992160352607e-01`
+  - train[7] t_remaining=31: `x_unmit=2.3017902813299233e-02`, `x_rem=4.6183259151171795e-02`, `y_exact=-2.6589249076613181e-01`
+  - train[8] t_remaining=30: `x_unmit=-2.0304568527918780e-02`, `x_rem=-4.2407510620893520e-02`, `y_exact=-4.0167559954592342e-08`
+  - train[9] t_remaining=32: `x_unmit=-4.1975308641975309e-02`, `x_rem=-1.0564539717341795e-01`, `y_exact=-1.7922159590888789e-02`
+  - train[10] t_remaining=30: `x_unmit=1.2207792207792208e-01`, `x_rem=3.0840925296886135e-01`, `y_exact=4.2899820762024210e-01`
+  - train[11] t_remaining=29: `x_unmit=5.0602409638554217e-02`, `x_rem=9.9007572086054610e-02`, `y_exact=-3.8289720930444488e-08`
+  - train[12] t_remaining=30: `x_unmit=4.7120418848167540e-02`, `x_rem=9.3950792941658548e-02`, `y_exact=3.3923127147682319e-01`
+  - train[13] t_remaining=29: `x_unmit=-7.7922077922077922e-03`, `x_rem=-2.2970408891989629e-02`, `y_exact=3.5651652117049049e-01`
+  - train[14] t_remaining=32: `x_unmit=1.5306122448979591e-02`, `x_rem=5.5063723114456814e-02`, `y_exact=5.5206820226398723e-01`
+  - train[15] t_remaining=32: `x_unmit=-1.0050251256281407e-02`, `x_rem=-2.7730831456157717e-02`, `y_exact=2.7638402733240425e-01`
+  - train[16] t_remaining=31: `x_unmit=7.7519379844961239e-03`, `x_rem=-2.3838051174461831e-03`, `y_exact=2.8801620393245152e-02`
+  - train[17] t_remaining=32: `x_unmit=-2.5252525252525252e-02`, `x_rem=-5.3955360119814194e-02`, `y_exact=-1.8830668182169122e-02`
+  - train[18] t_remaining=30: `x_unmit=1.2285012285012284e-02`, `x_rem=5.7828980335926865e-02`, `y_exact=1.5169187173360535e-01`
+  - train[19] t_remaining=32: `x_unmit=-3.4782608695652174e-02`, `x_rem=-9.8716433468168455e-02`, `y_exact=-1.8218499389106890e-01`
+  - train[20] t_remaining=31: `x_unmit=-5.7291666666666657e-02`, `x_rem=-1.2903229935878907e-01`, `y_exact=-3.6077415086251069e-01`
+  - train[21] t_remaining=31: `x_unmit=-5.5276381909547742e-02`, `x_rem=-1.5831483028536530e-01`, `y_exact=-1.7305831058956253e-01`
+  - train[22] t_remaining=30: `x_unmit=2.8423772609819122e-02`, `x_rem=4.7801914393909718e-02`, `y_exact=9.8300371974356785e-10`
+  - train[23] t_remaining=30: `x_unmit=3.0150753768844220e-02`, `x_rem=6.1620950598099314e-02`, `y_exact=1.1455410772684014e-08`
+- target x values: `x_u_target=-5.8524173027989825e-02`, `x_r_target=-1.3086637768178819e-01`
+- target contribution to E_cdr_unmit: `3.7988481421917340e-04`
+- target contribution to E_cdr_rem: `3.7960485191311380e-04`
+
+### term 124
+- pauli term from int row: `(1.8229458747088673e-02)*Y(q(0, 1))*Y(q(0, 2))*Y(q(1, 2))*Y(q(1, 3))`
+- int observable row: `[0, 2, 2, 0, 0, 0, 2, 2]`
+- Hamiltonian weight w_124: `1.8229458747088673e-02`
+- OGM effective shots used for this term: `496`
+- fitted unmit coeffs: `a_u=-3.6554593947474628e-01`, `b_u=3.2242415516887050e-02`
+- fitted rem coeffs: `a_r=-2.3069652946945296e-01`, `b_r=3.6951394692267672e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=6.5645514223194746e-03`, `x_rem=2.7774248270157502e-02`, `y_exact=1.4395902221155284e-02`
+  - train[1] t_remaining=29: `x_unmit=-2.5641025641025640e-02`, `x_rem=-2.5050692624608704e-02`, `y_exact=6.0826509139519994e-02`
+  - train[2] t_remaining=30: `x_unmit=4.4025157232704400e-02`, `x_rem=9.5750455247160679e-02`, `y_exact=1.4823168961591769e-02`
+  - train[3] t_remaining=31: `x_unmit=7.4889867841409691e-02`, `x_rem=1.8872515911614521e-01`, `y_exact=-1.6040743925895537e-02`
+  - train[4] t_remaining=30: `x_unmit=2.1978021978021978e-03`, `x_rem=1.1289473827051132e-02`, `y_exact=2.3778094337759480e-08`
+  - train[5] t_remaining=31: `x_unmit=1.0482180293501049e-02`, `x_rem=3.2266895795677403e-02`, `y_exact=-1.2275411255867975e-01`
+  - train[6] t_remaining=31: `x_unmit=9.9567099567099568e-02`, `x_rem=2.1404266240096997e-01`, `y_exact=2.3290362724909926e-02`
+  - train[7] t_remaining=31: `x_unmit=5.3763440860215055e-02`, `x_rem=1.1011848837004415e-01`, `y_exact=-4.0418033706072207e-02`
+  - train[8] t_remaining=30: `x_unmit=1.4989293361884369e-02`, `x_rem=4.1170866149093037e-02`, `y_exact=3.0645578862765717e-08`
+  - train[9] t_remaining=32: `x_unmit=-3.1111111111111110e-02`, `x_rem=-4.8519514504565917e-02`, `y_exact=3.1926581754410720e-03`
+  - train[10] t_remaining=30: `x_unmit=-8.4886128364389232e-02`, `x_rem=-1.7762033618454870e-01`, `y_exact=-3.6842764878264513e-10`
+  - train[11] t_remaining=29: `x_unmit=1.4925373134328358e-02`, `x_rem=2.1496519922988670e-02`, `y_exact=-6.1464320557030535e-09`
+  - train[12] t_remaining=30: `x_unmit=7.3852295409181631e-02`, `x_rem=1.6269483767824969e-01`, `y_exact=4.9712774907384998e-03`
+  - train[13] t_remaining=29: `x_unmit=4.5553145336225599e-02`, `x_rem=8.6823629341008832e-02`, `y_exact=4.0676735392315069e-09`
+  - train[14] t_remaining=32: `x_unmit=5.6277056277056280e-02`, `x_rem=1.4942785737676495e-01`, `y_exact=-9.3905703409213948e-02`
+  - train[15] t_remaining=32: `x_unmit=-1.5384615384615385e-02`, `x_rem=-1.0399315469841771e-02`, `y_exact=-2.2027134267718076e-01`
+  - train[16] t_remaining=31: `x_unmit=9.7345132743362831e-02`, `x_rem=2.3606177579468599e-01`, `y_exact=4.7989844876603835e-02`
+  - train[17] t_remaining=32: `x_unmit=2.9787234042553193e-02`, `x_rem=8.7081464792100827e-02`, `y_exact=2.6574609994941913e-02`
+  - train[18] t_remaining=30: `x_unmit=4.5563549160671464e-02`, `x_rem=1.0241564039303576e-01`, `y_exact=-1.2841895012062743e-01`
+  - train[19] t_remaining=32: `x_unmit=-1.1135857461024499e-02`, `x_rem=-2.9099132873248015e-02`, `y_exact=3.4585345522595773e-01`
+  - train[20] t_remaining=31: `x_unmit=-3.6036036036036036e-02`, `x_rem=-9.2688882079808049e-02`, `y_exact=3.3802275220872485e-01`
+  - train[21] t_remaining=31: `x_unmit=4.8054919908466817e-02`, `x_rem=1.0387950330887745e-01`, `y_exact=3.2460617527592295e-01`
+  - train[22] t_remaining=30: `x_unmit=5.1999999999999998e-02`, `x_rem=1.2648617779400320e-01`, `y_exact=1.2413893991016624e-07`
+  - train[23] t_remaining=30: `x_unmit=-4.2918454935622317e-02`, `x_rem=-9.5965542702263151e-02`, `y_exact=1.2754078641592782e-08`
+- target x values: `x_u_target=-3.3816425120772944e-02`, `x_r_target=-7.8716080378079575e-02`
+- target contribution to E_cdr_unmit: `8.1310445200996400e-04`
+- target contribution to E_cdr_rem: `1.0046422654214062e-03`
+
+### term 125
+- pauli term from int row: `(1.8229458747088673e-02)*Y(q(0, 1))*Y(q(0, 2))*X(q(1, 2))*X(q(1, 3))`
+- int observable row: `[0, 2, 2, 0, 0, 0, 1, 1]`
+- Hamiltonian weight w_125: `1.8229458747088673e-02`
+- OGM effective shots used for this term: `430`
+- fitted unmit coeffs: `a_u=-1.1187829887459674e-01`, `b_u=2.2484821686401407e-02`
+- fitted rem coeffs: `a_r=-9.0004861693836702e-02`, `b_r=2.1159433688747731e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-1.1982570806100218e-01`, `x_rem=-2.8608935231610005e-01`, `y_exact=1.4395980128153157e-02`
+  - train[1] t_remaining=29: `x_unmit=2.4830699774266364e-02`, `x_rem=5.9350084750365822e-02`, `y_exact=6.0826484292734601e-02`
+  - train[2] t_remaining=30: `x_unmit=-1.3215859030837004e-01`, `x_rem=-2.8903119804498822e-01`, `y_exact=1.4823117307004859e-02`
+  - train[3] t_remaining=31: `x_unmit=2.2935779816513763e-02`, `x_rem=6.0393753690453085e-02`, `y_exact=-1.6040759436103145e-02`
+  - train[4] t_remaining=30: `x_unmit=4.6357615894039736e-02`, `x_rem=1.1234620850685879e-01`, `y_exact=-2.3236149317838997e-08`
+  - train[5] t_remaining=31: `x_unmit=-6.8493150684931503e-02`, `x_rem=-1.4096320937295478e-01`, `y_exact=-1.2275393664045679e-01`
+  - train[6] t_remaining=31: `x_unmit=-2.1739130434782608e-02`, `x_rem=-5.8939833645916699e-02`, `y_exact=2.3290450594926980e-02`
+  - train[7] t_remaining=31: `x_unmit=-8.2051282051282051e-02`, `x_rem=-1.8112699482034858e-01`, `y_exact=-4.0418116422815509e-02`
+  - train[8] t_remaining=30: `x_unmit=-2.4038461538461540e-02`, `x_rem=-5.8857917966578570e-02`, `y_exact=-3.3887858237737412e-08`
+  - train[9] t_remaining=32: `x_unmit=1.5250544662309368e-02`, `x_rem=3.4608215889502324e-02`, `y_exact=3.1928090896541708e-03`
+  - train[10] t_remaining=30: `x_unmit=-4.8421052631578948e-02`, `x_rem=-9.2636488822355478e-02`, `y_exact=3.3539120867045257e-08`
+  - train[11] t_remaining=29: `x_unmit=4.5248868778280542e-02`, `x_rem=1.0243915717616568e-01`, `y_exact=2.2185058378952378e-09`
+  - train[12] t_remaining=30: `x_unmit=-1.8867924528301886e-02`, `x_rem=-4.1943148203090877e-02`, `y_exact=4.9712296672830576e-03`
+  - train[13] t_remaining=29: `x_unmit=-5.1643192488262914e-02`, `x_rem=-1.1851446564740070e-01`, `y_exact=4.7155885358154144e-09`
+  - train[14] t_remaining=32: `x_unmit=4.0963855421686748e-02`, `x_rem=8.3353094794020699e-02`, `y_exact=-9.3905619911581320e-02`
+  - train[15] t_remaining=32: `x_unmit=1.3215859030837005e-02`, `x_rem=4.1382775424742134e-02`, `y_exact=-2.2027142856912574e-01`
+  - train[16] t_remaining=31: `x_unmit=3.1674208144796379e-02`, `x_rem=8.8435490553675722e-02`, `y_exact=4.7989840760225284e-02`
+  - train[17] t_remaining=32: `x_unmit=3.1111111111111110e-02`, `x_rem=5.7172421999349611e-02`, `y_exact=2.6574568731861925e-02`
+  - train[18] t_remaining=30: `x_unmit=1.8018018018018018e-02`, `x_rem=4.9964130752774984e-02`, `y_exact=-1.2841890548552820e-01`
+  - train[19] t_remaining=32: `x_unmit=3.0023094688221709e-02`, `x_rem=6.2124515438106674e-02`, `y_exact=3.4585353664182622e-01`
+  - train[20] t_remaining=31: `x_unmit=-5.1724137931034482e-02`, `x_rem=-1.3479698907621879e-01`, `y_exact=3.3802278152337439e-01`
+  - train[21] t_remaining=31: `x_unmit=-3.3259423503325940e-02`, `x_rem=-7.2698690792095455e-02`, `y_exact=3.2460617002233333e-01`
+  - train[22] t_remaining=30: `x_unmit=-2.1834061135371178e-02`, `x_rem=-5.6560694527828130e-02`, `y_exact=1.5472608556297838e-07`
+  - train[23] t_remaining=30: `x_unmit=-3.0837004405286344e-02`, `x_rem=-5.1720715955292505e-02`, `y_exact=1.1159179220577088e-09`
+- target x values: `x_u_target=-1.3452914798206279e-02`, `x_r_target=-2.0143581077141485e-02`
+- target contribution to E_cdr_unmit: `4.3732309126066492e-04`
+- target contribution to E_cdr_rem: `4.1877540101054793e-04`
+
+### term 126
+- pauli term from int row: `(1.8229458747088673e-02)*X(q(0, 1))*X(q(0, 2))*Y(q(1, 2))*Y(q(1, 3))`
+- int observable row: `[0, 1, 1, 0, 0, 0, 2, 2]`
+- Hamiltonian weight w_126: `1.8229458747088673e-02`
+- OGM effective shots used for this term: `461`
+- fitted unmit coeffs: `a_u=1.2097133706276972e+00`, `b_u=7.7900234187703189e-03`
+- fitted rem coeffs: `a_r=5.1050357806313940e-01`, `b_r=7.4169629553630829e-03`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=3.9301310043668124e-02`, `x_rem=8.7624905157168601e-02`, `y_exact=1.4395923405570986e-02`
+  - train[1] t_remaining=29: `x_unmit=-2.1598272138228943e-03`, `x_rem=-1.2221439040417410e-04`, `y_exact=6.0826520245228680e-02`
+  - train[2] t_remaining=30: `x_unmit=2.1978021978021978e-03`, `x_rem=-6.4295328906361325e-03`, `y_exact=1.4823164600479602e-02`
+  - train[3] t_remaining=31: `x_unmit=3.2537960954446853e-02`, `x_rem=8.4086316033117531e-02`, `y_exact=-1.6040751617622431e-02`
+  - train[4] t_remaining=30: `x_unmit=-9.2872570194384454e-02`, `x_rem=-2.1744370344269570e-01`, `y_exact=2.5672636679848004e-08`
+  - train[5] t_remaining=31: `x_unmit=7.5050709939148072e-02`, `x_rem=1.5751953656601511e-01`, `y_exact=-1.2275408085290096e-01`
+  - train[6] t_remaining=31: `x_unmit=2.9082774049217001e-02`, `x_rem=6.2095210107189297e-02`, `y_exact=2.3290341421807026e-02`
+  - train[7] t_remaining=31: `x_unmit=-4.3103448275862072e-02`, `x_rem=-1.2247904958363125e-01`, `y_exact=-4.0418060430002803e-02`
+  - train[8] t_remaining=30: `x_unmit=4.0160642570281124e-02`, `x_rem=9.3726982739266593e-02`, `y_exact=3.0551941566817923e-08`
+  - train[9] t_remaining=32: `x_unmit=1.9271948608137045e-02`, `x_rem=4.4823239433385752e-02`, `y_exact=3.1926698488091345e-03`
+  - train[10] t_remaining=30: `x_unmit=9.4688221709006926e-02`, `x_rem=2.0162897446028091e-01`, `y_exact=2.7232943758160333e-09`
+  - train[11] t_remaining=29: `x_unmit=3.4642032332563508e-02`, `x_rem=9.9445728681673534e-02`, `y_exact=-4.6806741978043080e-09`
+  - train[12] t_remaining=30: `x_unmit=-5.5670103092783509e-02`, `x_rem=-1.3094321203452391e-01`, `y_exact=4.9712968074340797e-03`
+  - train[13] t_remaining=29: `x_unmit=6.2370062370062374e-03`, `x_rem=1.0774336779900678e-02`, `y_exact=5.6105266488364350e-09`
+  - train[14] t_remaining=32: `x_unmit=-4.0000000000000001e-02`, `x_rem=-8.3750653812662015e-02`, `y_exact=-9.3905698496227180e-02`
+  - train[15] t_remaining=32: `x_unmit=-7.0294784580498870e-02`, `x_rem=-1.5466261768850956e-01`, `y_exact=-2.2027134148501615e-01`
+  - train[16] t_remaining=31: `x_unmit=6.5263157894736842e-02`, `x_rem=1.7215351882238739e-01`, `y_exact=4.7989857272349543e-02`
+  - train[17] t_remaining=32: `x_unmit=6.3424947145877377e-03`, `x_rem=4.1988339600376241e-02`, `y_exact=2.6574638114851210e-02`
+  - train[18] t_remaining=30: `x_unmit=-5.7324840764331211e-02`, `x_rem=-1.1051822128762737e-01`, `y_exact=-1.2841895484162219e-01`
+  - train[19] t_remaining=32: `x_unmit=8.6757990867579904e-02`, `x_rem=2.0054956953053302e-01`, `y_exact=3.4585345213370577e-01`
+  - train[20] t_remaining=31: `x_unmit=5.7522123893805309e-02`, `x_rem=1.1848481888799466e-01`, `y_exact=3.3802277452520502e-01`
+  - train[21] t_remaining=31: `x_unmit=2.2222222222222223e-02`, `x_rem=4.8844514018232567e-02`, `y_exact=3.2460617901633926e-01`
+  - train[22] t_remaining=30: `x_unmit=2.6315789473684209e-02`, `x_rem=7.7349716300946822e-02`, `y_exact=1.2377048042924051e-07`
+  - train[23] t_remaining=30: `x_unmit=5.0997782705099776e-02`, `x_rem=1.1806089942360586e-01`, `y_exact=1.2747571222209235e-08`
+- target x values: `x_u_target=-2.3041474654377881e-02`, `x_r_target=-5.8688187478643815e-02`
+- target contribution to E_cdr_unmit: `-3.6611236561593443e-04`
+- target contribution to E_cdr_rem: `-4.1095701994509824e-04`
+
+### term 127
+- pauli term from int row: `(1.8229458747088673e-02)*X(q(0, 1))*X(q(0, 2))*X(q(1, 2))*X(q(1, 3))`
+- int observable row: `[0, 1, 1, 0, 0, 0, 1, 1]`
+- Hamiltonian weight w_127: `1.8229458747088673e-02`
+- OGM effective shots used for this term: `457`
+- fitted unmit coeffs: `a_u=2.5613711119971461e-01`, `b_u=2.5856607437108745e-02`
+- fitted rem coeffs: `a_r=1.2695596606033910e-01`, `b_r=2.5619983195255901e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-4.6808510638297871e-02`, `x_rem=-9.0263042277083178e-02`, `y_exact=1.4395994288705014e-02`
+  - train[1] t_remaining=29: `x_unmit=-2.3041474654377881e-02`, `x_rem=-5.6213599454303070e-02`, `y_exact=6.0826482641998109e-02`
+  - train[2] t_remaining=30: `x_unmit=-4.7404063205417610e-02`, `x_rem=-9.0285491255359646e-02`, `y_exact=1.4823137591157189e-02`
+  - train[3] t_remaining=31: `x_unmit=-4.6511627906976744e-02`, `x_rem=-1.0348801523691251e-01`, `y_exact=-1.6040758326272241e-02`
+  - train[4] t_remaining=30: `x_unmit=7.3913043478260873e-02`, `x_rem=1.7215582408624366e-01`, `y_exact=-2.3589402958313978e-08`
+  - train[5] t_remaining=31: `x_unmit=-3.8277511961722487e-02`, `x_rem=-7.4348659685793600e-02`, `y_exact=-1.2275394077246152e-01`
+  - train[6] t_remaining=31: `x_unmit=-3.0172413793103450e-02`, `x_rem=-7.4780084928553620e-02`, `y_exact=2.3290449059963490e-02`
+  - train[7] t_remaining=31: `x_unmit=0.0000000000000000e+00`, `x_rem=4.6862055664657325e-03`, `y_exact=-4.0418121746106206e-02`
+  - train[8] t_remaining=30: `x_unmit=3.0023094688221709e-02`, `x_rem=6.6944303373738592e-02`, `y_exact=-3.6145606709918852e-08`
+  - train[9] t_remaining=32: `x_unmit=-1.1206896551724138e-01`, `x_rem=-2.4321466333205286e-01`, `y_exact=3.1928112257544540e-03`
+  - train[10] t_remaining=30: `x_unmit=2.3148148148148147e-02`, `x_rem=4.6403390195497531e-02`, `y_exact=3.8172099067716943e-08`
+  - train[11] t_remaining=29: `x_unmit=2.2123893805309734e-02`, `x_rem=5.0996675285408889e-02`, `y_exact=6.5258709714419329e-10`
+  - train[12] t_remaining=30: `x_unmit=9.6916299559471369e-02`, `x_rem=2.0696364114682489e-01`, `y_exact=4.9712184660452427e-03`
+  - train[13] t_remaining=29: `x_unmit=8.8937093275488072e-02`, `x_rem=1.9974035913961935e-01`, `y_exact=-2.2343925244595332e-09`
+  - train[14] t_remaining=32: `x_unmit=0.0000000000000000e+00`, `x_rem=1.5283362856903233e-03`, `y_exact=-9.3905635437264323e-02`
+  - train[15] t_remaining=32: `x_unmit=-1.4084507042253521e-02`, `x_rem=-3.8158297863068971e-02`, `y_exact=-2.2027144154158756e-01`
+  - train[16] t_remaining=31: `x_unmit=-8.7962962962962965e-02`, `x_rem=-2.0175682610973439e-01`, `y_exact=4.7989832101841247e-02`
+  - train[17] t_remaining=32: `x_unmit=-2.1881838074398249e-03`, `x_rem=-6.3139932753230434e-03`, `y_exact=2.6574594196120207e-02`
+  - train[18] t_remaining=30: `x_unmit=-3.7037037037037035e-02`, `x_rem=-8.9525708695969930e-02`, `y_exact=-1.2841891129037128e-01`
+  - train[19] t_remaining=32: `x_unmit=-1.8691588785046728e-02`, `x_rem=-3.8948599847109126e-02`, `y_exact=3.4585354499522569e-01`
+  - train[20] t_remaining=31: `x_unmit=3.3707865168539325e-02`, `x_rem=7.7592130741730853e-02`, `y_exact=3.3802280076301661e-01`
+  - train[21] t_remaining=31: `x_unmit=2.1505376344086021e-03`, `x_rem=1.2856500593748314e-02`, `y_exact=3.2460617318636020e-01`
+  - train[22] t_remaining=30: `x_unmit=1.8691588785046728e-02`, `x_rem=6.3853705236281824e-02`, `y_exact=1.5548201635786104e-07`
+  - train[23] t_remaining=30: `x_unmit=-3.3018867924528301e-02`, `x_rem=-4.9592484074548561e-02`, `y_exact=-3.1383201299807692e-09`
+- target x values: `x_u_target=3.8461538461538464e-02`, `x_r_target=7.1119858328636001e-02`
+- target contribution to E_cdr_unmit: `6.5093814716111933e-04`
+- target contribution to E_cdr_rem: `6.3163385627459879e-04`
+
+### term 128
+- pauli term from int row: `(8.2651141025051819e-02)*Z(q(0, 1))*Z(q(1, 3))`
+- int observable row: `[0, 3, 0, 0, 0, 0, 0, 3]`
+- Hamiltonian weight w_128: `8.2651141025051819e-02`
+- OGM effective shots used for this term: `1894`
+- fitted unmit coeffs: `a_u=3.7160173509762928e+00`, `b_u=-1.5058133656508505e-02`
+- fitted rem coeffs: `a_r=2.4028226380880002e+00`, `b_r=-6.2055645908109323e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-1.0824742268041238e-01`, `x_rem=-1.4970277065697829e-01`, `y_exact=-5.5151773887216016e-01`
+  - train[1] t_remaining=29: `x_unmit=2.3469387755102041e-02`, `x_rem=6.5544643617733239e-02`, `y_exact=3.9984761462975763e-02`
+  - train[2] t_remaining=30: `x_unmit=4.1022908897176344e-02`, `x_rem=6.7797450161687978e-02`, `y_exact=1.0543937540160447e-01`
+  - train[3] t_remaining=31: `x_unmit=-6.0574948665297744e-02`, `x_rem=-8.4182789497721927e-02`, `y_exact=-3.4014232301357694e-01`
+  - train[4] t_remaining=30: `x_unmit=-2.5327951564076689e-01`, `x_rem=-3.7519307638754751e-01`, `y_exact=-1.0000001970204435e+00`
+  - train[5] t_remaining=31: `x_unmit=3.9634146341463415e-02`, `x_rem=7.2196285469115856e-02`, `y_exact=-3.8358424510295121e-02`
+  - train[6] t_remaining=31: `x_unmit=1.1213047910295617e-02`, `x_rem=2.1167841948725227e-02`, `y_exact=-1.0905097981587258e-02`
+  - train[7] t_remaining=31: `x_unmit=-1.0174717368961973e-01`, `x_rem=-1.3017421483206998e-01`, `y_exact=-1.9159448938859486e-01`
+  - train[8] t_remaining=30: `x_unmit=-1.3255459624174709e-01`, `x_rem=-1.7353777831886188e-01`, `y_exact=-5.2975041470223516e-01`
+  - train[9] t_remaining=32: `x_unmit=9.7508125677139759e-03`, `x_rem=4.4055350865802062e-02`, `y_exact=2.9771224291678243e-02`
+  - train[10] t_remaining=30: `x_unmit=-9.6982758620689655e-02`, `x_rem=-1.4167848991425577e-01`, `y_exact=-3.8202293354031686e-01`
+  - train[11] t_remaining=29: `x_unmit=-2.4645296899632160e-01`, `x_rem=-3.6432698457164114e-01`, `y_exact=-1.0000001705798534e+00`
+  - train[12] t_remaining=30: `x_unmit=-6.2726801451529285e-02`, `x_rem=-9.4463780239034303e-02`, `y_exact=-1.2015660945649015e-01`
+  - train[13] t_remaining=29: `x_unmit=-2.1917808219178081e-01`, `x_rem=-3.2441895024295103e-01`, `y_exact=-7.9884836032472328e-01`
+  - train[14] t_remaining=32: `x_unmit=-9.7370983446932822e-03`, `x_rem=-2.8984850886529029e-03`, `y_exact=-4.2652977076906226e-03`
+  - train[15] t_remaining=32: `x_unmit=7.0281124497991966e-03`, `x_rem=3.7468897653823344e-02`, `y_exact=5.6631376807266404e-03`
+  - train[16] t_remaining=31: `x_unmit=-1.6267210606833249e-01`, `x_rem=-2.3336881959084679e-01`, `y_exact=-6.8859676632344780e-01`
+  - train[17] t_remaining=32: `x_unmit=-8.9498189342990170e-02`, `x_rem=-1.0882389505808945e-01`, `y_exact=-2.4372072161716307e-01`
+  - train[18] t_remaining=30: `x_unmit=8.6163203243791175e-03`, `x_rem=4.2249558061861293e-02`, `y_exact=6.3235404846683746e-02`
+  - train[19] t_remaining=32: `x_unmit=4.9263585576434746e-02`, `x_rem=1.0071916736851119e-01`, `y_exact=1.5226864748651769e-01`
+  - train[20] t_remaining=31: `x_unmit=-2.2176379577101599e-02`, `x_rem=-8.9011819345125327e-03`, `y_exact=-7.0083735801222735e-02`
+  - train[21] t_remaining=31: `x_unmit=4.2894056847545221e-02`, `x_rem=8.9319089859922707e-02`, `y_exact=1.5125351364329537e-01`
+  - train[22] t_remaining=30: `x_unmit=-7.6297049847405901e-02`, `x_rem=-8.4785418907352320e-02`, `y_exact=-8.8252526859776637e-02`
+  - train[23] t_remaining=30: `x_unmit=-1.0283315844700944e-01`, `x_rem=-1.3308129679929875e-01`, `y_exact=-4.6965847782977926e-01`
+- target x values: `x_u_target=-1.6736401673640166e-02`, `x_r_target=-8.5927500542660965e-03`
+- target contribution to E_cdr_unmit: `-6.3848744242688922e-03`
+- target contribution to E_cdr_rem: `-6.8354560122733101e-03`
+
+### term 129
+- pauli term from int row: `(1.5840961910321222e-02)*Y(q(0, 1))*Z(q(0, 2))*Y(q(0, 3))*Z(q(1, 3))`
+- int observable row: `[0, 2, 3, 2, 0, 0, 0, 3]`
+- Hamiltonian weight w_129: `1.5840961910321222e-02`
+- OGM effective shots used for this term: `392`
+- fitted unmit coeffs: `a_u=3.0202879933361721e+00`, `b_u=4.4532347767253490e-02`
+- fitted rem coeffs: `a_r=1.3176388656883318e+00`, `b_r=4.0402828006412088e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=6.2500000000000000e-02`, `x_rem=1.2950392814261233e-01`, `y_exact=4.4937786649571043e-02`
+  - train[1] t_remaining=29: `x_unmit=7.7747989276139406e-02`, `x_rem=1.5364573926250583e-01`, `y_exact=2.2718606400251604e-01`
+  - train[2] t_remaining=30: `x_unmit=4.9868766404199474e-02`, `x_rem=1.3935637512128918e-01`, `y_exact=5.0255746743418162e-01`
+  - train[3] t_remaining=31: `x_unmit=9.7087378640776691e-03`, `x_rem=2.8502261655150938e-02`, `y_exact=7.1549231094811969e-02`
+  - train[4] t_remaining=30: `x_unmit=-4.2780748663101602e-02`, `x_rem=-9.3034085093075342e-02`, `y_exact=5.4387332923586305e-08`
+  - train[5] t_remaining=31: `x_unmit=1.0275689223057644e-01`, `x_rem=2.5196773637358938e-01`, `y_exact=6.2118143259851355e-01`
+  - train[6] t_remaining=31: `x_unmit=1.1363636363636364e-02`, `x_rem=3.3023131151321813e-02`, `y_exact=7.3131819063680581e-01`
+  - train[7] t_remaining=31: `x_unmit=-3.7783375314861464e-02`, `x_rem=-4.9117174603129227e-02`, `y_exact=-4.1651662815294149e-01`
+  - train[8] t_remaining=30: `x_unmit=5.9154929577464786e-02`, `x_rem=1.1065546821660376e-01`, `y_exact=-5.0078409854185791e-09`
+  - train[9] t_remaining=32: `x_unmit=9.0395480225988700e-02`, `x_rem=2.1040072231704376e-01`, `y_exact=2.8255654812166225e-03`
+  - train[10] t_remaining=30: `x_unmit=1.7499999999999999e-01`, `x_rem=3.9246843784563595e-01`, `y_exact=7.8611535066478289e-01`
+  - train[11] t_remaining=29: `x_unmit=5.0761421319796954e-02`, `x_rem=1.3590935267473020e-01`, `y_exact=-2.7480829020883847e-08`
+  - train[12] t_remaining=30: `x_unmit=9.6938775510204078e-02`, `x_rem=2.0569995714404027e-01`, `y_exact=8.1224912142160521e-01`
+  - train[13] t_remaining=29: `x_unmit=1.0704960835509138e-01`, `x_rem=2.3971581795075758e-01`, `y_exact=3.9279988544323519e-01`
+  - train[14] t_remaining=32: `x_unmit=-4.4155844155844157e-02`, `x_rem=-1.1054585691973258e-01`, `y_exact=4.1247228708894090e-01`
+  - train[15] t_remaining=32: `x_unmit=5.2356020942408377e-02`, `x_rem=1.3154377696017522e-01`, `y_exact=-8.4487787943781284e-02`
+  - train[16] t_remaining=31: `x_unmit=1.0182767624020887e-01`, `x_rem=2.1509286866076943e-01`, `y_exact=6.9962977743169896e-02`
+  - train[17] t_remaining=32: `x_unmit=1.4925373134328358e-02`, `x_rem=4.6116325389274404e-02`, `y_exact=1.6258435174853331e-02`
+  - train[18] t_remaining=30: `x_unmit=5.2910052910052907e-02`, `x_rem=1.4417936192688835e-01`, `y_exact=-6.7498119906794316e-02`
+  - train[19] t_remaining=32: `x_unmit=-9.9999999999999985e-03`, `x_rem=-3.1716943798622707e-02`, `y_exact=-2.9616154450701693e-01`
+  - train[20] t_remaining=31: `x_unmit=5.9952038369304558e-02`, `x_rem=1.5470480467603592e-01`, `y_exact=2.8430587911656391e-01`
+  - train[21] t_remaining=31: `x_unmit=-1.7142857142857144e-02`, `x_rem=-2.0840425993979120e-02`, `y_exact=-1.9294960155677396e-01`
+  - train[22] t_remaining=30: `x_unmit=-4.7872340425531915e-02`, `x_rem=-1.2426176624050163e-01`, `y_exact=-1.7000252903731557e-08`
+  - train[23] t_remaining=30: `x_unmit=-3.2085561497326207e-02`, `x_rem=-5.5301973022436071e-02`, `y_exact=-1.1010671926598949e-08`
+- target x values: `x_u_target=-2.3498694516971279e-02`, `x_r_target=-5.3941169953663437e-02`
+- target contribution to E_cdr_unmit: `-4.1884259128810219e-04`
+- target contribution to E_cdr_rem: `-4.8587642298760750e-04`
+
+### term 130
+- pauli term from int row: `(1.5840961910321222e-02)*X(q(0, 1))*Z(q(0, 2))*X(q(0, 3))*Z(q(1, 3))`
+- int observable row: `[0, 1, 3, 1, 0, 0, 0, 3]`
+- Hamiltonian weight w_130: `1.5840961910321222e-02`
+- OGM effective shots used for this term: `376`
+- fitted unmit coeffs: `a_u=3.3571757693722053e+00`, `b_u=3.9962003708589384e-02`
+- fitted rem coeffs: `a_r=1.5998627427965404e+00`, `b_r=2.9267166656165296e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=6.1797752808988762e-02`, `x_rem=1.3254429824754932e-01`, `y_exact=4.4937814854605927e-02`
+  - train[1] t_remaining=29: `x_unmit=8.5714285714285715e-02`, `x_rem=1.8915965954293490e-01`, `y_exact=2.2718608056395484e-01`
+  - train[2] t_remaining=30: `x_unmit=3.3333333333333333e-02`, `x_rem=8.0880060136198292e-02`, `y_exact=5.0255746929147560e-01`
+  - train[3] t_remaining=31: `x_unmit=2.5445292620865116e-03`, `x_rem=-2.8002815063384581e-03`, `y_exact=7.1549233060652195e-02`
+  - train[4] t_remaining=30: `x_unmit=0.0000000000000000e+00`, `x_rem=-8.6403749840350185e-04`, `y_exact=5.4387324939347918e-08`
+  - train[5] t_remaining=31: `x_unmit=1.0327455919395466e-01`, `x_rem=2.3269922497681464e-01`, `y_exact=6.2118142764377393e-01`
+  - train[6] t_remaining=31: `x_unmit=1.5625000000000000e-01`, `x_rem=3.5966231201625426e-01`, `y_exact=7.3131820750010867e-01`
+  - train[7] t_remaining=31: `x_unmit=1.3477088948787063e-02`, `x_rem=2.8465702040364308e-02`, `y_exact=-4.1651663129403360e-01`
+  - train[8] t_remaining=30: `x_unmit=6.9252077562326875e-02`, `x_rem=1.5185042751062031e-01`, `y_exact=-2.6079413243637295e-08`
+  - train[9] t_remaining=32: `x_unmit=1.2793733681462141e-01`, `x_rem=2.6859472851277122e-01`, `y_exact=2.8255917646779118e-03`
+  - train[10] t_remaining=30: `x_unmit=1.3131313131313133e-01`, `x_rem=3.0702662882659110e-01`, `y_exact=7.8611535066478821e-01`
+  - train[11] t_remaining=29: `x_unmit=3.6269430051813469e-02`, `x_rem=7.9356973064413638e-02`, `y_exact=-2.7480836334850078e-08`
+  - train[12] t_remaining=30: `x_unmit=8.8235294117647065e-02`, `x_rem=1.9792449754746647e-01`, `y_exact=8.1224912484232836e-01`
+  - train[13] t_remaining=29: `x_unmit=8.8888888888888892e-02`, `x_rem=2.0360547416701708e-01`, `y_exact=3.9279988544324501e-01`
+  - train[14] t_remaining=32: `x_unmit=-2.1978021978021980e-02`, `x_rem=-2.5234578275411482e-02`, `y_exact=4.1247228677842696e-01`
+  - train[15] t_remaining=32: `x_unmit=-5.2924791086350974e-02`, `x_rem=-1.1076591600104158e-01`, `y_exact=-8.4487761983612950e-02`
+  - train[16] t_remaining=31: `x_unmit=5.7591623036649213e-02`, `x_rem=1.2441646838038056e-01`, `y_exact=6.9962929751635969e-02`
+  - train[17] t_remaining=32: `x_unmit=2.8818443804034580e-03`, `x_rem=2.1245546187476191e-02`, `y_exact=1.6258454433999169e-02`
+  - train[18] t_remaining=30: `x_unmit=-5.4644808743169399e-03`, `x_rem=2.0385632838326824e-03`, `y_exact=-6.7498136965978187e-02`
+  - train[19] t_remaining=32: `x_unmit=-3.2258064516129031e-02`, `x_rem=-8.6355488035176162e-02`, `y_exact=-2.9616154079410428e-01`
+  - train[20] t_remaining=31: `x_unmit=-5.6910569105691054e-02`, `x_rem=-1.1875606295686623e-01`, `y_exact=2.8430589418407270e-01`
+  - train[21] t_remaining=31: `x_unmit=-2.5380710659898477e-02`, `x_rem=-5.2961917158559274e-02`, `y_exact=-1.9294954054604116e-01`
+  - train[22] t_remaining=30: `x_unmit=1.2531328320802004e-02`, `x_rem=2.4678354831588280e-02`, `y_exact=-2.6269265415349177e-08`
+  - train[23] t_remaining=30: `x_unmit=5.0251256281407036e-03`, `x_rem=3.5706273303791375e-03`, `y_exact=2.5862087323514068e-08`
+- target x values: `x_u_target=-7.1428571428571438e-02`, `x_r_target=-1.5175887925259934e-01`
+- target contribution to E_cdr_unmit: `-3.1655986705977240e-03`
+- target contribution to E_cdr_rem: `-3.3824605618196493e-03`
+
+### term 131
+- pauli term from int row: `(3.9956945209230821e-02)*Z(q(0, 2))*Z(q(0, 3))`
+- int observable row: `[0, 0, 3, 3, 0, 0, 0, 0]`
+- Hamiltonian weight w_131: `3.9956945209230821e-02`
+- OGM effective shots used for this term: `1150`
+- fitted unmit coeffs: `a_u=3.4195612063726211e+00`, `b_u=1.5846932135156577e-01`
+- fitted rem coeffs: `a_r=2.0742295403330706e+00`, `b_r=2.3883590498460908e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=6.6889632107023410e-03`, `x_rem=7.1830608415974218e-02`, `y_exact=1.5314311286421842e-01`
+  - train[1] t_remaining=29: `x_unmit=-9.3802345058626460e-02`, `x_rem=-8.1561504775133978e-02`, `y_exact=-4.4736583041368794e-02`
+  - train[2] t_remaining=30: `x_unmit=7.6394849785407726e-02`, `x_rem=1.9537118731089206e-01`, `y_exact=2.2964952385218593e-01`
+  - train[3] t_remaining=31: `x_unmit=8.3263946711074107e-04`, `x_rem=6.3688699216003633e-02`, `y_exact=2.1378425091000494e-01`
+  - train[4] t_remaining=30: `x_unmit=1.9627749576988154e-01`, `x_rem=3.9113217818182527e-01`, `y_exact=8.8292660196855965e-01`
+  - train[5] t_remaining=31: `x_unmit=0.0000000000000000e+00`, `x_rem=6.4039543714340411e-02`, `y_exact=1.0548470037886654e-01`
+  - train[6] t_remaining=31: `x_unmit=4.0716612377850160e-02`, `x_rem=1.3177238798911947e-01`, `y_exact=2.7128688418060443e-01`
+  - train[7] t_remaining=31: `x_unmit=2.9535864978902954e-02`, `x_rem=9.9217375537227342e-02`, `y_exact=1.5585533191055539e-01`
+  - train[8] t_remaining=30: `x_unmit=5.1666666666666666e-02`, `x_rem=1.4876113046844749e-01`, `y_exact=4.1675161927795112e-01`
+  - train[9] t_remaining=32: `x_unmit=-1.0247349823321555e-01`, `x_rem=-9.8849640692267662e-02`, `y_exact=-1.8621334003244996e-01`
+  - train[10] t_remaining=30: `x_unmit=9.2801387684301823e-02`, `x_rem=2.1413008331545338e-01`, `y_exact=5.4571923577256798e-01`
+  - train[11] t_remaining=29: `x_unmit=1.2553373185311700e-01`, `x_rem=2.7822790610485093e-01`, `y_exact=7.9255551731769858e-01`
+  - train[12] t_remaining=30: `x_unmit=1.1923411662315056e-01`, `x_rem=2.6063364699294134e-01`, `y_exact=4.0599771298409687e-01`
+  - train[13] t_remaining=29: `x_unmit=1.6218560277536861e-01`, `x_rem=3.3420265066236338e-01`, `y_exact=7.8914484792194695e-01`
+  - train[14] t_remaining=32: `x_unmit=-1.6679904686258934e-02`, `x_rem=2.8433605566056751e-02`, `y_exact=6.5248055871877500e-02`
+  - train[15] t_remaining=32: `x_unmit=-1.0024449877750612e-01`, `x_rem=-1.0708913935105127e-01`, `y_exact=-2.6941325040313630e-01`
+  - train[16] t_remaining=31: `x_unmit=1.3663034367141660e-01`, `x_rem=2.9527061166911511e-01`, `y_exact=6.5237556904823235e-01`
+  - train[17] t_remaining=32: `x_unmit=9.1896407685881365e-03`, `x_rem=7.6969427051950381e-02`, `y_exact=7.5228340003868993e-02`
+  - train[18] t_remaining=30: `x_unmit=-7.0559610705596104e-02`, `x_rem=-4.8121113814544522e-02`, `y_exact=-1.6354887201868118e-01`
+  - train[19] t_remaining=32: `x_unmit=-1.1447811447811448e-01`, `x_rem=-1.2327690376470869e-01`, `y_exact=-1.2713496963640827e-01`
+  - train[20] t_remaining=31: `x_unmit=-8.9564502875924407e-02`, `x_rem=-7.4929593056935459e-02`, `y_exact=-1.2820777961197133e-01`
+  - train[21] t_remaining=31: `x_unmit=-9.5317725752508367e-02`, `x_rem=-9.3548374566402179e-02`, `y_exact=-3.1793323823231162e-02`
+  - train[22] t_remaining=30: `x_unmit=-9.3617021276595751e-03`, `x_rem=5.6193935799540295e-02`, `y_exact=3.9770125998769959e-02`
+  - train[23] t_remaining=30: `x_unmit=-7.2041166380789029e-02`, `x_rem=-5.8442554530911704e-02`, `y_exact=-7.2310074964921714e-02`
+- target x values: `x_u_target=-4.4701986754966887e-02`, `x_r_target=-2.6570828622193534e-02`
+- target contribution to E_cdr_unmit: `2.2408420649688997e-04`
+- target contribution to E_cdr_rem: `-1.2478716669877311e-03`
+
+### term 132
+- pauli term from int row: `(8.0506013557725881e-02)*Z(q(0, 2))*Z(q(1, 0))`
+- int observable row: `[0, 0, 3, 0, 3, 0, 0, 0]`
+- Hamiltonian weight w_132: `8.0506013557725881e-02`
+- OGM effective shots used for this term: `1935`
+- fitted unmit coeffs: `a_u=3.5972555192402229e+00`, `b_u=-1.4756178565501521e-01`
+- fitted rem coeffs: `a_r=2.6087809567848739e+00`, `b_r=-9.5483846206666795e-03`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=2.1406727828746176e-02`, `x_rem=-6.0096538055812400e-03`, `y_exact=-1.2725522093267297e-01`
+  - train[1] t_remaining=29: `x_unmit=4.1794087665647302e-02`, `x_rem=-5.5952765731238580e-03`, `y_exact=-6.1480273766484045e-02`
+  - train[2] t_remaining=30: `x_unmit=-2.1871713985278654e-01`, `x_rem=-3.5599912556133223e-01`, `y_exact=-9.3408634193707196e-01`
+  - train[3] t_remaining=31: `x_unmit=-4.9574361542313469e-02`, `x_rem=-9.3003616923643298e-02`, `y_exact=-1.3104979071196643e-01`
+  - train[4] t_remaining=30: `x_unmit=-1.6846986089644514e-01`, `x_rem=-2.8436794855914993e-01`, `y_exact=-7.7955915729586445e-01`
+  - train[5] t_remaining=31: `x_unmit=-1.3329954384186518e-01`, `x_rem=-2.4271215415072114e-01`, `y_exact=-7.6564161517276075e-01`
+  - train[6] t_remaining=31: `x_unmit=-2.0039781203381402e-01`, `x_rem=-3.3310173834849099e-01`, `y_exact=-8.4693855651477712e-01`
+  - train[7] t_remaining=31: `x_unmit=-4.7325102880658436e-02`, `x_rem=-1.2846579964917809e-01`, `y_exact=-4.3650217546385012e-01`
+  - train[8] t_remaining=30: `x_unmit=-2.4635495223730517e-02`, `x_rem=-9.3863519975428092e-02`, `y_exact=-3.7014870874314948e-01`
+  - train[9] t_remaining=32: `x_unmit=6.3329928498467830e-02`, `x_rem=2.8610103699169314e-02`, `y_exact=1.0053649887880736e-01`
+  - train[10] t_remaining=30: `x_unmit=-1.8591403417918176e-01`, `x_rem=-3.0469069061482951e-01`, `y_exact=-7.7955916563242678e-01`
+  - train[11] t_remaining=29: `x_unmit=-1.3008538422903063e-01`, `x_rem=-2.1340865485859423e-01`, `y_exact=-6.3490054486150627e-01`
+  - train[12] t_remaining=30: `x_unmit=-2.6237360298030865e-01`, `x_rem=-4.2228704199913586e-01`, `y_exact=-9.7565717486496439e-01`
+  - train[13] t_remaining=29: `x_unmit=-1.7744438696326953e-01`, `x_rem=-2.9217340728576896e-01`, `y_exact=-7.7955912032267383e-01`
+  - train[14] t_remaining=32: `x_unmit=-1.4187530682376043e-01`, `x_rem=-2.6498853669369848e-01`, `y_exact=-7.7646411341900490e-01`
+  - train[15] t_remaining=32: `x_unmit=8.7754090233019333e-02`, `x_rem=7.2650761212619680e-02`, `y_exact=1.4513362875703037e-01`
+  - train[16] t_remaining=31: `x_unmit=-1.0963114754098360e-01`, `x_rem=-2.0051027208164351e-01`, `y_exact=-6.4695703410986738e-01`
+  - train[17] t_remaining=32: `x_unmit=-5.7826520438683950e-02`, `x_rem=-1.3193636280473323e-01`, `y_exact=-9.3956905428470697e-02`
+  - train[18] t_remaining=30: `x_unmit=6.8762278978389005e-02`, `x_rem=3.2483816277960834e-02`, `y_exact=5.7332028860926046e-02`
+  - train[19] t_remaining=32: `x_unmit=2.9107054760730142e-02`, `x_rem=-1.5236811752147304e-02`, `y_exact=-1.5942268677927529e-02`
+  - train[20] t_remaining=31: `x_unmit=3.4739454094292804e-03`, `x_rem=-5.7720407051642220e-02`, `y_exact=-1.5047877330124562e-01`
+  - train[21] t_remaining=31: `x_unmit=9.3919920909540291e-03`, `x_rem=-4.6622953342025375e-02`, `y_exact=-1.6070794351514170e-01`
+  - train[22] t_remaining=30: `x_unmit=1.4653865588681153e-02`, `x_rem=-4.0309427854258242e-02`, `y_exact=-2.2121580366186524e-02`
+  - train[23] t_remaining=30: `x_unmit=7.2773536895674298e-02`, `x_rem=6.7948683848888761e-02`, `y_exact=2.6614489759137283e-01`
+- target x values: `x_u_target=-2.3394723743155800e-02`, `x_r_target=-8.0511103055992447e-02`
+- target contribution to E_cdr_unmit: `-1.8654739526360826e-02`
+- target contribution to E_cdr_rem: `-1.7677849957537302e-02`
+
+### term 133
+- pauli term from int row: `(4.2098456524183842e-02)*Y(q(0, 2))*Y(q(0, 3))*Y(q(1, 0))*Y(q(1, 1))`
+- int observable row: `[0, 0, 2, 2, 2, 2, 0, 0]`
+- Hamiltonian weight w_133: `4.2098456524183842e-02`
+- OGM effective shots used for this term: `496`
+- fitted unmit coeffs: `a_u=5.1751979359845636e-02`, `b_u=-2.5846531235264223e-03`
+- fitted rem coeffs: `a_r=2.6122447573072607e-02`, `b_r=-2.4296569214057231e-03`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=6.5645514223194746e-03`, `x_rem=-7.9743037233150418e-03`, `y_exact=4.0214806945107692e-02`
+  - train[1] t_remaining=29: `x_unmit=-8.5470085470085479e-03`, `x_rem=-4.9073753858047804e-02`, `y_exact=-1.8970431000715561e-09`
+  - train[2] t_remaining=30: `x_unmit=2.0964360587002098e-03`, `x_rem=7.7058315613746913e-03`, `y_exact=3.7337188213333658e-08`
+  - train[3] t_remaining=31: `x_unmit=-6.6079295154185022e-02`, `x_rem=-1.4136862977712877e-01`, `y_exact=1.5174346764071889e-02`
+  - train[4] t_remaining=30: `x_unmit=2.1978021978021978e-03`, `x_rem=-8.6951495972347730e-03`, `y_exact=-3.6833347540952382e-08`
+  - train[5] t_remaining=31: `x_unmit=-1.8867924528301886e-02`, `x_rem=-6.6252929819483178e-02`, `y_exact=2.6774809729971040e-08`
+  - train[6] t_remaining=31: `x_unmit=4.7619047619047616e-02`, `x_rem=9.8194199977140684e-02`, `y_exact=1.6744816270118793e-09`
+  - train[7] t_remaining=31: `x_unmit=-7.0967741935483872e-02`, `x_rem=-1.4697116706593305e-01`, `y_exact=-1.0087000398824159e-08`
+  - train[8] t_remaining=30: `x_unmit=-1.0706638115631691e-02`, `x_rem=-3.5798191381675511e-02`, `y_exact=3.2826992085458639e-09`
+  - train[9] t_remaining=32: `x_unmit=3.1111111111111110e-02`, `x_rem=4.5460606506182603e-02`, `y_exact=-1.1054926016419138e-02`
+  - train[10] t_remaining=30: `x_unmit=-4.3478260869565216e-02`, `x_rem=-7.7064690567938535e-02`, `y_exact=9.7346330324412755e-09`
+  - train[11] t_remaining=29: `x_unmit=4.4776119402985072e-02`, `x_rem=8.5072797328176838e-02`, `y_exact=-4.0027505680845962e-09`
+  - train[12] t_remaining=30: `x_unmit=1.3373253493013973e-01`, `x_rem=2.7016072065639618e-01`, `y_exact=3.4983277432758121e-08`
+  - train[13] t_remaining=29: `x_unmit=2.1691973969631237e-03`, `x_rem=5.8584054604263573e-03`, `y_exact=1.2280660864937957e-09`
+  - train[14] t_remaining=32: `x_unmit=6.0606060606060608e-02`, `x_rem=1.1128788881911884e-01`, `y_exact=1.5718704303096245e-03`
+  - train[15] t_remaining=32: `x_unmit=-2.4175824175824177e-02`, `x_rem=-5.6929336616527396e-02`, `y_exact=-9.2496012605408365e-02`
+  - train[16] t_remaining=31: `x_unmit=3.9823008849557522e-02`, `x_rem=7.8182935294214786e-02`, `y_exact=-5.8217962305664320e-03`
+  - train[17] t_remaining=32: `x_unmit=5.9574468085106386e-02`, `x_rem=1.0590030357140914e-01`, `y_exact=-1.1169647333529096e-02`
+  - train[18] t_remaining=30: `x_unmit=-4.0767386091127102e-02`, `x_rem=-8.3270207485012265e-02`, `y_exact=7.9281276708204868e-09`
+  - train[19] t_remaining=32: `x_unmit=2.4498886414253896e-02`, `x_rem=4.7056101438690830e-02`, `y_exact=-2.7964928543946388e-02`
+  - train[20] t_remaining=31: `x_unmit=-8.1081081081081086e-02`, `x_rem=-1.7389026897443843e-01`, `y_exact=-6.9773444629462443e-09`
+  - train[21] t_remaining=31: `x_unmit=7.0938215102974822e-02`, `x_rem=1.5677886431890098e-01`, `y_exact=4.2245421407652049e-02`
+  - train[22] t_remaining=30: `x_unmit=1.2000000000000000e-02`, `x_rem=3.4638370971858234e-02`, `y_exact=9.3290212383878066e-09`
+  - train[23] t_remaining=30: `x_unmit=7.2961373390557943e-02`, `x_rem=1.4594230244827436e-01`, `y_exact=-1.6843224491446517e-08`
+- target x values: `x_u_target=0.0000000000000000e+00`, `x_r_target=-2.1171759785052071e-04`
+- target contribution to E_cdr_unmit: `-1.0880990715087305e-04`
+- target contribution to E_cdr_rem: `-1.0251763523405306e-04`
+
+### term 134
+- pauli term from int row: `(4.2098456524183842e-02)*Y(q(0, 2))*Y(q(0, 3))*X(q(1, 0))*X(q(1, 1))`
+- int observable row: `[0, 0, 2, 2, 1, 1, 0, 0]`
+- Hamiltonian weight w_134: `4.2098456524183842e-02`
+- OGM effective shots used for this term: `526`
+- fitted unmit coeffs: `a_u=-7.2852203854964465e-02`, `b_u=-2.6958836478554156e-03`
+- fitted rem coeffs: `a_r=-3.5001425916049579e-02`, `b_r=-2.5810051478174865e-03`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=7.1174377224199285e-03`, `x_rem=3.1833149897431509e-02`, `y_exact=4.0214809622162104e-02`
+  - train[1] t_remaining=29: `x_unmit=-6.1224489795918366e-02`, `x_rem=-1.0645251178171455e-01`, `y_exact=-2.1359294979030278e-08`
+  - train[2] t_remaining=30: `x_unmit=3.5120147874306840e-02`, `x_rem=6.8086270526047613e-02`, `y_exact=1.3998809957656064e-08`
+  - train[3] t_remaining=31: `x_unmit=-1.3133208255159476e-02`, `x_rem=-3.7248187711859344e-02`, `y_exact=1.5174352212277231e-02`
+  - train[4] t_remaining=30: `x_unmit=-1.4705882352941176e-02`, `x_rem=-2.8676423062123316e-02`, `y_exact=3.6991869765439891e-08`
+  - train[5] t_remaining=31: `x_unmit=-1.5267175572519083e-02`, `x_rem=-2.3690667612205875e-02`, `y_exact=2.6074749260388274e-09`
+  - train[6] t_remaining=31: `x_unmit=1.7543859649122806e-02`, `x_rem=3.4703389925120426e-02`, `y_exact=3.8077908562298761e-08`
+  - train[7] t_remaining=31: `x_unmit=-4.8780487804878050e-02`, `x_rem=-1.1267092296743328e-01`, `y_exact=-2.6753328145437628e-08`
+  - train[8] t_remaining=30: `x_unmit=-1.9267822736030828e-03`, `x_rem=6.8656181965636096e-03`, `y_exact=-3.4431120203448012e-09`
+  - train[9] t_remaining=32: `x_unmit=1.1392405063291140e-01`, `x_rem=2.5120516383676916e-01`, `y_exact=-1.1054902461255510e-02`
+  - train[10] t_remaining=30: `x_unmit=4.0133779264214048e-02`, `x_rem=6.5083033545278252e-02`, `y_exact=-5.0251511131429219e-09`
+  - train[11] t_remaining=29: `x_unmit=-1.4492753623188406e-02`, `x_rem=-3.0144431736559972e-02`, `y_exact=2.2388697884876614e-09`
+  - train[12] t_remaining=30: `x_unmit=-6.6439522998296419e-02`, `x_rem=-1.3669881304604711e-01`, `y_exact=-1.0729036276798005e-08`
+  - train[13] t_remaining=29: `x_unmit=-3.7878787878787880e-03`, `x_rem=-4.3613826620418098e-03`, `y_exact=-1.0028191435292100e-08`
+  - train[14] t_remaining=32: `x_unmit=4.5801526717557252e-02`, `x_rem=1.0205928070914094e-01`, `y_exact=1.5718953499242252e-03`
+  - train[15] t_remaining=32: `x_unmit=3.8532110091743121e-02`, `x_rem=7.4938191718197350e-02`, `y_exact=-9.2495964933476157e-02`
+  - train[16] t_remaining=31: `x_unmit=-1.0074626865671642e-01`, `x_rem=-1.7830380880793573e-01`, `y_exact=-5.8218076428407746e-03`
+  - train[17] t_remaining=32: `x_unmit=-4.3956043956043959e-02`, `x_rem=-9.2743283085538170e-02`, `y_exact=-1.1169617853554388e-02`
+  - train[18] t_remaining=30: `x_unmit=2.4952015355086371e-02`, `x_rem=6.3587316364567964e-02`, `y_exact=-2.9796203106296665e-08`
+  - train[19] t_remaining=32: `x_unmit=-2.3853211009174313e-02`, `x_rem=-4.3436922730461042e-02`, `y_exact=-2.7964857700258736e-02`
+  - train[20] t_remaining=31: `x_unmit=-9.8445595854922283e-02`, `x_rem=-2.0993409098518609e-01`, `y_exact=-1.2524451085317635e-08`
+  - train[21] t_remaining=31: `x_unmit=-1.2844036697247707e-02`, `x_rem=-3.8338829552657154e-02`, `y_exact=4.2245401582393351e-02`
+  - train[22] t_remaining=30: `x_unmit=1.4388489208633094e-02`, `x_rem=2.7783658636249542e-02`, `y_exact=1.4102759948924856e-08`
+  - train[23] t_remaining=30: `x_unmit=-2.9304029304029304e-02`, `x_rem=-4.4670971644170644e-02`, `y_exact=1.1087353115119178e-08`
+- target x values: `x_u_target=1.6574585635359115e-02`, `x_r_target=5.0242106202293614e-02`
+- target contribution to E_cdr_unmit: `-1.6432622015696675e-04`
+- target contribution to E_cdr_rem: `-1.8268837830811462e-04`
+
+### term 135
+- pauli term from int row: `(4.2098456524183842e-02)*X(q(0, 2))*X(q(0, 3))*Y(q(1, 0))*Y(q(1, 1))`
+- int observable row: `[0, 0, 1, 1, 2, 2, 0, 0]`
+- Hamiltonian weight w_135: `4.2098456524183842e-02`
+- OGM effective shots used for this term: `461`
+- fitted unmit coeffs: `a_u=9.3166367682023174e-03`, `b_u=-2.2144796984511516e-03`
+- fitted rem coeffs: `a_r=-1.4779307193152520e-04`, `b_r=-2.0487837132805112e-03`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=3.4934497816593885e-02`, `x_rem=5.5607287534860911e-02`, `y_exact=4.0214816424529745e-02`
+  - train[1] t_remaining=29: `x_unmit=-4.1036717062634988e-02`, `x_rem=-9.2273565897896745e-02`, `y_exact=-1.2252609541679621e-08`
+  - train[2] t_remaining=30: `x_unmit=1.0329670329670329e-01`, `x_rem=2.1376626868779652e-01`, `y_exact=-3.4203116185365288e-08`
+  - train[3] t_remaining=31: `x_unmit=2.8199566160520606e-02`, `x_rem=6.0203866768755408e-02`, `y_exact=1.5174365940059602e-02`
+  - train[4] t_remaining=30: `x_unmit=2.8077753779697623e-02`, `x_rem=4.8715352893210023e-02`, `y_exact=3.8365455160513322e-08`
+  - train[5] t_remaining=31: `x_unmit=-1.4198782961460446e-02`, `x_rem=-3.2433697586566550e-02`, `y_exact=2.5434404956324025e-08`
+  - train[6] t_remaining=31: `x_unmit=8.2774049217002238e-02`, `x_rem=1.6460593957918102e-01`, `y_exact=9.3052188083132610e-09`
+  - train[7] t_remaining=31: `x_unmit=1.7241379310344827e-02`, `x_rem=2.4714323328339685e-02`, `y_exact=7.8887387176722901e-09`
+  - train[8] t_remaining=30: `x_unmit=2.0080321285140562e-02`, `x_rem=3.2760942826628545e-02`, `y_exact=-9.8951795748252081e-10`
+  - train[9] t_remaining=32: `x_unmit=-6.4239828693790149e-03`, `x_rem=9.8784363096158893e-03`, `y_exact=-1.1054919707275644e-02`
+  - train[10] t_remaining=30: `x_unmit=4.3879907621247112e-02`, `x_rem=9.6839882068298105e-02`, `y_exact=-1.1385592063340594e-08`
+  - train[11] t_remaining=29: `x_unmit=-4.3879907621247112e-02`, `x_rem=-7.8395746737370528e-02`, `y_exact=-3.5497693125216844e-09`
+  - train[12] t_remaining=30: `x_unmit=-3.5051546391752578e-02`, `x_rem=-8.7866651710301766e-02`, `y_exact=-6.7568935495734549e-10`
+  - train[13] t_remaining=29: `x_unmit=7.2765072765072769e-02`, `x_rem=1.5961764502967643e-01`, `y_exact=4.3925305008223607e-09`
+  - train[14] t_remaining=32: `x_unmit=-8.2105263157894737e-02`, `x_rem=-1.5781684456162315e-01`, `y_exact=1.5719101751451206e-03`
+  - train[15] t_remaining=32: `x_unmit=-1.5873015873015872e-02`, `x_rem=-3.4396814537358253e-02`, `y_exact=-9.2495996851799128e-02`
+  - train[16] t_remaining=31: `x_unmit=5.6842105263157895e-02`, `x_rem=1.1724173509771801e-01`, `y_exact=-5.8218097528426691e-03`
+  - train[17] t_remaining=32: `x_unmit=-4.0169133192389003e-02`, `x_rem=-6.5940422495074771e-02`, `y_exact=-1.1169670114931682e-02`
+  - train[18] t_remaining=30: `x_unmit=2.1231422505307855e-03`, `x_rem=1.2056524211805458e-02`, `y_exact=-1.3470462311521217e-08`
+  - train[19] t_remaining=32: `x_unmit=4.1095890410958902e-02`, `x_rem=9.3862551248776002e-02`, `y_exact=-2.7964893745974870e-02`
+  - train[20] t_remaining=31: `x_unmit=1.1061946902654868e-01`, `x_rem=2.3840629760408297e-01`, `y_exact=2.3272380876401224e-08`
+  - train[21] t_remaining=31: `x_unmit=-5.7777777777777775e-02`, `x_rem=-1.2428409506617813e-01`, `y_exact=4.2245456953726959e-02`
+  - train[22] t_remaining=30: `x_unmit=1.0526315789473684e-01`, `x_rem=2.1303947871394996e-01`, `y_exact=-4.2713122637840551e-09`
+  - train[23] t_remaining=30: `x_unmit=2.2172949002217295e-03`, `x_rem=1.1148122539895083e-02`, `y_exact=-1.4807246619037078e-08`
+- target x values: `x_u_target=2.3041474654377881e-02`, `x_r_target=4.5435795798959490e-02`
+- target contribution to E_cdr_unmit: `-8.4188941642164471e-05`
+- target contribution to E_cdr_rem: `-8.6533327251136013e-05`
+
+### term 136
+- pauli term from int row: `(4.2098456524183842e-02)*X(q(0, 2))*X(q(0, 3))*X(q(1, 0))*X(q(1, 1))`
+- int observable row: `[0, 0, 1, 1, 1, 1, 0, 0]`
+- Hamiltonian weight w_136: `4.2098456524183842e-02`
+- OGM effective shots used for this term: `556`
+- fitted unmit coeffs: `a_u=-3.9002315787790322e-02`, `b_u=-1.7577364586819045e-03`
+- fitted rem coeffs: `a_r=-1.5166084649463611e-02`, `b_r=-1.7427977620816063e-03`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-2.8776978417266189e-02`, `x_rem=-4.4063365774243593e-02`, `y_exact=4.0214760841777449e-02`
+  - train[1] t_remaining=29: `x_unmit=6.4150943396226415e-02`, `x_rem=1.4889326489286256e-01`, `y_exact=2.1957305752702138e-08`
+  - train[2] t_remaining=30: `x_unmit=2.7322404371584699e-02`, `x_rem=5.2835444062774163e-02`, `y_exact=2.8469892353191876e-08`
+  - train[3] t_remaining=31: `x_unmit=2.6819923371647510e-02`, `x_rem=7.2121533717044675e-02`, `y_exact=1.5174372965520672e-02`
+  - train[4] t_remaining=30: `x_unmit=-2.9982363315696647e-02`, `x_rem=-4.4112212340459693e-02`, `y_exact=-3.4977644478371568e-08`
+  - train[5] t_remaining=31: `x_unmit=6.8548387096774188e-02`, `x_rem=1.3811090366271414e-01`, `y_exact=-5.6523508328171212e-09`
+  - train[6] t_remaining=31: `x_unmit=-1.2259194395796848e-02`, `x_rem=-2.2015378079884587e-02`, `y_exact=-3.4444918768423090e-08`
+  - train[7] t_remaining=31: `x_unmit=3.5647279549718573e-02`, `x_rem=7.4119021348408032e-02`, `y_exact=-2.8271369069098302e-08`
+  - train[8] t_remaining=30: `x_unmit=8.0882352941176475e-02`, `x_rem=1.7552245699925587e-01`, `y_exact=1.9916008281618884e-08`
+  - train[9] t_remaining=32: `x_unmit=-1.6216216216216217e-02`, `x_rem=-3.1148229796481363e-02`, `y_exact=-1.1054939834473801e-02`
+  - train[10] t_remaining=30: `x_unmit=2.6315789473684209e-02`, `x_rem=5.4494635841163673e-02`, `y_exact=1.3489825172587388e-08`
+  - train[11] t_remaining=29: `x_unmit=-4.1894353369763208e-02`, `x_rem=-7.3308490444217944e-02`, `y_exact=8.7893730996004999e-09`
+  - train[12] t_remaining=30: `x_unmit=-8.3487940630797772e-02`, `x_rem=-1.6657430611333413e-01`, `y_exact=5.3311066960434206e-09`
+  - train[13] t_remaining=29: `x_unmit=-1.2477718360071301e-02`, `x_rem=-3.2031215737140101e-02`, `y_exact=-1.3241269116022229e-10`
+  - train[14] t_remaining=32: `x_unmit=-6.2381852551984876e-02`, `x_rem=-1.1679744024375847e-01`, `y_exact=1.5718799837704609e-03`
+  - train[15] t_remaining=32: `x_unmit=2.1978021978021980e-02`, `x_rem=4.7569183985431335e-02`, `y_exact=-9.2495975918241213e-02`
+  - train[16] t_remaining=31: `x_unmit=2.8462998102466792e-02`, `x_rem=8.5018578287517133e-02`, `y_exact=-5.8218356717308871e-03`
+  - train[17] t_remaining=32: `x_unmit=3.7433155080213901e-02`, `x_rem=6.6854335924879230e-02`, `y_exact=-1.1169708427130965e-02`
+  - train[18] t_remaining=30: `x_unmit=6.1151079136690649e-02`, `x_rem=1.2346775472927086e-01`, `y_exact=-6.2741220963011970e-10`
+  - train[19] t_remaining=32: `x_unmit=-2.2556390977443608e-02`, `x_rem=-5.6632502632478043e-02`, `y_exact=-2.7964868181288557e-02`
+  - train[20] t_remaining=31: `x_unmit=4.9180327868852458e-02`, `x_rem=1.0395433845330992e-01`, `y_exact=3.4288106465957387e-08`
+  - train[21] t_remaining=31: `x_unmit=1.1029411764705883e-02`, `x_rem=1.3124384830825269e-02`, `y_exact=4.2245403902545262e-02`
+  - train[22] t_remaining=30: `x_unmit=-6.5913370998116755e-02`, `x_rem=-1.3953118915577861e-01`, `y_exact=-1.8791453583780610e-09`
+  - train[23] t_remaining=30: `x_unmit=1.9455252918287938e-02`, `x_rem=6.2922667383270653e-02`, `y_exact=-2.0361699108925466e-08`
+- target x values: `x_u_target=-4.7957371225577264e-02`, `x_r_target=-1.2456231738693900e-01`
+- target contribution to E_cdr_unmit: `4.7450045242887800e-06`
+- target contribution to E_cdr_rem: `6.1600519165956490e-06`
+
+### term 137
+- pauli term from int row: `(-4.5401029857615252e-03)*Z(q(0, 2))*Y(q(1, 0))*Z(q(1, 1))*Y(q(1, 2))`
+- int observable row: `[0, 0, 3, 0, 2, 3, 2, 0]`
+- Hamiltonian weight w_137: `-4.5401029857615252e-03`
+- OGM effective shots used for this term: `403`
+- fitted unmit coeffs: `a_u=1.7754550215188867e+00`, `b_u=2.7556757973205729e-02`
+- fitted rem coeffs: `a_r=7.7158663057948629e-01`, `b_r=2.6833624558976664e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-3.7037037037037042e-02`, `x_rem=-1.0620816069045717e-01`, `y_exact=-6.4171493153770895e-02`
+  - train[1] t_remaining=29: `x_unmit=5.5408970976253295e-02`, `x_rem=1.2340264877670140e-01`, `y_exact=-1.0526439957534452e-08`
+  - train[2] t_remaining=30: `x_unmit=2.0833333333333332e-02`, `x_rem=6.1716086179794655e-02`, `y_exact=-9.4395817932022769e-08`
+  - train[3] t_remaining=31: `x_unmit=1.1564823173178713e-18`, `x_rem=8.4173102088000561e-03`, `y_exact=-3.4631651698539623e-01`
+  - train[4] t_remaining=30: `x_unmit=3.4852546916890083e-02`, `x_rem=7.8907912698903737e-02`, `y_exact=1.4012305574661837e-01`
+  - train[5] t_remaining=31: `x_unmit=7.5566750629722920e-03`, `x_rem=9.8644797689865504e-03`, `y_exact=2.3406162364899249e-08`
+  - train[6] t_remaining=31: `x_unmit=1.6949152542372881e-02`, `x_rem=6.7136652505658465e-02`, `y_exact=-7.6567649652431361e-08`
+  - train[7] t_remaining=31: `x_unmit=-2.3373116307898032e-18`, `x_rem=-8.9590395044510649e-04`, `y_exact=-1.7477862577370418e-08`
+  - train[8] t_remaining=30: `x_unmit=4.3478260869565216e-02`, `x_rem=8.6138902072866300e-02`, `y_exact=1.7442315892338889e-01`
+  - train[9] t_remaining=32: `x_unmit=-7.1999999999999995e-02`, `x_rem=-1.5300237100063765e-01`, `y_exact=1.8229701524150513e-01`
+  - train[10] t_remaining=30: `x_unmit=6.1538461538461542e-02`, `x_rem=1.3975928321795891e-01`, `y_exact=1.6193770715432473e-01`
+  - train[11] t_remaining=29: `x_unmit=-1.1898734177215189e-01`, `x_rem=-2.6668933748904994e-01`, `y_exact=-4.1473960082254790e-01`
+  - train[12] t_remaining=30: `x_unmit=4.5092838196286469e-02`, `x_rem=1.0331610836108303e-01`, `y_exact=-5.4870793934539199e-08`
+  - train[13] t_remaining=29: `x_unmit=1.1653116531165311e-01`, `x_rem=2.6138619325514612e-01`, `y_exact=1.6193761160500247e-01`
+  - train[14] t_remaining=32: `x_unmit=-8.4033613445378148e-03`, `x_rem=-2.8398969924344555e-02`, `y_exact=2.7354813368471932e-02`
+  - train[15] t_remaining=32: `x_unmit=3.8888888888888896e-02`, `x_rem=8.0489509260474643e-02`, `y_exact=1.4315584450350408e-01`
+  - train[16] t_remaining=31: `x_unmit=1.0129870129870130e-01`, `x_rem=2.3683659274848629e-01`, `y_exact=3.5863044531736310e-01`
+  - train[17] t_remaining=32: `x_unmit=4.4554455445544552e-02`, `x_rem=1.0770365144709608e-01`, `y_exact=1.8223672306951663e-01`
+  - train[18] t_remaining=30: `x_unmit=-6.0686015831134567e-02`, `x_rem=-1.2198967631084334e-01`, `y_exact=-2.1426591653748601e-10`
+  - train[19] t_remaining=32: `x_unmit=8.5271317829457363e-02`, `x_rem=1.9929287224564529e-01`, `y_exact=1.9888786281471099e-01`
+  - train[20] t_remaining=31: `x_unmit=-3.0612244897959183e-02`, `x_rem=-6.6614275282785629e-02`, `y_exact=9.5517121842294651e-09`
+  - train[21] t_remaining=31: `x_unmit=-2.5773195876288658e-02`, `x_rem=-5.5030854744351473e-02`, `y_exact=8.6071933719856886e-02`
+  - train[22] t_remaining=30: `x_unmit=0.0000000000000000e+00`, `x_rem=1.7571185702592292e-03`, `y_exact=1.6353000470031196e-03`
+  - train[23] t_remaining=30: `x_unmit=-2.5380710659898477e-02`, `x_rem=-6.9734344095750647e-02`, `y_exact=1.8877242168178829e-01`
+- target x values: `x_u_target=6.8627450980392149e-02`, `x_r_target=1.4553875451491310e-01`
+- target contribution to E_cdr_unmit: `-6.7829915160286616e-04`
+- target contribution to E_cdr_rem: `-6.3166172159871800e-04`
+
+### term 138
+- pauli term from int row: `(-4.5401029857615252e-03)*Z(q(0, 2))*X(q(1, 0))*Z(q(1, 1))*X(q(1, 2))`
+- int observable row: `[0, 0, 3, 0, 1, 3, 1, 0]`
+- Hamiltonian weight w_138: `-4.5401029857615252e-03`
+- OGM effective shots used for this term: `365`
+- fitted unmit coeffs: `a_u=1.4230445581923754e+00`, `b_u=3.1071490959206010e-02`
+- fitted rem coeffs: `a_r=6.7619633264114198e-01`, `b_r=2.9370369857616683e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-6.0773480662983423e-02`, `x_rem=-1.4854575880145046e-01`, `y_exact=-6.4171440976237365e-02`
+  - train[1] t_remaining=29: `x_unmit=-3.4300791556728237e-02`, `x_rem=-6.0095658988389762e-02`, `y_exact=7.1636371393290920e-09`
+  - train[2] t_remaining=30: `x_unmit=-4.0767386091127102e-02`, `x_rem=-1.1198227503670856e-01`, `y_exact=-1.0343349028018860e-07`
+  - train[3] t_remaining=31: `x_unmit=7.1258907363420448e-03`, `x_rem=-6.4664583196801240e-03`, `y_exact=-3.4631654657355954e-01`
+  - train[4] t_remaining=30: `x_unmit=5.4830287206266322e-02`, `x_rem=1.2431289408784904e-01`, `y_exact=1.4012305574660788e-01`
+  - train[5] t_remaining=31: `x_unmit=-2.2556390977443608e-02`, `x_rem=-5.1940143620484026e-02`, `y_exact=5.3131107596711384e-08`
+  - train[6] t_remaining=31: `x_unmit=-7.8534031413612565e-02`, `x_rem=-1.6285315035115097e-01`, `y_exact=-2.6740083793240006e-08`
+  - train[7] t_remaining=31: `x_unmit=7.2164948453608241e-02`, `x_rem=1.5461437708386949e-01`, `y_exact=1.1398726889289767e-08`
+  - train[8] t_remaining=30: `x_unmit=-5.1724137931034482e-02`, `x_rem=-8.4855716742260473e-02`, `y_exact=1.7442315902023106e-01`
+  - train[9] t_remaining=32: `x_unmit=4.9723756906077346e-02`, `x_rem=1.1387964389513100e-01`, `y_exact=1.8229692703498640e-01`
+  - train[10] t_remaining=30: `x_unmit=9.8522167487684730e-03`, `x_rem=2.2837355554814667e-02`, `y_exact=1.6193770715428860e-01`
+  - train[11] t_remaining=29: `x_unmit=-1.1168831168831168e-01`, `x_rem=-2.4776964292624076e-01`, `y_exact=-4.1473960082251321e-01`
+  - train[12] t_remaining=30: `x_unmit=4.2253521126760563e-02`, `x_rem=8.8855050275465974e-02`, `y_exact=-5.5228310620244669e-08`
+  - train[13] t_remaining=29: `x_unmit=1.1229946524064172e-01`, `x_rem=2.7789934297901414e-01`, `y_exact=1.6193761160498402e-01`
+  - train[14] t_remaining=32: `x_unmit=-3.5714285714285712e-02`, `x_rem=-6.0753402212755533e-02`, `y_exact=2.7354824031991666e-02`
+  - train[15] t_remaining=32: `x_unmit=-1.3123359580052493e-02`, `x_rem=-3.4878952323849653e-02`, `y_exact=1.4315582153330778e-01`
+  - train[16] t_remaining=31: `x_unmit=8.9473684210526316e-02`, `x_rem=2.0673543013826301e-01`, `y_exact=3.5863047477306981e-01`
+  - train[17] t_remaining=32: `x_unmit=6.0869565217391307e-02`, `x_rem=1.3632860258365195e-01`, `y_exact=1.8223670476591747e-01`
+  - train[18] t_remaining=30: `x_unmit=4.1095890410958916e-02`, `x_rem=9.1443387439672980e-02`, `y_exact=8.5425196141366704e-10`
+  - train[19] t_remaining=32: `x_unmit=2.8571428571428571e-02`, `x_rem=6.0312701429809580e-02`, `y_exact=1.9888777461496321e-01`
+  - train[20] t_remaining=31: `x_unmit=2.5380710659898477e-02`, `x_rem=3.6526460300238005e-02`, `y_exact=-2.0013592386146980e-08`
+  - train[21] t_remaining=31: `x_unmit=-2.2471910112359550e-02`, `x_rem=-4.4127912539300693e-02`, `y_exact=8.6071944996367583e-02`
+  - train[22] t_remaining=30: `x_unmit=1.0539845758354756e-01`, `x_rem=2.4038491869358855e-01`, `y_exact=1.6352620485865052e-03`
+  - train[23] t_remaining=30: `x_unmit=7.9365079365079361e-02`, `x_rem=1.6606847820025861e-01`, `y_exact=1.8877231737502223e-01`
+- target x values: `x_u_target=4.3037974683544304e-02`, `x_r_target=1.0496241884957354e-01`
+- target contribution to E_cdr_unmit: `-4.1912617497178942e-04`
+- target contribution to E_cdr_rem: `-4.5557923353694636e-04`
+
+### term 139
+- pauli term from int row: `(-7.6471876029928004e-03)*Y(q(0, 2))*Y(q(0, 3))*Y(q(1, 0))*Z(q(1, 1))*Z(q(1, 2))*Y(q(1, 3))`
+- int observable row: `[0, 0, 2, 2, 2, 3, 3, 2]`
+- Hamiltonian weight w_139: `-7.6471876029928004e-03`
+- OGM effective shots used for this term: `138`
+- fitted unmit coeffs: `a_u=1.6608822156176983e-02`, `b_u=2.2641598316686402e-03`
+- fitted rem coeffs: `a_r=5.9011728866781733e-03`, `b_r=2.2412249224318575e-03`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-8.5470085470085479e-03`, `x_rem=-1.3730787398262317e-02`, `y_exact=3.4975009673965857e-02`
+  - train[1] t_remaining=29: `x_unmit=7.9754601226993863e-02`, `x_rem=2.0279560687261733e-01`, `y_exact=-4.8891325518111600e-09`
+  - train[2] t_remaining=30: `x_unmit=1.0810810810810811e-01`, `x_rem=3.3042096448176478e-01`, `y_exact=3.1417179713021989e-08`
+  - train[3] t_remaining=31: `x_unmit=6.6225165562913907e-03`, `x_rem=1.4716003554493493e-02`, `y_exact=-7.9343014672308802e-03`
+  - train[4] t_remaining=30: `x_unmit=-8.5271317829457363e-02`, `x_rem=-2.6694090476137305e-01`, `y_exact=7.9001245816851389e-09`
+  - train[5] t_remaining=31: `x_unmit=-4.0000000000000001e-02`, `x_rem=-1.4837630677870386e-01`, `y_exact=-1.7140837812066069e-10`
+  - train[6] t_remaining=31: `x_unmit=-9.2198581560283682e-02`, `x_rem=-2.8321291817263999e-01`, `y_exact=-3.5374890077566647e-08`
+  - train[7] t_remaining=31: `x_unmit=2.7027027027027029e-02`, `x_rem=1.3443350600422288e-01`, `y_exact=-1.6749925412684259e-08`
+  - train[8] t_remaining=30: `x_unmit=-5.6338028169014086e-02`, `x_rem=-1.8607959073450581e-01`, `y_exact=1.6930843475531388e-08`
+  - train[9] t_remaining=32: `x_unmit=-1.0948905109489052e-01`, `x_rem=-2.8794925122370318e-01`, `y_exact=-3.2125586779863840e-03`
+  - train[10] t_remaining=30: `x_unmit=-1.1888111888111888e-01`, `x_rem=-3.8640433564122145e-01`, `y_exact=-1.0211407905254940e-08`
+  - train[11] t_remaining=29: `x_unmit=-1.9424460431654678e-01`, `x_rem=-6.1022542894415088e-01`, `y_exact=-5.5568834090253501e-09`
+  - train[12] t_remaining=30: `x_unmit=-3.2258064516129031e-02`, `x_rem=-1.1879284424808984e-01`, `y_exact=4.9048123946140571e-09`
+  - train[13] t_remaining=29: `x_unmit=-2.2302158273381295e-01`, `x_rem=-6.6499979491641759e-01`, `y_exact=-1.0779174259257101e-08`
+  - train[14] t_remaining=32: `x_unmit=-1.7647058823529413e-01`, `x_rem=-4.8523236503463435e-01`, `y_exact=-9.1181994829642263e-03`
+  - train[15] t_remaining=32: `x_unmit=1.0526315789473684e-01`, `x_rem=3.4668650477710206e-01`, `y_exact=4.4937549866905374e-02`
+  - train[16] t_remaining=31: `x_unmit=-2.8985507246376812e-02`, `x_rem=-8.3219969404937436e-02`, `y_exact=-1.0456159681568608e-03`
+  - train[17] t_remaining=32: `x_unmit=6.6225165562913907e-03`, `x_rem=3.4003071139748813e-02`, `y_exact=3.5888742656232778e-02`
+  - train[18] t_remaining=30: `x_unmit=7.4074074074074077e-03`, `x_rem=2.3405891828376886e-02`, `y_exact=1.3308086263821097e-08`
+  - train[19] t_remaining=32: `x_unmit=1.1278195488721804e-01`, `x_rem=3.3450495601081776e-01`, `y_exact=-3.9852491631488712e-02`
+  - train[20] t_remaining=31: `x_unmit=-7.0866141732283464e-02`, `x_rem=-1.2375887761661890e-01`, `y_exact=2.1359214559776971e-08`
+  - train[21] t_remaining=31: `x_unmit=0.0000000000000000e+00`, `x_rem=6.1127851342329093e-02`, `y_exact=-1.2229160021560288e-02`
+  - train[22] t_remaining=30: `x_unmit=-3.1250000000000000e-02`, `x_rem=-3.3595487624557760e-02`, `y_exact=1.0204360841269962e-08`
+  - train[23] t_remaining=30: `x_unmit=9.5890410958904104e-02`, `x_rem=2.8192514148862546e-01`, `y_exact=-7.2658643273686264e-09`
+- target x values: `x_u_target=-2.3255813953488372e-02`, `x_r_target=-1.1091871494074589e-01`
+- target contribution to E_cdr_unmit: `-1.4360715951906765e-05`
+- target contribution to E_cdr_rem: `-1.2133596872007493e-05`
+
+### term 140
+- pauli term from int row: `(-7.6471876029928004e-03)*Y(q(0, 2))*Y(q(0, 3))*X(q(1, 0))*Z(q(1, 1))*Z(q(1, 2))*X(q(1, 3))`
+- int observable row: `[0, 0, 2, 2, 1, 3, 3, 1]`
+- Hamiltonian weight w_140: `-7.6471876029928004e-03`
+- OGM effective shots used for this term: `125`
+- fitted unmit coeffs: `a_u=5.5695724392363026e-02`, `b_u=1.8869324606778260e-03`
+- fitted rem coeffs: `a_r=1.8734917759087959e-02`, `b_r=2.0117721073847740e-03`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=1.5231788079470199e-01`, `x_rem=4.6802451001954026e-01`, `y_exact=3.4974995661483002e-02`
+  - train[1] t_remaining=29: `x_unmit=-6.3829787234042548e-02`, `x_rem=-1.8714812907991779e-01`, `y_exact=-2.0832761210984511e-08`
+  - train[2] t_remaining=30: `x_unmit=0.0000000000000000e+00`, `x_rem=6.1813500459098917e-03`, `y_exact=-5.8921589761428027e-09`
+  - train[3] t_remaining=31: `x_unmit=1.9354838709677420e-02`, `x_rem=8.7799792926650300e-02`, `y_exact=-7.9343006982244627e-03`
+  - train[4] t_remaining=30: `x_unmit=9.9236641221374045e-02`, `x_rem=2.3473814978696014e-01`, `y_exact=-1.5302854093774146e-09`
+  - train[5] t_remaining=31: `x_unmit=0.0000000000000000e+00`, `x_rem=-1.7805302328056924e-02`, `y_exact=3.1170267398546150e-09`
+  - train[6] t_remaining=31: `x_unmit=-2.0979020979020980e-02`, `x_rem=-4.9973184341788740e-02`, `y_exact=2.2661696375030299e-09`
+  - train[7] t_remaining=31: `x_unmit=-2.2900763358778626e-02`, `x_rem=-5.7420692353063602e-02`, `y_exact=-1.5561305466784747e-08`
+  - train[8] t_remaining=30: `x_unmit=1.0828025477707007e-01`, `x_rem=3.0864110740394485e-01`, `y_exact=1.3058317063467670e-09`
+  - train[9] t_remaining=32: `x_unmit=4.4585987261146494e-02`, `x_rem=1.2317506189992650e-01`, `y_exact=-3.2125565049492752e-03`
+  - train[10] t_remaining=30: `x_unmit=-6.7567567567567571e-02`, `x_rem=-1.8636459389372978e-01`, `y_exact=-1.0569585166991263e-08`
+  - train[11] t_remaining=29: `x_unmit=-1.5107913669064749e-01`, `x_rem=-4.3423891204909065e-01`, `y_exact=-2.3351853120172325e-08`
+  - train[12] t_remaining=30: `x_unmit=-1.0447761194029850e-01`, `x_rem=-3.1800743641176571e-01`, `y_exact=-2.2385710455087445e-10`
+  - train[13] t_remaining=29: `x_unmit=1.4084507042253521e-02`, `x_rem=-2.7326157473437987e-03`, `y_exact=1.2200693740634170e-09`
+  - train[14] t_remaining=32: `x_unmit=1.5151515151515152e-02`, `x_rem=6.3629545900398418e-02`, `y_exact=-9.1181900684286256e-03`
+  - train[15] t_remaining=32: `x_unmit=-2.4000000000000000e-02`, `x_rem=-9.7329492248027574e-02`, `y_exact=4.4937518944141275e-02`
+  - train[16] t_remaining=31: `x_unmit=7.5949367088607597e-02`, `x_rem=2.1355305229506333e-01`, `y_exact=-1.0456106437509659e-03`
+  - train[17] t_remaining=32: `x_unmit=-3.9473684210526314e-02`, `x_rem=-1.3533583047058156e-01`, `y_exact=3.5888759438350792e-02`
+  - train[18] t_remaining=30: `x_unmit=-5.3333333333333337e-02`, `x_rem=-1.9524883710529334e-01`, `y_exact=1.8101203009684544e-08`
+  - train[19] t_remaining=32: `x_unmit=-9.3525179856115109e-02`, `x_rem=-3.2682302531016882e-01`, `y_exact=-3.9852478273313924e-02`
+  - train[20] t_remaining=31: `x_unmit=7.4626865671641784e-02`, `x_rem=1.9146516293081636e-01`, `y_exact=1.1356653755910624e-08`
+  - train[21] t_remaining=31: `x_unmit=-1.1594202898550725e-01`, `x_rem=-3.9501027059845750e-01`, `y_exact=-1.2229144913235922e-02`
+  - train[22] t_remaining=30: `x_unmit=7.4829931972789115e-02`, `x_rem=2.8709710415418110e-01`, `y_exact=4.6973096362466889e-09`
+  - train[23] t_remaining=30: `x_unmit=2.7027027027027029e-02`, `x_rem=1.0562389932754498e-01`, `y_exact=-2.7635708524372013e-09`
+- target x values: `x_u_target=5.1851851851851850e-02`, `x_r_target=1.1189738924807349e-01`
+- target contribution to E_cdr_unmit: `-3.6514241867579252e-05`
+- target contribution to E_cdr_rem: `-3.1415873988617308e-05`
+
+### term 141
+- pauli term from int row: `(-7.6471876029928004e-03)*X(q(0, 2))*X(q(0, 3))*Y(q(1, 0))*Z(q(1, 1))*Z(q(1, 2))*Y(q(1, 3))`
+- int observable row: `[0, 0, 1, 1, 2, 3, 3, 2]`
+- Hamiltonian weight w_141: `-7.6471876029928004e-03`
+- OGM effective shots used for this term: `140`
+- fitted unmit coeffs: `a_u=1.4470763992379258e-02`, `b_u=1.3418685642421636e-03`
+- fitted rem coeffs: `a_r=9.1337377721732102e-03`, `b_r=9.5040070822983254e-04`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=1.2658227848101267e-01`, `x_rem=3.7682171094504907e-01`, `y_exact=3.4974979231341838e-02`
+  - train[1] t_remaining=29: `x_unmit=7.7922077922077920e-02`, `x_rem=2.2480363804017739e-01`, `y_exact=-8.7107370613886135e-09`
+  - train[2] t_remaining=30: `x_unmit=1.3333333333333333e-01`, `x_rem=3.8202802093436400e-01`, `y_exact=3.1332597542019852e-09`
+  - train[3] t_remaining=31: `x_unmit=-2.5316455696202531e-02`, `x_rem=-1.4018558864432212e-01`, `y_exact=-7.9343019599206286e-03`
+  - train[4] t_remaining=30: `x_unmit=6.5359477124183009e-03`, `x_rem=5.1007488699253275e-03`, `y_exact=-6.5615627182230146e-09`
+  - train[5] t_remaining=31: `x_unmit=1.7197452229299362e-01`, `x_rem=5.4510286251578477e-01`, `y_exact=-2.5924838964993656e-09`
+  - train[6] t_remaining=31: `x_unmit=8.1481481481481488e-02`, `x_rem=1.9613038692543594e-01`, `y_exact=1.4381249019100585e-08`
+  - train[7] t_remaining=31: `x_unmit=6.8027210884353739e-03`, `x_rem=7.8792560069202364e-03`, `y_exact=4.5917960638206273e-10`
+  - train[8] t_remaining=30: `x_unmit=6.2500000000000000e-02`, `x_rem=2.0718615641292892e-01`, `y_exact=6.0049911029569783e-09`
+  - train[9] t_remaining=32: `x_unmit=2.4390243902439025e-02`, `x_rem=5.1972610457147739e-02`, `y_exact=-3.2125607931396318e-03`
+  - train[10] t_remaining=30: `x_unmit=6.5789473684210523e-02`, `x_rem=1.8258594840401554e-01`, `y_exact=4.5322101890406903e-09`
+  - train[11] t_remaining=29: `x_unmit=9.2307692307692313e-02`, `x_rem=2.7070305901343550e-01`, `y_exact=8.8596105705105210e-09`
+  - train[12] t_remaining=30: `x_unmit=7.1942446043165471e-03`, `x_rem=6.0581503051594536e-02`, `y_exact=-6.9393420046678066e-09`
+  - train[13] t_remaining=29: `x_unmit=6.4748201438848921e-02`, `x_rem=2.1847022082645268e-01`, `y_exact=1.0504300250884241e-08`
+  - train[14] t_remaining=32: `x_unmit=7.8125000000000000e-02`, `x_rem=2.1559294172343180e-01`, `y_exact=-9.1181794878029913e-03`
+  - train[15] t_remaining=32: `x_unmit=-8.4507042253521125e-02`, `x_rem=-2.0431650201142598e-01`, `y_exact=4.4937554709868939e-02`
+  - train[16] t_remaining=31: `x_unmit=1.0606060606060606e-01`, `x_rem=3.3435833925520431e-01`, `y_exact=-1.0456104638248845e-03`
+  - train[17] t_remaining=32: `x_unmit=-3.3112582781456956e-02`, `x_rem=-7.1790950668906436e-02`, `y_exact=3.5888732298726841e-02`
+  - train[18] t_remaining=30: `x_unmit=-6.1538461538461542e-02`, `x_rem=-1.3688759761807265e-01`, `y_exact=7.6164240997690426e-09`
+  - train[19] t_remaining=32: `x_unmit=-7.0422535211267609e-02`, `x_rem=-2.6127523704068911e-01`, `y_exact=-3.9852500350101960e-02`
+  - train[20] t_remaining=31: `x_unmit=9.6774193548387094e-02`, `x_rem=3.0558628763985840e-01`, `y_exact=3.6126125838339663e-09`
+  - train[21] t_remaining=31: `x_unmit=-1.4970059880239520e-01`, `x_rem=-4.3028905868498019e-01`, `y_exact=-1.2229158419320246e-02`
+  - train[22] t_remaining=30: `x_unmit=-5.7142857142857141e-02`, `x_rem=-1.7262372444790067e-01`, `y_exact=-1.9585260780733439e-09`
+  - train[23] t_remaining=30: `x_unmit=-1.5625000000000000e-02`, `x_rem=-2.1712358090559644e-02`, `y_exact=1.1498711878747307e-08`
+- target x values: `x_u_target=-9.5541401273885357e-02`, `x_r_target=-2.4270140981990104e-01`
+- target contribution to E_cdr_unmit: `3.1115263173482098e-07`
+- target contribution to E_cdr_rem: `9.6841714577995852e-06`
+
+### term 142
+- pauli term from int row: `(-7.6471876029928004e-03)*X(q(0, 2))*X(q(0, 3))*X(q(1, 0))*Z(q(1, 1))*Z(q(1, 2))*X(q(1, 3))`
+- int observable row: `[0, 0, 1, 1, 1, 3, 3, 1]`
+- Hamiltonian weight w_142: `-7.6471876029928004e-03`
+- OGM effective shots used for this term: `140`
+- fitted unmit coeffs: `a_u=-1.5395790924812199e-02`, `b_u=1.4919704556033773e-03`
+- fitted rem coeffs: `a_r=-5.2028993117654619e-03`, `b_r=1.5993570922468996e-03`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-4.4117647058823532e-02`, `x_rem=-1.5421994179081239e-01`, `y_exact=3.4974995491354292e-02`
+  - train[1] t_remaining=29: `x_unmit=-1.5862068965517243e-01`, `x_rem=-4.3328441499297138e-01`, `y_exact=-1.0641785894204615e-08`
+  - train[2] t_remaining=30: `x_unmit=-8.6614173228346455e-02`, `x_rem=-2.5491837571051473e-01`, `y_exact=2.3680121286704165e-08`
+  - train[3] t_remaining=31: `x_unmit=-1.7391304347826086e-01`, `x_rem=-4.8635781847390441e-01`, `y_exact=-7.9342914531153295e-03`
+  - train[4] t_remaining=30: `x_unmit=7.2992700729927005e-03`, `x_rem=3.6856446945178124e-02`, `y_exact=6.2061597727598248e-09`
+  - train[5] t_remaining=31: `x_unmit=7.9365079365079361e-02`, `x_rem=2.6068000303841671e-01`, `y_exact=2.0008029636170804e-09`
+  - train[6] t_remaining=31: `x_unmit=7.1428571428571425e-02`, `x_rem=3.5251678665790920e-01`, `y_exact=-8.2867671094869893e-09`
+  - train[7] t_remaining=31: `x_unmit=7.4074074074074077e-03`, `x_rem=4.7135689796629771e-02`, `y_exact=8.5196003628167173e-09`
+  - train[8] t_remaining=30: `x_unmit=-1.7241379310344829e-01`, `x_rem=-4.9424366695928107e-01`, `y_exact=2.2453667576963738e-08`
+  - train[9] t_remaining=32: `x_unmit=6.0402684563758392e-02`, `x_rem=1.9315701781356101e-01`, `y_exact=-3.2125625082650008e-03`
+  - train[10] t_remaining=30: `x_unmit=2.9411764705882353e-02`, `x_rem=1.1851691422464906e-01`, `y_exact=-6.7795565172739584e-09`
+  - train[11] t_remaining=29: `x_unmit=-9.8039215686274508e-02`, `x_rem=-2.8922547159860001e-01`, `y_exact=3.5559315147898125e-08`
+  - train[12] t_remaining=30: `x_unmit=1.3698630136986301e-02`, `x_rem=1.0458376824215437e-02`, `y_exact=2.5929261779938912e-08`
+  - train[13] t_remaining=29: `x_unmit=1.6201117318435754e-01`, `x_rem=4.8002774626795902e-01`, `y_exact=6.6983101257716998e-09`
+  - train[14] t_remaining=32: `x_unmit=1.0067114093959731e-01`, `x_rem=2.8478176639062774e-01`, `y_exact=-9.1182127835969361e-03`
+  - train[15] t_remaining=32: `x_unmit=3.1847133757961783e-02`, `x_rem=1.5381331081970667e-01`, `y_exact=4.4937541745767369e-02`
+  - train[16] t_remaining=31: `x_unmit=-1.7355371900826447e-01`, `x_rem=-4.3995005697235157e-01`, `y_exact=-1.0456024299163428e-03`
+  - train[17] t_remaining=32: `x_unmit=-8.4507042253521125e-02`, `x_rem=-2.7101116329070934e-01`, `y_exact=3.5888727347103362e-02`
+  - train[18] t_remaining=30: `x_unmit=4.2424242424242427e-02`, `x_rem=1.1268822894318858e-01`, `y_exact=1.5484669652852682e-08`
+  - train[19] t_remaining=32: `x_unmit=2.6666666666666668e-02`, `x_rem=4.6865308085667211e-02`, `y_exact=-3.9852481859898578e-02`
+  - train[20] t_remaining=31: `x_unmit=-7.1942446043165471e-03`, `x_rem=-1.7348304776704890e-02`, `y_exact=1.9899736613533712e-08`
+  - train[21] t_remaining=31: `x_unmit=0.0000000000000000e+00`, `x_rem=1.0956357139385804e-01`, `y_exact=-1.2229136696333874e-02`
+  - train[22] t_remaining=30: `x_unmit=-6.9767441860465115e-02`, `x_rem=-1.6259146559823670e-01`, `y_exact=8.4647721061858876e-11`
+  - train[23] t_remaining=30: `x_unmit=7.2992700729927005e-03`, `x_rem=2.2567210755761513e-02`, `y_exact=1.1206429932715998e-08`
+- target x values: `x_u_target=1.4102564102564102e-01`, `x_r_target=4.2518652466037893e-01`
+- target contribution to E_cdr_unmit: `5.1942055725375877e-06`
+- target contribution to E_cdr_rem: `4.6865451546589841e-06`
+
+### term 143
+- pauli term from int row: `(8.3839045915120314e-02)*Z(q(0, 2))*Z(q(1, 1))`
+- int observable row: `[0, 0, 3, 0, 0, 3, 0, 0]`
+- Hamiltonian weight w_143: `8.3839045915120314e-02`
+- OGM effective shots used for this term: `2601`
+- fitted unmit coeffs: `a_u=5.0929404399780740e+00`, `b_u=-4.7386676862089867e-02`
+- fitted rem coeffs: `a_r=3.3744630767879689e+00`, `b_r=-2.7422146742505944e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-1.8433179723502304e-02`, `x_rem=-5.1698307222370371e-02`, `y_exact=-1.0140366512594266e-01`
+  - train[1] t_remaining=29: `x_unmit=2.5898724391186703e-02`, `x_rem=3.4939270597432105e-02`, `y_exact=2.7503945154461382e-03`
+  - train[2] t_remaining=30: `x_unmit=-4.8595292331055431e-02`, `x_rem=-5.5036524786852219e-02`, `y_exact=-1.7852845807840018e-01`
+  - train[3] t_remaining=31: `x_unmit=-5.0019238168526360e-03`, `x_rem=-2.8907567129788429e-02`, `y_exact=-1.5749037215335743e-01`
+  - train[4] t_remaining=30: `x_unmit=-1.4285714285714285e-01`, `x_rem=-2.3761688170649567e-01`, `y_exact=-8.8292660196848316e-01`
+  - train[5] t_remaining=31: `x_unmit=-2.6295436968290797e-02`, `x_rem=-2.9974461822162689e-02`, `y_exact=-1.4855255428431949e-01`
+  - train[6] t_remaining=31: `x_unmit=-3.4482758620689655e-02`, `x_rem=-4.3557625913964573e-02`, `y_exact=-1.6276959718299927e-01`
+  - train[7] t_remaining=31: `x_unmit=-1.0875331564986737e-01`, `x_rem=-1.6339482459640128e-01`, `y_exact=-6.0254149331824503e-01`
+  - train[8] t_remaining=30: `x_unmit=-5.8777120315581854e-02`, `x_rem=-1.0484425796706812e-01`, `y_exact=-2.8476762958276530e-01`
+  - train[9] t_remaining=32: `x_unmit=-9.8569157392686804e-02`, `x_rem=-1.4636622413497491e-01`, `y_exact=-7.7138749740529700e-01`
+  - train[10] t_remaining=30: `x_unmit=-6.8803752931978102e-02`, `x_rem=-1.0781775818926262e-01`, `y_exact=-5.4571923422089952e-01`
+  - train[11] t_remaining=29: `x_unmit=-1.4068441064638784e-01`, `x_rem=-2.4183537451298276e-01`, `y_exact=-7.9255551731766816e-01`
+  - train[12] t_remaining=30: `x_unmit=-1.3406940063091483e-01`, `x_rem=-1.9275532537165657e-01`, `y_exact=-3.8512796090557616e-01`
+  - train[13] t_remaining=29: `x_unmit=-1.2374323279195669e-01`, `x_rem=-2.0349407362913244e-01`, `y_exact=-7.8914482784589135e-01`
+  - train[14] t_remaining=32: `x_unmit=-4.2328042328042326e-02`, `x_rem=-5.1261958402716516e-02`, `y_exact=-1.3832079883766707e-01`
+  - train[15] t_remaining=32: `x_unmit=6.2095238095238092e-02`, `x_rem=8.5498789583420789e-02`, `y_exact=3.4185575950969127e-01`
+  - train[16] t_remaining=31: `x_unmit=-1.2180221458571974e-01`, `x_rem=-1.9995271786444516e-01`, `y_exact=-5.4348086342491386e-01`
+  - train[17] t_remaining=32: `x_unmit=-2.3790642347343377e-02`, `x_rem=-3.5510021362407516e-02`, `y_exact=-5.1152505427106490e-02`
+  - train[18] t_remaining=30: `x_unmit=-9.0214067278287458e-02`, `x_rem=-1.2666238909542851e-01`, `y_exact=-6.3929711034114534e-01`
+  - train[19] t_remaining=32: `x_unmit=-5.2467936261173728e-02`, `x_rem=-7.8951164349510328e-02`, `y_exact=-4.6694212053810680e-01`
+  - train[20] t_remaining=31: `x_unmit=1.2158054711246201e-01`, `x_rem=1.8527367681118129e-01`, `y_exact=6.4299193685532763e-01`
+  - train[21] t_remaining=31: `x_unmit=-8.3333333333333329e-02`, `x_rem=-1.2696557829219773e-01`, `y_exact=-3.6600053550659251e-01`
+  - train[22] t_remaining=30: `x_unmit=1.3226299694189603e-01`, `x_rem=1.8064201311848424e-01`, `y_exact=5.6809476740019915e-01`
+  - train[23] t_remaining=30: `x_unmit=-1.4214368036880523e-02`, `x_rem=-5.4954787243950615e-02`, `y_exact=-2.6356489790401477e-01`
+- target x values: `x_u_target=-9.8760796094630121e-02`, `x_r_target=-1.4830743432960844e-01`
+- target contribution to E_cdr_unmit: `-4.6142456226941936e-02`
+- target contribution to E_cdr_rem: `-4.4256964603984407e-02`
+
+### term 144
+- pauli term from int row: `(1.8229458747088673e-02)*Y(q(0, 2))*Y(q(0, 3))*Y(q(1, 1))*Y(q(1, 2))`
+- int observable row: `[0, 0, 2, 2, 0, 2, 2, 0]`
+- Hamiltonian weight w_144: `1.8229458747088673e-02`
+- OGM effective shots used for this term: `496`
+- fitted unmit coeffs: `a_u=1.1300003482964907e+00`, `b_u=2.0140036452839186e-02`
+- fitted rem coeffs: `a_r=5.3963889651789587e-01`, `b_r=2.1899775582032054e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-2.4070021881838075e-02`, `x_rem=-5.2237926878339454e-02`, `y_exact=1.4395939196657735e-02`
+  - train[1] t_remaining=29: `x_unmit=2.1367521367521368e-02`, `x_rem=4.6345977802585377e-02`, `y_exact=6.0826321115234061e-02`
+  - train[2] t_remaining=30: `x_unmit=-2.3060796645702306e-02`, `x_rem=-2.5212906424296303e-02`, `y_exact=1.4823162169736280e-02`
+  - train[3] t_remaining=31: `x_unmit=-1.0132158590308370e-01`, `x_rem=-2.1297195299459484e-01`, `y_exact=-1.6040739886138251e-02`
+  - train[4] t_remaining=30: `x_unmit=-4.6153846153846156e-02`, `x_rem=-1.0643545565662475e-01`, `y_exact=-3.5185533865399919e-08`
+  - train[5] t_remaining=31: `x_unmit=-7.3375262054507340e-02`, `x_rem=-1.8799130576618528e-01`, `y_exact=-1.2275404054132628e-01`
+  - train[6] t_remaining=31: `x_unmit=4.7619047619047616e-02`, `x_rem=1.0709678748038692e-01`, `y_exact=2.3290408127618251e-02`
+  - train[7] t_remaining=31: `x_unmit=2.1505376344086021e-03`, `x_rem=-1.5525809060373163e-02`, `y_exact=-4.0418068896481876e-02`
+  - train[8] t_remaining=30: `x_unmit=-7.0663811563169171e-02`, `x_rem=-1.6869162588149358e-01`, `y_exact=-1.3360303762529752e-08`
+  - train[9] t_remaining=32: `x_unmit=3.1111111111111110e-02`, `x_rem=6.4037938214483905e-02`, `y_exact=3.1926819723763315e-03`
+  - train[10] t_remaining=30: `x_unmit=2.2774327122153208e-02`, `x_rem=3.3455292637372964e-02`, `y_exact=2.7438937482559562e-08`
+  - train[11] t_remaining=29: `x_unmit=2.7718550106609809e-02`, `x_rem=4.6183879555204643e-02`, `y_exact=-3.9170746530163292e-09`
+  - train[12] t_remaining=30: `x_unmit=-4.5908183632734530e-02`, `x_rem=-1.2110271644135617e-01`, `y_exact=4.9712530746118377e-03`
+  - train[13] t_remaining=29: `x_unmit=2.8199566160520606e-02`, `x_rem=5.7792328616676533e-02`, `y_exact=3.3597562393741789e-09`
+  - train[14] t_remaining=32: `x_unmit=4.3290043290043288e-02`, `x_rem=1.0107667421525690e-01`, `y_exact=-9.3905641601035122e-02`
+  - train[15] t_remaining=32: `x_unmit=4.1758241758241756e-02`, `x_rem=7.7516191236719739e-02`, `y_exact=-2.2027131798801419e-01`
+  - train[16] t_remaining=31: `x_unmit=-1.3274336283185841e-02`, `x_rem=-2.4803111551962669e-02`, `y_exact=4.7989801625476412e-02`
+  - train[17] t_remaining=32: `x_unmit=-2.5531914893617020e-02`, `x_rem=-5.7811025470856342e-02`, `y_exact=2.6574690182329858e-02`
+  - train[18] t_remaining=30: `x_unmit=2.6378896882494004e-02`, `x_rem=6.7552149817344198e-02`, `y_exact=-1.2841892876989236e-01`
+  - train[19] t_remaining=32: `x_unmit=1.5590200445434299e-02`, `x_rem=5.8826053668243380e-02`, `y_exact=3.4585335502744124e-01`
+  - train[20] t_remaining=31: `x_unmit=1.4414414414414414e-01`, `x_rem=2.9282602059042806e-01`, `y_exact=3.3802285630762835e-01`
+  - train[21] t_remaining=31: `x_unmit=8.9244851258581240e-02`, `x_rem=1.8716202843758842e-01`, `y_exact=3.2460635484814082e-01`
+  - train[22] t_remaining=30: `x_unmit=0.0000000000000000e+00`, `x_rem=4.1196851978105966e-03`, `y_exact=-2.6409883841667998e-08`
+  - train[23] t_remaining=30: `x_unmit=-3.0042918454935622e-02`, `x_rem=-6.5315212260117411e-02`, `y_exact=-3.9713364104119004e-09`
+- target x values: `x_u_target=-5.3140096618357488e-02`, `x_r_target=-1.1332166465445059e-01`
+- target contribution to E_cdr_unmit: `-7.2750654872454946e-04`
+- target contribution to E_cdr_rem: `-7.1556098947537161e-04`
+
+### term 145
+- pauli term from int row: `(1.8229458747088673e-02)*Y(q(0, 2))*Y(q(0, 3))*X(q(1, 1))*X(q(1, 2))`
+- int observable row: `[0, 0, 2, 2, 0, 1, 1, 0]`
+- Hamiltonian weight w_145: `1.8229458747088673e-02`
+- OGM effective shots used for this term: `460`
+- fitted unmit coeffs: `a_u=-1.3639695329182350e-01`, `b_u=2.4862274241812855e-02`
+- fitted rem coeffs: `a_r=-9.2730543381716782e-02`, `b_r=2.4895326534121142e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-2.6052104208416832e-02`, `x_rem=-7.0312353832961666e-02`, `y_exact=1.4395930341270397e-02`
+  - train[1] t_remaining=29: `x_unmit=2.8925619834710745e-02`, `x_rem=5.9557996675689180e-02`, `y_exact=6.0826345467256113e-02`
+  - train[2] t_remaining=30: `x_unmit=6.3917525773195871e-02`, `x_rem=1.2789493822322939e-01`, `y_exact=1.4823143406924340e-02`
+  - train[3] t_remaining=31: `x_unmit=1.4989293361884369e-02`, `x_rem=1.0582842582195044e-03`, `y_exact=-1.6040736820958863e-02`
+  - train[4] t_remaining=30: `x_unmit=4.6843177189409370e-02`, `x_rem=1.0395516056973243e-01`, `y_exact=-4.2353936359970106e-08`
+  - train[5] t_remaining=31: `x_unmit=-4.9250535331905779e-02`, `x_rem=-1.1989710347843169e-01`, `y_exact=-1.2275408320909791e-01`
+  - train[6] t_remaining=31: `x_unmit=-1.7821782178217820e-02`, `x_rem=-3.9178747126000807e-02`, `y_exact=2.3290367717303303e-02`
+  - train[7] t_remaining=31: `x_unmit=6.1032863849765258e-02`, `x_rem=1.3666987124436367e-01`, `y_exact=-4.0418034255725710e-02`
+  - train[8] t_remaining=30: `x_unmit=8.8105726872246704e-03`, `x_rem=-1.0525178355695710e-03`, `y_exact=-1.2816923449062645e-08`
+  - train[9] t_remaining=32: `x_unmit=-8.1967213114754103e-03`, `x_rem=-1.8854307119175021e-02`, `y_exact=3.1926887259930265e-03`
+  - train[10] t_remaining=30: `x_unmit=-2.2813688212927757e-02`, `x_rem=-4.4625027772759285e-02`, `y_exact=2.2965904570893610e-08`
+  - train[11] t_remaining=29: `x_unmit=2.0533880903490761e-03`, `x_rem=-3.0948070060095984e-03`, `y_exact=-1.2959262267123719e-09`
+  - train[12] t_remaining=30: `x_unmit=7.1713147410358571e-02`, `x_rem=1.7480450815868284e-01`, `y_exact=4.9712805268706545e-03`
+  - train[13] t_remaining=29: `x_unmit=-4.9676025917926567e-02`, `x_rem=-9.8064937091059443e-02`, `y_exact=-7.4207242101139428e-09`
+  - train[14] t_remaining=32: `x_unmit=-8.9285714285714281e-03`, `x_rem=-3.6493051172119838e-02`, `y_exact=-9.3905618176829964e-02`
+  - train[15] t_remaining=32: `x_unmit=1.2448132780082987e-02`, `x_rem=4.2583330079399871e-02`, `y_exact=-2.2027130247657017e-01`
+  - train[16] t_remaining=31: `x_unmit=2.1276595744680851e-02`, `x_rem=5.0634064620551290e-02`, `y_exact=4.7989808812685858e-02`
+  - train[17] t_remaining=32: `x_unmit=1.8711018711018712e-02`, `x_rem=4.0509680365801395e-02`, `y_exact=2.6574675462176480e-02`
+  - train[18] t_remaining=30: `x_unmit=-6.0344827586206899e-02`, `x_rem=-1.2605790551948284e-01`, `y_exact=-1.2841892239827474e-01`
+  - train[19] t_remaining=32: `x_unmit=-5.4621848739495799e-02`, `x_rem=-1.3054943555925330e-01`, `y_exact=3.4585334238890814e-01`
+  - train[20] t_remaining=31: `x_unmit=2.4096385542168676e-02`, `x_rem=3.4390429049332656e-02`, `y_exact=3.3802294437340819e-01`
+  - train[21] t_remaining=31: `x_unmit=-1.4373716632443531e-02`, `x_rem=-2.1301896860729367e-02`, `y_exact=3.2460634853902809e-01`
+  - train[22] t_remaining=30: `x_unmit=6.8273092369477914e-02`, `x_rem=1.5967402588471094e-01`, `y_exact=-2.6142826094773956e-08`
+  - train[23] t_remaining=30: `x_unmit=-2.8688524590163935e-02`, `x_rem=-6.3190117171574758e-02`, `y_exact=-2.3367068141052779e-09`
+- target x values: `x_u_target=1.0395010395010396e-02`, `x_r_target=2.2651791381542167e-02`
+- target contribution to E_cdr_unmit: `4.2737920563057851e-04`
+- target contribution to E_cdr_rem: `4.1553711436458660e-04`
+
+### term 146
+- pauli term from int row: `(1.8229458747088673e-02)*X(q(0, 2))*X(q(0, 3))*Y(q(1, 1))*Y(q(1, 2))`
+- int observable row: `[0, 0, 1, 1, 0, 2, 2, 0]`
+- Hamiltonian weight w_146: `1.8229458747088673e-02`
+- OGM effective shots used for this term: `461`
+- fitted unmit coeffs: `a_u=9.3407411920071959e-02`, `b_u=2.3579834601873902e-02`
+- fitted rem coeffs: `a_r=6.3943635533089418e-02`, `b_r=2.3150672179259885e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=0.0000000000000000e+00`, `x_rem=-1.3629094918640455e-02`, `y_exact=1.4395942598356403e-02`
+  - train[1] t_remaining=29: `x_unmit=-1.5118790496760260e-02`, `x_rem=-2.4070009650487438e-02`, `y_exact=6.0826290042306268e-02`
+  - train[2] t_remaining=30: `x_unmit=-6.5934065934065934e-03`, `x_rem=-1.5234818453338019e-02`, `y_exact=1.4823106088700466e-02`
+  - train[3] t_remaining=31: `x_unmit=3.2537960954446853e-02`, `x_rem=6.3106799360073559e-02`, `y_exact=-1.6040730328266913e-02`
+  - train[4] t_remaining=30: `x_unmit=-3.2397408207343416e-02`, `x_rem=-3.0053592469001352e-02`, `y_exact=2.8134566258140220e-08`
+  - train[5] t_remaining=31: `x_unmit=5.0709939148073022e-02`, `x_rem=1.3007969766244634e-01`, `y_exact=-1.2275399467614376e-01`
+  - train[6] t_remaining=31: `x_unmit=9.6196868008948541e-02`, `x_rem=2.3511492199524592e-01`, `y_exact=2.3290410913902260e-02`
+  - train[7] t_remaining=31: `x_unmit=4.3103448275862068e-03`, `x_rem=2.0932926479589588e-02`, `y_exact=-4.0418006759204074e-02`
+  - train[8] t_remaining=30: `x_unmit=6.0240963855421686e-02`, `x_rem=1.2091478602448595e-01`, `y_exact=2.0053466813359146e-08`
+  - train[9] t_remaining=32: `x_unmit=1.4989293361884369e-02`, `x_rem=2.6746279409796483e-02`, `y_exact=3.1927541993303698e-03`
+  - train[10] t_remaining=30: `x_unmit=-1.3163972286374134e-01`, `x_rem=-3.2330696897602534e-01`, `y_exact=2.6913588481199675e-08`
+  - train[11] t_remaining=29: `x_unmit=-3.4642032332563508e-02`, `x_rem=-6.6804999978316945e-02`, `y_exact=3.4750006664468130e-09`
+  - train[12] t_remaining=30: `x_unmit=6.8041237113402056e-02`, `x_rem=1.4539810289843011e-01`, `y_exact=4.9712505397491386e-03`
+  - train[13] t_remaining=29: `x_unmit=3.1185031185031187e-02`, `x_rem=6.9919673806043608e-02`, `y_exact=-2.4536675482867864e-09`
+  - train[14] t_remaining=32: `x_unmit=3.1578947368421054e-02`, `x_rem=7.0809507392386964e-02`, `y_exact=-9.3905692110526656e-02`
+  - train[15] t_remaining=32: `x_unmit=3.4013605442176874e-02`, `x_rem=6.3835596522765395e-02`, `y_exact=-2.2027132470713506e-01`
+  - train[16] t_remaining=31: `x_unmit=-2.3157894736842106e-02`, `x_rem=-6.0116087337042767e-02`, `y_exact=4.7989883426625524e-02`
+  - train[17] t_remaining=32: `x_unmit=-4.8625792811839326e-02`, `x_rem=-8.3392060760382261e-02`, `y_exact=2.6574681560443632e-02`
+  - train[18] t_remaining=30: `x_unmit=-1.9108280254777069e-02`, `x_rem=-5.1634299561008332e-02`, `y_exact=-1.2841893523479622e-01`
+  - train[19] t_remaining=32: `x_unmit=1.1415525114155251e-01`, `x_rem=2.4348599793638270e-01`, `y_exact=3.4585335781877324e-01`
+  - train[20] t_remaining=31: `x_unmit=-4.8672566371681415e-02`, `x_rem=-9.0023131758524222e-02`, `y_exact=3.3802285322932163e-01`
+  - train[21] t_remaining=31: `x_unmit=8.8888888888888889e-03`, `x_rem=2.8531479894201562e-02`, `y_exact=3.2460630427967235e-01`
+  - train[22] t_remaining=30: `x_unmit=1.3157894736842105e-02`, `x_rem=1.5712191325158109e-02`, `y_exact=-1.2172106661083217e-08`
+  - train[23] t_remaining=30: `x_unmit=-1.9955654101995565e-02`, `x_rem=-5.2166909774978905e-02`, `y_exact=-6.6833847023110719e-09`
+- target x values: `x_u_target=0.0000000000000000e+00`, `x_r_target=-5.3868278037964065e-03`
+- target contribution to E_cdr_unmit: `4.2984762213803436e-04`
+- target contribution to E_cdr_rem: `4.1574502525642751e-04`
+
+### term 147
+- pauli term from int row: `(1.8229458747088673e-02)*X(q(0, 2))*X(q(0, 3))*X(q(1, 1))*X(q(1, 2))`
+- int observable row: `[0, 0, 1, 1, 0, 1, 1, 0]`
+- Hamiltonian weight w_147: `1.8229458747088673e-02`
+- OGM effective shots used for this term: `490`
+- fitted unmit coeffs: `a_u=1.1778941882753462e+00`, `b_u=2.8322876044941117e-02`
+- fitted rem coeffs: `a_r=5.7502593113035627e-01`, `b_r=2.8657583338345380e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=2.5948103792415168e-02`, `x_rem=7.6507333778668835e-02`, `y_exact=1.4395925556207808e-02`
+  - train[1] t_remaining=29: `x_unmit=-2.1367521367521368e-02`, `x_rem=-2.0649589254357222e-02`, `y_exact=6.0826301637841682e-02`
+  - train[2] t_remaining=30: `x_unmit=-5.4393305439330547e-02`, `x_rem=-1.0468127393685701e-01`, `y_exact=1.4823111971128313e-02`
+  - train[3] t_remaining=31: `x_unmit=-1.5317286652078774e-02`, `x_rem=-4.2377571406920153e-02`, `y_exact=-1.6040719417893302e-02`
+  - train[4] t_remaining=30: `x_unmit=-3.2258064516129031e-02`, `x_rem=-6.6728943223478138e-02`, `y_exact=3.5182757652828869e-08`
+  - train[5] t_remaining=31: `x_unmit=6.7415730337078653e-03`, `x_rem=1.8472151749268459e-02`, `y_exact=-1.2275407318170894e-01`
+  - train[6] t_remaining=31: `x_unmit=-7.9051383399209481e-03`, `x_rem=-1.7567986925853811e-02`, `y_exact=2.3290390271712858e-02`
+  - train[7] t_remaining=31: `x_unmit=-5.5793991416309002e-02`, `x_rem=-1.1819188249324344e-01`, `y_exact=-4.0417950717814156e-02`
+  - train[8] t_remaining=30: `x_unmit=2.1141649048625794e-03`, `x_rem=-3.9663222359469572e-04`, `y_exact=1.4044810108845917e-08`
+  - train[9] t_remaining=32: `x_unmit=2.8340080971659919e-02`, `x_rem=7.9311415724812789e-02`, `y_exact=3.1927699652773058e-03`
+  - train[10] t_remaining=30: `x_unmit=-1.9354838709677420e-02`, `x_rem=-4.0811566064846379e-02`, `y_exact=1.4206902603972847e-08`
+  - train[11] t_remaining=29: `x_unmit=-7.2765072765072769e-02`, `x_rem=-1.5701326142225275e-01`, `y_exact=7.1878767726083003e-09`
+  - train[12] t_remaining=30: `x_unmit=-8.3682008368200830e-03`, `x_rem=-7.1848373162309628e-03`, `y_exact=4.9712474741003872e-03`
+  - train[13] t_remaining=29: `x_unmit=-5.3061224489795916e-02`, `x_rem=-1.3852418974922082e-01`, `y_exact=5.4904403204633602e-10`
+  - train[14] t_remaining=32: `x_unmit=7.2765072765072769e-02`, `x_rem=1.5550854181697410e-01`, `y_exact=-9.3905688444534063e-02`
+  - train[15] t_remaining=32: `x_unmit=-6.0085836909871251e-02`, `x_rem=-1.3762522763262094e-01`, `y_exact=-2.2027131653900661e-01`
+  - train[16] t_remaining=31: `x_unmit=5.3763440860215055e-02`, `x_rem=1.0886617357116871e-01`, `y_exact=4.7989881848638748e-02`
+  - train[17] t_remaining=32: `x_unmit=3.0425963488843813e-02`, `x_rem=4.8721064165766770e-02`, `y_exact=2.6574689814391587e-02`
+  - train[18] t_remaining=30: `x_unmit=-5.3061224489795916e-02`, `x_rem=-1.1185115103633972e-01`, `y_exact=-1.2841892994700674e-01`
+  - train[19] t_remaining=32: `x_unmit=1.0799136069114468e-02`, `x_rem=2.7640227455476805e-02`, `y_exact=3.4585333913881777e-01`
+  - train[20] t_remaining=31: `x_unmit=1.0438413361169102e-02`, `x_rem=2.3531473822852277e-02`, `y_exact=3.3802293821823970e-01`
+  - train[21] t_remaining=31: `x_unmit=7.4446680080482899e-02`, `x_rem=1.6496600252156798e-01`, `y_exact=3.2460630240786142e-01`
+  - train[22] t_remaining=30: `x_unmit=-2.1881838074398249e-03`, `x_rem=-2.1419277326493298e-02`, `y_exact=-1.1154699720236315e-08`
+  - train[23] t_remaining=30: `x_unmit=5.7777777777777775e-02`, `x_rem=9.8822494140102982e-02`, `y_exact=-1.0938830842984565e-08`
+- target x values: `x_u_target=-2.7888446215139442e-02`, `x_r_target=-7.7838532057010398e-02`
+- target contribution to E_cdr_unmit: `-8.2520433385283907e-05`
+- target contribution to E_cdr_rem: `-2.9352328954518114e-04`
+
+### term 148
+- pauli term from int row: `(-4.4605985966505090e-03)*Z(q(0, 2))*Y(q(1, 1))*Z(q(1, 2))*Y(q(1, 3))`
+- int observable row: `[0, 0, 3, 0, 0, 2, 3, 2]`
+- Hamiltonian weight w_148: `-4.4605985966505090e-03`
+- OGM effective shots used for this term: `392`
+- fitted unmit coeffs: `a_u=2.5040378869187760e+00`, `b_u=6.4800691012026485e-02`
+- fitted rem coeffs: `a_r=1.2565124878558713e+00`, `b_r=6.3241017666416696e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=4.4155844155844157e-02`, `x_rem=9.4196361477192334e-02`, `y_exact=-8.2912023417713032e-02`
+  - train[1] t_remaining=29: `x_unmit=-9.8143236074270557e-02`, `x_rem=-2.0733511318826456e-01`, `y_exact=-6.3006172254462506e-02`
+  - train[2] t_remaining=30: `x_unmit=4.1551246537396121e-02`, `x_rem=5.0400023902672612e-02`, `y_exact=-7.6929379559214514e-02`
+  - train[3] t_remaining=31: `x_unmit=4.9261083743842365e-03`, `x_rem=1.1947356191649336e-02`, `y_exact=6.9841169153366328e-02`
+  - train[4] t_remaining=30: `x_unmit=-3.8961038961038960e-02`, `x_rem=-8.2818560860628665e-02`, `y_exact=-2.6357024131660412e-08`
+  - train[5] t_remaining=31: `x_unmit=-9.5238095238095264e-03`, `x_rem=-3.2944291590340763e-02`, `y_exact=3.1730766952570005e-01`
+  - train[6] t_remaining=31: `x_unmit=-1.3404825737265416e-02`, `x_rem=-5.8080047444437960e-03`, `y_exact=3.0055994515321449e-01`
+  - train[7] t_remaining=31: `x_unmit=-6.7024128686327081e-02`, `x_rem=-1.5468888728132393e-01`, `y_exact=-2.6589266862486305e-01`
+  - train[8] t_remaining=30: `x_unmit=5.3763440860215058e-03`, `x_rem=1.1932237589093635e-02`, `y_exact=1.3335025027021987e-08`
+  - train[9] t_remaining=32: `x_unmit=2.4154589371980676e-02`, `x_rem=3.5236642113344409e-02`, `y_exact=-1.7922003027805791e-02`
+  - train[10] t_remaining=30: `x_unmit=2.1739130434782608e-02`, `x_rem=6.0910420522254476e-02`, `y_exact=4.2899820263862187e-01`
+  - train[11] t_remaining=29: `x_unmit=-6.4039408866995079e-02`, `x_rem=-1.0779701405608984e-01`, `y_exact=1.1916521837276466e-07`
+  - train[12] t_remaining=30: `x_unmit=1.0695187165775400e-02`, `x_rem=3.2112139428200931e-02`, `y_exact=3.3923121838874487e-01`
+  - train[13] t_remaining=29: `x_unmit=5.2356020942408384e-02`, `x_rem=1.2439283946778512e-01`, `y_exact=3.5651658143091047e-01`
+  - train[14] t_remaining=32: `x_unmit=8.6161879895561358e-02`, `x_rem=2.1027950997711356e-01`, `y_exact=5.5206826539455278e-01`
+  - train[15] t_remaining=32: `x_unmit=8.9999999999999997e-02`, `x_rem=1.8583189208365300e-01`, `y_exact=2.7638396733782911e-01`
+  - train[16] t_remaining=31: `x_unmit=1.7283950617283949e-02`, `x_rem=4.3584979893897924e-02`, `y_exact=2.8801512979323284e-02`
+  - train[17] t_remaining=32: `x_unmit=-4.9751243781094530e-02`, `x_rem=-1.1036728109212234e-01`, `y_exact=-1.8830421718617450e-02`
+  - train[18] t_remaining=30: `x_unmit=4.6004842615012108e-02`, `x_rem=1.1212518259702065e-01`, `y_exact=1.5169192872391940e-01`
+  - train[19] t_remaining=32: `x_unmit=9.1743119266055051e-03`, `x_rem=9.2318966512892741e-03`, `y_exact=-1.8218507118913591e-01`
+  - train[20] t_remaining=31: `x_unmit=-7.9283887468030695e-02`, `x_rem=-1.6644337244449686e-01`, `y_exact=-3.6077416749285551e-01`
+  - train[21] t_remaining=31: `x_unmit=-4.4117647058823532e-02`, `x_rem=-1.0098479603775938e-01`, `y_exact=-1.7305822166989096e-01`
+  - train[22] t_remaining=30: `x_unmit=-4.3902439024390241e-02`, `x_rem=-1.0954435062424132e-01`, `y_exact=-1.3753380688144316e-07`
+  - train[23] t_remaining=30: `x_unmit=6.4425770308123242e-02`, `x_rem=1.4597735575810625e-01`, `y_exact=-2.5403495026599103e-08`
+- target x values: `x_u_target=-4.0189125295508277e-02`, `x_r_target=-9.2142496500217733e-02`
+- target contribution to E_cdr_unmit: `1.5984288046306500e-04`
+- target contribution to E_cdr_rem: `2.3434727070340409e-04`
+
+### term 149
+- pauli term from int row: `(-4.4605985966505090e-03)*Z(q(0, 2))*X(q(1, 1))*Z(q(1, 2))*X(q(1, 3))`
+- int observable row: `[0, 0, 3, 0, 0, 1, 3, 1]`
+- Hamiltonian weight w_149: `-4.4605985966505090e-03`
+- OGM effective shots used for this term: `393`
+- fitted unmit coeffs: `a_u=2.1287551670271649e+00`, `b_u=8.5830035179199349e-02`
+- fitted rem coeffs: `a_r=9.6110484079034664e-01`, `b_r=7.8863331527745745e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-7.6115485564304461e-02`, `x_rem=-1.4294750887007612e-01`, `y_exact=-8.2912010891894261e-02`
+  - train[1] t_remaining=29: `x_unmit=-7.9283887468030695e-02`, `x_rem=-1.5467069272430906e-01`, `y_exact=-6.3006355922139434e-02`
+  - train[2] t_remaining=30: `x_unmit=-4.7872340425531915e-02`, `x_rem=-1.0595048924585332e-01`, `y_exact=-7.6929357249352265e-02`
+  - train[3] t_remaining=31: `x_unmit=-8.2051282051282051e-02`, `x_rem=-1.7768069019146995e-01`, `y_exact=6.9841166789447240e-02`
+  - train[4] t_remaining=30: `x_unmit=1.6042780748663103e-02`, `x_rem=2.9187845383834933e-02`, `y_exact=-2.6357091980432929e-08`
+  - train[5] t_remaining=31: `x_unmit=-7.9452054794520555e-02`, `x_rem=-1.6486077204522837e-01`, `y_exact=3.1730760735353619e-01`
+  - train[6] t_remaining=31: `x_unmit=-4.8780487804878075e-03`, `x_rem=-8.3749748720688879e-03`, `y_exact=3.0055989482541406e-01`
+  - train[7] t_remaining=31: `x_unmit=-1.0362694300518134e-01`, `x_rem=-2.3450898548779434e-01`, `y_exact=-2.6589261033663703e-01`
+  - train[8] t_remaining=30: `x_unmit=-1.6786570743405275e-02`, `x_rem=-3.3454840049624270e-02`, `y_exact=-5.1754175525442398e-08`
+  - train[9] t_remaining=32: `x_unmit=-9.7087378640776691e-03`, `x_rem=-5.7495761496431366e-03`, `y_exact=-1.7922082900902948e-02`
+  - train[10] t_remaining=30: `x_unmit=1.7073170731707318e-01`, `x_rem=3.9610208912497014e-01`, `y_exact=4.2899820263862021e-01`
+  - train[11] t_remaining=29: `x_unmit=3.8647342995169080e-02`, `x_rem=8.4603144950796058e-02`, `y_exact=1.1916523243337529e-07`
+  - train[12] t_remaining=30: `x_unmit=5.6179775280898875e-02`, `x_rem=1.5111695797663705e-01`, `y_exact=3.3923121358482422e-01`
+  - train[13] t_remaining=29: `x_unmit=9.5477386934673364e-02`, `x_rem=2.2824055779713392e-01`, `y_exact=3.5651658143091958e-01`
+  - train[14] t_remaining=32: `x_unmit=6.3291139240506333e-02`, `x_rem=1.5460088248568543e-01`, `y_exact=5.5206827671115799e-01`
+  - train[15] t_remaining=32: `x_unmit=-3.0769230769230771e-02`, `x_rem=-8.0353846606778856e-02`, `y_exact=2.7638409112595441e-01`
+  - train[16] t_remaining=31: `x_unmit=9.6045197740112997e-02`, `x_rem=2.1192097119920000e-01`, `y_exact=2.8801512397531929e-02`
+  - train[17] t_remaining=32: `x_unmit=-1.7199017199017199e-02`, `x_rem=-4.1587264466590300e-02`, `y_exact=-1.8830380600671468e-02`
+  - train[18] t_remaining=30: `x_unmit=-5.1282051282051282e-03`, `x_rem=-5.7821001453224703e-03`, `y_exact=1.5169182746545429e-01`
+  - train[19] t_remaining=32: `x_unmit=-5.7071960297766747e-02`, `x_rem=-1.3166280524547619e-01`, `y_exact=-1.8218519036345371e-01`
+  - train[20] t_remaining=31: `x_unmit=-7.6167076167076173e-02`, `x_rem=-1.5590066803774516e-01`, `y_exact=-3.6077413074071529e-01`
+  - train[21] t_remaining=31: `x_unmit=-4.5346062052505964e-02`, `x_rem=-1.0704007805041962e-01`, `y_exact=-1.7305824625477528e-01`
+  - train[22] t_remaining=30: `x_unmit=-3.0456852791878174e-02`, `x_rem=-3.9940882623076705e-02`, `y_exact=-1.3530701509769306e-07`
+  - train[23] t_remaining=30: `x_unmit=0.0000000000000000e+00`, `x_rem=9.2036897031966530e-03`, `y_exact=-7.5546264271885901e-09`
+- target x values: `x_u_target=-3.7037037037037035e-02`, `x_r_target=-8.0512686032880643e-02`
+- target contribution to E_cdr_unmit: `-3.1167322965100743e-05`
+- target contribution to E_cdr_rem: `-6.6114958343366567e-06`
+
+### term 150
+- pauli term from int row: `(8.5514413700634159e-02)*Z(q(0, 2))*Z(q(1, 2))`
+- int observable row: `[0, 0, 3, 0, 0, 0, 3, 0]`
+- Hamiltonian weight w_150: `8.5514413700634159e-02`
+- OGM effective shots used for this term: `2618`
+- fitted unmit coeffs: `a_u=5.1667566854627172e+00`, `b_u=1.3159618287507951e-01`
+- fitted rem coeffs: `a_r=2.8340544228192659e+00`, `b_r=8.9040459872720010e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-7.6045627376425851e-04`, `x_rem=1.1187323694000264e-02`, `y_exact=1.9794402630441181e-02`
+  - train[1] t_remaining=29: `x_unmit=-3.2730073161340009e-02`, `x_rem=-5.4639481777903419e-02`, `y_exact=3.7798139136253884e-03`
+  - train[2] t_remaining=30: `x_unmit=1.3774319066147861e-01`, `x_rem=2.9011692372747983e-01`, `y_exact=8.7251730818137929e-01`
+  - train[3] t_remaining=31: `x_unmit=-9.2664092664092659e-03`, `x_rem=1.0632959073835860e-02`, `y_exact=3.6465845223932689e-02`
+  - train[4] t_remaining=30: `x_unmit=1.0585498255137650e-01`, `x_rem=2.3480672077569545e-01`, `y_exact=7.7955915729585190e-01`
+  - train[5] t_remaining=31: `x_unmit=1.0446601941747573e-01`, `x_rem=2.1097845733280979e-01`, `y_exact=5.5047260124243780e-01`
+  - train[6] t_remaining=31: `x_unmit=1.1466865227103500e-01`, `x_rem=2.4755533190175483e-01`, `y_exact=7.1925226012117349e-01`
+  - train[7] t_remaining=31: `x_unmit=4.9429657794676805e-02`, `x_rem=9.5426814594468293e-02`, `y_exact=7.2570331234723506e-01`
+  - train[8] t_remaining=30: `x_unmit=1.2269938650306749e-02`, `x_rem=4.0055345416388062e-02`, `y_exact=2.3816471904794170e-01`
+  - train[9] t_remaining=32: `x_unmit=7.0249520153550862e-02`, `x_rem=9.7889268209720895e-02`, `y_exact=6.6391008324362222e-01`
+  - train[10] t_remaining=30: `x_unmit=1.1417322834645670e-01`, `x_rem=2.4695334663901800e-01`, `y_exact=7.7955916563241312e-01`
+  - train[11] t_remaining=29: `x_unmit=9.6629213483146070e-02`, `x_rem=2.0299186066814437e-01`, `y_exact=6.3490054486149972e-01`
+  - train[12] t_remaining=30: `x_unmit=1.6179952644041043e-01`, `x_rem=3.2787556353079433e-01`, `y_exact=9.5190688312348259e-01`
+  - train[13] t_remaining=29: `x_unmit=1.3457872664887532e-01`, `x_rem=2.7842969376865084e-01`, `y_exact=7.7955912032268260e-01`
+  - train[14] t_remaining=32: `x_unmit=7.9626168224299063e-02`, `x_rem=1.6775109428605223e-01`, `y_exact=5.7014017447728960e-01`
+  - train[15] t_remaining=32: `x_unmit=-5.7591623036649213e-02`, `x_rem=-1.1100455531788969e-01`, `y_exact=-4.3843033737411302e-01`
+  - train[16] t_remaining=31: `x_unmit=7.5392269422120170e-02`, `x_rem=1.7776437119978747e-01`, `y_exact=5.2512312618036661e-01`
+  - train[17] t_remaining=32: `x_unmit=3.8729666924864447e-03`, `x_rem=1.5310115940289097e-02`, `y_exact=4.1032759626075256e-02`
+  - train[18] t_remaining=30: `x_unmit=9.9065420560747658e-02`, `x_rem=1.4148245824112093e-01`, `y_exact=5.5026566079288852e-01`
+  - train[19] t_remaining=32: `x_unmit=8.7878787878787876e-02`, `x_rem=1.3206704276478898e-01`, `y_exact=6.1060761749163883e-01`
+  - train[20] t_remaining=31: `x_unmit=-1.9364599092284418e-01`, `x_rem=-2.8845682278994794e-01`, `y_exact=-6.8362512735698100e-01`
+  - train[21] t_remaining=31: `x_unmit=8.7891361750282906e-02`, `x_rem=1.4100709839495057e-01`, `y_exact=5.3987612849851785e-01`
+  - train[22] t_remaining=30: `x_unmit=-1.3421550094517959e-01`, `x_rem=-2.1097435496381239e-01`, `y_exact=-5.8574331303287874e-01`
+  - train[23] t_remaining=30: `x_unmit=1.4448669201520912e-02`, `x_rem=3.7564990368102138e-04`, `y_exact=6.9730075277559797e-02`
+- target x values: `x_u_target=5.3739195791055995e-02`, `x_r_target=9.3998372661077370e-02`
+- target contribution to E_cdr_unmit: `3.4997075843885853e-02`
+- target contribution to E_cdr_rem: `3.0394983554119799e-02`
+
+### term 151
+- pauli term from int row: `(4.3841061686302918e-02)*Y(q(0, 2))*Y(q(0, 3))*Y(q(1, 2))*Y(q(1, 3))`
+- int observable row: `[0, 0, 2, 2, 0, 0, 2, 2]`
+- Hamiltonian weight w_151: `4.3841061686302918e-02`
+- OGM effective shots used for this term: `562`
+- fitted unmit coeffs: `a_u=3.8957050467467930e-01`, `b_u=4.4540593502670506e-02`
+- fitted rem coeffs: `a_r=1.9955486760321403e-01`, `b_r=4.4373927190980218e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=4.2307692307692310e-02`, `x_rem=9.4965178755036364e-02`, `y_exact=2.1574389302180544e-02`
+  - train[1] t_remaining=29: `x_unmit=4.7801147227533453e-02`, `x_rem=1.0830900370736600e-01`, `y_exact=3.4268573837167426e-03`
+  - train[2] t_remaining=30: `x_unmit=-7.3170731707317069e-02`, `x_rem=-1.5464860683469608e-01`, `y_exact=-1.2873177795161133e-02`
+  - train[3] t_remaining=31: `x_unmit=-7.6923076923076927e-03`, `x_rem=-2.1881184887280657e-02`, `y_exact=1.2919103088844232e-02`
+  - train[4] t_remaining=30: `x_unmit=3.9370078740157480e-02`, `x_rem=8.1526629680060317e-02`, `y_exact=-4.4043656071754692e-09`
+  - train[5] t_remaining=31: `x_unmit=-1.1235955056179775e-02`, `x_rem=-3.6033420569112205e-02`, `y_exact=1.5349728718551015e-01`
+  - train[6] t_remaining=31: `x_unmit=-4.3643263757115747e-02`, `x_rem=-7.6572519651870952e-02`, `y_exact=-2.2037778110002983e-02`
+  - train[7] t_remaining=31: `x_unmit=1.0357815442561205e-01`, `x_rem=2.3402129222465551e-01`, `y_exact=2.6239201858426453e-01`
+  - train[8] t_remaining=30: `x_unmit=1.1278195488721804e-02`, `x_rem=2.6784633150019270e-02`, `y_exact=-2.9989116766893680e-08`
+  - train[9] t_remaining=32: `x_unmit=-1.3592233009708738e-02`, `x_rem=-2.2276856348735601e-02`, `y_exact=9.1264793791193566e-02`
+  - train[10] t_remaining=30: `x_unmit=1.8018018018018018e-03`, `x_rem=2.2666544777158932e-03`, `y_exact=-1.3797096796330030e-08`
+  - train[11] t_remaining=29: `x_unmit=8.9887640449438200e-02`, `x_rem=1.6933965121123962e-01`, `y_exact=3.2918901824111094e-08`
+  - train[12] t_remaining=30: `x_unmit=-4.7781569965870310e-02`, `x_rem=-1.0564840554459547e-01`, `y_exact=-4.9198620029653611e-03`
+  - train[13] t_remaining=29: `x_unmit=-1.1406844106463879e-02`, `x_rem=-4.1501228315774734e-02`, `y_exact=1.2347700139090108e-08`
+  - train[14] t_remaining=32: `x_unmit=7.0631970260223054e-02`, `x_rem=1.3801825593325689e-01`, `y_exact=1.1212691239933636e-01`
+  - train[15] t_remaining=32: `x_unmit=2.7027027027027022e-02`, `x_rem=4.6754230287764230e-02`, `y_exact=1.0701483882098262e-01`
+  - train[16] t_remaining=31: `x_unmit=1.1196911196911197e-01`, `x_rem=2.4709280461691641e-01`, `y_exact=9.3284291116760010e-03`
+  - train[17] t_remaining=32: `x_unmit=-5.6074766355140183e-03`, `x_rem=-1.4514783014509786e-02`, `y_exact=3.0718144497669530e-02`
+  - train[18] t_remaining=30: `x_unmit=2.9535864978902954e-02`, `x_rem=5.0088834653752780e-02`, `y_exact=7.0930083737621441e-02`
+  - train[19] t_remaining=32: `x_unmit=2.3166023166023165e-02`, `x_rem=6.2848957333637948e-02`, `y_exact=1.2812445947410495e-01`
+  - train[20] t_remaining=31: `x_unmit=-4.3809523809523812e-02`, `x_rem=-8.3344571317665025e-02`, `y_exact=1.8151631756718939e-01`
+  - train[21] t_remaining=31: `x_unmit=-2.0202020202020202e-03`, `x_rem=-1.9373050095998180e-03`, `y_exact=3.7775859391776502e-02`
+  - train[22] t_remaining=30: `x_unmit=7.1684587813620072e-03`, `x_rem=-4.8211575576281585e-03`, `y_exact=-1.3247292775858403e-08`
+  - train[23] t_remaining=30: `x_unmit=-5.3435114503816793e-02`, `x_rem=-1.0850008761688641e-01`, `y_exact=1.4521166151068774e-08`
+- target x values: `x_u_target=4.6218487394957986e-02`, `x_r_target=9.1797224931889285e-02`
+- target contribution to E_cdr_unmit: `2.7420809820542578e-03`
+- target contribution to E_cdr_rem: `2.7485062095167169e-03`
+
+### term 152
+- pauli term from int row: `(4.3841061686302918e-02)*Y(q(0, 2))*Y(q(0, 3))*X(q(1, 2))*X(q(1, 3))`
+- int observable row: `[0, 0, 2, 2, 0, 0, 1, 1]`
+- Hamiltonian weight w_152: `4.3841061686302918e-02`
+- OGM effective shots used for this term: `460`
+- fitted unmit coeffs: `a_u=6.4237619006301414e-02`, `b_u=4.8156022483853624e-02`
+- fitted rem coeffs: `a_r=2.4468667788515606e-02`, `b_r=4.8347154792803090e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-4.6092184368737472e-02`, `x_rem=-1.0210397124391835e-01`, `y_exact=2.1574396156374243e-02`
+  - train[1] t_remaining=29: `x_unmit=7.0247933884297523e-02`, `x_rem=1.6607065706734322e-01`, `y_exact=3.4268759423916151e-03`
+  - train[2] t_remaining=30: `x_unmit=8.0412371134020624e-02`, `x_rem=1.8520711115139679e-01`, `y_exact=-1.2873141141017281e-02`
+  - train[3] t_remaining=31: `x_unmit=-1.4989293361884369e-02`, `x_rem=-4.3819971008651211e-02`, `y_exact=1.2919110317956495e-02`
+  - train[4] t_remaining=30: `x_unmit=3.0549898167006109e-02`, `x_rem=9.1862018262347453e-02`, `y_exact=9.0408496771088545e-10`
+  - train[5] t_remaining=31: `x_unmit=4.9250535331905779e-02`, `x_rem=8.9437656934862872e-02`, `y_exact=1.5349745460790840e-01`
+  - train[6] t_remaining=31: `x_unmit=2.5742574257425741e-02`, `x_rem=4.0777976472333534e-02`, `y_exact=-2.2037697609417296e-02`
+  - train[7] t_remaining=31: `x_unmit=9.3896713615023476e-03`, `x_rem=2.8458808708967821e-02`, `y_exact=2.6239206718788499e-01`
+  - train[8] t_remaining=30: `x_unmit=-4.8458149779735685e-02`, `x_rem=-1.0675096884972625e-01`, `y_exact=2.7696584904200795e-08`
+  - train[9] t_remaining=32: `x_unmit=-8.1967213114754103e-03`, `x_rem=-2.1990839197074143e-02`, `y_exact=9.1264787996237356e-02`
+  - train[10] t_remaining=30: `x_unmit=1.9011406844106463e-02`, `x_rem=3.8424996726355916e-02`, `y_exact=-5.7354435215130285e-09`
+  - train[11] t_remaining=29: `x_unmit=-7.1868583162217656e-02`, `x_rem=-1.6889190179903488e-01`, `y_exact=-2.5835099906309777e-08`
+  - train[12] t_remaining=30: `x_unmit=1.1952191235059761e-02`, `x_rem=3.2422064552308456e-02`, `y_exact=-4.9198598381925123e-03`
+  - train[13] t_remaining=29: `x_unmit=5.3995680345572353e-02`, `x_rem=1.3460592939084848e-01`, `y_exact=-1.3307289701388840e-09`
+  - train[14] t_remaining=32: `x_unmit=-1.3392857142857142e-02`, `x_rem=-3.3101552043378127e-02`, `y_exact=1.1212699823153600e-01`
+  - train[15] t_remaining=32: `x_unmit=3.7344398340248962e-02`, `x_rem=7.2747155183579895e-02`, `y_exact=1.0701485867913625e-01`
+  - train[16] t_remaining=31: `x_unmit=0.0000000000000000e+00`, `x_rem=5.6503989749524383e-03`, `y_exact=9.3284096501252654e-03`
+  - train[17] t_remaining=32: `x_unmit=9.7713097713097719e-02`, `x_rem=1.8846069895417603e-01`, `y_exact=3.0718138012979509e-02`
+  - train[18] t_remaining=30: `x_unmit=0.0000000000000000e+00`, `x_rem=-3.9736349906383034e-03`, `y_exact=7.0930115753792183e-02`
+  - train[19] t_remaining=32: `x_unmit=9.6638655462184878e-02`, `x_rem=2.1185501276050533e-01`, `y_exact=1.2812441399416136e-01`
+  - train[20] t_remaining=31: `x_unmit=8.0321285140562242e-03`, `x_rem=2.5551620925700385e-02`, `y_exact=1.8151637352099342e-01`
+  - train[21] t_remaining=31: `x_unmit=-5.5441478439425054e-02`, `x_rem=-1.0491387355294052e-01`, `y_exact=3.7775832486780181e-02`
+  - train[22] t_remaining=30: `x_unmit=5.6224899598393573e-02`, `x_rem=1.1277651994327295e-01`, `y_exact=3.5513147910476650e-09`
+  - train[23] t_remaining=30: `x_unmit=3.2786885245901641e-02`, `x_rem=7.8632662331005201e-02`, `y_exact=4.9296103893711063e-09`
+- target x values: `x_u_target=-5.1975051975051978e-02`, `x_r_target=-1.1729128726192134e-01`
+- target contribution to E_cdr_unmit: `1.9648366503358535e-03`
+- target contribution to E_cdr_rem: `1.9937684346064870e-03`
+
+### term 153
+- pauli term from int row: `(4.3841061686302918e-02)*X(q(0, 2))*X(q(0, 3))*Y(q(1, 2))*Y(q(1, 3))`
+- int observable row: `[0, 0, 1, 1, 0, 0, 2, 2]`
+- Hamiltonian weight w_153: `4.3841061686302918e-02`
+- OGM effective shots used for this term: `527`
+- fitted unmit coeffs: `a_u=7.0711814582480859e-01`, `b_u=5.0537003729396374e-02`
+- fitted rem coeffs: `a_r=3.7840111645318075e-01`, `b_r=4.9466807408924868e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-2.9239766081871343e-02`, `x_rem=-5.5493890279019353e-02`, `y_exact=2.1574431777373355e-02`
+  - train[1] t_remaining=29: `x_unmit=-9.5238095238095247e-03`, `x_rem=-1.7031134727729075e-02`, `y_exact=3.4268490152504459e-03`
+  - train[2] t_remaining=30: `x_unmit=-3.8022813688212927e-02`, `x_rem=-6.6554435277911675e-02`, `y_exact=-1.2873191798367260e-02`
+  - train[3] t_remaining=31: `x_unmit=-4.1825095057034217e-02`, `x_rem=-6.6386864428712916e-02`, `y_exact=1.2919114512345353e-02`
+  - train[4] t_remaining=30: `x_unmit=-5.9925093632958802e-02`, `x_rem=-1.3813206475343764e-01`, `y_exact=1.1846188979801612e-08`
+  - train[5] t_remaining=31: `x_unmit=-7.3529411764705881e-03`, `x_rem=-2.4144848961792271e-02`, `y_exact=1.5349731498553043e-01`
+  - train[6] t_remaining=31: `x_unmit=7.8125000000000000e-03`, `x_rem=7.8701505085617286e-04`, `y_exact=-2.2037765227307562e-02`
+  - train[7] t_remaining=31: `x_unmit=3.5781544256120526e-02`, `x_rem=8.7511184331652891e-02`, `y_exact=2.6239203282012680e-01`
+  - train[8] t_remaining=30: `x_unmit=5.2724077328646741e-03`, `x_rem=7.9689662683373724e-03`, `y_exact=3.7187585104878394e-08`
+  - train[9] t_remaining=32: `x_unmit=2.6515151515151516e-02`, `x_rem=6.0036545565383764e-02`, `y_exact=9.1264791609565327e-02`
+  - train[10] t_remaining=30: `x_unmit=5.1999999999999998e-02`, `x_rem=1.1665003314737299e-01`, `y_exact=-2.6278940500941208e-08`
+  - train[11] t_remaining=29: `x_unmit=6.9860279441117765e-02`, `x_rem=1.3327253105786041e-01`, `y_exact=-4.3385469737663056e-08`
+  - train[12] t_remaining=30: `x_unmit=-2.9304029304029304e-02`, `x_rem=-6.3079692430862117e-02`, `y_exact=-4.9198489887938247e-03`
+  - train[13] t_remaining=29: `x_unmit=-2.5362318840579712e-02`, `x_rem=-5.1000118808374531e-02`, `y_exact=-8.6299014875583816e-09`
+  - train[14] t_remaining=32: `x_unmit=6.6921606118546847e-02`, `x_rem=1.4216041315290326e-01`, `y_exact=1.1212688523337089e-01`
+  - train[15] t_remaining=32: `x_unmit=-1.3435700575815739e-02`, `x_rem=-2.5581940751006151e-02`, `y_exact=1.0701483762946196e-01`
+  - train[16] t_remaining=31: `x_unmit=-5.4003724394785846e-02`, `x_rem=-1.1187523856280941e-01`, `y_exact=9.3284155897342125e-03`
+  - train[17] t_remaining=32: `x_unmit=3.1423290203327174e-02`, `x_rem=7.7754192393515970e-02`, `y_exact=3.0718106734112075e-02`
+  - train[18] t_remaining=30: `x_unmit=-4.6554934823091247e-02`, `x_rem=-7.6705329010098633e-02`, `y_exact=7.0930106445617702e-02`
+  - train[19] t_remaining=32: `x_unmit=4.9309664694280081e-02`, `x_rem=1.1542114256074984e-01`, `y_exact=1.2812442990828271e-01`
+  - train[20] t_remaining=31: `x_unmit=1.5325670498084290e-02`, `x_rem=4.6180549132617078e-02`, `y_exact=1.8151635802623872e-01`
+  - train[21] t_remaining=31: `x_unmit=2.6156941649899398e-02`, `x_rem=3.3245891586844684e-02`, `y_exact=3.7775859042282645e-02`
+  - train[22] t_remaining=30: `x_unmit=-4.5283018867924525e-02`, `x_rem=-8.5819786267421441e-02`, `y_exact=2.8503667900249809e-08`
+  - train[23] t_remaining=30: `x_unmit=-2.9126213592233011e-02`, `x_rem=-5.0876172815472270e-02`, `y_exact=-1.2988070853215384e-08`
+- target x values: `x_u_target=5.8585858585858588e-02`, `x_r_target=1.1873314715851531e-01`
+- target contribution to E_cdr_unmit: `4.0318049833306347e-03`
+- target contribution to E_cdr_rem: `4.1384016939826473e-03`
+
+### term 154
+- pauli term from int row: `(4.3841061686302918e-02)*X(q(0, 2))*X(q(0, 3))*X(q(1, 2))*X(q(1, 3))`
+- int observable row: `[0, 0, 1, 1, 0, 0, 1, 1]`
+- Hamiltonian weight w_154: `4.3841061686302918e-02`
+- OGM effective shots used for this term: `490`
+- fitted unmit coeffs: `a_u=4.7934737015414630e-01`, `b_u=4.5733907558843372e-02`
+- fitted rem coeffs: `a_r=2.2413952243672991e-01`, `b_r=4.5259391388669322e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-3.7924151696606789e-02`, `x_rem=-6.4638481157253333e-02`, `y_exact=2.1574426940953403e-02`
+  - train[1] t_remaining=29: `x_unmit=-2.1367521367521368e-02`, `x_rem=-3.9999112925726790e-02`, `y_exact=3.4268840079364170e-03`
+  - train[2] t_remaining=30: `x_unmit=-1.6736401673640166e-02`, `x_rem=-1.5049942051018114e-02`, `y_exact=-1.2873165705242462e-02`
+  - train[3] t_remaining=31: `x_unmit=8.0962800875273522e-02`, `x_rem=1.6992243788617920e-01`, `y_exact=1.2919090129043470e-02`
+  - train[4] t_remaining=30: `x_unmit=-8.0645161290322578e-03`, `x_rem=-3.5753767092591281e-02`, `y_exact=-6.8461927903231449e-09`
+  - train[5] t_remaining=31: `x_unmit=8.7640449438202248e-02`, `x_rem=2.0374592686031215e-01`, `y_exact=1.5349740735576814e-01`
+  - train[6] t_remaining=31: `x_unmit=-3.5573122529644272e-02`, `x_rem=-7.5528200912366547e-02`, `y_exact=-2.2037714478403553e-02`
+  - train[7] t_remaining=31: `x_unmit=4.7210300429184553e-02`, `x_rem=1.1546893141083078e-01`, `y_exact=2.6239201780127214e-01`
+  - train[8] t_remaining=30: `x_unmit=7.3995771670190280e-02`, `x_rem=1.6174513687667583e-01`, `y_exact=-2.3508368053391255e-08`
+  - train[9] t_remaining=32: `x_unmit=1.2145748987854251e-02`, `x_rem=5.6996624526004631e-02`, `y_exact=9.1264795581295119e-02`
+  - train[10] t_remaining=30: `x_unmit=-1.9354838709677420e-02`, `x_rem=-4.4342669489539709e-02`, `y_exact=4.8455581824586067e-09`
+  - train[11] t_remaining=29: `x_unmit=1.4553014553014554e-02`, `x_rem=3.5298816289216724e-02`, `y_exact=3.0255873696261287e-08`
+  - train[12] t_remaining=30: `x_unmit=3.3472803347280332e-02`, `x_rem=7.6782431403214654e-02`, `y_exact=-4.9199013414936580e-03`
+  - train[13] t_remaining=29: `x_unmit=5.3061224489795916e-02`, `x_rem=1.0639870278854290e-01`, `y_exact=3.1646225772663208e-09`
+  - train[14] t_remaining=32: `x_unmit=1.8711018711018712e-02`, `x_rem=3.1930408948868588e-02`, `y_exact=1.1212694794895287e-01`
+  - train[15] t_remaining=32: `x_unmit=-8.5836909871244635e-03`, `x_rem=-2.5608381080313849e-02`, `y_exact=1.0701486663509044e-01`
+  - train[16] t_remaining=31: `x_unmit=-5.3763440860215055e-02`, `x_rem=-1.3189157122562517e-01`, `y_exact=9.3283967964460993e-03`
+  - train[17] t_remaining=32: `x_unmit=-3.8539553752535496e-02`, `x_rem=-8.4763722749815501e-02`, `y_exact=3.0718170150945821e-02`
+  - train[18] t_remaining=30: `x_unmit=-8.5714285714285715e-02`, `x_rem=-1.9612334650652799e-01`, `y_exact=7.0930086268017806e-02`
+  - train[19] t_remaining=32: `x_unmit=4.5356371490280781e-02`, `x_rem=9.9594305828534471e-02`, `y_exact=1.2812444269522327e-01`
+  - train[20] t_remaining=31: `x_unmit=2.7139874739039668e-02`, `x_rem=5.3743754628624081e-02`, `y_exact=1.8151642522134340e-01`
+  - train[21] t_remaining=31: `x_unmit=6.0362173038229373e-03`, `x_rem=1.6567966343776799e-02`, `y_exact=3.7775832008935507e-02`
+  - train[22] t_remaining=30: `x_unmit=-5.0328227571115977e-02`, `x_rem=-1.0103909929186106e-01`, `y_exact=1.8115203269963822e-08`
+  - train[23] t_remaining=30: `x_unmit=5.3333333333333337e-02`, `x_rem=1.1731757728584198e-01`, `y_exact=7.8187064609635158e-10`
+- target x values: `x_u_target=2.3904382470119521e-02`, `x_r_target=3.2429147775455178e-02`
+- target contribution to E_cdr_unmit: `2.5073759936961944e-03`
+- target contribution to E_cdr_rem: `2.3028852647924898e-03`
+
+### term 155
+- pauli term from int row: `(8.3798006895533739e-02)*Z(q(0, 2))*Z(q(1, 3))`
+- int observable row: `[0, 0, 3, 0, 0, 0, 0, 3]`
+- Hamiltonian weight w_155: `8.3798006895533739e-02`
+- OGM effective shots used for this term: `1918`
+- fitted unmit coeffs: `a_u=3.7406262624497266e+00`, `b_u=1.3173902697061429e-01`
+- fitted rem coeffs: `a_r=2.5554787424156151e+00`, `b_r=-5.3180825651072483e-03`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=3.2024793388429749e-02`, `x_rem=9.7882084913487932e-02`, `y_exact=2.0886448342816644e-01`
+  - train[1] t_remaining=29: `x_unmit=-3.4836065573770489e-02`, `x_rem=4.4214872190657993e-03`, `y_exact=5.4950065337492832e-02`
+  - train[2] t_remaining=30: `x_unmit=6.8158697863682602e-02`, `x_rem=1.5058259267444446e-01`, `y_exact=2.4009749183412737e-01`
+  - train[3] t_remaining=31: `x_unmit=2.3928215353938187e-02`, `x_rem=8.7159960843504553e-02`, `y_exact=2.5207431764140636e-01`
+  - train[4] t_remaining=30: `x_unmit=1.5376676986584106e-01`, `x_rem=2.9628172730715707e-01`, `y_exact=8.8292660196854023e-01`
+  - train[5] t_remaining=31: `x_unmit=6.3508064516129031e-02`, `x_rem=1.3290441512817217e-01`, `y_exact=3.6372156821466428e-01`
+  - train[6] t_remaining=31: `x_unmit=8.3503054989816694e-02`, `x_rem=1.7037012221114481e-01`, `y_exact=2.9045589357655555e-01`
+  - train[7] t_remaining=31: `x_unmit=2.7137736815156171e-02`, `x_rem=8.6730161053619914e-02`, `y_exact=3.1334035643491659e-01`
+  - train[8] t_remaining=30: `x_unmit=4.5929018789144051e-02`, `x_rem=1.3260515088036728e-01`, `y_exact=4.1675161927794602e-01`
+  - train[9] t_remaining=32: `x_unmit=-3.1567683253076510e-02`, `x_rem=8.3009438105131044e-03`, `y_exact=6.9409152829301157e-03`
+  - train[10] t_remaining=30: `x_unmit=8.7737301180092361e-02`, `x_rem=1.8427705701281707e-01`, `y_exact=5.4571923422089430e-01`
+  - train[11] t_remaining=29: `x_unmit=8.3546899026140445e-02`, `x_rem=1.9095404046908759e-01`, `y_exact=7.9255551731768281e-01`
+  - train[12] t_remaining=30: `x_unmit=1.1536416799574695e-01`, `x_rem=2.2080916035598530e-01`, `y_exact=4.0887825264704908e-01`
+  - train[13] t_remaining=29: `x_unmit=1.1286919831223628e-01`, `x_rem=2.3704799308811444e-01`, `y_exact=7.8914482784592099e-01`
+  - train[14] t_remaining=32: `x_unmit=9.9601593625498003e-02`, `x_rem=1.8487140490787829e-01`, `y_exact=3.4464473777940868e-01`
+  - train[15] t_remaining=32: `x_unmit=-9.1463414634146336e-03`, `x_rem=2.4251898786713303e-02`, `y_exact=-4.8559050892624182e-02`
+  - train[16] t_remaining=31: `x_unmit=1.6036772216547499e-01`, `x_rem=3.0100748735353938e-01`, `y_exact=6.6531477135443273e-01`
+  - train[17] t_remaining=32: `x_unmit=4.1109969167523124e-02`, `x_rem=1.1454128164934216e-01`, `y_exact=1.0407665122950778e-01`
+  - train[18] t_remaining=30: `x_unmit=-4.1982802225594334e-02`, `x_rem=-7.5697520923404763e-03`, `y_exact=3.1699420687278483e-02`
+  - train[19] t_remaining=32: `x_unmit=-2.7551020408163266e-02`, `x_rem=5.9846967715049106e-03`, `y_exact=-1.2772322827563196e-01`
+  - train[20] t_remaining=31: `x_unmit=5.6415376934598103e-02`, `x_rem=1.2353109586895884e-01`, `y_exact=1.9111196380299444e-01`
+  - train[21] t_remaining=31: `x_unmit=-4.1237113402061855e-02`, `x_rem=-1.1250738256603434e-02`, `y_exact=-1.3167649476750212e-02`
+  - train[22] t_remaining=30: `x_unmit=-3.4871794871794870e-02`, `x_rem=7.9119216952455058e-03`, `y_exact=3.9770125998779882e-02`
+  - train[23] t_remaining=30: `x_unmit=-9.2879256965944276e-02`, `x_rem=-7.9168927624188826e-02`, `y_exact=-7.2310074964925461e-02`
+- target x values: `x_u_target=1.1437095972153158e-02`, `x_r_target=5.6436056595136216e-02`
+- target contribution to E_cdr_unmit: `1.4624505972389354e-02`
+- target contribution to E_cdr_rem: `1.1639799610656441e-02`
+
+### term 156
+- pauli term from int row: `(9.0539041860436861e-02)*Z(q(0, 3))*Z(q(1, 0))`
+- int observable row: `[0, 0, 0, 3, 3, 0, 0, 0]`
+- Hamiltonian weight w_156: `9.0539041860436861e-02`
+- OGM effective shots used for this term: `1912`
+- fitted unmit coeffs: `a_u=3.1833865297844306e+00`, `b_u=-2.3225117016625309e-02`
+- fitted rem coeffs: `a_r=2.1769854032894536e+00`, `b_r=2.4572385221926039e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-1.5704154002026344e-01`, `x_rem=-2.3055044375061756e-01`, `y_exact=-4.2435737783947425e-01`
+  - train[1] t_remaining=29: `x_unmit=-2.7512690355329950e-01`, `x_rem=-4.2262048643484484e-01`, `y_exact=-8.9378325392433911e-01`
+  - train[2] t_remaining=30: `x_unmit=-1.5238583889173934e-01`, `x_rem=-2.6358304566909724e-01`, `y_exact=-2.9556314315764387e-01`
+  - train[3] t_remaining=31: `x_unmit=-6.0265577119509701e-02`, `x_rem=-9.1008688119442599e-02`, `y_exact=-3.1929428853463626e-01`
+  - train[4] t_remaining=30: `x_unmit=-2.9183673469387755e-01`, `x_rem=-4.3810449349807967e-01`, `y_exact=-8.8292650677372442e-01`
+  - train[5] t_remaining=31: `x_unmit=-1.4198782961460446e-01`, `x_rem=-2.5200424997585247e-01`, `y_exact=-3.3984325024740908e-01`
+  - train[6] t_remaining=31: `x_unmit=-1.1255627813906953e-01`, `x_rem=-2.0651141897479364e-01`, `y_exact=-4.2434841128184209e-01`
+  - train[7] t_remaining=31: `x_unmit=-2.0667003537139969e-01`, `x_rem=-3.3514257985491663e-01`, `y_exact=-7.1935317039769542e-01`
+  - train[8] t_remaining=30: `x_unmit=-2.8324873096446701e-01`, `x_rem=-4.2889372330996722e-01`, `y_exact=-8.8700126574050431e-01`
+  - train[9] t_remaining=32: `x_unmit=-2.2303664921465968e-01`, `x_rem=-3.4664197267039459e-01`, `y_exact=-8.3556053765281757e-01`
+  - train[10] t_remaining=30: `x_unmit=-1.6102564102564101e-01`, `x_rem=-2.6518983661840817e-01`, `y_exact=-5.4571926743569354e-01`
+  - train[11] t_remaining=29: `x_unmit=-1.8960244648318042e-01`, `x_rem=-2.7856484081910049e-01`, `y_exact=-7.9255549168214001e-01`
+  - train[12] t_remaining=30: `x_unmit=-1.4064914992272023e-01`, `x_rem=-2.4745642718705213e-01`, `y_exact=-4.3034053885289614e-01`
+  - train[13] t_remaining=29: `x_unmit=-2.2929936305732485e-01`, `x_rem=-3.5317339957922322e-01`, `y_exact=-7.8914478804429700e-01`
+  - train[14] t_remaining=32: `x_unmit=-1.1883182275931521e-01`, `x_rem=-2.2108044291902734e-01`, `y_exact=-2.8109113589257612e-01`
+  - train[15] t_remaining=32: `x_unmit=-1.7255504352278545e-01`, `x_rem=-2.6222115403594465e-01`, `y_exact=-5.5657097379837139e-01`
+  - train[16] t_remaining=31: `x_unmit=-2.6460132046724227e-01`, `x_rem=-4.0665692381574287e-01`, `y_exact=-8.1967333382210650e-01`
+  - train[17] t_remaining=32: `x_unmit=-2.1783700666324962e-01`, `x_rem=-3.4048240857935536e-01`, `y_exact=-8.1012511101971685e-01`
+  - train[18] t_remaining=30: `x_unmit=-2.5523429710867396e-01`, `x_rem=-3.9579447598248363e-01`, `y_exact=-8.9378323832853257e-01`
+  - train[19] t_remaining=32: `x_unmit=-1.7701385325808106e-01`, `x_rem=-2.7987141495900580e-01`, `y_exact=-6.2183623023219337e-01`
+  - train[20] t_remaining=31: `x_unmit=-1.9514661274014156e-01`, `x_rem=-3.1651339335869183e-01`, `y_exact=-7.2131348557880948e-01`
+  - train[21] t_remaining=31: `x_unmit=-1.7244897959183675e-01`, `x_rem=-2.8087833772964982e-01`, `y_exact=-7.3537640122999481e-01`
+  - train[22] t_remaining=30: `x_unmit=-3.1240021287919106e-01`, `x_rem=-4.6659884461146545e-01`, `y_exact=-9.5151773477027568e-01`
+  - train[23] t_remaining=30: `x_unmit=-1.6086065573770492e-01`, `x_rem=-2.2872755659640920e-01`, `y_exact=-4.5803141894151372e-01`
+- target x values: `x_u_target=-1.2531203195207188e-01`, `x_r_target=-2.0733525561997149e-01`
+- target contribution to E_cdr_unmit: `-3.8220309714874119e-02`
+- target contribution to E_cdr_rem: `-3.8641469116342565e-02`
+
+### term 157
+- pauli term from int row: `(1.5038609069168565e-02)*Z(q(0, 3))*Y(q(1, 0))*Z(q(1, 1))*Y(q(1, 2))`
+- int observable row: `[0, 0, 0, 3, 2, 3, 2, 0]`
+- Hamiltonian weight w_157: `1.5038609069168565e-02`
+- OGM effective shots used for this term: `368`
+- fitted unmit coeffs: `a_u=3.3070557080776006e+00`, `b_u=-2.9141177170877393e-02`
+- fitted rem coeffs: `a_r=1.4837816871030980e+00`, `b_r=-2.8071677881512120e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-3.1746031746031744e-02`, `x_rem=-9.1513312501977417e-02`, `y_exact=-5.2309646789358533e-01`
+  - train[1] t_remaining=29: `x_unmit=1.3698630136986301e-02`, `x_rem=3.6721390515769885e-02`, `y_exact=2.6061718042839536e-08`
+  - train[2] t_remaining=30: `x_unmit=0.0000000000000000e+00`, `x_rem=5.9329480855964166e-03`, `y_exact=1.6662531476050557e-08`
+  - train[3] t_remaining=31: `x_unmit=-2.6315789473684209e-02`, `x_rem=-6.8797308273916558e-02`, `y_exact=-4.5372574421593320e-01`
+  - train[4] t_remaining=30: `x_unmit=7.3170731707317069e-02`, `x_rem=1.8276043267820019e-01`, `y_exact=1.9509047992039952e-01`
+  - train[5] t_remaining=31: `x_unmit=2.2004889975550123e-02`, `x_rem=5.8130244146196851e-02`, `y_exact=-2.4703714450009489e-09`
+  - train[6] t_remaining=31: `x_unmit=3.7463976945244955e-02`, `x_rem=8.1350667259974613e-02`, `y_exact=-8.7286128117305652e-08`
+  - train[7] t_remaining=31: `x_unmit=1.3333333333333334e-02`, `x_rem=1.6661150759932863e-02`, `y_exact=6.1997340738068549e-09`
+  - train[8] t_remaining=30: `x_unmit=-1.9900497512437811e-02`, `x_rem=-3.4822414118551970e-02`, `y_exact=3.9781701574402623e-01`
+  - train[9] t_remaining=32: `x_unmit=-7.9575596816976128e-03`, `x_rem=-3.7455860924331022e-02`, `y_exact=1.3792681656326025e-01`
+  - train[10] t_remaining=30: `x_unmit=5.6300268096514748e-02`, `x_rem=1.2768299362357996e-01`, `y_exact=1.0709825473482060e-01`
+  - train[11] t_remaining=29: `x_unmit=-7.3446327683615822e-02`, `x_rem=-1.5692443512960264e-01`, `y_exact=-5.3971339785211014e-01`
+  - train[12] t_remaining=30: `x_unmit=7.8384798099762468e-02`, `x_rem=1.7804707366043604e-01`, `y_exact=-2.2279778383804787e-08`
+  - train[13] t_remaining=29: `x_unmit=7.5718015665796348e-02`, `x_rem=1.7934622414421039e-01`, `y_exact=1.5487079739187196e-01`
+  - train[14] t_remaining=32: `x_unmit=-3.5175879396984924e-02`, `x_rem=-7.4438890931427956e-02`, `y_exact=6.9414498896269144e-03`
+  - train[15] t_remaining=32: `x_unmit=-1.5463917525773196e-02`, `x_rem=-4.9342079051865398e-02`, `y_exact=-2.4509584926363301e-01`
+  - train[16] t_remaining=31: `x_unmit=3.5897435897435895e-02`, `x_rem=7.9206531961493964e-02`, `y_exact=3.4947679787535624e-01`
+  - train[17] t_remaining=32: `x_unmit=3.6011080332409975e-02`, `x_rem=8.4593984982523254e-02`, `y_exact=2.4174717286224606e-01`
+  - train[18] t_remaining=30: `x_unmit=-7.0866141732283464e-02`, `x_rem=-1.5621045691692079e-01`, `y_exact=-2.4682148071384654e-08`
+  - train[19] t_remaining=32: `x_unmit=5.3475935828877004e-02`, `x_rem=1.2571977830095721e-01`, `y_exact=2.8351075146652699e-01`
+  - train[20] t_remaining=31: `x_unmit=2.7932960893854747e-02`, `x_rem=4.4668064081225471e-02`, `y_exact=-9.3963238940123912e-09`
+  - train[21] t_remaining=31: `x_unmit=2.1857923497267760e-02`, `x_rem=5.5332735676141158e-02`, `y_exact=1.5582759733497650e-01`
+  - train[22] t_remaining=30: `x_unmit=5.6410256410256411e-02`, `x_rem=1.2924273583547208e-01`, `y_exact=1.7506341662838956e-01`
+  - train[23] t_remaining=30: `x_unmit=-5.4945054945054949e-03`, `x_rem=-3.0464226151651633e-02`, `y_exact=-1.0043379089807138e-01`
+- target x values: `x_u_target=2.9325513196480934e-03`, `x_r_target=1.2784415389293280e-02`
+- target contribution to E_cdr_unmit: `-2.9239667755289248e-04`
+- target contribution to E_cdr_rem: `-1.3688738175240086e-04`
+
+### term 158
+- pauli term from int row: `(1.5038609069168565e-02)*Z(q(0, 3))*X(q(1, 0))*Z(q(1, 1))*X(q(1, 2))`
+- int observable row: `[0, 0, 0, 3, 1, 3, 1, 0]`
+- Hamiltonian weight w_158: `1.5038609069168565e-02`
+- OGM effective shots used for this term: `376`
+- fitted unmit coeffs: `a_u=1.3932015443619332e+00`, `b_u=-9.6767093457969730e-03`
+- fitted rem coeffs: `a_r=7.2018493680382789e-01`, `b_r=-1.2635452406199406e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-2.1857923497267760e-02`, `x_rem=-7.5283712789297921e-02`, `y_exact=-5.2309643501162584e-01`
+  - train[1] t_remaining=29: `x_unmit=8.2294264339152115e-02`, `x_rem=1.8300996254106905e-01`, `y_exact=-1.3196490882485677e-08`
+  - train[2] t_remaining=30: `x_unmit=-4.4692737430167592e-02`, `x_rem=-9.4421878985046101e-02`, `y_exact=1.2891803440440755e-08`
+  - train[3] t_remaining=31: `x_unmit=-8.1743869209809257e-03`, `x_rem=-3.8038286109679478e-02`, `y_exact=-4.5372577097103772e-01`
+  - train[4] t_remaining=30: `x_unmit=1.5384615384615382e-02`, `x_rem=4.8959713113616250e-02`, `y_exact=1.9509047992039666e-01`
+  - train[5] t_remaining=31: `x_unmit=8.0862533692722376e-03`, `x_rem=1.2348837629048263e-02`, `y_exact=2.1287559659748629e-08`
+  - train[6] t_remaining=31: `x_unmit=1.1111111111111110e-01`, `x_rem=2.2950337102357107e-01`, `y_exact=-2.0477314953570918e-08`
+  - train[7] t_remaining=31: `x_unmit=3.1088082901554404e-02`, `x_rem=5.7538673958461239e-02`, `y_exact=-5.7053288976230572e-08`
+  - train[8] t_remaining=30: `x_unmit=5.7220708446866483e-02`, `x_rem=1.3587652455376070e-01`, `y_exact=3.9781704668393136e-01`
+  - train[9] t_remaining=32: `x_unmit=3.2640949554896145e-02`, `x_rem=6.7463660006517864e-02`, `y_exact=1.3792694591653007e-01`
+  - train[10] t_remaining=30: `x_unmit=6.0606060606060606e-03`, `x_rem=1.8393167481382925e-02`, `y_exact=1.0709825473478528e-01`
+  - train[11] t_remaining=29: `x_unmit=-2.1164021164021163e-02`, `x_rem=-6.0271511719255683e-02`, `y_exact=-5.3971339785208972e-01`
+  - train[12] t_remaining=30: `x_unmit=3.0640668523676879e-02`, `x_rem=6.5096908611441337e-02`, `y_exact=-1.9727468608866323e-08`
+  - train[13] t_remaining=29: `x_unmit=-4.4198895027624308e-02`, `x_rem=-8.8535371035898577e-02`, `y_exact=1.5487079739186654e-01`
+  - train[14] t_remaining=32: `x_unmit=-8.3123425692695208e-02`, `x_rem=-1.8388771617235194e-01`, `y_exact=6.9414761667331380e-03`
+  - train[15] t_remaining=32: `x_unmit=-2.6525198938992041e-03`, `x_rem=-2.6901781128264936e-02`, `y_exact=-2.4509587485674011e-01`
+  - train[16] t_remaining=31: `x_unmit=-2.6455026455026454e-02`, `x_rem=-5.4835062367128116e-02`, `y_exact=3.4947682228612048e-01`
+  - train[17] t_remaining=32: `x_unmit=3.4666666666666665e-02`, `x_rem=5.2843654534323180e-02`, `y_exact=2.4174711134534704e-01`
+  - train[18] t_remaining=30: `x_unmit=-3.6211699164345405e-02`, `x_rem=-5.8456252233056991e-02`, `y_exact=9.6690260652594901e-09`
+  - train[19] t_remaining=32: `x_unmit=1.5479115479115479e-01`, `x_rem=3.6832014435012328e-01`, `y_exact=2.8351082648708453e-01`
+  - train[20] t_remaining=31: `x_unmit=-6.5934065934065936e-02`, `x_rem=-1.4313663015937894e-01`, `y_exact=-6.5871766242636949e-08`
+  - train[21] t_remaining=31: `x_unmit=7.7747989276139406e-02`, `x_rem=1.8163538248172148e-01`, `y_exact=1.5582749547420355e-01`
+  - train[22] t_remaining=30: `x_unmit=6.7331670822942641e-02`, `x_rem=1.5646768789131302e-01`, `y_exact=1.7506346607736664e-01`
+  - train[23] t_remaining=30: `x_unmit=5.8510638297872342e-02`, `x_rem=1.4407473521274733e-01`, `y_exact=-1.0043370052153947e-01`
+- target x values: `x_u_target=1.3774104683195593e-02`, `x_r_target=5.0276696529635297e-02`
+- target contribution to E_cdr_unmit: `1.4306822187453187e-04`
+- target contribution to E_cdr_rem: `3.5450614077895613e-04`
+
+### term 159
+- pauli term from int row: `(8.2651141025051819e-02)*Z(q(0, 3))*Z(q(1, 1))`
+- int observable row: `[0, 0, 0, 3, 0, 3, 0, 0]`
+- Hamiltonian weight w_159: `8.2651141025051819e-02`
+- OGM effective shots used for this term: `1894`
+- fitted unmit coeffs: `a_u=4.4560546766370779e+00`, `b_u=3.3800499073529895e-02`
+- fitted rem coeffs: `a_r=2.7791842929384756e+00`, `b_r=-3.3942270463095420e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-1.2164948453608247e-01`, `x_rem=-1.6609885787627673e-01`, `y_exact=-5.5151768465852447e-01`
+  - train[1] t_remaining=29: `x_unmit=-3.8775510204081633e-02`, `x_rem=-2.1865889212827883e-02`, `y_exact=3.9984979478035962e-02`
+  - train[2] t_remaining=30: `x_unmit=9.0570058604155564e-03`, `x_rem=1.0818829011150855e-02`, `y_exact=1.0543937145047845e-01`
+  - train[3] t_remaining=31: `x_unmit=-9.5482546201232033e-02`, `x_rem=-1.4046211245686763e-01`, `y_exact=-3.4014235195269582e-01`
+  - train[4] t_remaining=30: `x_unmit=-2.4016145307769929e-01`, `x_rem=-3.5855690312062716e-01`, `y_exact=-1.0000001970203645e+00`
+  - train[5] t_remaining=31: `x_unmit=-2.9471544715447155e-02`, `x_rem=-3.0514042231644282e-02`, `y_exact=-3.8358451687399819e-02`
+  - train[6] t_remaining=31: `x_unmit=1.4271151885830785e-02`, `x_rem=2.1542409626857609e-02`, `y_exact=-1.0905130925085271e-02`
+  - train[7] t_remaining=31: `x_unmit=-6.2692702980472761e-02`, `x_rem=-6.7172227302986637e-02`, `y_exact=-1.9159448174672328e-01`
+  - train[8] t_remaining=30: `x_unmit=-1.0716099542915185e-01`, `x_rem=-1.3975513167813083e-01`, `y_exact=-5.2975034494729123e-01`
+  - train[9] t_remaining=32: `x_unmit=-1.6251354279523293e-02`, `x_rem=1.5138716139904100e-02`, `y_exact=2.9771174130789078e-02`
+  - train[10] t_remaining=30: `x_unmit=-7.9741379310344834e-02`, `x_rem=-1.2307233861554587e-01`, `y_exact=-3.8202293354031713e-01`
+  - train[11] t_remaining=29: `x_unmit=-2.3909616395165528e-01`, `x_rem=-3.5739233489773214e-01`, `y_exact=-1.0000001705798516e+00`
+  - train[12] t_remaining=30: `x_unmit=-4.7174701918092275e-02`, `x_rem=-7.1688665347905661e-02`, `y_exact=-1.2015657297178642e-01`
+  - train[13] t_remaining=29: `x_unmit=-1.5806111696522657e-01`, `x_rem=-2.3700703763420378e-01`, `y_exact=-7.9884836032468709e-01`
+  - train[14] t_remaining=32: `x_unmit=1.1684518013631937e-02`, `x_rem=2.7887317806488239e-02`, `y_exact=-4.2652516234273075e-03`
+  - train[15] t_remaining=32: `x_unmit=-8.9174540130534654e-19`, `x_rem=3.3228150698030340e-02`, `y_exact=5.6633613293951696e-03`
+  - train[16] t_remaining=31: `x_unmit=-1.6063233044365119e-01`, `x_rem=-2.3212687568222914e-01`, `y_exact=-6.8859669574209859e-01`
+  - train[17] t_remaining=32: `x_unmit=-5.9493016037247805e-02`, `x_rem=-6.0220187527138994e-02`, `y_exact=-2.4372082980183923e-01`
+  - train[18] t_remaining=30: `x_unmit=1.7739483020780537e-02`, `x_rem=7.0270219971915876e-02`, `y_exact=6.3235385723450999e-02`
+  - train[19] t_remaining=32: `x_unmit=2.1838496698831894e-02`, `x_rem=6.2359282592169558e-02`, `y_exact=1.5226871314030554e-01`
+  - train[20] t_remaining=31: `x_unmit=-1.3924703455389376e-02`, `x_rem=1.2919873703907318e-02`, `y_exact=-7.0084044249133226e-02`
+  - train[21] t_remaining=31: `x_unmit=1.9121447028423774e-02`, `x_rem=5.6979486791759237e-02`, `y_exact=1.5125343837370908e-01`
+  - train[22] t_remaining=30: `x_unmit=-3.0518819938962362e-02`, `x_rem=-8.3286203964235278e-03`, `y_exact=-8.8252467403980295e-02`
+  - train[23] t_remaining=30: `x_unmit=-1.1752360965372508e-01`, `x_rem=-1.5557357597079963e-01`, `y_exact=-4.6965842642156469e-01`
+- target x values: `x_u_target=4.1841004184100397e-03`, `x_r_target=1.8519985500879865e-02`
+- target contribution to E_cdr_unmit: `4.3346456461625851e-03`
+- target contribution to E_cdr_rem: `1.4487242710249817e-03`
+
+### term 160
+- pauli term from int row: `(1.5840961910321222e-02)*Z(q(0, 3))*Y(q(1, 1))*Z(q(1, 2))*Y(q(1, 3))`
+- int observable row: `[0, 0, 0, 3, 0, 2, 3, 2]`
+- Hamiltonian weight w_160: `1.5840961910321222e-02`
+- OGM effective shots used for this term: `348`
+- fitted unmit coeffs: `a_u=2.6007561915357398e+00`, `b_u=1.2485521671263158e-01`
+- fitted rem coeffs: `a_r=1.2693586043641321e+00`, `b_r=1.2080483323884252e-01`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=2.9999999999999999e-02`, `x_rem=8.1395644396839689e-02`, `y_exact=4.4937865896746344e-02`
+  - train[1] t_remaining=29: `x_unmit=-4.7619047619047616e-02`, `x_rem=-8.2177439831277288e-02`, `y_exact=2.2718606757008197e-01`
+  - train[2] t_remaining=30: `x_unmit=-2.0100502512562814e-02`, `x_rem=-4.5211372616189620e-02`, `y_exact=5.0255745757650028e-01`
+  - train[3] t_remaining=31: `x_unmit=-2.6595744680851064e-02`, `x_rem=-4.9902368838388847e-02`, `y_exact=7.1549175879634219e-02`
+  - train[4] t_remaining=30: `x_unmit=-2.0202020202020204e-02`, `x_rem=-5.3005357029815139e-02`, `y_exact=-3.3680277233870092e-08`
+  - train[5] t_remaining=31: `x_unmit=3.1250000000000000e-02`, `x_rem=7.2091655940666979e-02`, `y_exact=6.2118146678296871e-01`
+  - train[6] t_remaining=31: `x_unmit=7.7922077922077922e-03`, `x_rem=2.0393285484433581e-02`, `y_exact=7.3131822728042928e-01`
+  - train[7] t_remaining=31: `x_unmit=-2.8277634961439587e-02`, `x_rem=-9.6409358869492548e-02`, `y_exact=-4.1651666359557271e-01`
+  - train[8] t_remaining=30: `x_unmit=-4.8593350383631703e-02`, `x_rem=-1.0096256499775795e-01`, `y_exact=8.2267377461741802e-09`
+  - train[9] t_remaining=32: `x_unmit=-2.9411764705882353e-02`, `x_rem=-7.2186838353132998e-02`, `y_exact=2.8255132843254876e-03`
+  - train[10] t_remaining=30: `x_unmit=1.8367346938775511e-01`, `x_rem=4.0888443080414644e-01`, `y_exact=7.8611536502187063e-01`
+  - train[11] t_remaining=29: `x_unmit=-2.0408163265306121e-02`, `x_rem=-5.4270866128173216e-02`, `y_exact=1.1513168038862887e-07`
+  - train[12] t_remaining=30: `x_unmit=1.2182741116751269e-01`, `x_rem=2.9764179327950419e-01`, `y_exact=8.1224910453007526e-01`
+  - train[13] t_remaining=29: `x_unmit=1.2000000000000000e-01`, `x_rem=2.6399530945660288e-01`, `y_exact=3.9279992362761623e-01`
+  - train[14] t_remaining=32: `x_unmit=-4.6070460704607047e-02`, `x_rem=-7.9756520232987752e-02`, `y_exact=4.1247220255039763e-01`
+  - train[15] t_remaining=32: `x_unmit=-1.6666666666666666e-02`, `x_rem=-6.1829901810962283e-02`, `y_exact=-8.4487833301385373e-02`
+  - train[16] t_remaining=31: `x_unmit=1.8087855297157621e-02`, `x_rem=3.1973987757002421e-02`, `y_exact=6.9962804432413261e-02`
+  - train[17] t_remaining=32: `x_unmit=-5.4347826086956520e-03`, `x_rem=-9.8655418100378235e-03`, `y_exact=1.6258477452583707e-02`
+  - train[18] t_remaining=30: `x_unmit=-8.9918256130790186e-02`, `x_rem=-1.8437688526690890e-01`, `y_exact=-6.7498263270944436e-02`
+  - train[19] t_remaining=32: `x_unmit=3.6649214659685861e-02`, `x_rem=6.3481079962704412e-02`, `y_exact=-2.9616161607885616e-01`
+  - train[20] t_remaining=31: `x_unmit=1.1680911680911681e-01`, `x_rem=2.6988628873353532e-01`, `y_exact=2.8430583571456769e-01`
+  - train[21] t_remaining=31: `x_unmit=4.4198895027624308e-02`, `x_rem=9.6835412385618380e-02`, `y_exact=-1.9294952117601741e-01`
+  - train[22] t_remaining=30: `x_unmit=1.7045454545454544e-02`, `x_rem=2.2752189939484972e-02`, `y_exact=1.5086162625709894e-07`
+  - train[23] t_remaining=30: `x_unmit=2.6315789473684209e-02`, `x_rem=6.3225982786660528e-02`, `y_exact=-2.1103637900356277e-08`
+- target x values: `x_u_target=-2.0512820512820513e-02`, `x_r_target=-4.7064136037042674e-02`
+- target contribution to E_cdr_unmit: `1.1327297113645756e-03`
+- target contribution to E_cdr_rem: `9.6730564217515605e-04`
+
+### term 161
+- pauli term from int row: `(1.5840961910321222e-02)*Z(q(0, 3))*X(q(1, 1))*Z(q(1, 2))*X(q(1, 3))`
+- int observable row: `[0, 0, 0, 3, 0, 1, 3, 1]`
+- Hamiltonian weight w_161: `1.5840961910321222e-02`
+- OGM effective shots used for this term: `414`
+- fitted unmit coeffs: `a_u=2.3018860594178681e+00`, `b_u=1.5282283619939907e-01`
+- fitted rem coeffs: `a_r=1.3092693258468666e+00`, `b_r=1.4839425186510025e-01`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-4.7619047619047616e-02`, `x_rem=-9.4314440787341941e-02`, `y_exact=4.4937830151500498e-02`
+  - train[1] t_remaining=29: `x_unmit=-1.1235955056179775e-02`, `x_rem=-2.5214320155759303e-02`, `y_exact=2.2718615957366756e-01`
+  - train[2] t_remaining=30: `x_unmit=6.7357512953367879e-02`, `x_rem=1.4052738127290246e-01`, `y_exact=5.0255746059365203e-01`
+  - train[3] t_remaining=31: `x_unmit=2.3622047244094488e-02`, `x_rem=6.6715843090344090e-02`, `y_exact=7.1549170712734755e-02`
+  - train[4] t_remaining=30: `x_unmit=2.6178010471204188e-02`, `x_rem=5.3174957654572717e-02`, `y_exact=-3.3680336491242319e-08`
+  - train[5] t_remaining=31: `x_unmit=-2.0000000000000000e-02`, `x_rem=-2.3711271343838707e-02`, `y_exact=6.2118149228848019e-01`
+  - train[6] t_remaining=31: `x_unmit=7.7720207253886009e-02`, `x_rem=1.8114746921021890e-01`, `y_exact=7.3131815278576207e-01`
+  - train[7] t_remaining=31: `x_unmit=-1.7283950617283949e-02`, `x_rem=-4.7854179639883906e-02`, `y_exact=-4.1651670484482517e-01`
+  - train[8] t_remaining=30: `x_unmit=-1.8469656992084433e-02`, `x_rem=-3.6769088570778430e-02`, `y_exact=-4.8875097773927810e-08`
+  - train[9] t_remaining=32: `x_unmit=-5.4794520547945202e-02`, `x_rem=-1.2146023972717067e-01`, `y_exact=2.8255795115021748e-03`
+  - train[10] t_remaining=30: `x_unmit=1.2345679012345678e-02`, `x_rem=5.4287683974323819e-02`, `y_exact=7.8611536502186974e-01`
+  - train[11] t_remaining=29: `x_unmit=4.2606516290726815e-02`, `x_rem=7.2758632728646244e-02`, `y_exact=1.1513168990680111e-07`
+  - train[12] t_remaining=30: `x_unmit=5.0251256281407038e-02`, `x_rem=1.2083245761327574e-01`, `y_exact=8.1224909775989484e-01`
+  - train[13] t_remaining=29: `x_unmit=7.6115485564304461e-02`, `x_rem=1.9217076604637978e-01`, `y_exact=3.9279992362763883e-01`
+  - train[14] t_remaining=32: `x_unmit=-1.6759776536312849e-02`, `x_rem=-3.0824392687539018e-02`, `y_exact=4.1247218137878106e-01`
+  - train[15] t_remaining=32: `x_unmit=-1.6393442622950821e-02`, `x_rem=-5.0380757727825465e-02`, `y_exact=-8.4487766612030224e-02`
+  - train[16] t_remaining=31: `x_unmit=-5.3984575835475578e-02`, `x_rem=-1.1961344912787848e-01`, `y_exact=6.9962803233006743e-02`
+  - train[17] t_remaining=32: `x_unmit=5.1813471502590676e-03`, `x_rem=9.6080288357479390e-03`, `y_exact=1.6258463045785085e-02`
+  - train[18] t_remaining=30: `x_unmit=2.4630541871921183e-02`, `x_rem=4.7132962888002859e-02`, `y_exact=-6.7498106436769123e-02`
+  - train[19] t_remaining=32: `x_unmit=-7.9155672823219003e-03`, `x_rem=-2.7757026476343906e-02`, `y_exact=-2.9616158310845331e-01`
+  - train[20] t_remaining=31: `x_unmit=-7.8048780487804878e-02`, `x_rem=-1.5199591665524900e-01`, `y_exact=2.8430586160695664e-01`
+  - train[21] t_remaining=31: `x_unmit=1.9900497512437804e-02`, `x_rem=3.5585715594579292e-02`, `y_exact=-1.9294951294878174e-01`
+  - train[22] t_remaining=30: `x_unmit=7.9545454545454544e-02`, `x_rem=1.6961677784391668e-01`, `y_exact=1.1035975555391058e-07`
+  - train[23] t_remaining=30: `x_unmit=-5.4187192118226604e-02`, `x_rem=-1.4126435807364787e-01`, `y_exact=-1.7235493829655286e-09`
+- target x values: `x_u_target=-1.7283950617283949e-02`, `x_r_target=-4.3559547043012792e-02`
+- target contribution to E_cdr_unmit: `1.7906172069558535e-03`
+- target contribution to E_cdr_rem: `1.4472789605735445e-03`
+
+### term 162
+- pauli term from int row: `(8.3798006895533739e-02)*Z(q(0, 3))*Z(q(1, 2))`
+- int observable row: `[0, 0, 0, 3, 0, 0, 3, 0]`
+- Hamiltonian weight w_162: `8.3798006895533739e-02`
+- OGM effective shots used for this term: `1912`
+- fitted unmit coeffs: `a_u=3.9076710393210150e+00`, `b_u=1.0615855831369286e-01`
+- fitted rem coeffs: `a_r=2.2779810417907536e+00`, `b_r=1.4586683769995251e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-4.0526849037487347e-03`, `x_rem=3.7082433296507386e-02`, `y_exact=2.0886474816421385e-01`
+  - train[1] t_remaining=29: `x_unmit=-9.1370558375634525e-03`, `x_rem=2.1372424829341857e-02`, `y_exact=5.4949818436115877e-02`
+  - train[2] t_remaining=30: `x_unmit=9.5946639302206260e-02`, `x_rem=2.1188745808966494e-01`, `y_exact=2.4009736909504859e-01`
+  - train[3] t_remaining=31: `x_unmit=3.5750766087844742e-02`, `x_rem=1.0095366161359615e-01`, `y_exact=2.5207477438261927e-01`
+  - train[4] t_remaining=30: `x_unmit=1.5102040816326531e-01`, `x_rem=3.1279600447774042e-01`, `y_exact=8.8292650677369577e-01`
+  - train[5] t_remaining=31: `x_unmit=1.0141987829614604e-01`, `x_rem=2.0443533153112833e-01`, `y_exact=3.6372158014357248e-01`
+  - train[6] t_remaining=31: `x_unmit=5.2526263131565783e-02`, `x_rem=1.3898299360650784e-01`, `y_exact=2.9045593188539676e-01`
+  - train[7] t_remaining=31: `x_unmit=6.2152602324406267e-02`, `x_rem=1.3368671228733528e-01`, `y_exact=3.1334036315446367e-01`
+  - train[8] t_remaining=30: `x_unmit=-1.2182741116751269e-02`, `x_rem=3.3504373927171573e-02`, `y_exact=4.1675146918296657e-01`
+  - train[9] t_remaining=32: `x_unmit=-2.8272251308900525e-02`, `x_rem=-1.1787205438209509e-02`, `y_exact=6.9409523341422280e-03`
+  - train[10] t_remaining=30: `x_unmit=1.1897435897435897e-01`, `x_rem=2.4463300412667499e-01`, `y_exact=5.4571926743566890e-01`
+  - train[11] t_remaining=29: `x_unmit=1.1722731906218145e-01`, `x_rem=2.5074670702356217e-01`, `y_exact=7.9255549168212924e-01`
+  - train[12] t_remaining=30: `x_unmit=8.8098918083462138e-02`, `x_rem=1.9778306329672904e-01`, `y_exact=4.0887817547915117e-01`
+  - train[13] t_remaining=29: `x_unmit=1.7728237791932058e-01`, `x_rem=3.4465547889719461e-01`, `y_exact=7.8914478804429555e-01`
+  - train[14] t_remaining=32: `x_unmit=5.9415911379657606e-02`, `x_rem=1.3520198957500570e-01`, `y_exact=3.4464474724680866e-01`
+  - train[15] t_remaining=32: `x_unmit=-2.9185867895545316e-02`, `x_rem=-2.1032232138806273e-02`, `y_exact=-4.8559224517706348e-02`
+  - train[16] t_remaining=31: `x_unmit=1.3255459624174709e-01`, `x_rem=2.7224725866971811e-01`, `y_exact=6.6531475874029766e-01`
+  - train[17] t_remaining=32: `x_unmit=3.0240902101486417e-02`, `x_rem=8.3119922118423339e-02`, `y_exact=1.0407675709858466e-01`
+  - train[18] t_remaining=30: `x_unmit=-3.2901296111665007e-02`, `x_rem=-1.4991192786919552e-02`, `y_exact=3.1699474566058934e-02`
+  - train[19] t_remaining=32: `x_unmit=-2.2062596203181118e-02`, `x_rem=-4.1705441748307185e-03`, `y_exact=-1.2772320533322334e-01`
+  - train[20] t_remaining=31: `x_unmit=5.0556117290192111e-02`, `x_rem=1.1420989534670403e-01`, `y_exact=1.9111223031406380e-01`
+  - train[21] t_remaining=31: `x_unmit=-1.6326530612244899e-02`, `x_rem=1.4008315803717485e-02`, `y_exact=-1.3167764910232416e-02`
+  - train[22] t_remaining=30: `x_unmit=-7.9829696647152736e-03`, `x_rem=3.0319886592749194e-02`, `y_exact=3.9770065362302064e-02`
+  - train[23] t_remaining=30: `x_unmit=-5.3278688524590161e-02`, `x_rem=-5.0343259320744294e-02`, `y_exact=-7.2310302591130429e-02`
+- target x values: `x_u_target=-1.4478282576135796e-02`, `x_r_target=8.5179644637925142e-03`
+- target contribution to E_cdr_unmit: `4.1548889334646951e-03`
+- target contribution to E_cdr_rem: `2.8483315724105664e-03`
+
+### term 163
+- pauli term from int row: `(9.4788721929423364e-02)*Z(q(0, 3))*Z(q(1, 3))`
+- int observable row: `[0, 0, 0, 3, 0, 0, 0, 3]`
+- Hamiltonian weight w_163: `9.4788721929423364e-02`
+- OGM effective shots used for this term: `1894`
+- fitted unmit coeffs: `a_u=3.8936107600075385e+00`, `b_u=-1.4474987529014574e-01`
+- fitted rem coeffs: `a_r=2.4806808888724143e+00`, `b_r=-2.2787773950986601e-01`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=2.2268041237113403e-01`, `x_rem=3.8397780593896624e-01`, `y_exact=7.6701031433374522e-01`
+  - train[1] t_remaining=29: `x_unmit=2.4081632653061225e-01`, `x_rem=4.1790403869188864e-01`, `y_exact=7.9884845601019128e-01`
+  - train[2] t_remaining=30: `x_unmit=5.8071390516782097e-02`, `x_rem=1.1888861552476174e-01`, `y_exact=-4.9973597387829499e-02`
+  - train[3] t_remaining=31: `x_unmit=1.0780287474332649e-01`, `x_rem=2.1221299751455899e-01`, `y_exact=4.0736186610471992e-01`
+  - train[4] t_remaining=30: `x_unmit=2.7547931382441976e-01`, `x_rem=4.6723278051745892e-01`, `y_exact=1.0000001970204584e+00`
+  - train[5] t_remaining=31: `x_unmit=8.2317073170731711e-02`, `x_rem=1.5399886557005099e-01`, `y_exact=1.4480121791214107e-02`
+  - train[6] t_remaining=31: `x_unmit=1.0193679918450560e-01`, `x_rem=1.8239575184315945e-01`, `y_exact=1.4479761032153515e-01`
+  - train[7] t_remaining=31: `x_unmit=1.8396711202466598e-01`, `x_rem=3.1702250918771385e-01`, `y_exact=5.9760728898999571e-01`
+  - train[8] t_remaining=30: `x_unmit=3.3062468257998984e-01`, `x_rem=5.5178410433704705e-01`, `y_exact=1.0000001415047963e+00`
+  - train[9] t_remaining=32: `x_unmit=2.3293607800650054e-01`, `x_rem=4.0072516194363555e-01`, `y_exact=7.9884841118785976e-01`
+  - train[10] t_remaining=30: `x_unmit=9.9137931034482762e-02`, `x_rem=1.9405143773628128e-01`, `y_exact=3.8202293354033628e-01`
+  - train[11] t_remaining=29: `x_unmit=2.9374671571203365e-01`, `x_rem=4.9389406130903646e-01`, `y_exact=1.0000001705798820e+00`
+  - train[12] t_remaining=30: `x_unmit=8.2426127527216175e-02`, `x_rem=1.5931917512444832e-01`, `y_exact=1.4161893634557191e-01`
+  - train[13] t_remaining=29: `x_unmit=2.4025289778714437e-01`, `x_rem=4.1256460434542619e-01`, `y_exact=7.9884836032473172e-01`
+  - train[14] t_remaining=32: `x_unmit=6.0370009737098343e-02`, `x_rem=1.2444507705031693e-01`, `y_exact=-5.9288359730796353e-02`
+  - train[15] t_remaining=32: `x_unmit=1.9277108433734941e-01`, `x_rem=3.3659999911050620e-01`, `y_exact=5.9946683698664960e-01`
+  - train[16] t_remaining=31: `x_unmit=2.6058133605303418e-01`, `x_rem=4.4626811980914649e-01`, `y_exact=8.4295527082392030e-01`
+  - train[17] t_remaining=32: `x_unmit=2.2503879979306776e-01`, `x_rem=3.8770116740255933e-01`, `y_exact=9.4976918372297781e-01`
+  - train[18] t_remaining=30: `x_unmit=2.6203750633552964e-01`, `x_rem=4.4548918708208651e-01`, `y_exact=7.9884837803900099e-01`
+  - train[19] t_remaining=32: `x_unmit=1.6099542915185372e-01`, `x_rem=2.9430480307445345e-01`, `y_exact=5.9729072242511516e-01`
+  - train[20] t_remaining=31: `x_unmit=1.9236719958741619e-01`, `x_rem=3.2980204087343934e-01`, `y_exact=6.0028529951382237e-01`
+  - train[21] t_remaining=31: `x_unmit=1.4315245478036176e-01`, `x_rem=2.6689101215872435e-01`, `y_exact=5.9729072776655789e-01`
+  - train[22] t_remaining=30: `x_unmit=3.3468972533062052e-01`, `x_rem=5.5583006345976838e-01`, `y_exact=1.0000001368120159e+00`
+  - train[23] t_remaining=30: `x_unmit=2.9066107030430222e-01`, `x_rem=4.8847551417160234e-01`, `y_exact=1.0000001479542284e+00`
+- target x values: `x_u_target=1.1610878661087866e-01`, `x_r_target=2.1346094144576186e-01`
+- target contribution to E_cdr_unmit: `2.9131659203734575e-02`
+- target contribution to E_cdr_rem: `2.8593087967249287e-02`
+
+### term 164
+- pauli term from int row: `(3.8617185736002355e-02)*Z(q(1, 0))*Z(q(1, 1))`
+- int observable row: `[0, 0, 0, 0, 3, 3, 0, 0]`
+- Hamiltonian weight w_164: `3.8617185736002355e-02`
+- OGM effective shots used for this term: `1150`
+- fitted unmit coeffs: `a_u=3.4970412818595253e+00`, `b_u=-4.2752995389852055e-02`
+- fitted rem coeffs: `a_r=2.5962399068090312e+00`, `b_r=5.4034411376093716e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=4.8494983277591976e-02`, `x_rem=3.2106447769098469e-02`, `y_exact=1.5314337894701299e-01`
+  - train[1] t_remaining=29: `x_unmit=5.1926298157453935e-02`, `x_rem=3.4822227411680742e-02`, `y_exact=-4.4736752907001520e-02`
+  - train[2] t_remaining=30: `x_unmit=7.6394849785407726e-02`, `x_rem=6.0918105284411786e-02`, `y_exact=2.2964963538688077e-01`
+  - train[3] t_remaining=31: `x_unmit=2.5811823480432972e-02`, `x_rem=4.5525267478861396e-03`, `y_exact=2.1378463588305691e-01`
+  - train[4] t_remaining=30: `x_unmit=2.7241962774957701e-01`, `x_rem=3.2904642500385900e-01`, `y_exact=8.8292650677363171e-01`
+  - train[5] t_remaining=31: `x_unmit=7.2390572390572394e-02`, `x_rem=5.9516565540661974e-02`, `y_exact=1.0548459378587127e-01`
+  - train[6] t_remaining=31: `x_unmit=9.9348534201954400e-02`, `x_rem=9.4370034815857290e-02`, `y_exact=2.7128692248946051e-01`
+  - train[7] t_remaining=31: `x_unmit=8.1856540084388182e-02`, `x_rem=7.3083170536274139e-02`, `y_exact=1.5585520737071945e-01`
+  - train[8] t_remaining=30: `x_unmit=1.3333333333333333e-01`, `x_rem=1.3955823293172698e-01`, `y_exact=4.1675146918301126e-01`
+  - train[9] t_remaining=32: `x_unmit=-4.5936395759717315e-02`, `x_rem=-1.0077665533410778e-01`, `y_exact=-1.8621330108164419e-01`
+  - train[10] t_remaining=30: `x_unmit=1.8647007805724197e-01`, `x_rem=2.1492984700541740e-01`, `y_exact=5.4571926820459182e-01`
+  - train[11] t_remaining=29: `x_unmit=1.9555935098206662e-01`, `x_rem=2.2862218668501030e-01`, `y_exact=7.9255549168214345e-01`
+  - train[12] t_remaining=30: `x_unmit=1.3664055700609226e-01`, `x_rem=1.4166825202088984e-01`, `y_exact=4.0599771433886656e-01`
+  - train[13] t_remaining=29: `x_unmit=2.2810060711188204e-01`, `x_rem=2.7202851798720112e-01`, `y_exact=7.8914479809999516e-01`
+  - train[14] t_remaining=32: `x_unmit=4.0508339952343132e-02`, `x_rem=1.0216743520091979e-02`, `y_exact=6.5248103278589542e-02`
+  - train[15] t_remaining=32: `x_unmit=-2.0374898125509373e-02`, `x_rem=-5.5427204217966264e-02`, `y_exact=-2.6941342264871648e-01`
+  - train[16] t_remaining=31: `x_unmit=1.6512992455993294e-01`, `x_rem=1.7886899051120075e-01`, `y_exact=6.5237544559801131e-01`
+  - train[17] t_remaining=32: `x_unmit=1.7543859649122806e-02`, `x_rem=-1.0012600826986148e-02`, `y_exact=7.5228440957791465e-02`
+  - train[18] t_remaining=30: `x_unmit=-2.0275750202757500e-02`, `x_rem=-6.3146805737606906e-02`, `y_exact=-1.6354881041080155e-01`
+  - train[19] t_remaining=32: `x_unmit=6.7340067340067337e-03`, `x_rem=-2.3668507604250561e-02`, `y_exact=-1.2713514199815673e-01`
+  - train[20] t_remaining=31: `x_unmit=-7.3130649137222684e-02`, `x_rem=-1.4264830185868491e-01`, `y_exact=-1.2820749077350743e-01`
+  - train[21] t_remaining=31: `x_unmit=-1.3377926421404682e-02`, `x_rem=-5.8389314544369547e-02`, `y_exact=-3.1793138193047035e-02`
+  - train[22] t_remaining=30: `x_unmit=-2.5531914893617020e-03`, `x_rem=-4.4042431122666939e-02`, `y_exact=3.9770065362227755e-02`
+  - train[23] t_remaining=30: `x_unmit=-5.1457975986277877e-03`, `x_rem=-3.7823432913225978e-02`, `y_exact=-7.2310302591105255e-02`
+- target x values: `x_u_target=-3.8079470198675497e-02`, `x_r_target=-8.4733446558229120e-02`
+- target contribution to E_cdr_unmit: `-6.7934764105695945e-03`
+- target contribution to E_cdr_rem: `-6.4086742798367263e-03`
+
+### term 165
+- pauli term from int row: `(7.3585839913404387e-03)*Z(q(1, 0))*Y(q(1, 1))*Z(q(1, 2))*Y(q(1, 3))`
+- int observable row: `[0, 0, 0, 0, 3, 2, 3, 2]`
+- Hamiltonian weight w_165: `7.3585839913404387e-03`
+- OGM effective shots used for this term: `740`
+- fitted unmit coeffs: `a_u=2.1622919747654987e+00`, `b_u=-4.7355195078773143e-02`
+- fitted rem coeffs: `a_r=1.0087524053129671e+00`, `b_r=-4.7134576360400540e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-1.9108280254777069e-02`, `x_rem=-3.9464176068117328e-02`, `y_exact=1.5290920268729852e-02`
+  - train[1] t_remaining=29: `x_unmit=-3.7641154328732747e-03`, `x_rem=-8.2373989419879095e-03`, `y_exact=-2.3594584869046670e-01`
+  - train[2] t_remaining=30: `x_unmit=4.0843214756258232e-02`, `x_rem=9.3003475737416769e-02`, `y_exact=1.0720553875572814e-01`
+  - train[3] t_remaining=31: `x_unmit=-5.1150895140664961e-02`, `x_rem=-1.1108839257870720e-01`, `y_exact=8.9722366685626755e-03`
+  - train[4] t_remaining=30: `x_unmit=1.1523687580025609e-02`, `x_rem=2.7682113896175420e-02`, `y_exact=3.2527665997088243e-08`
+  - train[5] t_remaining=31: `x_unmit=5.2238805970149252e-02`, `x_rem=1.0562301285040927e-01`, `y_exact=-1.3151986385492259e-01`
+  - train[6] t_remaining=31: `x_unmit=7.9155672823219003e-03`, `x_rem=1.7005964153594913e-02`, `y_exact=-2.3477336548294758e-01`
+  - train[7] t_remaining=31: `x_unmit=2.6246719160104987e-03`, `x_rem=1.3474416155152246e-02`, `y_exact=3.8647135054087534e-01`
+  - train[8] t_remaining=30: `x_unmit=1.7038007863695939e-02`, `x_rem=3.4627436476580571e-02`, `y_exact=1.5690112042780719e-08`
+  - train[9] t_remaining=32: `x_unmit=-4.5092838196286469e-02`, `x_rem=-1.0025682812553705e-01`, `y_exact=1.4421413172501198e-02`
+  - train[10] t_remaining=30: `x_unmit=-5.2631578947368418e-02`, `x_rem=-1.0094605837632485e-01`, `y_exact=-4.2899820664213056e-01`
+  - train[11] t_remaining=29: `x_unmit=-2.5062656641604009e-02`, `x_rem=-6.1993574261463409e-02`, `y_exact=-8.7883783579611704e-08`
+  - train[12] t_remaining=30: `x_unmit=-9.6354166666666671e-02`, `x_rem=-2.0120982725355926e-01`, `y_exact=-3.2781917221445445e-01`
+  - train[13] t_remaining=29: `x_unmit=-1.0928961748633880e-02`, `x_rem=-2.8349590603489971e-02`, `y_exact=-3.5651652755961993e-01`
+  - train[14] t_remaining=32: `x_unmit=-4.7872340425531915e-02`, `x_rem=-1.0555687608124746e-01`, `y_exact=-3.4856612886471344e-01`
+  - train[15] t_remaining=32: `x_unmit=4.2105263157894736e-02`, `x_rem=9.3752625869535380e-02`, `y_exact=1.7820561141080382e-01`
+  - train[16] t_remaining=31: `x_unmit=-1.7676767676767676e-02`, `x_rem=-3.6329609730661662e-02`, `y_exact=-8.8641243316550475e-02`
+  - train[17] t_remaining=32: `x_unmit=3.6363636363636362e-02`, `x_rem=7.0855787831939271e-02`, `y_exact=-1.7686153097129460e-02`
+  - train[18] t_remaining=30: `x_unmit=-3.8461538461538464e-02`, `x_rem=-7.8779308326286393e-02`, `y_exact=5.9363254869120419e-02`
+  - train[19] t_remaining=32: `x_unmit=7.3349633251833741e-03`, `x_rem=1.5283292476916756e-02`, `y_exact=1.4635267546106581e-01`
+  - train[20] t_remaining=31: `x_unmit=-1.0781671159029650e-02`, `x_rem=-1.6646346299065244e-02`, `y_exact=-2.9587034599242606e-01`
+  - train[21] t_remaining=31: `x_unmit=2.5974025974025974e-03`, `x_rem=-6.6679129961148935e-03`, `y_exact=1.7611968463538585e-01`
+  - train[22] t_remaining=30: `x_unmit=7.0866141732283464e-02`, `x_rem=1.5557820089779736e-01`, `y_exact=-1.4910097680813436e-07`
+  - train[23] t_remaining=30: `x_unmit=1.7639077340569877e-02`, `x_rem=2.8040891942458020e-02`, `y_exact=2.7518389620729570e-08`
+- target x values: `x_u_target=-4.5510455104551047e-02`, `x_r_target=-9.0846772769376929e-02`
+- target contribution to E_cdr_unmit: `-1.0726025593485093e-03`
+- target contribution to E_cdr_rem: `-1.0211983613382825e-03`
+
+### term 166
+- pauli term from int row: `(7.3585839913404387e-03)*Z(q(1, 0))*X(q(1, 1))*Z(q(1, 2))*X(q(1, 3))`
+- int observable row: `[0, 0, 0, 0, 3, 1, 3, 1]`
+- Hamiltonian weight w_166: `7.3585839913404387e-03`
+- OGM effective shots used for this term: `807`
+- fitted unmit coeffs: `a_u=3.2248939303130184e+00`, `b_u=-2.9665437464548933e-02`
+- fitted rem coeffs: `a_r=1.5864687110815132e+00`, `b_r=-3.1059998587732673e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=2.2397891963109356e-02`, `x_rem=4.6620473512411116e-02`, `y_exact=1.5290968169878511e-02`
+  - train[1] t_remaining=29: `x_unmit=-6.2918340026773767e-02`, `x_rem=-1.2316067581245899e-01`, `y_exact=-2.3594593568113531e-01`
+  - train[2] t_remaining=30: `x_unmit=2.6246719160104987e-02`, `x_rem=5.1522593089471165e-02`, `y_exact=1.0720551440888965e-01`
+  - train[3] t_remaining=31: `x_unmit=-2.4643320363164717e-02`, `x_rem=-4.7616633416575162e-02`, `y_exact=8.9722407951865826e-03`
+  - train[4] t_remaining=30: `x_unmit=-6.0846560846560843e-02`, `x_rem=-1.2261060044438819e-01`, `y_exact=3.2527730842515368e-08`
+  - train[5] t_remaining=31: `x_unmit=-1.9607843137254902e-02`, `x_rem=-4.7114467997362332e-02`, `y_exact=-1.3151983688971536e-01`
+  - train[6] t_remaining=31: `x_unmit=1.0050251256281407e-02`, `x_rem=1.9957128296937646e-02`, `y_exact=-2.3477330950902917e-01`
+  - train[7] t_remaining=31: `x_unmit=8.7231352718078387e-02`, `x_rem=1.8780186658833894e-01`, `y_exact=3.8647142334698709e-01`
+  - train[8] t_remaining=30: `x_unmit=-5.0251256281407036e-03`, `x_rem=-5.9680979139007410e-03`, `y_exact=7.2791933115065935e-08`
+  - train[9] t_remaining=32: `x_unmit=-1.4117647058823530e-02`, `x_rem=-2.3157966329986023e-02`, `y_exact=1.4421354138765972e-02`
+  - train[10] t_remaining=30: `x_unmit=-5.5214723926380369e-02`, `x_rem=-1.1055163184129256e-01`, `y_exact=-4.2899820664213739e-01`
+  - train[11] t_remaining=29: `x_unmit=3.6900369003690036e-03`, `x_rem=1.0013067936128869e-02`, `y_exact=-8.7883803782921733e-08`
+  - train[12] t_remaining=30: `x_unmit=-5.8355437665782495e-02`, `x_rem=-1.2518306626392667e-01`, `y_exact=-3.2781916822836499e-01`
+  - train[13] t_remaining=29: `x_unmit=-2.6957637997432605e-02`, `x_rem=-6.5967912187643127e-02`, `y_exact=-3.5651652755964985e-01`
+  - train[14] t_remaining=32: `x_unmit=-2.7888446215139442e-02`, `x_rem=-4.2450145818535075e-02`, `y_exact=-3.4856615416416759e-01`
+  - train[15] t_remaining=32: `x_unmit=7.4074074074074070e-02`, `x_rem=1.5123444480723891e-01`, `y_exact=1.7820554392060611e-01`
+  - train[16] t_remaining=31: `x_unmit=9.4212651413189772e-03`, `x_rem=2.7603916979939601e-02`, `y_exact=-8.8641243502852171e-02`
+  - train[17] t_remaining=32: `x_unmit=-1.8915510718789406e-02`, `x_rem=-4.4947128288141347e-02`, `y_exact=-1.7686122920405126e-02`
+  - train[18] t_remaining=30: `x_unmit=4.7738693467336682e-02`, `x_rem=9.5945445604281004e-02`, `y_exact=5.9363105983972847e-02`
+  - train[19] t_remaining=32: `x_unmit=-3.0690537084398978e-02`, `x_rem=-5.4318698291235264e-02`, `y_exact=1.4635265884111412e-01`
+  - train[20] t_remaining=31: `x_unmit=-3.3047735618115054e-02`, `x_rem=-7.0884160718828110e-02`, `y_exact=-2.9587033752478120e-01`
+  - train[21] t_remaining=31: `x_unmit=3.5322777101096221e-02`, `x_rem=6.4143238631911514e-02`, `y_exact=1.7611966094237419e-01`
+  - train[22] t_remaining=30: `x_unmit=-6.4343163538873996e-02`, `x_rem=-1.3193193269365500e-01`, `y_exact=-1.0859908979378307e-07`
+  - train[23] t_remaining=30: `x_unmit=-1.8867924528301886e-02`, `x_rem=-3.5138455092062704e-02`, `y_exact=8.1383330108651829e-09`
+- target x values: `x_u_target=8.9399744572158362e-03`, `x_r_target=1.8857879967438582e-02`
+- target contribution to E_cdr_unmit: `-6.1441828962958696e-06`
+- target contribution to E_cdr_rem: `-8.4076388989913081e-06`
+
+### term 167
+- pauli term from int row: `(1.3066466930229781e-02)*Y(q(1, 0))*Y(q(1, 2))`
+- int observable row: `[0, 0, 0, 0, 2, 0, 2, 0]`
+- Hamiltonian weight w_167: `1.3066466930229781e-02`
+- OGM effective shots used for this term: `1989`
+- fitted unmit coeffs: `a_u=4.5343935946933955e+00`, `b_u=2.2129011089435793e-02`
+- fitted rem coeffs: `a_r=3.0175099709266910e+00`, `b_r=3.1195408004279137e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=4.8403707518022657e-02`, `x_rem=7.5303140067378913e-02`, `y_exact=4.3097117491093673e-01`
+  - train[1] t_remaining=29: `x_unmit=-2.1905247070809986e-02`, `x_rem=-3.8294340415222332e-02`, `y_exact=2.2977528206376108e-08`
+  - train[2] t_remaining=30: `x_unmit=-1.9289340101522844e-02`, `x_rem=-3.2219274653252715e-02`, `y_exact=-1.9953971639949507e-08`
+  - train[3] t_remaining=31: `x_unmit=9.6085409252669035e-02`, `x_rem=1.4115056356341354e-01`, `y_exact=4.5694087893386237e-01`
+  - train[4] t_remaining=30: `x_unmit=-3.5605289928789419e-02`, `x_rem=-6.0513356352752706e-02`, `y_exact=-1.9509047992041070e-01`
+  - train[5] t_remaining=31: `x_unmit=-7.2850898494414762e-03`, `x_rem=-1.3694856466018609e-02`, `y_exact=-2.3888919146810887e-09`
+  - train[6] t_remaining=31: `x_unmit=-9.0666666666666673e-03`, `x_rem=-1.8227848101265855e-02`, `y_exact=-2.9405175406439115e-08`
+  - train[7] t_remaining=31: `x_unmit=-1.6343207354443310e-02`, `x_rem=-2.7648121091443569e-02`, `y_exact=4.2989335296068984e-08`
+  - train[8] t_remaining=30: `x_unmit=-9.7863884749130645e-02`, `x_rem=-1.5060635106287737e-01`, `y_exact=-3.9781704668393181e-01`
+  - train[9] t_remaining=32: `x_unmit=-2.1472392638036811e-02`, `x_rem=-3.4305042459115656e-02`, `y_exact=-1.2917963872094546e-01`
+  - train[10] t_remaining=30: `x_unmit=-3.1472081218274113e-02`, `x_rem=-4.9981182474917653e-02`, `y_exact=-1.0709825383696003e-01`
+  - train[11] t_remaining=29: `x_unmit=8.9473684210526316e-02`, `x_rem=1.3075410044097585e-01`, `y_exact=5.3971339785210393e-01`
+  - train[12] t_remaining=30: `x_unmit=2.0147420147420148e-02`, `x_rem=2.9783194340156329e-02`, `y_exact=-3.2179777724317645e-08`
+  - train[13] t_remaining=29: `x_unmit=-3.5222052067381319e-02`, `x_rem=-5.7255719341128497e-02`, `y_exact=-1.5487079196844206e-01`
+  - train[14] t_remaining=32: `x_unmit=1.6443987667009250e-02`, `x_rem=1.8764631797532762e-02`, `y_exact=1.8475119801652198e-02`
+  - train[15] t_remaining=32: `x_unmit=3.5806953814218993e-02`, `x_rem=5.0442726734989250e-02`, `y_exact=1.9479388535015169e-01`
+  - train[16] t_remaining=31: `x_unmit=-6.8316831683168322e-02`, `x_rem=-1.0299357241329925e-01`, `y_exact=-3.4881133401301401e-01`
+  - train[17] t_remaining=32: `x_unmit=-4.9098196392785572e-02`, `x_rem=-7.6545496055401993e-02`, `y_exact=-2.4204232735012979e-01`
+  - train[18] t_remaining=30: `x_unmit=-2.3958333333333335e-02`, `x_rem=-3.6276245730359709e-02`, `y_exact=-4.9112813282014300e-08`
+  - train[19] t_remaining=32: `x_unmit=-1.0330578512396695e-03`, `x_rem=-3.4777746227688984e-03`, `y_exact=-2.3137766683972100e-01`
+  - train[20] t_remaining=31: `x_unmit=2.4948024948024949e-02`, `x_rem=3.1507721381139067e-02`, `y_exact=1.3582279868179576e-08`
+  - train[21] t_remaining=31: `x_unmit=-4.9608355091383810e-02`, `x_rem=-7.9273273244916231e-02`, `y_exact=-1.0442546236757158e-01`
+  - train[22] t_remaining=30: `x_unmit=-6.7130780706116361e-02`, `x_rem=-1.0241142073028728e-01`, `y_exact=-1.7506346607733875e-01`
+  - train[23] t_remaining=30: `x_unmit=3.0271934325295024e-02`, `x_rem=4.3752827913481514e-02`, `y_exact=1.0043370052153368e-01`
+- target x values: `x_u_target=1.7694369973190349e-02`, `x_r_target=2.4353312098925810e-02`
+- target contribution to E_cdr_unmit: `1.3375129409137236e-03`
+- target contribution to E_cdr_rem: `1.3678208870511670e-03`
+
+### term 168
+- pauli term from int row: `(1.3066466930229781e-02)*X(q(1, 0))*X(q(1, 2))`
+- int observable row: `[0, 0, 0, 0, 1, 0, 1, 0]`
+- Hamiltonian weight w_168: `1.3066466930229781e-02`
+- OGM effective shots used for this term: `1984`
+- fitted unmit coeffs: `a_u=4.2736093626023610e+00`, `b_u=-1.0261320135785906e-02`
+- fitted rem coeffs: `a_r=2.8440039628679790e+00`, `b_r=6.1101304475677846e-04`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=9.6230158730158735e-02`, `x_rem=1.3954966656142059e-01`, `y_exact=4.3097124415249610e-01`
+  - train[1] t_remaining=29: `x_unmit=-2.5087807325639738e-03`, `x_rem=-4.2826202740332987e-03`, `y_exact=-3.4036603052115454e-08`
+  - train[2] t_remaining=30: `x_unmit=-2.0187099950763170e-02`, `x_rem=-3.3973115326068642e-02`, `y_exact=-2.8893503941036784e-08`
+  - train[3] t_remaining=31: `x_unmit=1.1581067472306143e-01`, `x_rem=1.6863979137871060e-01`, `y_exact=4.5694084648604372e-01`
+  - train[4] t_remaining=30: `x_unmit=-7.3170731707317069e-02`, `x_rem=-1.1265969802555176e-01`, `y_exact=-1.9509047992041553e-01`
+  - train[5] t_remaining=31: `x_unmit=7.1283095723014261e-03`, `x_rem=7.0343948763087983e-03`, `y_exact=2.4401759183033042e-08`
+  - train[6] t_remaining=31: `x_unmit=1.4669926650366749e-03`, `x_rem=-5.3055792587221821e-03`, `y_exact=2.9447776059538675e-08`
+  - train[7] t_remaining=31: `x_unmit=-4.1067761806981521e-03`, `x_rem=-1.0013206540641391e-02`, `y_exact=1.5446356752629626e-08`
+  - train[8] t_remaining=30: `x_unmit=-7.8825347758887165e-02`, `x_rem=-1.2436496912070649e-01`, `y_exact=-3.9781701574400913e-01`
+  - train[9] t_remaining=32: `x_unmit=-3.4201123021949976e-02`, `x_rem=-5.7501874626344006e-02`, `y_exact=-1.2917951365230698e-01`
+  - train[10] t_remaining=30: `x_unmit=-1.9860973187686196e-03`, `x_rem=-9.1972228158167333e-03`, `y_exact=-1.0709825383694217e-01`
+  - train[11] t_remaining=29: `x_unmit=7.2927072927072928e-02`, `x_rem=1.0938729745239688e-01`, `y_exact=5.3971339785207217e-01`
+  - train[12] t_remaining=30: `x_unmit=4.5662100456621002e-03`, `x_rem=3.0062182538917706e-03`, `y_exact=-3.3944805289666022e-08`
+  - train[13] t_remaining=29: `x_unmit=-3.3078880407124679e-02`, `x_rem=-5.7685199244770252e-02`, `y_exact=-1.5487079196845133e-01`
+  - train[14] t_remaining=32: `x_unmit=-1.1799410029498525e-02`, `x_rem=-2.1612692722808149e-02`, `y_exact=1.8475120039169075e-02`
+  - train[15] t_remaining=32: `x_unmit=8.0321285140562249e-02`, `x_rem=1.1961952693232240e-01`, `y_exact=1.9479382863556755e-01`
+  - train[16] t_remaining=31: `x_unmit=-3.7112353838332487e-02`, `x_rem=-5.7271072760831022e-02`, `y_exact=-3.4881131331402510e-01`
+  - train[17] t_remaining=32: `x_unmit=-4.0526849037487338e-03`, `x_rem=-1.0589746267480892e-02`, `y_exact=-2.4204237678290788e-01`
+  - train[18] t_remaining=30: `x_unmit=4.6082949308755760e-03`, `x_rem=3.0833076391029732e-03`, `y_exact=9.2257267020616748e-09`
+  - train[19] t_remaining=32: `x_unmit=-2.5050100200400802e-02`, `x_rem=-3.8585308048284674e-02`, `y_exact=-2.3137759051863085e-01`
+  - train[20] t_remaining=31: `x_unmit=6.0240963855421690e-03`, `x_rem=4.5419774335436654e-03`, `y_exact=-2.3779427702460865e-08`
+  - train[21] t_remaining=31: `x_unmit=-5.4726368159203981e-02`, `x_rem=-8.2243994014256680e-02`, `y_exact=-1.0442555452411575e-01`
+  - train[22] t_remaining=30: `x_unmit=-2.5691699604743084e-02`, `x_rem=-4.2983296285442708e-02`, `y_exact=-1.7506341662842320e-01`
+  - train[23] t_remaining=30: `x_unmit=-5.5583628094997475e-03`, `x_rem=-1.2862604057492179e-02`, `y_exact=1.0043379089809105e-01`
+- target x values: `x_u_target=-5.0175614651279475e-04`, `x_r_target=-3.1484517692575379e-03`
+- target contribution to E_cdr_unmit: `-1.6209775285356542e-04`
+- target contribution to E_cdr_rem: `-1.0901609807480137e-04`
+
+### term 169
+- pauli term from int row: `(6.2676336633941477e-03)*Y(q(1, 0))*X(q(1, 1))*X(q(1, 2))*Y(q(1, 3))`
+- int observable row: `[0, 0, 0, 0, 2, 1, 1, 2]`
+- Hamiltonian weight w_169: `6.2676336633941477e-03`
+- OGM effective shots used for this term: `33`
+- fitted unmit coeffs: `a_u=9.9248231063267342e-02`, `b_u=6.2631873915958173e-03`
+- fitted rem coeffs: `a_r=4.5714119446836170e-02`, `b_r=5.7540955893512049e-03`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=2.8571428571428570e-01`, `x_rem=6.1677504295446539e-01`, `y_exact=7.7248084649902571e-02`
+  - train[1] t_remaining=29: `x_unmit=2.5925925925925924e-01`, `x_rem=5.4545357759982527e-01`, `y_exact=-8.4590424107224109e-08`
+  - train[2] t_remaining=30: `x_unmit=3.3333333333333331e-01`, `x_rem=7.2049556286178995e-01`, `y_exact=5.3922071379812132e-08`
+  - train[3] t_remaining=31: `x_unmit=-2.9411764705882354e-01`, `x_rem=-6.1380433159676429e-01`, `y_exact=-6.5343266036135661e-02`
+  - train[4] t_remaining=30: `x_unmit=0.0000000000000000e+00`, `x_rem=5.0364896384239952e-02`, `y_exact=2.9158335384812587e-08`
+  - train[5] t_remaining=31: `x_unmit=0.0000000000000000e+00`, `x_rem=6.3525616547240843e-02`, `y_exact=4.3634497279862632e-08`
+  - train[6] t_remaining=31: `x_unmit=3.0303030303030304e-02`, `x_rem=1.0184345121976143e-01`, `y_exact=-3.4275966389230371e-08`
+  - train[7] t_remaining=31: `x_unmit=9.6774193548387094e-02`, `x_rem=2.1249130230661115e-01`, `y_exact=-5.0847708573438297e-09`
+  - train[8] t_remaining=30: `x_unmit=7.6923076923076927e-02`, `x_rem=1.6530639298425201e-01`, `y_exact=3.3440341126781833e-08`
+  - train[9] t_remaining=32: `x_unmit=5.8823529411764705e-02`, `x_rem=1.2218385444271389e-01`, `y_exact=1.6563669238085950e-02`
+  - train[10] t_remaining=30: `x_unmit=1.1111111111111110e-01`, `x_rem=2.0943511786483335e-01`, `y_exact=8.4191577444347632e-02`
+  - train[11] t_remaining=29: `x_unmit=0.0000000000000000e+00`, `x_rem=3.6818285379205395e-03`, `y_exact=-7.5396967279171640e-08`
+  - train[12] t_remaining=30: `x_unmit=-2.0000000000000001e-01`, `x_rem=-4.2305561030445854e-01`, `y_exact=-3.6363869520053052e-08`
+  - train[13] t_remaining=29: `x_unmit=2.9032258064516131e-01`, `x_rem=6.2898249236049186e-01`, `y_exact=6.9966932678880850e-02`
+  - train[14] t_remaining=32: `x_unmit=-1.2500000000000000e-01`, `x_rem=-2.2442687187625143e-01`, `y_exact=5.5678482620316995e-03`
+  - train[15] t_remaining=32: `x_unmit=1.5384615384615385e-01`, `x_rem=3.2927811229714771e-01`, `y_exact=1.4402263732430424e-02`
+  - train[16] t_remaining=31: `x_unmit=1.5384615384615385e-01`, `x_rem=2.7316725324535202e-01`, `y_exact=3.3796350849146714e-02`
+  - train[17] t_remaining=32: `x_unmit=-8.5714285714285715e-02`, `x_rem=-1.8819789620896402e-01`, `y_exact=6.3872683164797285e-03`
+  - train[18] t_remaining=30: `x_unmit=1.4285714285714285e-01`, `x_rem=3.1826182692315957e-01`, `y_exact=7.2409237766869203e-08`
+  - train[19] t_remaining=32: `x_unmit=1.4285714285714285e-01`, `x_rem=3.7031450222800105e-01`, `y_exact=-1.1828124782517713e-02`
+  - train[20] t_remaining=31: `x_unmit=-1.8918918918918920e-01`, `x_rem=-3.6167095620688644e-01`, `y_exact=3.0656991976903574e-08`
+  - train[21] t_remaining=31: `x_unmit=-8.1081081081081086e-02`, `x_rem=-1.3976159051012485e-01`, `y_exact=3.3189991644918732e-02`
+  - train[22] t_remaining=30: `x_unmit=-9.0909090909090912e-02`, `x_rem=-1.9266188848846835e-01`, `y_exact=2.5420491676582018e-09`
+  - train[23] t_remaining=30: `x_unmit=7.6923076923076927e-02`, `x_rem=1.6924718805542069e-01`, `y_exact=-4.1833677873383158e-08`
+- target x values: `x_u_target=-2.2580645161290322e-01`, `x_r_target=-4.9575129353919584e-01`
+- target contribution to E_cdr_unmit: `-1.0120789000335877e-04`
+- target contribution to E_cdr_rem: `-1.0597777712028101e-04`
+
+### term 170
+- pauli term from int row: `(1.6100735746573811e-02)*Y(q(1, 0))*Y(q(1, 1))*Y(q(1, 2))*Y(q(1, 3))`
+- int observable row: `[0, 0, 0, 0, 2, 2, 2, 2]`
+- Hamiltonian weight w_170: `1.6100735746573811e-02`
+- OGM effective shots used for this term: `1218`
+- fitted unmit coeffs: `a_u=2.9091430224023357e-01`, `b_u=1.8749434184236666e-02`
+- fitted rem coeffs: `a_r=8.7471250436692252e-02`, `b_r=1.9479498990521284e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=4.8903878583473864e-02`, `x_rem=9.7483668876478399e-02`, `y_exact=1.2607173752089568e-01`
+  - train[1] t_remaining=29: `x_unmit=-3.8556193601312551e-02`, `x_rem=-7.3945368744627676e-02`, `y_exact=-5.6478557755224906e-08`
+  - train[2] t_remaining=30: `x_unmit=-1.1363636363636364e-02`, `x_rem=-1.8364232979538504e-02`, `y_exact=2.5324170191063194e-08`
+  - train[3] t_remaining=31: `x_unmit=-9.1438071487946800e-03`, `x_rem=-2.8362577411287698e-02`, `y_exact=2.4159893033770616e-01`
+  - train[4] t_remaining=30: `x_unmit=5.9171597633136093e-03`, `x_rem=2.2006168705885582e-02`, `y_exact=2.4393421123696692e-08`
+  - train[5] t_remaining=31: `x_unmit=1.3567438148443736e-02`, `x_rem=3.4357757353684210e-02`, `y_exact=3.6047066388362429e-08`
+  - train[6] t_remaining=31: `x_unmit=2.8960817717206135e-02`, `x_rem=6.1488372232279390e-02`, `y_exact=-2.4221710550025841e-08`
+  - train[7] t_remaining=31: `x_unmit=-3.9068994181213630e-02`, `x_rem=-8.1369289540097894e-02`, `y_exact=-4.6271912469092958e-08`
+  - train[8] t_remaining=30: `x_unmit=2.3330651649235722e-02`, `x_rem=5.5784837022950270e-02`, `y_exact=5.1342148898317012e-08`
+  - train[9] t_remaining=32: `x_unmit=-3.3222591362126247e-03`, `x_rem=-1.9988920837141137e-03`, `y_exact=-2.1414893044587296e-02`
+  - train[10] t_remaining=30: `x_unmit=-3.0654515327257662e-02`, `x_rem=-6.3311874240540231e-02`, `y_exact=2.3454384455445787e-08`
+  - train[11] t_remaining=29: `x_unmit=-1.6507384882710686e-02`, `x_rem=-2.8581236206208747e-02`, `y_exact=-2.5939948454655925e-08`
+  - train[12] t_remaining=30: `x_unmit=3.6378334680679060e-02`, `x_rem=7.2931869764751411e-02`, `y_exact=-1.5463042197443517e-08`
+  - train[13] t_remaining=29: `x_unmit=6.5451532725766357e-02`, `x_rem=1.3797245469796288e-01`, `y_exact=-7.4338422823473110e-02`
+  - train[14] t_remaining=32: `x_unmit=-3.2745591939546598e-02`, `x_rem=-6.7835306339465440e-02`, `y_exact=-1.6334895589786608e-04`
+  - train[15] t_remaining=32: `x_unmit=3.6471586089906700e-02`, `x_rem=7.8413685341920794e-02`, `y_exact=1.6622296483692622e-08`
+  - train[16] t_remaining=31: `x_unmit=1.6867469879518072e-02`, `x_rem=3.1253692820880467e-02`, `y_exact=9.3159501174058384e-03`
+  - train[17] t_remaining=32: `x_unmit=5.6864337936636889e-03`, `x_rem=1.1935272048294265e-02`, `y_exact=-1.6144607663525583e-02`
+  - train[18] t_remaining=30: `x_unmit=-2.2413793103448276e-02`, `x_rem=-4.5188009965210787e-02`, `y_exact=8.3668968419355725e-08`
+  - train[19] t_remaining=32: `x_unmit=2.2978723404255320e-02`, `x_rem=4.4848739354809056e-02`, `y_exact=8.6370669521533050e-02`
+  - train[20] t_remaining=31: `x_unmit=2.3850085178875640e-02`, `x_rem=5.0318822064999512e-02`, `y_exact=1.6456610597280255e-08`
+  - train[21] t_remaining=31: `x_unmit=5.7708871662360037e-02`, `x_rem=1.1146657417235144e-01`, `y_exact=1.5098103243131267e-01`
+  - train[22] t_remaining=30: `x_unmit=-2.1862348178137651e-02`, `x_rem=-4.3431846643640241e-02`, `y_exact=-2.4167322552904380e-08`
+  - train[23] t_remaining=30: `x_unmit=1.9311502938706968e-02`, `x_rem=3.9618646404985587e-02`, `y_exact=-4.0567801066127474e-08`
+- target x values: `x_u_target=-2.3297491039426525e-02`, `x_r_target=-4.7545177990516163e-02`
+- target contribution to E_cdr_unmit: `1.9275576769190743e-04`
+- target contribution to E_cdr_rem: `2.4667394351841529e-04`
+
+### term 171
+- pauli term from int row: `(9.8331020831796678e-03)*Y(q(1, 0))*Y(q(1, 1))*X(q(1, 2))*X(q(1, 3))`
+- int observable row: `[0, 0, 0, 0, 2, 2, 1, 1]`
+- Hamiltonian weight w_171: `9.8331020831796678e-03`
+- OGM effective shots used for this term: `52`
+- fitted unmit coeffs: `a_u=-4.4714654022509535e-02`, `b_u=4.3609768258440398e-03`
+- fitted rem coeffs: `a_r=-1.9985817179096036e-02`, `b_r=4.2843859655160551e-03`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=0.0000000000000000e+00`, `x_rem=2.7521473446474650e-02`, `y_exact=6.7114151914581047e-02`
+  - train[1] t_remaining=29: `x_unmit=-1.0204081632653061e-01`, `x_rem=-2.0591217217581373e-01`, `y_exact=1.1279644032100591e-08`
+  - train[2] t_remaining=30: `x_unmit=-1.8867924528301886e-02`, `x_rem=-3.0947244269403928e-02`, `y_exact=-3.4700119515791205e-08`
+  - train[3] t_remaining=31: `x_unmit=-1.1538461538461539e-01`, `x_rem=-2.6632326145362106e-01`, `y_exact=6.5343285524017969e-02`
+  - train[4] t_remaining=30: `x_unmit=-2.3076923076923078e-01`, `x_rem=-4.9288108578552658e-01`, `y_exact=-2.9158363090014144e-08`
+  - train[5] t_remaining=31: `x_unmit=-5.6603773584905662e-02`, `x_rem=-1.4481179102115849e-01`, `y_exact=-1.1025799155906685e-08`
+  - train[6] t_remaining=31: `x_unmit=2.8571428571428571e-02`, `x_rem=1.0854879811339828e-01`, `y_exact=3.6964762010239004e-08`
+  - train[7] t_remaining=31: `x_unmit=5.4545454545454543e-02`, `x_rem=1.2853542864076617e-01`, `y_exact=4.1430998861794563e-08`
+  - train[8] t_remaining=30: `x_unmit=6.6666666666666666e-02`, `x_rem=1.1712793579146251e-01`, `y_exact=-2.8631734959147971e-08`
+  - train[9] t_remaining=32: `x_unmit=2.5000000000000000e-01`, `x_rem=5.1179457445971865e-01`, `y_exact=3.0267047527631182e-03`
+  - train[10] t_remaining=30: `x_unmit=1.3725490196078433e-01`, `x_rem=2.9170758594540419e-01`, `y_exact=-8.4191577444356069e-02`
+  - train[11] t_remaining=29: `x_unmit=3.1707317073170732e-01`, `x_rem=6.7296064915786258e-01`, `y_exact=7.5396975116156922e-08`
+  - train[12] t_remaining=30: `x_unmit=-1.3793103448275862e-01`, `x_rem=-3.0697900616359197e-01`, `y_exact=4.5707142072383239e-08`
+  - train[13] t_remaining=29: `x_unmit=1.3207547169811321e-01`, `x_rem=2.7917208365329860e-01`, `y_exact=-6.9966932678872315e-02`
+  - train[14] t_remaining=32: `x_unmit=0.0000000000000000e+00`, `x_rem=-3.5842234885685630e-02`, `y_exact=-2.5778752074112149e-02`
+  - train[15] t_remaining=32: `x_unmit=-2.1568627450980393e-01`, `x_rem=-4.7521749719899731e-01`, `y_exact=-1.4402265515222373e-02`
+  - train[16] t_remaining=31: `x_unmit=5.8823529411764705e-02`, `x_rem=9.3551825715549597e-02`, `y_exact=-3.3796346680541323e-02`
+  - train[17] t_remaining=32: `x_unmit=9.8039215686274508e-02`, `x_rem=2.0609298512613802e-01`, `y_exact=-5.9081535136752426e-02`
+  - train[18] t_remaining=30: `x_unmit=0.0000000000000000e+00`, `x_rem=1.6301479645026949e-02`, `y_exact=3.6280222901408005e-08`
+  - train[19] t_remaining=32: `x_unmit=1.1111111111111110e-01`, `x_rem=2.1280668698127778e-01`, `y_exact=1.5091248515079497e-01`
+  - train[20] t_remaining=31: `x_unmit=-1.4814814814814814e-01`, `x_rem=-3.2272546988460987e-01`, `y_exact=-7.0932239295953507e-10`
+  - train[21] t_remaining=31: `x_unmit=-1.6129032258064516e-01`, `x_rem=-3.2690910913745563e-01`, `y_exact=8.1295614324984097e-02`
+  - train[22] t_remaining=30: `x_unmit=-4.0000000000000001e-02`, `x_rem=-8.5175218726793289e-02`, `y_exact=-7.4704428013028818e-08`
+  - train[23] t_remaining=30: `x_unmit=5.1351351351351349e-01`, `x_rem=1.1459113898899538e+00`, `y_exact=4.7561358283563218e-08`
+- target x values: `x_u_target=-1.8181818181818181e-02`, `x_r_target=-5.2297933135383605e-02`
+- target contribution to E_cdr_unmit: `5.0876180449403404e-05`
+- target contribution to E_cdr_rem: `5.2406529339221462e-05`
+
+### term 172
+- pauli term from int row: `(9.8331020831796678e-03)*X(q(1, 0))*X(q(1, 1))*Y(q(1, 2))*Y(q(1, 3))`
+- int observable row: `[0, 0, 0, 0, 1, 1, 2, 2]`
+- Hamiltonian weight w_172: `9.8331020831796678e-03`
+- OGM effective shots used for this term: `132`
+- fitted unmit coeffs: `a_u=9.4947385856216787e-03`, `b_u=3.0075555521341243e-03`
+- fitted rem coeffs: `a_r=1.1758748358034078e-02`, `b_r=2.4764688793023812e-03`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=0.0000000000000000e+00`, `x_rem=1.5179312850280962e-02`, `y_exact=6.7114151914558509e-02`
+  - train[1] t_remaining=29: `x_unmit=4.2735042735042736e-02`, `x_rem=1.0531392296308895e-01`, `y_exact=1.1279669865923148e-08`
+  - train[2] t_remaining=30: `x_unmit=5.5118110236220472e-02`, `x_rem=1.3132901268905922e-01`, `y_exact=-3.4700106598753800e-08`
+  - train[3] t_remaining=31: `x_unmit=6.8702290076335881e-02`, `x_rem=1.4497157967569341e-01`, `y_exact=6.5343285524010725e-02`
+  - train[4] t_remaining=30: `x_unmit=-1.1290322580645161e-01`, `x_rem=-2.3532512248522269e-01`, `y_exact=-2.9158336716453971e-08`
+  - train[5] t_remaining=31: `x_unmit=1.2962962962962962e-01`, `x_rem=2.5581765032946274e-01`, `y_exact=-1.1025806247218935e-08`
+  - train[6] t_remaining=31: `x_unmit=-4.6153846153846156e-02`, `x_rem=-1.2224995892370728e-01`, `y_exact=3.6964785651985123e-08`
+  - train[7] t_remaining=31: `x_unmit=8.2706766917293228e-02`, `x_rem=1.8965264642385044e-01`, `y_exact=4.1430982649972714e-08`
+  - train[8] t_remaining=30: `x_unmit=2.9411764705882353e-02`, `x_rem=6.7598461369218807e-02`, `y_exact=-2.8631739398419682e-08`
+  - train[9] t_remaining=32: `x_unmit=4.7619047619047616e-02`, `x_rem=1.0676176818520712e-01`, `y_exact=3.0267047527502786e-03`
+  - train[10] t_remaining=30: `x_unmit=6.4748201438848921e-02`, `x_rem=1.3672436618828993e-01`, `y_exact=-8.4191577444351823e-02`
+  - train[11] t_remaining=29: `x_unmit=1.1278195488721804e-01`, `x_rem=2.2490519593106323e-01`, `y_exact=7.5396983726036595e-08`
+  - train[12] t_remaining=30: `x_unmit=1.5068493150684931e-01`, `x_rem=3.2507487439299904e-01`, `y_exact=4.5707132268951730e-08`
+  - train[13] t_remaining=29: `x_unmit=2.9411764705882353e-02`, `x_rem=5.1048363917496176e-02`, `y_exact=-6.9966932678873883e-02`
+  - train[14] t_remaining=32: `x_unmit=4.8387096774193547e-02`, `x_rem=8.7950373832809917e-02`, `y_exact=-2.5778752074101088e-02`
+  - train[15] t_remaining=32: `x_unmit=-9.0909090909090912e-02`, `x_rem=-1.9184813989585039e-01`, `y_exact=-1.4402265515192081e-02`
+  - train[16] t_remaining=31: `x_unmit=4.6875000000000000e-02`, `x_rem=8.1090742971043045e-02`, `y_exact=-3.3796346680534689e-02`
+  - train[17] t_remaining=32: `x_unmit=5.2631578947368418e-02`, `x_rem=1.0272954328209707e-01`, `y_exact=-5.9081535136754515e-02`
+  - train[18] t_remaining=30: `x_unmit=2.4390243902439025e-02`, `x_rem=4.9496660713745665e-02`, `y_exact=3.6280231532459233e-08`
+  - train[19] t_remaining=32: `x_unmit=2.8985507246376812e-02`, `x_rem=5.8510281702008046e-02`, `y_exact=1.5091248515085803e-01`
+  - train[20] t_remaining=31: `x_unmit=3.3112582781456956e-02`, `x_rem=5.8056971125868717e-02`, `y_exact=-7.0932997740570143e-10`
+  - train[21] t_remaining=31: `x_unmit=8.5714285714285715e-02`, `x_rem=1.8213068028714813e-01`, `y_exact=8.1295614324984583e-02`
+  - train[22] t_remaining=30: `x_unmit=-7.5757575757575760e-02`, `x_rem=-1.6562521944662814e-01`, `y_exact=-7.4704432995612145e-08`
+  - train[23] t_remaining=30: `x_unmit=6.5573770491803282e-02`, `x_rem=1.2998615637453431e-01`, `y_exact=4.7561350340477503e-08`
+- target x values: `x_u_target=-4.0650406504065040e-02`, `x_r_target=-9.0124198248503873e-02`
+- target contribution to E_cdr_unmit: `2.5778367685069331e-05`
+- target contribution to E_cdr_rem: `1.3930763309123730e-05`
+
+### term 173
+- pauli term from int row: `(1.6100735746573811e-02)*X(q(1, 0))*X(q(1, 1))*X(q(1, 2))*X(q(1, 3))`
+- int observable row: `[0, 0, 0, 0, 1, 1, 1, 1]`
+- Hamiltonian weight w_173: `1.6100735746573811e-02`
+- OGM effective shots used for this term: `1243`
+- fitted unmit coeffs: `a_u=2.8397795760793493e-01`, `b_u=2.3451689060158574e-02`
+- fitted rem coeffs: `a_r=1.5737330325393459e-01`, `b_r=2.4152913830361656e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=3.1055900621118012e-02`, `x_rem=6.7875832951946088e-02`, `y_exact=1.2607173752089224e-01`
+  - train[1] t_remaining=29: `x_unmit=5.0288540807914263e-02`, `x_rem=9.3273258813652324e-02`, `y_exact=-5.6478573661243383e-08`
+  - train[2] t_remaining=30: `x_unmit=3.1847133757961785e-03`, `x_rem=3.4228440756683878e-03`, `y_exact=2.5324197887960685e-08`
+  - train[3] t_remaining=31: `x_unmit=-3.0050083472454091e-02`, `x_rem=-6.7453657840895784e-02`, `y_exact=2.4159893033769636e-01`
+  - train[4] t_remaining=30: `x_unmit=-2.3492560689115098e-03`, `x_rem=-1.5675723642297010e-02`, `y_exact=2.4393428885546102e-08`
+  - train[5] t_remaining=31: `x_unmit=1.6750418760469010e-02`, `x_rem=3.4335584484369200e-02`, `y_exact=3.6047078664033938e-08`
+  - train[6] t_remaining=31: `x_unmit=-3.1347962382445138e-02`, `x_rem=-6.5628559274862969e-02`, `y_exact=-2.4221711687931159e-08`
+  - train[7] t_remaining=31: `x_unmit=-5.1107325383304937e-03`, `x_rem=-2.1282134787703157e-02`, `y_exact=-4.6271890572389943e-08`
+  - train[8] t_remaining=30: `x_unmit=1.3050570962479609e-02`, `x_rem=3.5087742760595585e-02`, `y_exact=5.1342134037551479e-08`
+  - train[9] t_remaining=32: `x_unmit=1.5873015873015872e-02`, `x_rem=2.7832602413697331e-02`, `y_exact=-2.1414893044609883e-02`
+  - train[10] t_remaining=30: `x_unmit=-6.2597809076682309e-03`, `x_rem=-1.7847572784323609e-02`, `y_exact=2.3454393944383201e-08`
+  - train[11] t_remaining=29: `x_unmit=4.0355125100887809e-03`, `x_rem=8.6539641662828209e-03`, `y_exact=-2.5939983816050501e-08`
+  - train[12] t_remaining=30: `x_unmit=-6.7621320604614163e-02`, `x_rem=-1.4157644209969100e-01`, `y_exact=-1.5463029666876951e-08`
+  - train[13] t_remaining=29: `x_unmit=-4.8006509357200973e-02`, `x_rem=-1.0512328059878777e-01`, `y_exact=-7.4338422823482797e-02`
+  - train[14] t_remaining=32: `x_unmit=-4.2570281124497990e-02`, `x_rem=-9.7537730262343261e-02`, `y_exact=-1.6334895589564108e-04`
+  - train[15] t_remaining=32: `x_unmit=8.1037277147487843e-03`, `x_rem=1.0298148820292917e-02`, `y_exact=1.6622310455155498e-08`
+  - train[16] t_remaining=31: `x_unmit=-1.5715467328370553e-02`, `x_rem=-3.7056856447002129e-02`, `y_exact=9.3159501174163144e-03`
+  - train[17] t_remaining=32: `x_unmit=-2.8708133971291867e-02`, `x_rem=-5.3897281784396948e-02`, `y_exact=-1.6144607663560545e-02`
+  - train[18] t_remaining=30: `x_unmit=-1.7087062652563059e-02`, `x_rem=-3.1723349934967553e-02`, `y_exact=8.3668983621426699e-08`
+  - train[19] t_remaining=32: `x_unmit=-4.1528239202657809e-02`, `x_rem=-7.8443209192784233e-02`, `y_exact=8.6370669521545179e-02`
+  - train[20] t_remaining=31: `x_unmit=2.1069692058346839e-02`, `x_rem=4.0806006843176000e-02`, `y_exact=1.6456582667164626e-08`
+  - train[21] t_remaining=31: `x_unmit=3.0444964871194378e-02`, `x_rem=6.5170493071426305e-02`, `y_exact=1.5098103243134012e-01`
+  - train[22] t_remaining=30: `x_unmit=-3.4035656401944892e-02`, `x_rem=-7.3867708106739052e-02`, `y_exact=-2.4167311229503515e-08`
+  - train[23] t_remaining=30: `x_unmit=-3.6734693877551024e-02`, `x_rem=-7.1421683079635812e-02`, `y_exact=-4.0567811259818415e-08`
+- target x values: `x_u_target=-2.4291497975708503e-03`, `x_r_target=-3.6172806394731832e-03`
+- target contribution to E_cdr_unmit: `3.6648275836041999e-04`
+- target contribution to E_cdr_rem: `3.7971412347003310e-04`
+
+### term 174
+- pauli term from int row: `(6.2676336633941477e-03)*X(q(1, 0))*Y(q(1, 1))*Y(q(1, 2))*X(q(1, 3))`
+- int observable row: `[0, 0, 0, 0, 1, 2, 2, 1]`
+- Hamiltonian weight w_174: `6.2676336633941477e-03`
+- OGM effective shots used for this term: `79`
+- fitted unmit coeffs: `a_u=-4.2109802251386566e-02`, `b_u=1.0027174987169105e-02`
+- fitted rem coeffs: `a_r=-1.5026401741287630e-02`, `b_r=1.0329390986147822e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-1.2121212121212122e-01`, `x_rem=-2.2930360577682296e-01`, `y_exact=7.7248084649920945e-02`
+  - train[1] t_remaining=29: `x_unmit=-1.6417910447761194e-01`, `x_rem=-3.3471567265652480e-01`, `y_exact=-8.4590425990305445e-08`
+  - train[2] t_remaining=30: `x_unmit=8.8235294117647065e-02`, `x_rem=1.6061157377535479e-01`, `y_exact=5.3922079492226840e-08`
+  - train[3] t_remaining=31: `x_unmit=-6.8493150684931503e-02`, `x_rem=-1.5443736814150788e-01`, `y_exact=-6.5343266036115677e-02`
+  - train[4] t_remaining=30: `x_unmit=-1.5492957746478872e-01`, `x_rem=-2.8245319612249287e-01`, `y_exact=2.9158343347486974e-08`
+  - train[5] t_remaining=31: `x_unmit=1.2345679012345678e-02`, `x_rem=3.3087666045165713e-02`, `y_exact=4.3634490909681115e-08`
+  - train[6] t_remaining=31: `x_unmit=-4.6511627906976737e-02`, `x_rem=-9.7146228211555205e-02`, `y_exact=-3.4275972895675362e-08`
+  - train[7] t_remaining=31: `x_unmit=-9.7560975609756101e-02`, `x_rem=-1.9379113785848190e-01`, `y_exact=-5.0847394326972206e-09`
+  - train[8] t_remaining=30: `x_unmit=2.9411764705882353e-02`, `x_rem=8.4357189148238518e-02`, `y_exact=3.3440353568717519e-08`
+  - train[9] t_remaining=32: `x_unmit=1.8987341772151900e-01`, `x_rem=3.8426856641836021e-01`, `y_exact=1.6563669238082279e-02`
+  - train[10] t_remaining=30: `x_unmit=-1.2000000000000000e-01`, `x_rem=-2.3264877782152069e-01`, `y_exact=8.4191577444355015e-02`
+  - train[11] t_remaining=29: `x_unmit=-9.6774193548387094e-02`, `x_rem=-1.9291027249284934e-01`, `y_exact=-7.5396992414147304e-08`
+  - train[12] t_remaining=30: `x_unmit=6.8493150684931503e-02`, `x_rem=1.7182113291983359e-01`, `y_exact=-3.6363885224944495e-08`
+  - train[13] t_remaining=29: `x_unmit=-3.1578947368421061e-02`, `x_rem=-6.2930645381608835e-02`, `y_exact=6.9966932678884958e-02`
+  - train[14] t_remaining=32: `x_unmit=4.9180327868852458e-02`, `x_rem=1.1088622091894315e-01`, `y_exact=5.5678482620368664e-03`
+  - train[15] t_remaining=32: `x_unmit=-2.7272727272727271e-01`, `x_rem=-5.8972733383737952e-01`, `y_exact=1.4402263732462853e-02`
+  - train[16] t_remaining=31: `x_unmit=0.0000000000000000e+00`, `x_rem=2.1704155858786409e-02`, `y_exact=3.3796350849151724e-02`
+  - train[17] t_remaining=32: `x_unmit=1.4084507042253521e-02`, `x_rem=4.2483991033436912e-02`, `y_exact=6.3872683164451754e-03`
+  - train[18] t_remaining=30: `x_unmit=-8.8607594936708861e-02`, `x_rem=-2.3293476694954254e-01`, `y_exact=7.2409281822494797e-08`
+  - train[19] t_remaining=32: `x_unmit=9.5238095238095233e-02`, `x_rem=2.0627287556140961e-01`, `y_exact=-1.1828124782500581e-02`
+  - train[20] t_remaining=31: `x_unmit=-2.7027027027027029e-02`, `x_rem=-7.5703890551151301e-02`, `y_exact=3.0656940371381253e-08`
+  - train[21] t_remaining=31: `x_unmit=6.3291139240506333e-02`, `x_rem=1.8823930967925473e-01`, `y_exact=3.3189991644873754e-02`
+  - train[22] t_remaining=30: `x_unmit=6.6666666666666666e-02`, `x_rem=1.0915439376413102e-01`, `y_exact=2.5420449687618629e-09`
+  - train[23] t_remaining=30: `x_unmit=5.4945054945054944e-02`, `x_rem=8.5237727036681976e-02`, `y_exact=-4.1833671075265727e-08`
+- target x values: `x_u_target=8.6956521739130432e-02`, `x_r_target=2.0288901938550286e-01`
+- target contribution to E_cdr_unmit: `3.9896327833136938e-05`
+- target contribution to E_cdr_rem: `4.5632754596492638e-05`
+
+### term 175
+- pauli term from int row: `(4.8601141850978559e-02)*Z(q(1, 0))*Z(q(1, 2))`
+- int observable row: `[0, 0, 0, 0, 3, 0, 3, 0]`
+- Hamiltonian weight w_175: `4.8601141850978559e-02`
+- OGM effective shots used for this term: `2697`
+- fitted unmit coeffs: `a_u=3.6482376905806086e+00`, `b_u=-1.2291004686620802e-01`
+- fitted rem coeffs: `a_r=2.5861144477597202e+00`, `b_r=-2.0385638933460664e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-1.3284671532846715e-01`, `x_rem=-2.2025404451718797e-01`, `y_exact=-5.5654420327398302e-01`
+  - train[1] t_remaining=29: `x_unmit=2.1183345507669833e-02`, `x_rem=-9.4796913134238426e-03`, `y_exact=-6.1480075014560105e-02`
+  - train[2] t_remaining=30: `x_unmit=-2.2114668652271036e-01`, `x_rem=-3.5235501026239713e-01`, `y_exact=-9.3408632678154380e-01`
+  - train[3] t_remaining=31: `x_unmit=-2.1786492374727670e-01`, `x_rem=-3.3851358952707516e-01`, `y_exact=-8.9407068612431928e-01`
+  - train[4] t_remaining=30: `x_unmit=-2.6664214784847368e-01`, `x_rem=-4.1912104248871801e-01`, `y_exact=-1.0000001970204362e+00`
+  - train[5] t_remaining=31: `x_unmit=-1.4399709829524845e-01`, `x_rem=-2.4359933823990812e-01`, `y_exact=-7.6564149333151821e-01`
+  - train[6] t_remaining=31: `x_unmit=-1.8835370237239396e-01`, `x_rem=-3.0416840543422841e-01`, `y_exact=-8.4693860018895861e-01`
+  - train[7] t_remaining=31: `x_unmit=-5.3323593864134405e-02`, `x_rem=-1.1527313443153343e-01`, `y_exact=-4.3650206528549129e-01`
+  - train[8] t_remaining=30: `x_unmit=-1.1779630300833635e-01`, `x_rem=-2.1205847004957865e-01`, `y_exact=-5.2975034494726803e-01`
+  - train[9] t_remaining=32: `x_unmit=1.5350877192982455e-02`, `x_rem=-1.8686836641533564e-02`, `y_exact=2.9770898920080113e-02`
+  - train[10] t_remaining=30: `x_unmit=-2.2434017595307917e-01`, `x_rem=-3.5430796915076229e-01`, `y_exact=-1.0000001886277647e+00`
+  - train[11] t_remaining=29: `x_unmit=-2.4011502516175415e-01`, `x_rem=-3.7344827182754559e-01`, `y_exact=-1.0000001705798351e+00`
+  - train[12] t_remaining=30: `x_unmit=-2.3025084238113067e-01`, `x_rem=-3.6887842066768106e-01`, `y_exact=-9.7565713553650024e-01`
+  - train[13] t_remaining=29: `x_unmit=-2.4624624624624625e-01`, `x_rem=-3.8792861577671728e-01`, `y_exact=-1.0000001160748244e+00`
+  - train[14] t_remaining=32: `x_unmit=-1.2590448625180897e-01`, `x_rem=-2.2228444767784211e-01`, `y_exact=-7.7770374164792533e-01`
+  - train[15] t_remaining=32: `x_unmit=-3.3175355450236969e-02`, `x_rem=-8.5715472361341957e-02`, `y_exact=-1.3674939179806084e-01`
+  - train[16] t_remaining=31: `x_unmit=-2.1041055718475074e-01`, `x_rem=-3.3993466721110677e-01`, `y_exact=-8.3189773778637610e-01`
+  - train[17] t_remaining=32: `x_unmit=-5.0724637681159424e-02`, `x_rem=-1.1218998698360293e-01`, `y_exact=-2.6225548709763907e-01`
+  - train[18] t_remaining=30: `x_unmit=6.0875756496974014e-02`, `x_rem=4.5496575096279447e-02`, `y_exact=5.7331932497508099e-02`
+  - train[19] t_remaining=32: `x_unmit=-4.1606886657101862e-02`, `x_rem=-9.8958076592786021e-02`, `y_exact=-2.1793271174758755e-01`
+  - train[20] t_remaining=31: `x_unmit=-4.2507204610951012e-02`, `x_rem=-1.0365476581323084e-01`, `y_exact=-1.5047902020284304e-01`
+  - train[21] t_remaining=31: `x_unmit=-3.5522066738428421e-02`, `x_rem=-9.0413750399307311e-02`, `y_exact=-2.2162092316158388e-01`
+  - train[22] t_remaining=30: `x_unmit=3.1680954155795749e-02`, `x_rem=7.3779564902763913e-03`, `y_exact=-8.8252467404025370e-02`
+  - train[23] t_remaining=30: `x_unmit=-8.0334423845874234e-02`, `x_rem=-1.4642491776238314e-01`, `y_exact=-4.6965842642155536e-01`
+- target x values: `x_u_target=-6.7047075606276749e-02`, `x_r_target=-1.2744000433377284e-01`
+- target contribution to E_cdr_unmit: `-1.7861586201516261e-02`
+- target contribution to E_cdr_rem: `-1.7008459264925082e-02`
+
+### term 176
+- pauli term from int row: `(5.9706375835881995e-02)*Z(q(1, 0))*Z(q(1, 3))`
+- int observable row: `[0, 0, 0, 0, 3, 0, 0, 3]`
+- Hamiltonian weight w_176: `5.9706375835881995e-02`
+- OGM effective shots used for this term: `1150`
+- fitted unmit coeffs: `a_u=2.9906319133449015e+00`, `b_u=-6.4085094218613942e-02`
+- fitted rem coeffs: `a_r=2.1570026906702275e+00`, `b_r=-5.6744981428582475e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-2.2909698996655517e-01`, `x_rem=-3.1093678818653553e-01`, `y_exact=-5.9659905994335705e-01`
+  - train[1] t_remaining=29: `x_unmit=-2.9648241206030151e-01`, `x_rem=-4.1227918848580308e-01`, `y_exact=-8.9378328281065955e-01`
+  - train[2] t_remaining=30: `x_unmit=-1.0042918454935622e-01`, `x_rem=-1.5657869096336013e-01`, `y_exact=-2.9556326984787795e-01`
+  - train[3] t_remaining=31: `x_unmit=-6.5778517901748546e-02`, `x_rem=-8.2847165936839370e-02`, `y_exact=-3.1971400729826471e-01`
+  - train[4] t_remaining=30: `x_unmit=-2.3011844331641285e-01`, `x_rem=-3.1904930547357663e-01`, `y_exact=-8.8292650677371787e-01`
+  - train[5] t_remaining=31: `x_unmit=-7.0707070707070704e-02`, `x_rem=-1.1430659492674998e-01`, `y_exact=-3.3984326549559635e-01`
+  - train[6] t_remaining=31: `x_unmit=-1.7100977198697068e-01`, `x_rem=-2.5101272991584339e-01`, `y_exact=-4.2434840591647432e-01`
+  - train[7] t_remaining=31: `x_unmit=-2.2025316455696203e-01`, `x_rem=-3.1575947030760110e-01`, `y_exact=-7.1935315603629113e-01`
+  - train[8] t_remaining=30: `x_unmit=-2.8499999999999998e-01`, `x_rem=-3.9461055740125528e-01`, `y_exact=-8.8700126574048732e-01`
+  - train[9] t_remaining=32: `x_unmit=-2.2614840989399293e-01`, `x_rem=-3.1572809911210775e-01`, `y_exact=-8.4355764308552295e-01`
+  - train[10] t_remaining=30: `x_unmit=-1.8473547267996532e-01`, `x_rem=-2.6311447146881511e-01`, `y_exact=-5.4571926820459449e-01`
+  - train[11] t_remaining=29: `x_unmit=-1.6652433817250215e-01`, `x_rem=-2.2168064890444900e-01`, `y_exact=-7.9255549168211992e-01`
+  - train[12] t_remaining=30: `x_unmit=-1.5230635335073978e-01`, `x_rem=-2.2799159941670119e-01`, `y_exact=-4.3034057953612187e-01`
+  - train[13] t_remaining=29: `x_unmit=-2.2463139635732871e-01`, `x_rem=-3.0844856549287869e-01`, `y_exact=-7.8914479810004146e-01`
+  - train[14] t_remaining=32: `x_unmit=-1.2470214455917394e-01`, `x_rem=-1.9301296446317417e-01`, `y_exact=-2.8754434336389190e-01`
+  - train[15] t_remaining=32: `x_unmit=-1.6381418092909536e-01`, `x_rem=-2.2824940138865205e-01`, `y_exact=-5.9383723124646004e-01`
+  - train[16] t_remaining=31: `x_unmit=-2.7242246437552387e-01`, `x_rem=-3.7767746331266100e-01`, `y_exact=-8.2047778822539896e-01`
+  - train[17] t_remaining=32: `x_unmit=-2.1637426900584794e-01`, `x_rem=-2.9906438299514032e-01`, `y_exact=-8.1297306152724413e-01`
+  - train[18] t_remaining=30: `x_unmit=-2.6034063260340634e-01`, `x_rem=-3.6301810941091212e-01`, `y_exact=-8.9378320357297569e-01`
+  - train[19] t_remaining=32: `x_unmit=-2.1043771043771045e-01`, `x_rem=-2.9309708379475835e-01`, `y_exact=-6.5493226615819933e-01`
+  - train[20] t_remaining=31: `x_unmit=-2.1774856203779785e-01`, `x_rem=-3.1176640268765404e-01`, `y_exact=-7.2131352751560618e-01`
+  - train[21] t_remaining=31: `x_unmit=-2.0234113712374582e-01`, `x_rem=-2.8704763386259863e-01`, `y_exact=-7.4658603086734943e-01`
+  - train[22] t_remaining=30: `x_unmit=-2.9872340425531912e-01`, `x_rem=-4.1337386018237099e-01`, `y_exact=-9.5151773477023893e-01`
+  - train[23] t_remaining=30: `x_unmit=-1.4579759862778729e-01`, `x_rem=-1.8726220393618387e-01`, `y_exact=-4.5803141894151439e-01`
+- target x values: `x_u_target=-1.4403973509933773e-01`, `x_r_target=-2.0331785879298594e-01`
+- target contribution to E_cdr_unmit: `-2.9545994004720567e-02`
+- target contribution to E_cdr_rem: `-2.9572696314629648e-02`
+
+### term 177
+- pauli term from int row: `(7.3914214661757651e-03)*Y(q(1, 0))*Z(q(1, 1))*Y(q(1, 2))*Z(q(1, 3))`
+- int observable row: `[0, 0, 0, 0, 2, 3, 2, 3]`
+- Hamiltonian weight w_177: `7.3914214661757651e-03`
+- OGM effective shots used for this term: `771`
+- fitted unmit coeffs: `a_u=3.1129537351132588e+00`, `b_u=2.4951206632479198e-02`
+- fitted rem coeffs: `a_r=1.5095830937976884e+00`, `b_r=2.3017358258082220e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-2.1164021164021163e-02`, `x_rem=-5.1076904062672762e-02`, `y_exact=-4.3097124415252042e-01`
+  - train[1] t_remaining=29: `x_unmit=-4.3010752688172046e-02`, `x_rem=-9.5716781980959037e-02`, `y_exact=3.4036587506684653e-08`
+  - train[2] t_remaining=30: `x_unmit=-2.7100271002710027e-03`, `x_rem=-7.6732452043124779e-03`, `y_exact=2.8893496612694432e-08`
+  - train[3] t_remaining=31: `x_unmit=-1.8324607329842930e-02`, `x_rem=-2.9487610724341549e-02`, `y_exact=-4.5694084648603500e-01`
+  - train[4] t_remaining=30: `x_unmit=4.2145593869731802e-02`, `x_rem=9.5024799219548622e-02`, `y_exact=1.9509047992040113e-01`
+  - train[5] t_remaining=31: `x_unmit=-2.7295285359801490e-02`, `x_rem=-4.4598429035166594e-02`, `y_exact=-2.4401726429451568e-08`
+  - train[6] t_remaining=31: `x_unmit=-8.4165477888730383e-02`, `x_rem=-1.6162099251971146e-01`, `y_exact=-2.9447794324090040e-08`
+  - train[7] t_remaining=31: `x_unmit=-3.0463576158940398e-02`, `x_rem=-7.6954668012374008e-02`, `y_exact=-1.5446350560246693e-08`
+  - train[8] t_remaining=30: `x_unmit=5.1948051948051948e-03`, `x_rem=1.3894263705654384e-02`, `y_exact=3.9781701574402456e-01`
+  - train[9] t_remaining=32: `x_unmit=7.9787234042553185e-03`, `x_rem=1.3648880843965367e-02`, `y_exact=1.2917951365228189e-01`
+  - train[10] t_remaining=30: `x_unmit=-4.5871559633027525e-02`, `x_rem=-9.0655758650977927e-02`, `y_exact=1.0709825383697247e-01`
+  - train[11] t_remaining=29: `x_unmit=-6.8090787716955939e-02`, `x_rem=-1.4611273032502839e-01`, `y_exact=-5.3971339785209949e-01`
+  - train[12] t_remaining=30: `x_unmit=-2.5062656641604009e-03`, `x_rem=-6.0484643405426339e-03`, `y_exact=3.3944789609897404e-08`
+  - train[13] t_remaining=29: `x_unmit=-1.0638297872340425e-02`, `x_rem=-2.1138891907669721e-02`, `y_exact=1.5487079196845521e-01`
+  - train[14] t_remaining=32: `x_unmit=-2.2516556291390728e-02`, `x_rem=-4.8037136149835104e-02`, `y_exact=-1.8475120039172600e-02`
+  - train[15] t_remaining=32: `x_unmit=-2.6737967914438501e-03`, `x_rem=-5.8625573551300087e-03`, `y_exact=-1.9479382863561906e-01`
+  - train[16] t_remaining=31: `x_unmit=7.6129032258064513e-02`, `x_rem=1.6354706337099756e-01`, `y_exact=3.4881131331400500e-01`
+  - train[17] t_remaining=32: `x_unmit=5.3594771241830062e-02`, `x_rem=1.1661596359146018e-01`, `y_exact=2.4204237678287838e-01`
+  - train[18] t_remaining=30: `x_unmit=3.6842105263157891e-02`, `x_rem=8.0202883508198403e-02`, `y_exact=-9.2257524918651534e-09`
+  - train[19] t_remaining=32: `x_unmit=3.9421813403416554e-03`, `x_rem=1.2285959424769162e-02`, `y_exact=2.3137759051865162e-01`
+  - train[20] t_remaining=31: `x_unmit=-2.9333333333333333e-02`, `x_rem=-6.1296027290118522e-02`, `y_exact=2.3779402267152987e-08`
+  - train[21] t_remaining=31: `x_unmit=2.9177718832891247e-02`, `x_rem=5.8983398507177327e-02`, `y_exact=1.0442555452407674e-01`
+  - train[22] t_remaining=30: `x_unmit=7.7319587628865982e-02`, `x_rem=1.6475769184883993e-01`, `y_exact=1.7506341662838079e-01`
+  - train[23] t_remaining=30: `x_unmit=-5.2770448548812663e-03`, `x_rem=-1.0446211447341628e-02`, `y_exact=-1.0043379089807830e-01`
+- target x values: `x_u_target=-4.0053404539385851e-03`, `x_r_target=-1.2193269424820033e-02`
+- target contribution to E_cdr_unmit: `9.2265392744493447e-05`
+- target contribution to E_cdr_rem: `3.4078923854395757e-05`
+
+### term 178
+- pauli term from int row: `(7.3914214661757651e-03)*X(q(1, 0))*Z(q(1, 1))*X(q(1, 2))*Z(q(1, 3))`
+- int observable row: `[0, 0, 0, 0, 1, 3, 1, 3]`
+- Hamiltonian weight w_178: `7.3914214661757651e-03`
+- OGM effective shots used for this term: `741`
+- fitted unmit coeffs: `a_u=1.3094460377151982e+00`, `b_u=5.4673714751217782e-03`
+- fitted rem coeffs: `a_r=7.0103432266602528e-01`, `b_r=2.4401088484675699e-03`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=1.3736263736263736e-02`, `x_rem=3.4969622529669765e-02`, `y_exact=-4.3097117491091719e-01`
+  - train[1] t_remaining=29: `x_unmit=7.6923076923076927e-02`, `x_rem=1.5777384469107500e-01`, `y_exact=-2.2977514361037282e-08`
+  - train[2] t_remaining=30: `x_unmit=1.1612903225806447e-02`, `x_rem=1.9385007039576622e-02`, `y_exact=1.9953980117825395e-08`
+  - train[3] t_remaining=31: `x_unmit=-8.6294416243654817e-02`, `x_rem=-1.7952184782231412e-01`, `y_exact=-4.5694087893383839e-01`
+  - train[4] t_remaining=30: `x_unmit=-2.1992238033635189e-02`, `x_rem=-3.7924184196368456e-02`, `y_exact=1.9509047992040018e-01`
+  - train[5] t_remaining=31: `x_unmit=1.0389610389610390e-02`, `x_rem=1.7205628261652693e-02`, `y_exact=2.3888530553273817e-09`
+  - train[6] t_remaining=31: `x_unmit=-3.7711313394018203e-02`, `x_rem=-7.2518418657370701e-02`, `y_exact=2.9405177289600668e-08`
+  - train[7] t_remaining=31: `x_unmit=1.2919896640826873e-02`, `x_rem=2.8614012637131286e-02`, `y_exact=-4.2989376843827446e-08`
+  - train[8] t_remaining=30: `x_unmit=2.0979020979020980e-02`, `x_rem=4.6536026192065698e-02`, `y_exact=3.9781704668393764e-01`
+  - train[9] t_remaining=32: `x_unmit=1.8597997138769671e-02`, `x_rem=4.3721127963340142e-02`, `y_exact=1.2917963872093374e-01`
+  - train[10] t_remaining=30: `x_unmit=-2.4456521739130436e-02`, `x_rem=-4.6398777365636718e-02`, `y_exact=1.0709825383694593e-01`
+  - train[11] t_remaining=29: `x_unmit=1.4416775884665793e-02`, `x_rem=2.3931730550412676e-02`, `y_exact=-5.3971339785208894e-01`
+  - train[12] t_remaining=30: `x_unmit=3.3613445378151259e-02`, `x_rem=7.8348777647472806e-02`, `y_exact=3.2179790528409394e-08`
+  - train[13] t_remaining=29: `x_unmit=-4.8913043478260872e-02`, `x_rem=-8.1263799100871684e-02`, `y_exact=1.5487079196844172e-01`
+  - train[14] t_remaining=32: `x_unmit=-1.6476552598225603e-02`, `x_rem=-3.6058767233006710e-02`, `y_exact=-1.8475119801673597e-02`
+  - train[15] t_remaining=32: `x_unmit=0.0000000000000000e+00`, `x_rem=-4.5310973558585393e-04`, `y_exact=-1.9479388535014697e-01`
+  - train[16] t_remaining=31: `x_unmit=4.4854881266490766e-02`, `x_rem=1.0073033156751865e-01`, `y_exact=3.4881133401298092e-01`
+  - train[17] t_remaining=32: `x_unmit=-2.5000000000000001e-02`, `x_rem=-5.0339669324883096e-02`, `y_exact=2.4204232735014133e-01`
+  - train[18] t_remaining=30: `x_unmit=7.7348066298342538e-02`, `x_rem=1.6204253850774109e-01`, `y_exact=4.9112821632971360e-08`
+  - train[19] t_remaining=32: `x_unmit=5.3030303030303032e-02`, `x_rem=1.1505065911682665e-01`, `y_exact=2.3137766683971780e-01`
+  - train[20] t_remaining=31: `x_unmit=-4.7493403693931395e-02`, `x_rem=-1.0085827000682498e-01`, `y_exact=-1.3582297645358916e-08`
+  - train[21] t_remaining=31: `x_unmit=2.3319615912208505e-02`, `x_rem=5.6966891769769483e-02`, `y_exact=1.0442546236755258e-01`
+  - train[22] t_remaining=30: `x_unmit=3.2911392405063293e-02`, `x_rem=6.2726198118518040e-02`, `y_exact=1.7506346607736201e-01`
+  - train[23] t_remaining=30: `x_unmit=2.6525198938992044e-02`, `x_rem=6.5140088161941168e-02`, `y_exact=-1.0043370052152424e-01`
+- target x values: `x_u_target=2.6385224274406332e-03`, `x_r_target=8.7229417202722270e-03`
+- target contribution to E_cdr_unmit: `6.5949028288378816e-05`
+- target contribution to E_cdr_rem: `6.3235017888429548e-05`
+
+### term 179
+- pauli term from int row: `(4.7321087579006910e-02)*Z(q(1, 1))*Z(q(1, 2))`
+- int observable row: `[0, 0, 0, 0, 0, 3, 3, 0]`
+- Hamiltonian weight w_179: `4.7321087579006910e-02`
+- OGM effective shots used for this term: `2376`
+- fitted unmit coeffs: `a_u=5.1372308168293213e+00`, `b_u=8.2227100928120633e-02`
+- fitted rem coeffs: `a_r=3.1425633579006860e+00`, `b_r=3.3573082736360657e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-1.4097279472382523e-01`, `x_rem=-2.2601912759200479e-01`, `y_exact=-5.9659905994332252e-01`
+  - train[1] t_remaining=29: `x_unmit=-1.8174342105263158e-01`, `x_rem=-2.7793970686209196e-01`, `y_exact=-8.9378328281055475e-01`
+  - train[2] t_remaining=30: `x_unmit=-1.1036789297658862e-01`, `x_rem=-1.5111884819664756e-01`, `y_exact=-2.9556326984786963e-01`
+  - train[3] t_remaining=31: `x_unmit=-5.6761268781302172e-02`, `x_rem=-9.5356171627614811e-02`, `y_exact=-3.1971400729826049e-01`
+  - train[4] t_remaining=30: `x_unmit=-2.1012658227848102e-01`, `x_rem=-3.2694469594448944e-01`, `y_exact=-8.8292650677363782e-01`
+  - train[5] t_remaining=31: `x_unmit=-8.4409991386735578e-02`, `x_rem=-1.1631585052143943e-01`, `y_exact=-3.3984326549557070e-01`
+  - train[6] t_remaining=31: `x_unmit=-1.0353327855382087e-01`, `x_rem=-1.4524987816216028e-01`, `y_exact=-4.2434840591645967e-01`
+  - train[7] t_remaining=31: `x_unmit=-1.2664473684210525e-01`, `x_rem=-1.8531822158721500e-01`, `y_exact=-7.1935315603632566e-01`
+  - train[8] t_remaining=30: `x_unmit=-1.5516520284399832e-01`, `x_rem=-2.4443660320171468e-01`, `y_exact=-8.8700126574045723e-01`
+  - train[9] t_remaining=32: `x_unmit=-1.9362950544844929e-01`, `x_rem=-2.9532434703427979e-01`, `y_exact=-8.4355764308555303e-01`
+  - train[10] t_remaining=30: `x_unmit=-1.3028620247757369e-01`, `x_rem=-1.9449428359217366e-01`, `y_exact=-5.4571926820458760e-01`
+  - train[11] t_remaining=29: `x_unmit=-1.7959352965574452e-01`, `x_rem=-2.8760490829010721e-01`, `y_exact=-7.9255549168215444e-01`
+  - train[12] t_remaining=30: `x_unmit=-1.2739667660843629e-01`, `x_rem=-1.8657956620319902e-01`, `y_exact=-4.3034057953609561e-01`
+  - train[13] t_remaining=29: `x_unmit=-1.6707616707616707e-01`, `x_rem=-2.6129773346488311e-01`, `y_exact=-7.8914479809999150e-01`
+  - train[14] t_remaining=32: `x_unmit=-9.0909090909090912e-02`, `x_rem=-1.2433961267269182e-01`, `y_exact=-2.8754434336390833e-01`
+  - train[15] t_remaining=32: `x_unmit=-1.3414634146341464e-01`, `x_rem=-2.1050549837509971e-01`, `y_exact=-5.9383723124641452e-01`
+  - train[16] t_remaining=31: `x_unmit=-1.6437786100707449e-01`, `x_rem=-2.5449385208147179e-01`, `y_exact=-8.2047778822536055e-01`
+  - train[17] t_remaining=32: `x_unmit=-1.5069649641198818e-01`, `x_rem=-2.3026152517910772e-01`, `y_exact=-8.1297306152726678e-01`
+  - train[18] t_remaining=30: `x_unmit=-1.7536704730831973e-01`, `x_rem=-2.6568993051521350e-01`, `y_exact=-8.9378320357295737e-01`
+  - train[19] t_remaining=32: `x_unmit=-1.2558139534883722e-01`, `x_rem=-1.9157906547914033e-01`, `y_exact=-6.5493226615819755e-01`
+  - train[20] t_remaining=31: `x_unmit=-1.4785506039150353e-01`, `x_rem=-2.1729641270283082e-01`, `y_exact=-7.2131352751563715e-01`
+  - train[21] t_remaining=31: `x_unmit=-1.5670706226493941e-01`, `x_rem=-2.3779227209450882e-01`, `y_exact=-7.4658603086731112e-01`
+  - train[22] t_remaining=30: `x_unmit=-2.0251572327044026e-01`, `x_rem=-3.1584821892457982e-01`, `y_exact=-9.5151773477016999e-01`
+  - train[23] t_remaining=30: `x_unmit=-1.2468619246861924e-01`, `x_rem=-2.1097578173506487e-01`, `y_exact=-4.5803141894151594e-01`
+- target x values: `x_u_target=-1.0874025441116127e-01`, `x_r_target=-1.6377795949775117e-01`
+- target contribution to E_cdr_unmit: `-2.2543609256203322e-02`
+- target contribution to E_cdr_rem: `-2.2766626280554467e-02`
+
+### term 180
+- pauli term from int row: `(1.3768860150438163e-02)*Y(q(1, 1))*Y(q(1, 3))`
+- int observable row: `[0, 0, 0, 0, 0, 2, 0, 2]`
+- Hamiltonian weight w_180: `1.3768860150438163e-02`
+- OGM effective shots used for this term: `1958`
+- fitted unmit coeffs: `a_u=4.0759411496263347e+00`, `b_u=3.1726198787611938e-02`
+- fitted rem coeffs: `a_r=2.8904174936779681e+00`, `b_r=3.7865312594827921e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=6.5956367326230336e-03`, `x_rem=1.0016349423036352e-02`, `y_exact=-1.5290968169893150e-02`
+  - train[1] t_remaining=29: `x_unmit=4.5634920634920632e-02`, `x_rem=6.1605780819846384e-02`, `y_exact=2.3594593568116443e-01`
+  - train[2] t_remaining=30: `x_unmit=-6.6800602712204921e-02`, `x_rem=-9.5391435739336436e-02`, `y_exact=-1.0720551440888021e-01`
+  - train[3] t_remaining=31: `x_unmit=-3.4760705289672546e-02`, `x_rem=-5.2805681162938940e-02`, `y_exact=-8.9722407951794043e-03`
+  - train[4] t_remaining=30: `x_unmit=-3.8696537678207736e-02`, `x_rem=-5.8956995033608635e-02`, `y_exact=-3.2527675015966972e-08`
+  - train[5] t_remaining=31: `x_unmit=2.9654837141468156e-02`, `x_rem=4.3945099001788855e-02`, `y_exact=1.3151983688978236e-01`
+  - train[6] t_remaining=31: `x_unmit=2.1739130434782608e-02`, `x_rem=3.1763628252719077e-02`, `y_exact=2.3477330950902220e-01`
+  - train[7] t_remaining=31: `x_unmit=-6.3613231552162849e-02`, `x_rem=-9.1001321101911684e-02`, `y_exact=-3.8647142334699136e-01`
+  - train[8] t_remaining=30: `x_unmit=-1.7946161515453640e-02`, `x_rem=-2.7773222780523684e-02`, `y_exact=-7.2791963437962944e-08`
+  - train[9] t_remaining=32: `x_unmit=-2.0429009193054137e-02`, `x_rem=-3.0454621297742953e-02`, `y_exact=-1.4421354138842029e-02`
+  - train[10] t_remaining=30: `x_unmit=5.6431113370615148e-02`, `x_rem=7.5513270732283005e-02`, `y_exact=4.2899820664211730e-01`
+  - train[11] t_remaining=29: `x_unmit=3.0271934325295024e-02`, `x_rem=4.1538353828165994e-02`, `y_exact=8.7883785113102545e-08`
+  - train[12] t_remaining=30: `x_unmit=7.8304239401496264e-02`, `x_rem=1.0775806351311412e-01`, `y_exact=3.2781916822835072e-01`
+  - train[13] t_remaining=29: `x_unmit=6.8592057761732855e-02`, `x_rem=9.3397806537326225e-02`, `y_exact=3.5651652755963209e-01`
+  - train[14] t_remaining=32: `x_unmit=8.0802882141019036e-02`, `x_rem=1.1136672268073840e-01`, `y_exact=3.4856615416414360e-01`
+  - train[15] t_remaining=32: `x_unmit=-5.6214543579164521e-02`, `x_rem=-8.1074625330062031e-02`, `y_exact=-1.7820554392054710e-01`
+  - train[16] t_remaining=31: `x_unmit=2.1109474717722142e-02`, `x_rem=2.8296905125726010e-02`, `y_exact=8.8641243502898190e-02`
+  - train[17] t_remaining=32: `x_unmit=3.3483258370814596e-02`, `x_rem=4.2716103422091131e-02`, `y_exact=1.7686122920406090e-02`
+  - train[18] t_remaining=30: `x_unmit=-1.0309278350515464e-02`, `x_rem=-1.8905639339905807e-02`, `y_exact=-5.9363105983970502e-02`
+  - train[19] t_remaining=32: `x_unmit=-6.5228299046663323e-03`, `x_rem=-1.2585376922338323e-02`, `y_exact=-1.4635265884108939e-01`
+  - train[20] t_remaining=31: `x_unmit=2.8183716075156576e-02`, `x_rem=3.7840345213450775e-02`, `y_exact=2.9587033752473069e-01`
+  - train[21] t_remaining=31: `x_unmit=-3.2625582599689278e-02`, `x_rem=-4.6467226921971388e-02`, `y_exact=-1.7611966094237830e-01`
+  - train[22] t_remaining=30: `x_unmit=5.0075112669003500e-04`, `x_rem=-2.2841771763838174e-03`, `y_exact=1.0859907954314296e-07`
+  - train[23] t_remaining=30: `x_unmit=-3.1120331950207458e-03`, `x_rem=-7.1239314102884751e-03`, `y_exact=-8.1383165471569941e-09`
+- target x values: `x_u_target=-6.7392431311560398e-03`, `x_r_target=-1.3081368114143462e-02`
+- target contribution to E_cdr_unmit: `5.8620101356225182e-05`
+- target contribution to E_cdr_rem: `7.5312025178573309e-07`
+
+### term 181
+- pauli term from int row: `(1.3768860150438163e-02)*X(q(1, 1))*X(q(1, 3))`
+- int observable row: `[0, 0, 0, 0, 0, 1, 0, 1]`
+- Hamiltonian weight w_181: `1.3768860150438163e-02`
+- OGM effective shots used for this term: `2050`
+- fitted unmit coeffs: `a_u=3.3837671896359987e+00`, `b_u=2.2929918736616758e-02`
+- fitted rem coeffs: `a_r=2.4043289080930590e+00`, `b_r=3.1442127816589623e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-1.0258915486077186e-02`, `x_rem=-1.6025748510452704e-02`, `y_exact=-1.5290920268714382e-02`
+  - train[1] t_remaining=29: `x_unmit=3.7755102040816328e-02`, `x_rem=5.0462886191181423e-02`, `y_exact=2.3594584869048235e-01`
+  - train[2] t_remaining=30: `x_unmit=-3.7661050545094152e-02`, `x_rem=-5.5985344563540110e-02`, `y_exact=-1.0720553875575341e-01`
+  - train[3] t_remaining=31: `x_unmit=-1.8791264601320468e-02`, `x_rem=-3.1044370710427469e-02`, `y_exact=-8.9722366685584878e-03`
+  - train[4] t_remaining=30: `x_unmit=-1.1313330054107231e-02`, `x_rem=-1.9628497402828151e-02`, `y_exact=-3.2527729345148285e-08`
+  - train[5] t_remaining=31: `x_unmit=5.2577845839714137e-02`, `x_rem=6.7214261082937113e-02`, `y_exact=1.3151986385490105e-01`
+  - train[6] t_remaining=31: `x_unmit=9.9420849420849416e-02`, `x_rem=1.3594649767247133e-01`, `y_exact=2.3477336548294200e-01`
+  - train[7] t_remaining=31: `x_unmit=-4.6310432569974552e-02`, `x_rem=-6.5491862710918267e-02`, `y_exact=-3.8647135054086146e-01`
+  - train[8] t_remaining=30: `x_unmit=9.8911968348170121e-03`, `x_rem=8.3447446538621288e-03`, `y_exact=-1.5690133177859624e-08`
+  - train[9] t_remaining=32: `x_unmit=1.6113744075829384e-02`, `x_rem=1.8351815727585721e-02`, `y_exact=-1.4421413172488243e-02`
+  - train[10] t_remaining=30: `x_unmit=3.9655996177735311e-02`, `x_rem=4.7025957584267669e-02`, `y_exact=4.2899820664211885e-01`
+  - train[11] t_remaining=29: `x_unmit=-6.4327485380116955e-02`, `x_rem=-9.5428634161288189e-02`, `y_exact=8.7883794029398570e-08`
+  - train[12] t_remaining=30: `x_unmit=6.2158130283441075e-02`, `x_rem=8.2477168512380558e-02`, `y_exact=3.2781917221451634e-01`
+  - train[13] t_remaining=29: `x_unmit=8.3665338645418322e-02`, `x_rem=1.1458508917538028e-01`, `y_exact=3.5651652755964042e-01`
+  - train[14] t_remaining=32: `x_unmit=4.4044044044044044e-02`, `x_rem=6.4112866018161602e-02`, `y_exact=3.4856612886471500e-01`
+  - train[15] t_remaining=32: `x_unmit=-4.3216080402010047e-02`, `x_rem=-6.2796470444123120e-02`, `y_exact=-1.7820561141081903e-01`
+  - train[16] t_remaining=31: `x_unmit=2.9713114754098359e-02`, `x_rem=4.0308967474932116e-02`, `y_exact=8.8641243316520194e-02`
+  - train[17] t_remaining=32: `x_unmit=1.1235955056179775e-02`, `x_rem=1.4826691823131465e-02`, `y_exact=1.7686153097147238e-02`
+  - train[18] t_remaining=30: `x_unmit=-1.4320987654320988e-02`, `x_rem=-2.4034120980044236e-02`, `y_exact=-5.9363254869073886e-02`
+  - train[19] t_remaining=32: `x_unmit=-1.0070493454179255e-02`, `x_rem=-1.6667527272019318e-02`, `y_exact=-1.4635267546104380e-01`
+  - train[20] t_remaining=31: `x_unmit=1.1165285226718674e-01`, `x_rem=1.5170179203086767e-01`, `y_exact=2.9587034599244477e-01`
+  - train[21] t_remaining=31: `x_unmit=-6.4700285442435779e-02`, `x_rem=-9.6864345395211313e-02`, `y_exact=-1.7611968463539809e-01`
+  - train[22] t_remaining=30: `x_unmit=-5.0505050505050509e-03`, `x_rem=-1.3132162193523941e-02`, `y_exact=1.4910096882065724e-07`
+  - train[23] t_remaining=30: `x_unmit=-2.8461167390255667e-02`, `x_rem=-4.0672906008309515e-02`, `y_exact=-2.7518406029924766e-08`
+- target x values: `x_u_target=1.9821605550049571e-03`, `x_r_target=1.7050246298305296e-03`
+- target contribution to E_cdr_unmit: `4.0806892802376107e-04`
+- target contribution to E_cdr_rem: `4.8936687688360206e-04`
+
+### term 182
+- pauli term from int row: `(4.9606291141792450e-02)*Z(q(1, 1))*Z(q(1, 3))`
+- int observable row: `[0, 0, 0, 0, 0, 3, 0, 3]`
+- Hamiltonian weight w_182: `4.9606291141792450e-02`
+- OGM effective shots used for this term: `2662`
+- fitted unmit coeffs: `a_u=3.9782571572040815e+00`, `b_u=6.7117579307336306e-02`
+- fitted rem coeffs: `a_r=2.6528071481896682e+00`, `b_r=-2.7213502772480934e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=-1.5820895522388059e-01`, `x_rem=-2.0384906512547935e-01`, `y_exact=-5.5654420327401444e-01`
+  - train[1] t_remaining=29: `x_unmit=-3.8263428991905817e-02`, `x_rem=-2.0207118323903917e-02`, `y_exact=-6.1480075014541218e-02`
+  - train[2] t_remaining=30: `x_unmit=-2.5317401045556387e-01`, `x_rem=-3.4531233292410313e-01`, `y_exact=-9.3408632678155845e-01`
+  - train[3] t_remaining=31: `x_unmit=-2.5317835088993823e-01`, `x_rem=-3.4309040281790448e-01`, `y_exact=-8.9407068612431606e-01`
+  - train[4] t_remaining=30: `x_unmit=-2.6077428780131484e-01`, `x_rem=-3.5508060747926556e-01`, `y_exact=-1.0000001970203574e+00`
+  - train[5] t_remaining=31: `x_unmit=-1.7800289435600578e-01`, `x_rem=-2.3772199828155210e-01`, `y_exact=-7.6564149333149234e-01`
+  - train[6] t_remaining=31: `x_unmit=-2.2238695329873981e-01`, `x_rem=-3.0338257887861891e-01`, `y_exact=-8.4693860018899025e-01`
+  - train[7] t_remaining=31: `x_unmit=-1.1938098747236552e-01`, `x_rem=-1.4402453948714600e-01`, `y_exact=-4.3650206528551194e-01`
+  - train[8] t_remaining=30: `x_unmit=-1.3519553072625698e-01`, `x_rem=-1.6251050714485843e-01`, `y_exact=-5.2975034494728013e-01`
+  - train[9] t_remaining=32: `x_unmit=-2.3615950445218737e-02`, `x_rem=2.4710570125354896e-03`, `y_exact=2.9770898920119332e-02`
+  - train[10] t_remaining=30: `x_unmit=-3.0015082956259426e-01`, `x_rem=-4.1266613333265717e-01`, `y_exact=-1.0000001886277821e+00`
+  - train[11] t_remaining=29: `x_unmit=-2.7320163995527397e-01`, `x_rem=-3.7257299182601822e-01`, `y_exact=-1.0000001705798580e+00`
+  - train[12] t_remaining=30: `x_unmit=-2.7170236753100341e-01`, `x_rem=-3.7428653288069030e-01`, `y_exact=-9.7565713553645572e-01`
+  - train[13] t_remaining=29: `x_unmit=-2.4952669443392655e-01`, `x_rem=-3.3935200131469934e-01`, `y_exact=-1.0000001160747918e+00`
+  - train[14] t_remaining=32: `x_unmit=-1.5162326079200855e-01`, `x_rem=-1.9821455757235645e-01`, `y_exact=-7.7770374164792722e-01`
+  - train[15] t_remaining=32: `x_unmit=-2.6710574460300035e-02`, `x_rem=-8.3062702908742406e-03`, `y_exact=-1.3674939179807299e-01`
+  - train[16] t_remaining=31: `x_unmit=-2.3330887747615553e-01`, `x_rem=-3.1132806405200725e-01`, `y_exact=-8.3189773778636444e-01`
+  - train[17] t_remaining=32: `x_unmit=-9.3959731543624164e-02`, `x_rem=-1.0225387267816384e-01`, `y_exact=-2.6225548709761154e-01`
+  - train[18] t_remaining=30: `x_unmit=-2.4659550975340450e-02`, `x_rem=2.7039365789716320e-03`, `y_exact=5.7331932497586120e-02`
+  - train[19] t_remaining=32: `x_unmit=-7.5519883254286754e-02`, `x_rem=-7.6629707617451290e-02`, `y_exact=-2.1793271174759196e-01`
+  - train[20] t_remaining=31: `x_unmit=-6.7889908256880738e-02`, `x_rem=-6.8952575824955453e-02`, `y_exact=-1.5047902020276280e-01`
+  - train[21] t_remaining=31: `x_unmit=-5.3378126166480029e-02`, `x_rem=-4.6244510843708148e-02`, `y_exact=-2.2162092316155951e-01`
+  - train[22] t_remaining=30: `x_unmit=-7.1141919007661439e-02`, `x_rem=-6.6714172642139399e-02`, `y_exact=-8.8252467403996268e-02`
+  - train[23] t_remaining=30: `x_unmit=-1.5533980582524270e-01`, `x_rem=-1.9317452521934478e-01`, `y_exact=-4.6965842642155414e-01`
+- target x values: `x_u_target=-9.3922651933701654e-02`, `x_r_target=-1.1222069312841754e-01`
+- target contribution to E_cdr_unmit: `-1.5205860224634941e-02`
+- target contribution to E_cdr_rem: `-1.6117746716061965e-02`
+
+### term 183
+- pauli term from int row: `(3.9956945209230821e-02)*Z(q(1, 2))*Z(q(1, 3))`
+- int observable row: `[0, 0, 0, 0, 0, 0, 3, 3]`
+- Hamiltonian weight w_183: `3.9956945209230821e-02`
+- OGM effective shots used for this term: `1150`
+- fitted unmit coeffs: `a_u=3.7384331649435487e+00`, `b_u=1.3564095975018581e-01`
+- fitted rem coeffs: `a_r=2.3945755563035944e+00`, `b_r=4.5691389331559688e-02`
+- training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
+  - train[0] t_remaining=31: `x_unmit=1.1705685618729096e-02`, `x_rem=5.5518197740875082e-02`, `y_exact=1.5314337894699842e-01`
+  - train[1] t_remaining=29: `x_unmit=-4.5226130653266333e-02`, `x_rem=-2.9353913123659633e-02`, `y_exact=-4.4736752906990467e-02`
+  - train[2] t_remaining=30: `x_unmit=8.6695278969957087e-02`, `x_rem=1.6866687471020247e-01`, `y_exact=2.2964963538687316e-01`
+  - train[3] t_remaining=31: `x_unmit=6.5778517901748546e-02`, `x_rem=1.3232521127889457e-01`, `y_exact=2.1378463588304872e-01`
+  - train[4] t_remaining=30: `x_unmit=1.7935702199661591e-01`, `x_rem=3.2200204520062747e-01`, `y_exact=8.8292650677368534e-01`
+  - train[5] t_remaining=31: `x_unmit=-4.8821548821548821e-02`, `x_rem=-3.7545507077447020e-02`, `y_exact=1.0548459378584918e-01`
+  - train[6] t_remaining=31: `x_unmit=8.3061889250814328e-02`, `x_rem=1.6259796198791995e-01`, `y_exact=2.7128692248947206e-01`
+  - train[7] t_remaining=31: `x_unmit=-1.9409282700421943e-02`, `x_rem=5.0180787465734034e-03`, `y_exact=1.5585520737079489e-01`
+  - train[8] t_remaining=30: `x_unmit=5.9999999999999998e-02`, `x_rem=1.3347561573937794e-01`, `y_exact=4.1675146918298073e-01`
+  - train[9] t_remaining=32: `x_unmit=-9.7173144876325085e-02`, `x_rem=-1.1168657441454780e-01`, `y_exact=-1.8621330108160911e-01`
+  - train[10] t_remaining=30: `x_unmit=1.0494362532523850e-01`, `x_rem=2.0056981046232059e-01`, `y_exact=5.4571926820457040e-01`
+  - train[11] t_remaining=29: `x_unmit=1.0162254483347566e-01`, `x_rem=2.0371619404975555e-01`, `y_exact=7.9255549168213968e-01`
+  - train[12] t_remaining=30: `x_unmit=6.3533507397737166e-02`, `x_rem=1.3174989553317537e-01`, `y_exact=4.0599771433887560e-01`
+  - train[13] t_remaining=29: `x_unmit=1.4830875975715524e-01`, `x_rem=2.7471308416870044e-01`, `y_exact=7.8914479810002092e-01`
+  - train[14] t_remaining=32: `x_unmit=-2.9388403494837172e-02`, `x_rem=-1.2195968830133968e-02`, `y_exact=6.5248103278594483e-02`
+  - train[15] t_remaining=32: `x_unmit=-1.0676446617766912e-01`, `x_rem=-1.3446832971899308e-01`, `y_exact=-2.6941342264873552e-01`
+  - train[16] t_remaining=31: `x_unmit=1.4165968147527241e-01`, `x_rem=2.6426848205149217e-01`, `y_exact=6.5237544559799643e-01`
+  - train[17] t_remaining=32: `x_unmit=-1.7543859649122806e-02`, `x_rem=1.0088020561658338e-02`, `y_exact=7.5228440957780571e-02`
+  - train[18] t_remaining=30: `x_unmit=-5.4339010543390104e-02`, `x_rem=-4.6632434849603638e-02`, `y_exact=-1.6354881041076311e-01`
+  - train[19] t_remaining=32: `x_unmit=-1.0101010101010101e-01`, `x_rem=-1.1698775608107365e-01`, `y_exact=-1.2713514199814879e-01`
+  - train[20] t_remaining=31: `x_unmit=-6.1626951520131472e-02`, `x_rem=-5.9765625283462152e-02`, `y_exact=-1.2820749077355198e-01`
+  - train[21] t_remaining=31: `x_unmit=-3.5117056856187288e-02`, `x_rem=-1.7953082741706931e-02`, `y_exact=-3.1793138193023443e-02`
+  - train[22] t_remaining=30: `x_unmit=-2.4680851063829789e-02`, `x_rem=1.5282570979400557e-03`, `y_exact=3.9770065362277868e-02`
+  - train[23] t_remaining=30: `x_unmit=0.0000000000000000e+00`, `x_rem=3.5057671207214994e-02`, `y_exact=-7.2310302591140296e-02`
+- target x values: `x_u_target=-8.6092715231788075e-02`, `x_r_target=-9.8285008002776092e-02`
+- target contribution to E_cdr_unmit: `-7.4404188138646049e-03`
+- target contribution to E_cdr_rem: `-7.5782137857299250e-03`
+
+## Complete expanded energy expressions (all summing terms)
+### E_cdr_unmit
+`E_cdr_unmit = (-2.2188175260558247e+00) + (-5.5798739416985654e-02) + (5.3519755356302684e-06) + (-2.4133702192350243e-04) + (-6.3908978032534746e-03) + (1.2598824055835048e-04) + (-1.9538530095675223e-03) + (4.6027844805176157e-03) + (-6.2119061643534975e-03) + (-6.2507360252086502e-02) + (-1.0201772298226318e-03) + (9.6135985183241424e-04) + (-6.8086264425825938e-03) + (-3.4363696334996341e-04) + (-9.0795201695120732e-04) + (5.7114035347470013e-03) + (-8.6406627427057896e-03) + (-2.3151516380106188e-03) + (-1.8257756296756025e-04) + (-5.1287566510654740e-04) + (-1.9666862073804401e-03) + (3.3929977717269029e-04) + (9.5087228941180364e-05) + (3.7770132604213739e-04) + (8.6083829072978289e-05) + (1.4100402064354538e-04) + (3.9937657210965951e-04) + (1.6999429947994658e-05) + (-2.1820650413176879e-02) + (-2.9026010300766094e-02) + (-9.8683970220967213e-04) + (-7.4254912003275089e-04) + (4.6813241159080400e-02) + (2.7438630021474016e-04) + (3.0606582201931531e-04) + (1.0308263876144686e-03) + (1.3410927615660376e-03) + (9.0162372186102966e-04) + (8.0229662774441600e-04) + (-5.9187657136030870e-06) + (1.6492325450532311e-05) + (-1.4781966033238573e-05) + (3.3350312399027278e-05) + (-1.9781325434356182e-03) + (1.5777017022473832e-03) + (3.5259356695071424e-03) + (3.3359326663800746e-03) + (-7.6163241924199804e-04) + (3.1108888627851420e-03) + (1.5878019362255061e-05) + (3.1718613860109395e-05) + (7.3700326127348340e-06) + (2.4218396164052414e-05) + (4.5424738311662760e-05) + (1.2096237630536592e-04) + (2.2793919666058414e-04) + (1.1024717443595334e-04) + (1.4755944516960870e-02) + (3.5250537900393460e-04) + (-3.2392705065222293e-04) + (1.9084035967324646e-04) + (-5.3865211388832296e-04) + (8.6747093968372099e-04) + (3.8933187812825428e-04) + (-2.0600433577114705e-04) + (-2.2141984883589639e-04) + (-1.8735360300926854e-04) + (3.9836969438066352e-05) + (6.9622848062671715e-04) + (-6.1311855877731007e-04) + (3.3982341760568707e-04) + (3.5714291058362024e-04) + (4.7547901060622603e-04) + (1.7031397331837259e-05) + (-7.7291385771060149e-03) + (-3.4536844575823336e-04) + (-7.3932744859971273e-04) + (-1.7069702201607371e-04) + (-1.4440137711007838e-04) + (-8.8203926051566196e-05) + (-4.0614117408573418e-05) + (-7.5385589498960535e-06) + (-2.1430223695848479e-05) + (-2.3583308292417288e-05) + (-1.3605855261906866e-05) + (-5.5847822848509268e-02) + (2.1129484615695082e-03) + (-2.3658366882357185e-03) + (-2.8155154192486050e-02) + (2.1063471095538375e-03) + (-2.7342183312627638e-03) + (-1.4213084902998425e-02) + (1.1241979979901985e-02) + (-5.1026215517602886e-04) + (-4.7111116976060024e-04) + (-1.8278136101515009e-04) + (2.0566876071540747e-04) + (2.4350337002049959e-04) + (3.6148794945401754e-04) + (4.9688825442365125e-05) + (-3.0182995411353464e-04) + (1.7697962120252707e-04) + (2.0520577750725256e-04) + (-2.7225687684139123e-04) + (4.8297542162528472e-04) + (-1.1433799783160733e-04) + (-4.5328889315494418e-05) + (-1.5544978005543674e-04) + (-6.4065102033206600e-04) + (3.2915936642951296e-02) + (-1.3579234467774880e-04) + (9.1796041956201046e-04) + (-8.7231972256415491e-03) + (4.0814779437185183e-03) + (1.3974356273557460e-03) + (-9.4091604975030663e-03) + (5.7940276082412930e-04) + (-5.1734920458477887e-04) + (3.1063723717222554e-03) + (2.9980250973645462e-03) + (2.1121717163820478e-03) + (2.4069528671155295e-03) + (-5.8339789264841124e-02) + (-3.9225035905042125e-04) + (3.7988481421917340e-04) + (8.1310445200996400e-04) + (4.3732309126066492e-04) + (-3.6611236561593443e-04) + (6.5093814716111933e-04) + (-6.3848744242688922e-03) + (-4.1884259128810219e-04) + (-3.1655986705977240e-03) + (2.2408420649688997e-04) + (-1.8654739526360826e-02) + (-1.0880990715087305e-04) + (-1.6432622015696675e-04) + (-8.4188941642164471e-05) + (4.7450045242887800e-06) + (-6.7829915160286616e-04) + (-4.1912617497178942e-04) + (-1.4360715951906765e-05) + (-3.6514241867579252e-05) + (3.1115263173482098e-07) + (5.1942055725375877e-06) + (-4.6142456226941936e-02) + (-7.2750654872454946e-04) + (4.2737920563057851e-04) + (4.2984762213803436e-04) + (-8.2520433385283907e-05) + (1.5984288046306500e-04) + (-3.1167322965100743e-05) + (3.4997075843885853e-02) + (2.7420809820542578e-03) + (1.9648366503358535e-03) + (4.0318049833306347e-03) + (2.5073759936961944e-03) + (1.4624505972389354e-02) + (-3.8220309714874119e-02) + (-2.9239667755289248e-04) + (1.4306822187453187e-04) + (4.3346456461625851e-03) + (1.1327297113645756e-03) + (1.7906172069558535e-03) + (4.1548889334646951e-03) + (2.9131659203734575e-02) + (-6.7934764105695945e-03) + (-1.0726025593485093e-03) + (-6.1441828962958696e-06) + (1.3375129409137236e-03) + (-1.6209775285356542e-04) + (-1.0120789000335877e-04) + (1.9275576769190743e-04) + (5.0876180449403404e-05) + (2.5778367685069331e-05) + (3.6648275836041999e-04) + (3.9896327833136938e-05) + (-1.7861586201516261e-02) + (-2.9545994004720567e-02) + (9.2265392744493447e-05) + (6.5949028288378816e-05) + (-2.2543609256203322e-02) + (5.8620101356225182e-05) + (4.0806892802376107e-04) + (-1.5205860224634941e-02) + (-7.4404188138646049e-03)`
+
+### E_cdr_rem
+`E_cdr_rem = (-2.2188175260558247e+00) + (-5.5798739416985696e-02) + (7.6150259707831583e-05) + (-2.3807808241657074e-04) + (-6.3908978032534858e-03) + (1.5412642615528742e-04) + (-1.8753831364643439e-03) + (4.6027844805176122e-03) + (-6.2119061643534923e-03) + (-6.2507360252086558e-02) + (-9.8690267297033853e-04) + (9.2957677391601514e-04) + (-6.8086264425825964e-03) + (-3.0335750594536983e-04) + (-1.0458723821649609e-03) + (5.7114035347470013e-03) + (-8.6406627427057896e-03) + (-2.0407183970490611e-03) + (-2.3454404350725032e-04) + (-5.4182788393961285e-04) + (-1.9407657976638481e-03) + (3.9020934146019815e-04) + (9.4130024302915347e-05) + (4.1261359529043808e-04) + (7.3639405553694649e-05) + (1.3938613248912733e-04) + (3.8846913258746923e-04) + (5.8506605326546702e-06) + (-2.0293297503228259e-02) + (-2.8428295188659126e-02) + (-9.0517647560007207e-04) + (-5.7053240157106037e-04) + (4.6790949590381298e-02) + (3.1632499736458528e-04) + (3.0749864903557178e-04) + (9.9988511153123591e-04) + (1.2395326734858203e-03) + (9.3160887401162891e-04) + (8.0442809720883098e-04) + (-1.4103417994405666e-05) + (1.2704471534042233e-05) + (-1.3781529784973033e-05) + (3.9135921459302386e-05) + (-1.9598243621081913e-03) + (1.5691530060751554e-03) + (3.4682300161603262e-03) + (3.3581875760350863e-03) + (-4.9711324825797308e-04) + (3.3131157225694489e-03) + (1.3121605390645331e-05) + (2.5298562474767623e-05) + (1.1976755497220990e-05) + (2.3705657789134747e-05) + (3.5917717297095630e-05) + (1.2234893302287393e-04) + (2.2461107128517321e-04) + (1.1598804362483977e-04) + (1.7139479743709555e-02) + (1.8044420767726195e-04) + (-4.8486222631549891e-04) + (1.8017484064202137e-04) + (-5.7786127780737426e-04) + (8.5769629968433195e-04) + (3.3154588443313262e-04) + (-2.2219981204951500e-04) + (-2.1548462213211405e-04) + (-2.3640552465044120e-04) + (2.9673529031959189e-05) + (7.4908116242242834e-04) + (-6.1107215647102553e-04) + (3.8808255163470156e-04) + (3.3872938542646458e-04) + (4.4254018553713259e-04) + (4.7840019742518549e-05) + (-5.8327163331198190e-03) + (-3.6932381664235038e-04) + (-8.1723335094062476e-04) + (-1.3516035020939951e-04) + (-1.2956442821090972e-04) + (-7.8825734630918630e-05) + (-2.3820503807334564e-05) + (-9.5423228135978737e-06) + (-3.2930172454961808e-05) + (-2.3410385885688442e-05) + (-1.7133908279713370e-05) + (-5.4910825631556477e-02) + (2.1326593436786371e-03) + (-2.3736632591076496e-03) + (-2.7553923017223338e-02) + (2.1865549209466469e-03) + (-2.8670076029235908e-03) + (-1.5556708800043867e-02) + (1.2721890396525904e-02) + (-3.9918424889664729e-04) + (-1.6830294502785578e-04) + (-1.2075727461256073e-04) + (2.4799107994159689e-04) + (2.4062988337092580e-04) + (4.0633477091448324e-04) + (5.7880828482826750e-05) + (-3.1654740110626217e-04) + (1.6534638390064611e-04) + (9.8057561193794926e-05) + (-2.7214339740239932e-04) + (4.0632358947891272e-04) + (-1.1876078223736957e-04) + (-2.4696950461732616e-05) + (-1.5163131460368140e-04) + (-6.1884928432159197e-04) + (3.6916905292258460e-02) + (-2.7727235603987506e-04) + (8.8314777352339327e-04) + (-7.8564704110962863e-03) + (4.8885235460446822e-03) + (2.6895265655062933e-04) + (-9.4102640435047864e-03) + (5.4553477407696038e-04) + (-5.4924521275998776e-04) + (2.7896182619497169e-03) + (2.9474774767994584e-03) + (1.8547711290547158e-03) + (2.4381203097310141e-03) + (-5.7090158403102595e-02) + (-3.4187508588634058e-04) + (3.7960485191311380e-04) + (1.0046422654214062e-03) + (4.1877540101054793e-04) + (-4.1095701994509824e-04) + (6.3163385627459879e-04) + (-6.8354560122733101e-03) + (-4.8587642298760750e-04) + (-3.3824605618196493e-03) + (-1.2478716669877311e-03) + (-1.7677849957537302e-02) + (-1.0251763523405306e-04) + (-1.8268837830811462e-04) + (-8.6533327251136013e-05) + (6.1600519165956490e-06) + (-6.3166172159871800e-04) + (-4.5557923353694636e-04) + (-1.2133596872007493e-05) + (-3.1415873988617308e-05) + (9.6841714577995852e-06) + (4.6865451546589841e-06) + (-4.4256964603984407e-02) + (-7.1556098947537161e-04) + (4.1553711436458660e-04) + (4.1574502525642751e-04) + (-2.9352328954518114e-04) + (2.3434727070340409e-04) + (-6.6114958343366567e-06) + (3.0394983554119799e-02) + (2.7485062095167169e-03) + (1.9937684346064870e-03) + (4.1384016939826473e-03) + (2.3028852647924898e-03) + (1.1639799610656441e-02) + (-3.8641469116342565e-02) + (-1.3688738175240086e-04) + (3.5450614077895613e-04) + (1.4487242710249817e-03) + (9.6730564217515605e-04) + (1.4472789605735445e-03) + (2.8483315724105664e-03) + (2.8593087967249287e-02) + (-6.4086742798367263e-03) + (-1.0211983613382825e-03) + (-8.4076388989913081e-06) + (1.3678208870511670e-03) + (-1.0901609807480137e-04) + (-1.0597777712028101e-04) + (2.4667394351841529e-04) + (5.2406529339221462e-05) + (1.3930763309123730e-05) + (3.7971412347003310e-04) + (4.5632754596492638e-05) + (-1.7008459264925082e-02) + (-2.9572696314629648e-02) + (3.4078923854395757e-05) + (6.3235017888429548e-05) + (-2.2766626280554467e-02) + (7.5312025178573309e-07) + (4.8936687688360206e-04) + (-1.6117746716061965e-02) + (-7.5782137857299250e-03)`

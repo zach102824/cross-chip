@@ -10,6 +10,7 @@ import sympy
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from main_cursor_lib import (
+    LocationAwareDecomposedNoise,
     clifford_snap_phi,
     clifford_snap_theta,
     count_non_clifford_ops,
@@ -352,4 +353,124 @@ def test_cdr_unmit_better_or_equal_baseline_on_small_problem() -> None:
     assert avg_cdr_err <= avg_baseline_err + 0.5, (
         f"CDR avg err={avg_cdr_err:.4f} should not be much worse than "
         f"baseline avg err={avg_baseline_err:.4f}"
+    )
+
+
+def test_cdr_coefficients_not_fully_degenerate_and_print() -> None:
+    """Diagnostic: print fitted CDR coefficients and guard against full degeneracy."""
+    circuit, qubits, symbols, target, obs = _small_problem()
+    resolvers = generate_near_clifford_param_sets(
+        target, symbols, num_circuits=6, t_max=1, circuit=circuit, seed=41,
+    )
+    noise_params = dict(
+        amp_damp_gamma=0.03,
+        phase_damp_gamma=0.03,
+        depol_prob=0.015,
+        leakage_approx_prob=0.01,
+        high_cz_multiplier=2.0,
+    )
+    # Use asymmetric readout calibration so unmit and REM branches are not trivially identical.
+    p0 = np.array([0.95, 0.89], dtype=float)
+    p1 = np.array([0.91, 0.96], dtype=float)
+
+    total_models = train_cdr_models(
+        circuit,
+        obs,
+        qubits,
+        resolvers,
+        noise_params=noise_params,
+        simulator_seed=23,
+        num_shots=6000,
+        measurement_scheme="direct_pauli",
+        p_0_success=p0,
+        p_1_success=p1,
+        apply_readout_noise=True,
+        sampling_seed=97,
+    )
+    coeffs_total_u = np.asarray(total_models["coeffs_unmit_to_exact"], dtype=float)
+    coeffs_total_r = np.asarray(total_models["coeffs_rem_to_exact"], dtype=float)
+    print(f"total-energy fit unmit: a={coeffs_total_u[0]: .8f}, b={coeffs_total_u[1]: .8f}")
+    print(f"total-energy fit rem:   a={coeffs_total_r[0]: .8f}, b={coeffs_total_r[1]: .8f}")
+
+    per_pauli_models = train_cf_models_per_pauli(
+        circuit,
+        obs,
+        qubits,
+        resolvers,
+        noise_params=noise_params,
+        simulator_seed=23,
+        num_shots=6000,
+        measurement_scheme="direct_pauli",
+        p_0_success=p0,
+        p_1_success=p1,
+        apply_readout_noise=True,
+        sampling_seed=101,
+    )
+    coeffs_per_u = np.asarray(per_pauli_models["coeffs_unmit_to_exact_per_term"], dtype=float)
+    coeffs_per_r = np.asarray(per_pauli_models["coeffs_rem_to_exact_per_term"], dtype=float)
+
+    for i in range(coeffs_per_u.shape[0]):
+        au, bu = float(coeffs_per_u[i, 0]), float(coeffs_per_u[i, 1])
+        ar, br = float(coeffs_per_r[i, 0]), float(coeffs_per_r[i, 1])
+        print(
+            f"per-pauli term {i} unmit: a={au: .8f}, b={bu: .8f} | "
+            f"rem: a={ar: .8f}, b={br: .8f}"
+        )
+
+    # Print raw training data behind per-Pauli fits: x (noisy term expectation) -> y (exact term expectation).
+    observables_int, weights, offset = pauli_sum_to_int_observables(obs, qubits)
+    term_strings = [str(term) for term in obs]
+    n_terms = len(weights)
+    n_train = len(resolvers)
+    y_exact = np.zeros((n_train, n_terms), dtype=float)
+    x_unmit = np.zeros((n_train, n_terms), dtype=float)
+    x_rem = np.zeros((n_train, n_terms), dtype=float)
+
+    noisy_circuit = circuit.with_noise(LocationAwareDecomposedNoise(**noise_params))
+    t_remaining = []
+    for i, resolver in enumerate(resolvers):
+        resolved = cirq.resolve_parameters(circuit, resolver)
+        state = cirq.Simulator(seed=23).simulate(resolved, qubit_order=qubits).final_state_vector
+        for k in range(n_terms):
+            y_exact[i, k] = exact_pauli_expectation_from_int_row(state, observables_int[k], qubits)
+
+        resolved_noisy = cirq.resolve_parameters(noisy_circuit, resolver)
+        rho = cirq.DensityMatrixSimulator(seed=23).simulate(
+            resolved_noisy, qubit_order=qubits
+        ).final_density_matrix
+        est = estimate_energy_from_noisy_rho_shots(
+            rho,
+            obs,
+            qubits,
+            num_shots=6000,
+            measurement_scheme="direct_pauli",
+            p_0_success=p0,
+            p_1_success=p1,
+            apply_rem=True,
+            apply_readout_noise=True,
+            sampling_seed=1000 + i,
+            return_per_term=True,
+        )
+        x_unmit[i, :] = est["per_term_unmitigated"]
+        x_rem[i, :] = est["per_term_rem"]
+        t_remaining.append(int(count_non_clifford_ops(circuit, resolver)))
+
+    print("\nper-pauli training details")
+    print(f"hamiltonian offset: {float(offset): .8f}")
+    for k in range(n_terms):
+        print(
+            f"term {k}: observable={term_strings[k]} int={observables_int[k].tolist()} coeff={float(weights[k]): .8f}"
+        )
+        for i in range(n_train):
+            print(
+                f"  train[{i}] t_remaining={t_remaining[i]:3d} "
+                f"x_unmit={x_unmit[i, k]: .8f} x_rem={x_rem[i, k]: .8f} y_exact={y_exact[i, k]: .8f}"
+            )
+
+    total_equal = np.allclose(coeffs_total_u, coeffs_total_r, atol=0.0, rtol=0.0)
+    per_term_equal = np.allclose(coeffs_per_u, coeffs_per_r, atol=0.0, rtol=0.0)
+    assert not (total_equal and per_term_equal), (
+        "CDR fits are exactly degenerate (unmit == REM) in both total and per-pauli models. "
+        f"total_unmit={coeffs_total_u.tolist()} total_rem={coeffs_total_r.tolist()} "
+        f"per_unmit={coeffs_per_u.tolist()} per_rem={coeffs_per_r.tolist()}"
     )
