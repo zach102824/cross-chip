@@ -108,7 +108,7 @@ def build_paper_lih_hamiltonian(bond: float) -> tuple[QubitOperator, dict[str, o
 
     # Match the active-space construction used in the user's reference script.
     occupied_indices = [0]
-    active_indices = [1, 2, 3]
+    active_indices = [1, 2, 5]
     active_space_hamiltonian = molecule.get_molecular_hamiltonian(
         occupied_indices=occupied_indices,
         active_indices=active_indices,
