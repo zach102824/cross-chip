@@ -104,10 +104,85 @@ def build_mixed_original_and_decomposed_circuit(
     return original, decomposed, qubits, theta_gate_count, phi_gate_count
 
 
+def build_notebook_style_original_and_decomposed_circuit(
+    n_qubits: int,
+    ansatz_layers: int,
+    rng: np.random.Generator,
+    angle_low: float = -np.pi,
+    angle_high: float = np.pi,
+) -> tuple[cirq.Circuit, cirq.Circuit, list[cirq.Qid], int, int]:
+    """Build random circuits with the same layer structure as prepare_original_fsim_ansatz_cirq.
+
+    Structure per layer:
+    1) even-odd theta-only couplers on both halves
+    2) odd-even theta-only couplers on both halves
+    3) onsite phi-only couplers between halves
+    """
+    if n_qubits % 2 != 0:
+        raise ValueError(f"Notebook-style ansatz requires even n_qubits, got {n_qubits}.")
+    num_spatial_orbitals = n_qubits // 2
+    if num_spatial_orbitals < 2:
+        raise ValueError(
+            "Notebook-style ansatz requires at least 2 spatial orbitals (n_qubits >= 4)."
+        )
+
+    qubits = list(cirq.LineQubit.range(n_qubits))
+    original = cirq.Circuit()
+    decomposed = cirq.Circuit()
+    theta_gate_count = 0
+    phi_gate_count = 0
+
+    for _ in range(ansatz_layers):
+        even_odd_moments = []
+        even_odd_decomp = []
+        for i in range(0, num_spatial_orbitals - 1, 2):
+            theta = float(rng.uniform(angle_low, angle_high))
+            q_top0, q_top1 = qubits[i], qubits[i + 1]
+            q_bot0, q_bot1 = qubits[i + num_spatial_orbitals], qubits[i + 1 + num_spatial_orbitals]
+            even_odd_moments.append(cirq.FSimGate(theta, 0.0).on(q_top0, q_top1))
+            even_odd_moments.append(cirq.FSimGate(theta, 0.0).on(q_bot0, q_bot1))
+            even_odd_decomp.extend(decompose_fsim_theta_only(theta, q_top0, q_top1))
+            even_odd_decomp.extend(decompose_fsim_theta_only(theta, q_bot0, q_bot1))
+            theta_gate_count += 2
+        original.append(even_odd_moments, strategy=cirq.InsertStrategy.NEW_THEN_INLINE)
+        decomposed.append(even_odd_decomp, strategy=cirq.InsertStrategy.NEW_THEN_INLINE)
+
+        odd_even_moments = []
+        odd_even_decomp = []
+        for i in range(1, num_spatial_orbitals - 1, 2):
+            theta = float(rng.uniform(angle_low, angle_high))
+            q_top0, q_top1 = qubits[i], qubits[i + 1]
+            q_bot0, q_bot1 = qubits[i + num_spatial_orbitals], qubits[i + 1 + num_spatial_orbitals]
+            odd_even_moments.append(cirq.FSimGate(theta, 0.0).on(q_top0, q_top1))
+            odd_even_moments.append(cirq.FSimGate(theta, 0.0).on(q_bot0, q_bot1))
+            odd_even_decomp.extend(decompose_fsim_theta_only(theta, q_top0, q_top1))
+            odd_even_decomp.extend(decompose_fsim_theta_only(theta, q_bot0, q_bot1))
+            theta_gate_count += 2
+        original.append(odd_even_moments, strategy=cirq.InsertStrategy.NEW_THEN_INLINE)
+        decomposed.append(odd_even_decomp, strategy=cirq.InsertStrategy.NEW_THEN_INLINE)
+
+        onsite_moments = []
+        onsite_decomp = []
+        for i in range(num_spatial_orbitals):
+            phi = float(rng.uniform(angle_low, angle_high))
+            q_top = qubits[i]
+            q_bot = qubits[i + num_spatial_orbitals]
+            onsite_moments.append(cirq.FSimGate(0.0, phi).on(q_top, q_bot))
+            onsite_decomp.extend(decompose_fsim_phi_only(phi, q_top, q_bot))
+            phi_gate_count += 1
+        original.append(onsite_moments, strategy=cirq.InsertStrategy.NEW_THEN_INLINE)
+        decomposed.append(onsite_decomp, strategy=cirq.InsertStrategy.NEW_THEN_INLINE)
+
+    if not is_cz_plus_single_qubit(decomposed.all_operations()):
+        raise AssertionError("Notebook-style decomposed circuit contains non CZ+1Q operations.")
+
+    return original, decomposed, qubits, theta_gate_count, phi_gate_count
+
+
 def test_fsim_decomposition_random_circuits(
-    min_qubits: int = 2,
-    max_qubits: int = 5,
-    max_depth: int = 8,
+    min_qubits: int = 4,
+    max_qubits: int = 10,
+    max_depth: int = 10,
     circuits_per_config: int = 6,
     trials_per_circuit: int = 4,
     atol: float = 1e-7,
@@ -218,6 +293,50 @@ def test_mixed_fsim_decomposition_random_circuits(
     return total_theta, total_phi
 
 
+def test_notebook_style_random_fsim_decomposition(
+    n_qubits: int = 8,
+    ansatz_layers: int = 5,
+    circuits: int = 5,
+    trials_per_circuit: int = 4,
+    atol: float = 1e-7,
+    seed: int = 12345,
+) -> tuple[int, int]:
+    rng = np.random.default_rng(seed)
+    sim = cirq.Simulator()
+    total_theta = 0
+    total_phi = 0
+
+    for _ in range(circuits):
+        original, decomposed, qubits, theta_count, phi_count = (
+            build_notebook_style_original_and_decomposed_circuit(
+                n_qubits=n_qubits,
+                ansatz_layers=ansatz_layers,
+                rng=rng,
+            )
+        )
+        total_theta += theta_count
+        total_phi += phi_count
+
+        for _ in range(trials_per_circuit):
+            initial_state = random_normalized_state_for_n_qubits(n_qubits, rng)
+            result_original = sim.simulate(
+                original,
+                qubit_order=qubits,
+                initial_state=initial_state.copy(),
+            ).final_state_vector
+            result_decomposed = sim.simulate(
+                decomposed,
+                qubit_order=qubits,
+                initial_state=initial_state.copy(),
+            ).final_state_vector
+            if not states_equal_up_to_global_phase(result_original, result_decomposed, atol=atol):
+                raise AssertionError(
+                    f"notebook-style mismatch for n_qubits={n_qubits}, ansatz_layers={ansatz_layers}."
+                )
+
+    return total_theta, total_phi
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(
         description="Test analytical FSim decompositions on random multi-qubit circuits."
@@ -250,6 +369,24 @@ def main() -> None:
         default=5,
         help="Number of mixed random circuits",
     )
+    parser.add_argument(
+        "--ansatz-qubits",
+        type=int,
+        default=8,
+        help="Qubit count for notebook-style ansatz random test (must be even)",
+    )
+    parser.add_argument(
+        "--ansatz-layers",
+        type=int,
+        default=5,
+        help="Layer count for notebook-style ansatz random test",
+    )
+    parser.add_argument(
+        "--ansatz-circuits",
+        type=int,
+        default=5,
+        help="Number of notebook-style random ansatz circuits",
+    )
     args = parser.parse_args()
 
     if args.mixed:
@@ -280,6 +417,21 @@ def main() -> None:
             "PASS: Random multi-qubit/depth circuits with theta-only and phi-only FSim "
             "match their analytical CZ+1Q decompositions up to global phase."
         )
+
+    theta_total, phi_total = test_notebook_style_random_fsim_decomposition(
+        n_qubits=args.ansatz_qubits,
+        ansatz_layers=args.ansatz_layers,
+        circuits=args.ansatz_circuits,
+        trials_per_circuit=args.trials_per_circuit,
+        atol=args.atol,
+        seed=args.seed,
+    )
+    print("PASS: Notebook-style random FSim ansatz circuits match decomposition.")
+    print(f"Notebook-style qubits: {args.ansatz_qubits}")
+    print(f"Notebook-style ansatz layers: {args.ansatz_layers}")
+    print(f"Notebook-style theta-only FSim gates: {theta_total}")
+    print(f"Notebook-style phi-only FSim gates: {phi_total}")
+    print(f"Notebook-style total FSim gates: {theta_total + phi_total}")
 
 
 if __name__ == "__main__":

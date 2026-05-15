@@ -11,8 +11,8 @@ import sympy
 PAULI_CHAR_TO_GATE = {"I": None, "X": cirq.X, "Y": cirq.Y, "Z": cirq.Z}
 
 # LiH simplified gate-only noise: depolarizing strength depends only on gate arity (2Q vs 1Q).
-TWO_QUBIT_GATE_DEPOL_PROB = 0.01
-ONE_QUBIT_GATE_DEPOL_PROB = 0.001
+TWO_QUBIT_GATE_DEPOL_PROB = 0.018
+ONE_QUBIT_GATE_DEPOL_PROB = 0.0018
 
 # Legacy notebooks referred to a single “depol_prob”; that matched the two-qubit channel strength.
 DEFAULT_DEPOL_PROB = TWO_QUBIT_GATE_DEPOL_PROB
@@ -395,24 +395,24 @@ def generate_near_clifford_param_sets(
     min_snap_fraction: float = 0.0,
     seed: int = 0,
 ) -> list[dict[sympy.Symbol, float]]:
-    """Generate `num_circuits` near-Clifford resolvers using `t_max`-bounded
-    greedy parameter snapping.
+    """Generate `num_circuits` near-Clifford resolvers in two explicit steps.
 
-    For each training circuit:
-      1. Start from the target VQE parameters (no snaps).
-      2. Optionally pre-snap a `min_snap_fraction` random subset for diversity.
-      3. While `count_non_clifford_ops(...) > t_max`, randomly pick an
-         unsnapped symbol and snap it.
-      4. Return the resolver dict for this training circuit.
+    Step 1:
+      Randomly choose which parameterized gates are replaced by nearest
+      Clifford angles (snapped from target parameters), enforcing:
+      ``(total_count - non_clifford_count) == t_max``.
+
+    Step 2:
+      For the remaining parameterized gates (the non-Clifford part), assign
+      rotation angles independently and uniformly from ``[0, 2π]``.
+
+    ``min_snap_fraction`` is retained only for API compatibility and ignored.
     """
     if num_circuits <= 0:
         raise ValueError(f"num_circuits must be > 0, got {num_circuits}.")
     if t_max < 0:
         raise ValueError(f"t_max must be >= 0, got {t_max}.")
-    if not (0.0 <= float(min_snap_fraction) <= 1.0):
-        raise ValueError(
-            f"min_snap_fraction must be in [0, 1], got {min_snap_fraction}."
-        )
+    _ = float(min_snap_fraction)  # Backward-compatible no-op.
 
     target_by_symbol: dict[sympy.Symbol, float] = {}
     for sym in symbols:
@@ -423,43 +423,104 @@ def generate_near_clifford_param_sets(
         else:
             raise KeyError(f"Target parameter missing for symbol {sym!s}.")
 
-    rng = np.random.default_rng(int(seed))
-    resolvers: list[dict[sympy.Symbol, float]] = []
+    # Estimate total count when all parameterized gates are non-Clifford.
+    probe_rng = np.random.default_rng(int(seed) + 99991)
+    total_count = 0
+    for _ in range(12):
+        probe_resolver = {
+            sym: float(probe_rng.uniform(0.0, 2.0 * np.pi)) for sym in symbols
+        }
+        total_count = max(total_count, count_non_clifford_ops(circuit, probe_resolver))
+    if t_max > total_count:
+        raise ValueError(
+            f"t_max={t_max} exceeds achievable Clifford count upper bound {total_count}."
+        )
 
+    resolvers: list[dict[sympy.Symbol, float]] = []
     for circ_idx in range(num_circuits):
         local_rng = np.random.default_rng(int(seed) + 1000 * (circ_idx + 1))
-        resolver: dict[sympy.Symbol, float] = dict(target_by_symbol)
-        snapped: set[sympy.Symbol] = set()
+        found: dict[sympy.Symbol, float] | None = None
 
-        if min_snap_fraction > 0.0:
-            n_min_snap = int(np.ceil(min_snap_fraction * len(symbols)))
-            n_min_snap = min(n_min_snap, len(symbols))
+        for _attempt in range(96):
+            # Step 1: start fully Clifford, then randomize selected symbols
+            # until (total_count - non_clifford_count) == t_max.
+            resolver: dict[sympy.Symbol, float] = {
+                sym: clifford_snap_value_for_symbol(sym, target_by_symbol[sym])
+                for sym in symbols
+            }
+            snapped: set[sympy.Symbol] = set(symbols)
+            unsnapped: set[sympy.Symbol] = set()
+
+            current_non_cliff = count_non_clifford_ops(circuit, resolver)
+            current_cliff = total_count - current_non_cliff
             order = list(symbols)
             local_rng.shuffle(order)
-            for sym in order[:n_min_snap]:
-                resolver[sym] = clifford_snap_value_for_symbol(sym, target_by_symbol[sym])
-                snapped.add(sym)
 
-        guard = 0
-        max_iterations = 4 * len(symbols) + 8
-        while True:
-            t_remaining = count_non_clifford_ops(circuit, resolver)
-            if t_remaining <= t_max:
-                break
-            unsnapped = [s for s in symbols if s not in snapped]
-            if not unsnapped:
-                break
-            pick = unsnapped[local_rng.integers(0, len(unsnapped))]
-            resolver[pick] = clifford_snap_value_for_symbol(pick, target_by_symbol[pick])
-            snapped.add(pick)
-            guard += 1
-            if guard > max_iterations:
+            for sym in order:
+                if current_cliff <= t_max:
+                    break
+                old_value = resolver[sym]
+                changed = False
+                for _ in range(24):
+                    trial = float(local_rng.uniform(0.0, 2.0 * np.pi))
+                    resolver[sym] = trial
+                    trial_non_cliff = count_non_clifford_ops(circuit, resolver)
+                    trial_cliff = total_count - trial_non_cliff
+                    if t_max <= trial_cliff < current_cliff:
+                        current_non_cliff = trial_non_cliff
+                        current_cliff = trial_cliff
+                        snapped.remove(sym)
+                        unsnapped.add(sym)
+                        changed = True
+                        break
+                if not changed:
+                    resolver[sym] = old_value
+
+            if current_cliff != t_max:
+                continue
+
+            # Step 2: assign remaining (non-Clifford) symbols independently
+            # from Uniform[0, 2π], then keep exact Clifford count via repair.
+            for sym in list(unsnapped):
+                resolver[sym] = float(local_rng.uniform(0.0, 2.0 * np.pi))
+
+            repair_guard = 0
+            while repair_guard < 64:
+                repair_guard += 1
+                current_non_cliff = count_non_clifford_ops(circuit, resolver)
+                current_cliff = total_count - current_non_cliff
+                if current_cliff == t_max:
+                    found = dict(resolver)
+                    break
+                if current_cliff > t_max and snapped:
+                    pick = list(snapped)[int(local_rng.integers(0, len(snapped)))]
+                    old = resolver[pick]
+                    resolver[pick] = float(local_rng.uniform(0.0, 2.0 * np.pi))
+                    trial_non_cliff = count_non_clifford_ops(circuit, resolver)
+                    if (total_count - trial_non_cliff) <= current_cliff:
+                        snapped.remove(pick)
+                        unsnapped.add(pick)
+                    else:
+                        resolver[pick] = old
+                elif current_cliff < t_max and unsnapped:
+                    pick = list(unsnapped)[int(local_rng.integers(0, len(unsnapped)))]
+                    resolver[pick] = clifford_snap_value_for_symbol(
+                        pick, target_by_symbol[pick]
+                    )
+                    unsnapped.remove(pick)
+                    snapped.add(pick)
+                else:
+                    break
+
+            if found is not None:
                 break
 
-        resolvers.append(resolver)
+        if found is None:
+            raise ValueError(
+                f"Could not construct resolver with exact Clifford count t_max={t_max}."
+            )
+        resolvers.append(found)
 
-    if rng is not None:
-        _ = rng.random()
     return resolvers
 
 
