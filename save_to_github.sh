@@ -1,5 +1,17 @@
 #!/usr/bin/env bash
+# Quick commit + push for cross_chips_sim.
+#
+# Usage (from project root):
+#   ./save_to_github.sh
+#   ./save_to_github.sh "your commit message"
+#
+# In Cursor chat, say: gpush
+#
+# Pushes to: https://github.com/zach102824/cross-chip
+# Uses explicit repo URL (reliable when `git push` via origin times out).
 set -euo pipefail
+
+GITHUB_REPO="https://github.com/zach102824/cross-chip.git"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
@@ -36,16 +48,22 @@ else
   echo "No new file changes to commit."
 fi
 
-echo "Pushing branch '$BRANCH'..."
+AHEAD_COUNT=0
 if git rev-parse --abbrev-ref --symbolic-full-name "@{u}" >/dev/null 2>&1; then
   AHEAD_COUNT="$(git rev-list --count "@{u}..HEAD")"
-  if [[ "$AHEAD_COUNT" -eq 0 ]]; then
-    echo "No local commits ahead of upstream. Nothing to push."
-    exit 0
-  fi
-  git push
-else
-  git push -u origin "$BRANCH"
+elif git rev-parse "origin/$BRANCH" >/dev/null 2>&1; then
+  AHEAD_COUNT="$(git rev-list --count "origin/$BRANCH..HEAD")"
 fi
 
-echo "Done. Changes are pushed to GitHub."
+if [[ "$HAS_CHANGES" -eq 0 && "$AHEAD_COUNT" -eq 0 ]]; then
+  echo "No local commits ahead of remote. Nothing to push."
+  exit 0
+fi
+
+echo "Pushing branch '$BRANCH' to $GITHUB_REPO..."
+git push "$GITHUB_REPO" "$BRANCH:$BRANCH"
+
+echo "Refreshing remote tracking refs..."
+git fetch origin
+
+echo "Done. Changes are on GitHub: https://github.com/zach102824/cross-chip"
