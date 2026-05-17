@@ -1,147 +1,278 @@
-# LiH CDR Shot Cost (per-Pauli, detailed)
+# LiH CDR+REM VQE Measurement Accounting (Full Walkthrough)
 
-This note answers your exact question:
+This document is a plain-language walkthrough of measurement cost in the LiH VQE notebook:
 
-- **With `per_pauli` CDR and `num_circuits=3`, for each Pauli term, how many noisy quantum shots are used?**
-- And then: **what is the full total to get one final CDR-corrected energy?**
+- `test_LiH_case/lih_fig13_compiled_ansatz.ipynb`
+- VQE section with Adam + parameter-shift + CDR objective (`cdr_rem_corrected`)
 
----
+The intent is to answer one specific confusion:
 
-## 1) Configuration in this LiH run
+> Why do I see numbers like `cdr_calls_cum=29` and `energy_evals_cum≈203`, and what exactly is each “energy eval” doing?
 
-- Workflow: `test_LiH_case/lih_fig13_compiled_ansatz.ipynb` (bottom CDR cell)
-- Mode: `run_mitigation("cdr")`
-- CDR scope: `cdr_fit_scope="per_pauli"`
-- `num_shots = 8192`
-- `num_circuits = 3`
-- LiH non-identity Pauli terms in fit: `61`
-- Measurement scheme: `ogm`
+We will explain this from top to bottom, including a concrete indexed timeline.
 
 ---
 
-## 2) Most important point: shots are **not** split as `8192 / 61`
+## 0) Quick symbol dictionary (no shorthand assumptions)
 
-In OGM, one sampled measurement basis can be compatible with many Pauli terms.
-So each Pauli term reuses overlapping shot pools.
+These symbols appear in formulas and logs:
 
-That means:
+- `P`: number of trainable parameters in the ansatz  
+  In this notebook, `P=3` (`theta1`, `theta2`, `theta3`).
 
-- You do **not** allocate disjoint per-term shot blocks.
-- A term's "effective shots" = number of sampled settings compatible with that term.
-- Sum of all terms' effective shots can be much larger than 8192 (because of reuse).
+- `T`: number of **main** VQE iterations  
+  In this notebook, `T=15`.
 
----
+- `W`: number of learning-rate candidates in warmup  
+  `VQE_LR_GRID=(0.01, 0.03, 0.02)`, so `W=3`.
 
-## 3) Per Pauli term, per one noisy-estimation call
+- `K`: warmup mini-iterations per LR candidate  
+  `VQE_WARMUP_ITERS=1`, so `K=1`.
 
-For one call to `estimate_energy_from_noisy_rho_shots(..., num_shots=8192)`:
+- `C`: number of CDR training circuits (`num_circuits`)  
+  In this notebook, `C=5`.
 
-- Requested sampled settings: `8192`
-- For a given Pauli term `k`, define:
-  - `S_k` = number of sampled settings compatible with term `k`
+- `S`: shots per noisy energy-estimation call (`num_shots`)  
+  In this notebook, `S=8192`.
 
-Then per-term noisy estimate uses:
+Counters printed in notebook:
 
-- **effective shots for term `k` = `S_k`**, if `S_k > 0`
-- fallback to direct 1-shot if `S_k = 0`
-
-So mathematically:
-
-- `N_eff(k) = max(S_k, 1)`
-
-For this LiH + OGM file combination:
-
-- There are **16 terms** with `S_k = 0` in each call, so they get fallback `N_eff=1`.
-- The other terms have `N_eff > 1` (varies by term).
+- `cdr_calls_iter`: outer CDR calls made in one main iteration.
+- `cdr_calls_cum`: cumulative outer CDR calls so far.
+- `energy_evals_cum`: cumulative inner noisy energy-estimation calls (modeled as `cdr_calls_cum * (C+2)`).
+- `shots_cum`: cumulative shots (modeled as `energy_evals_cum * S`).
 
 ---
 
-## 4) Per Pauli term across all CDR fitting work (3 training circuits)
+## 1) The two-layer counting model
 
-Your per-Pauli CDR model is trained on 3 near-Clifford circuits.
+This is the most important idea.
 
-For each Pauli term `k`:
+### Layer A: outer calls (`cdr_calls_*`)
 
-- training x/y pairs are built from 3 noisy-estimation calls
-- so that term gets:
-  - `N_eff_train(k,1)` shots from circuit 1 call
-  - `N_eff_train(k,2)` shots from circuit 2 call
-  - `N_eff_train(k,3)` shots from circuit 3 call
+An outer call means one invocation of `run_mitigation("cdr", ...)`.  
+In your VQE code, this happens in two pathways:
 
-Total for that term in CDR training:
+1. `energy_from_params(..., energy_mode="cdr_rem_corrected")` (used in gradient shift evaluations)
+2. `_vqe_run_mitigation_triple(...)` (used for post-update logging of raw/REM/REM+CF)
 
-- `N_eff_train_total(k) = N_eff_train(k,1) + N_eff_train(k,2) + N_eff_train(k,3)`
+Each of those increments `_n_energy_total` by 1.
 
-If a term is in the always-zero-compatible set (16 terms), this becomes:
+### Layer B: inner noisy energy evaluations (`energy_evals_*`)
 
-- `N_eff_train_total(k) = 1 + 1 + 1 = 3`
+Inside one `run_mitigation("cdr")`, your notebook uses this cost model:
 
----
+`energy_evals_per_cdr_call = num_circuits + 2 = C + 2`
 
-## 5) How many noisy-estimation calls happen for one final CDR energy
+With `C=5`, one outer CDR call corresponds to:
 
-With `mode="cdr"` and `per_pauli`:
+- `7` inner noisy energy-evaluation calls.
 
-1. Baseline target noisy energy call (`return_per_term=False`)
-2. 3 training-circuit noisy calls (for per-term fit data)
-3. Target per-term noisy call (`return_per_term=True`) for applying fitted models
+Therefore:
 
-Total calls:
+- `shots_per_cdr_call = 7 * 8192 = 57344`.
 
-- `N_calls = num_circuits + 2 = 3 + 2 = 5`
+So when you see `cdr_calls_cum=29`, that means approximately:
 
----
+- `29 * 7 = 203` inner noisy energy evaluations,
+- `203 * 8192 = 1,662,976` shots.
 
-## 6) Full shot total for one final CDR-corrected energy
-
-### Nominal sampled OGM shots
-
-- `N_nominal = N_calls * num_shots = 5 * 8192 = 40960`
-
-### Extra fallback direct measurements
-
-Each call has 16 zero-compatible terms, each adds 1 fallback shot:
-
-- `N_fallback_per_call = 16`
-- `N_fallback_total = 5 * 16 = 80`
-
-### Grand total
-
-- `N_total = N_nominal + N_fallback_total`
-- `N_total = 40960 + 80 = 41040`
+That is exactly the line you observed.
 
 ---
 
-## 7) Direct answer to your question
+## 2) What one outer CDR call does internally (the 7 inner evals)
 
-For `per_pauli` with 3 training circuits:
+For one outer CDR call `k`, we can index inner evaluations `j=1..7`.
 
-- **Per term, per one noisy-estimation call:** `N_eff(k) = max(S_k,1)` (varies by term)
-- **Per term across 3 training circuits only:** `sum_{i=1..3} N_eff_train(k,i)`
-- For 16 unsupported terms in this LiH run: exactly **3 shots total** in training (1 per circuit fallback)
+Interpretation used by this notebook:
 
-And for one full final CDR energy result (fit + apply):
+1. Target baseline noisy estimate (`return_per_term=False`)
+2. Training circuit 1 noisy estimate
+3. Training circuit 2 noisy estimate
+4. Training circuit 3 noisy estimate
+5. Training circuit 4 noisy estimate
+6. Training circuit 5 noisy estimate
+7. Target per-term noisy estimate (`return_per_term=True`) for applying fitted per-Pauli model
 
-- **41040 total measurement samples**
+So one outer call always expands to these seven inner evaluations (in the present code path/config).
+
+If you want a global inner-eval index, you can define:
+
+`eval_id = 7*(k-1) + j`
+
+where `k` is outer call index and `j in {1..7}`.
 
 ---
 
-## 8) Real-machine variant (skip baseline target call)
+## 3) What happens in one main VQE iteration
 
-If you run on real hardware and do **not** need the initial baseline target noisy-energy call
-(`_baseline_target_energies(..., return_per_term=False)`), then:
+Main iteration with `P=3` performs:
 
-- `N_calls_real = (num_circuits + 2) - 1 = num_circuits + 1`
-- with `num_circuits=3`: `N_calls_real = 4`
+1. Gradient call for `theta1 + pi/2`
+2. Gradient call for `theta1 - pi/2`
+3. Gradient call for `theta2 + pi/2`
+4. Gradient call for `theta2 - pi/2`
+5. Gradient call for `theta3 + pi/2`
+6. Gradient call for `theta3 - pi/2`
+7. Post-update logging call (returns raw, REM, REM+CF energy)
 
-Shot total with the same `num_shots=8192`:
+So each main iteration always has:
 
-- `N_nominal_real = 4 * 8192 = 32768`
+- `cdr_calls_iter = 7`.
 
-Using the same fallback pattern (16 zero-compatible terms per call):
+And inner-equivalent cost per main iteration:
 
-- `N_fallback_real = 4 * 16 = 64`
+- `7 * 7 = 49` inner noisy energy evaluations,
+- `49 * 8192 = 401,408` shots.
 
-So the real-machine total becomes:
+---
 
-- `N_total_real = 32768 + 64 = 32832`
+## 4) Why iter 1 cumulative is 29 (not 7 or 14)
+
+Because cumulative count includes setup work before main iteration 1.
+
+### Pre-main work:
+
+1. Initial baseline outer call: `+1`
+2. LR warmup outer calls:
+   - For each LR candidate, warmup mini-loop does `(2P+1)=7` calls
+   - With `W=3`, `K=1`: warmup calls = `3*1*7 = 21`
+
+Total before main iteration 1:
+
+- `1 + 21 = 22` outer calls.
+
+Then iteration 1 contributes its own 7:
+
+- `cdr_calls_cum = 22 + 7 = 29`.
+
+Inner-equivalent:
+
+- `29 * 7 = 203` energy evals,
+- `203 * 8192 = 1,662,976` shots.
+
+Exactly what your print line shows.
+
+---
+
+## 5) Explicit indexed timeline (outer calls and inner ranges)
+
+Use 1-based outer call index `k`.
+
+### Pre-main phase
+
+- `k=1`: initial baseline call  
+  inner eval IDs: `1..7`
+
+- `k=2..8`: warmup for LR candidate #1  
+  inner eval IDs: `8..56`
+
+- `k=9..15`: warmup for LR candidate #2  
+  inner eval IDs: `57..105`
+
+- `k=16..22`: warmup for LR candidate #3  
+  inner eval IDs: `106..154`
+
+### Main iteration 1
+
+- `k=23`: grad theta1(+)
+- `k=24`: grad theta1(-)
+- `k=25`: grad theta2(+)
+- `k=26`: grad theta2(-)
+- `k=27`: grad theta3(+)
+- `k=28`: grad theta3(-)
+- `k=29`: post-update logging
+
+inner eval IDs: `155..203`
+
+### Main iteration t (general)
+
+Outer call range for iteration `t` (1-based):
+
+- `k_start(t) = 22 + 7*(t-1) + 1`
+- `k_end(t) = 22 + 7*t`
+
+Inner eval range:
+
+- `e_start(t) = 7*(k_start(t)-1) + 1`
+- `e_end(t) = 7*k_end(t)`
+
+For `t=15`:
+
+- `k_end(15) = 127`
+- `e_end(15) = 7*127 = 889`
+
+So at the end of iteration 15 (before final recheck), the notebook correctly prints:
+
+- `cdr_calls_cum=127`
+- `energy_evals_cum≈889`
+
+### After the loop
+
+Notebook does one extra final recheck call:
+
+- `k=128`
+- inner eval IDs `890..896`
+
+That is why full-run inner total is 896.
+
+---
+
+## 6) Total formulas and concrete totals for current settings
+
+Current settings:
+
+- `P=3`, `T=15`, `W=3`, `K=1`, `C=5`, `S=8192`
+
+Total outer calls:
+
+`N_cdr_calls = 1 + W*K*(2P+1) + T*(2P+1) + 1`
+
+Plug in numbers:
+
+`N_cdr_calls = 1 + 3*1*7 + 15*7 + 1 = 128`
+
+Total inner noisy energy evals:
+
+`N_energy_evals = N_cdr_calls*(C+2) = 128*7 = 896`
+
+Total shots:
+
+`N_shots = N_energy_evals*S = 896*8192 = 7,340,032`
+
+These are the totals implied by your current notebook print model.
+
+---
+
+## 7) What the notebook print fields mean in one line
+
+When you see:
+
+`iter=01 ... cdr_calls_iter=7 cdr_calls_cum=29 energy_evals_cum≈203 shots_cum≈1662976`
+
+interpretation:
+
+- `cdr_calls_iter=7`: this iteration did exactly 6 gradient-shift calls + 1 post-update call.
+- `cdr_calls_cum=29`: includes pre-main baseline + warmup + current iteration.
+- `energy_evals_cum≈203`: multiply cumulative outer calls by 7 internal evals per call.
+- `shots_cum≈1662976`: multiply by 8192 shots per internal eval.
+
+---
+
+## 8) Caveats
+
+This document follows the current notebook accounting assumptions exactly:
+
+- inner cost per outer call is modeled as `num_circuits + 2`.
+
+Real hardware totals can change if any of these change:
+
+- `num_circuits`
+- `num_shots`
+- warmup grid/iters (`W`, `K`)
+- number of parameters `P`
+- number of VQE iterations `T`
+- mitigation scope/implementation path (`per_pauli` vs others)
+
+So always recompute totals from current runtime config.
