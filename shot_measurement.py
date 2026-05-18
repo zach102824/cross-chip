@@ -799,6 +799,8 @@ def _generate_near_clifford_resolvers_fallback(
     """Fallback near-Clifford generator for symbol names outside th_*/ph_*.
 
     Uses nearest pi/2 snapping for all symbols and the same greedy t_max loop.
+    After selecting snapped symbols, randomizes unsnapped symbols so different
+    training circuits are not degenerate copies of the target parameters.
     """
     if num_circuits <= 0:
         raise ValueError(f"num_circuits must be > 0, got {num_circuits}.")
@@ -852,6 +854,14 @@ def _generate_near_clifford_resolvers_fallback(
             guard += 1
             if guard > max_iterations:
                 break
+
+        # Keep CDR training diversity: unsnapped symbols should be sampled, not
+        # left fixed at target values. This mirrors the two-step near-Clifford
+        # construction used by the primary generator.
+        for sym in symbols:
+            if sym in snapped:
+                continue
+            resolver[sym] = float(local_rng.uniform(0.0, 2.0 * np.pi))
 
         resolvers.append(resolver)
 
