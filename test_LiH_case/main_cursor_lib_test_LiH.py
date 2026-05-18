@@ -586,3 +586,87 @@ def generate_random_clifford_analogue_param_sets(
 
     return resolvers
 
+
+def run_cdr_with_per_pauli_coeff_print(
+    *,
+    ansatz_circuit: cirq.Circuit,
+    observable_h: cirq.PauliSum,
+    qubits: list[cirq.Qid],
+    target_resolver: dict,
+    target_params: dict,
+    symbols: list,
+    base_noise_cfg: dict,
+    shot_cfg: dict,
+    readout_cal: dict,
+    cdr_cfg: dict | None = None,
+    simulator_seed: int = 1234,
+) -> dict[str, object]:
+    """Run CDR once and print per-Pauli affine coefficients (a_k, b_k).
+
+    This helper is opt-in and keeps the default CDR path silent in other cells.
+    """
+    # Local import avoids introducing a module-level dependency cycle.
+    from shot_measurement_test_LiH import run_mitigation
+
+    cdr_cfg_local = dict(cdr_cfg or {})
+    cdr_cfg_local.setdefault("cdr_fit_scope", "per_pauli")
+
+    out = run_mitigation(
+        "cdr",
+        ansatz_circuit=ansatz_circuit,
+        observable_h=observable_h,
+        qubits=qubits,
+        target_resolver=target_resolver,
+        target_params=target_params,
+        symbols=symbols,
+        base_noise_cfg=base_noise_cfg,
+        shot_cfg=shot_cfg,
+        readout_cal=readout_cal,
+        cdr_cfg=cdr_cfg_local,
+        simulator_seed=int(simulator_seed),
+    )
+
+    models = out.get("cdr_models", {})
+    coeffs_rem = np.asarray(models.get("coeffs_rem_to_exact_per_term", []), dtype=float)
+    coeffs_unmit = np.asarray(models.get("coeffs_unmit_to_exact_per_term", []), dtype=float)
+    weights = np.asarray(models.get("weights", []), dtype=float)
+
+    qubit_to_idx = {q: i for i, q in enumerate(qubits)}
+    term_labels: list[str] = []
+    for pauli_term in observable_h:
+        pauli_map = dict(pauli_term.items())
+        if len(pauli_map) == 0:
+            # Identity offset is not part of per-term CF coefficients.
+            continue
+        chars = ["I"] * len(qubits)
+        for q, op in pauli_map.items():
+            chars[qubit_to_idx[q]] = str(op)
+        term_labels.append("".join(chars))
+
+    print("CDR per-Pauli coefficients (exact_k ~= a_k * noisy_k + b_k)")
+    if coeffs_rem.size == 0:
+        print("No per-Pauli coefficients found. Ensure cdr_fit_scope='per_pauli'.")
+        return out
+
+    print(f"Number of Pauli terms: {len(coeffs_rem)}")
+    print("REM branch coefficients:")
+    for k, (a_k, b_k) in enumerate(coeffs_rem):
+        label = term_labels[k] if k < len(term_labels) else "UNKNOWN"
+        weight = float(weights[k]) if k < len(weights) else float("nan")
+        print(
+            f"term[{k:03d}] {label}  weight={weight: .12f}  "
+            f"a={float(a_k): .12f}, b={float(b_k): .12f}"
+        )
+
+    if coeffs_unmit.size:
+        print("UNMIT branch coefficients:")
+        for k, (a_k, b_k) in enumerate(coeffs_unmit):
+            label = term_labels[k] if k < len(term_labels) else "UNKNOWN"
+            weight = float(weights[k]) if k < len(weights) else float("nan")
+            print(
+                f"term[{k:03d}] {label}  weight={weight: .12f}  "
+                f"a={float(a_k): .12f}, b={float(b_k): .12f}"
+            )
+
+    return out
+

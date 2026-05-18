@@ -1,6 +1,7 @@
 # full CDR details for LiH testing case
 
 ## Configuration used
+
 - bond_length: `2.2`
 - target params [theta1, theta2, theta3]: `[-0.444980732142, 0.476365247616, 0.1426860331]`
 - measurement_scheme: `ogm`
@@ -17,9 +18,11 @@
 - OGM file: `/Users/zacharyhe/shadowgrouping/haozhaowu/LiH/hamil_class/ogm_outputs/OGM_ogm_LiH_2.2.txt`
 
 ## Important note on epsilon
+
 - For OGM `SettingSampler`, shot allocation is sampled from file probabilities `p` and total `N_samples` only; epsilon is not used in the sampler math.
 
 ## Model definition used
+
 - Per-pauli CDR applies, for each term `k`:
   - unmit branch: `y_k ~= a_u[k] * x_u[k] + b_u[k]`
   - rem branch:   `y_k ~= a_r[k] * x_r[k] + b_r[k]`
@@ -28,23 +31,27 @@
   - `E_cdr_rem   = offset + sum_k w_k * (a_r[k] * x_r_target[k] + b_r[k])`
 
 ## Constant term (offset)
+
 - Hamiltonian identity term: `(-7.1586579073350247e+00) * I`
 - offset: `-7.1586579073350247e+00`
-- E_cdr_unmit: `-7.8238614229404062`
-- E_cdr_rem: `-7.8238614229404062`
+- E_cdr_unmit: `-7.8434787927100000`
+- E_cdr_rem: `-7.8434787927100000`
 - delta (unmit - rem): `0.0000000000000000e+00`
 
 ## Int encoding map
+
 - `I=0, X=1, Y=2, Z=3`
 
 ## Per-term full details (Pauli term, training pairs, fits, shots, target contribution)
+
 ### term 0
+
 - pauli term from int row: `(1.5264219777698207e-02)*X(q(0))*X(q(1))`
 - int observable row: `[1, 1, 0, 0, 0, 0]`
 - Hamiltonian weight w_0: `1.5264219777698207e-02`
 - OGM effective shots used for this term: `574`
-- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=0.0000000000000000e+00`
-- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=0.0000000000000000e+00`
+- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=-0.0000000000000000e+00`
+- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=-0.0000000000000000e+00`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=-7.0921985815602835e-03`, `x_rem=-7.8517839275696506e-03`, `y_exact=0.0000000000000000e+00`
   - train[1] t_remaining=2: `x_unmit=-2.4118738404452691e-02`, `x_rem=-2.6701892280584741e-02`, `y_exact=0.0000000000000000e+00`
@@ -56,6 +63,7 @@
 - target contribution to E_cdr_rem: `0.0000000000000000e+00`
 
 ### term 1
+
 - pauli term from int row: `(2.3326675518445836e-03)*X(q(0))*X(q(1))*Z(q(2))*Z(q(3))`
 - int observable row: `[1, 1, 3, 3, 0, 0]`
 - Hamiltonian weight w_1: `2.3326675518445836e-03`
@@ -73,12 +81,13 @@
 - target contribution to E_cdr_rem: `0.0000000000000000e+00`
 
 ### term 2
+
 - pauli term from int row: `(4.7092490952951533e-03)*X(q(0))*X(q(1))*Z(q(2))*Z(q(3))*X(q(4))*X(q(5))`
 - int observable row: `[1, 1, 3, 3, 1, 1]`
 - Hamiltonian weight w_2: `4.7092490952951533e-03`
 - OGM effective shots used for this term: `49`
-- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=0.0000000000000000e+00`
-- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=0.0000000000000000e+00`
+- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=-0.0000000000000000e+00`
+- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=-0.0000000000000000e+00`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=-7.4074074074074070e-02`, `x_rem=-1.1225993295642203e-01`, `y_exact=0.0000000000000000e+00`
   - train[1] t_remaining=2: `x_unmit=-3.3333333333333333e-02`, `x_rem=-5.0516969830389960e-02`, `y_exact=0.0000000000000000e+00`
@@ -90,12 +99,13 @@
 - target contribution to E_cdr_rem: `0.0000000000000000e+00`
 
 ### term 3
+
 - pauli term from int row: `(4.7092490952951533e-03)*X(q(0))*X(q(1))*Z(q(2))*Z(q(3))*Y(q(4))*Y(q(5))`
 - int observable row: `[1, 1, 3, 3, 2, 2]`
 - Hamiltonian weight w_3: `4.7092490952951533e-03`
 - OGM effective shots used for this term: `68`
-- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=0.0000000000000000e+00`
-- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=0.0000000000000000e+00`
+- fitted unmit coeffs: `a_u=-0.0000000000000000e+00`, `b_u=0.0000000000000000e+00`
+- fitted rem coeffs: `a_r=-0.0000000000000000e+00`, `b_r=0.0000000000000000e+00`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=9.4339622641509441e-02`, `x_rem=1.4297255612374499e-01`, `y_exact=0.0000000000000000e+00`
   - train[1] t_remaining=2: `x_unmit=0.0000000000000000e+00`, `x_rem=1.0597583416876495e-16`, `y_exact=0.0000000000000000e+00`
@@ -107,12 +117,13 @@
 - target contribution to E_cdr_rem: `0.0000000000000000e+00`
 
 ### term 4
+
 - pauli term from int row: `(4.2983656068340519e-03)*X(q(0))*X(q(1))*Z(q(3))`
 - int observable row: `[1, 1, 0, 3, 0, 0]`
 - Hamiltonian weight w_4: `4.2983656068340519e-03`
 - OGM effective shots used for this term: `309`
-- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=0.0000000000000000e+00`
-- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=0.0000000000000000e+00`
+- fitted unmit coeffs: `a_u=-0.0000000000000000e+00`, `b_u=0.0000000000000000e+00`
+- fitted rem coeffs: `a_r=-0.0000000000000000e+00`, `b_r=0.0000000000000000e+00`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=-1.3422818791946308e-02`, `x_rem=-1.5958358325078446e-02`, `y_exact=0.0000000000000000e+00`
   - train[1] t_remaining=2: `x_unmit=-5.0505050505050504e-02`, `x_rem=-6.0045338142340608e-02`, `y_exact=0.0000000000000000e+00`
@@ -124,12 +135,13 @@
 - target contribution to E_cdr_rem: `0.0000000000000000e+00`
 
 ### term 5
+
 - pauli term from int row: `(-3.8063028881711678e-03)*X(q(0))*X(q(1))*Z(q(3))*Z(q(4))`
 - int observable row: `[1, 1, 0, 3, 3, 0]`
 - Hamiltonian weight w_5: `-3.8063028881711678e-03`
 - OGM effective shots used for this term: `192`
-- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=0.0000000000000000e+00`
-- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=0.0000000000000000e+00`
+- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=-0.0000000000000000e+00`
+- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=-0.0000000000000000e+00`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=-3.6649214659685861e-02`, `x_rem=-4.7515994373460053e-02`, `y_exact=0.0000000000000000e+00`
   - train[1] t_remaining=2: `x_unmit=2.5906735751295335e-02`, `x_rem=3.3588286178130533e-02`, `y_exact=0.0000000000000000e+00`
@@ -141,12 +153,13 @@
 - target contribution to E_cdr_rem: `-0.0000000000000000e+00`
 
 ### term 6
+
 - pauli term from int row: `(1.2439498134905486e-02)*X(q(0))*X(q(1))*Z(q(3))*Z(q(5))`
 - int observable row: `[1, 1, 0, 3, 0, 3]`
 - Hamiltonian weight w_6: `1.2439498134905486e-02`
 - OGM effective shots used for this term: `192`
-- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=0.0000000000000000e+00`
-- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=0.0000000000000000e+00`
+- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=-0.0000000000000000e+00`
+- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=-0.0000000000000000e+00`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=-3.6649214659685861e-02`, `x_rem=-4.8263366017349194e-02`, `y_exact=0.0000000000000000e+00`
   - train[1] t_remaining=2: `x_unmit=-4.6632124352331605e-02`, `x_rem=-6.1409863940653814e-02`, `y_exact=0.0000000000000000e+00`
@@ -158,12 +171,13 @@
 - target contribution to E_cdr_rem: `0.0000000000000000e+00`
 
 ### term 7
+
 - pauli term from int row: `(1.1507931652465444e-02)*X(q(0))*Y(q(1))*Z(q(2))*X(q(3))*Z(q(4))*Y(q(5))`
 - int observable row: `[1, 2, 3, 1, 3, 2]`
 - Hamiltonian weight w_7: `1.1507931652465444e-02`
 - OGM effective shots used for this term: `85`
-- fitted unmit coeffs: `a_u=-3.6860946083619445e-01`, `b_u=-4.0508961503900248e-01`
-- fitted rem coeffs: `a_r=-2.4322484244654050e-01`, `b_r=-4.0508961503900281e-01`
+- fitted unmit coeffs: `a_u=2.4030881862280000e+00`, `b_u=1.4196427550099999e-01`
+- fitted rem coeffs: `a_r=1.5856639820220000e+00`, `b_r=1.4196427550099999e-01`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=-2.0000000000000001e-01`, `x_rem=-3.0310181898233934e-01`, `y_exact=-4.3044022968427953e-01`
   - train[1] t_remaining=2: `x_unmit=-1.6831683168316833e-01`, `x_rem=-2.5508568924256275e-01`, `y_exact=-4.3044022968427953e-01`
@@ -175,12 +189,13 @@
 - target contribution to E_cdr_rem: `-3.6212695980335865e-03`
 
 ### term 8
+
 - pauli term from int row: `(-1.1507931652465444e-02)*X(q(0))*Y(q(1))*Z(q(2))*Y(q(3))*Z(q(4))*X(q(5))`
 - int observable row: `[1, 2, 3, 2, 3, 1]`
 - Hamiltonian weight w_8: `-1.1507931652465444e-02`
 - OGM effective shots used for this term: `115`
-- fitted unmit coeffs: `a_u=9.7720522460598613e-01`, `b_u=1.8162536494476872e-01`
-- fitted rem coeffs: `a_r=6.4480327296414197e-01`, `b_r=1.8162536494476877e-01`
+- fitted unmit coeffs: `a_u=1.8962285010060000e+00`, `b_u=5.9360723009999998e-02`
+- fitted rem coeffs: `a_r=1.2512155204950000e+00`, `b_r=5.9360723009999998e-02`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=1.7757009345794392e-01`, `x_rem=2.6910909161983393e-01`, `y_exact=4.3044022968427953e-01`
   - train[1] t_remaining=2: `x_unmit=3.7190082644628097e-01`, `x_rem=5.6361908488451529e-01`, `y_exact=4.3044022968427953e-01`
@@ -192,12 +207,13 @@
 - target contribution to E_cdr_rem: `-4.1025047692791567e-03`
 
 ### term 9
+
 - pauli term from int row: `(-5.7263977866494889e-03)*X(q(0))*Y(q(1))*X(q(3))*Y(q(4))`
 - int observable row: `[1, 2, 0, 1, 2, 0]`
 - Hamiltonian weight w_9: `-5.7263977866494889e-03`
 - OGM effective shots used for this term: `95`
-- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=0.0000000000000000e+00`
-- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=0.0000000000000000e+00`
+- fitted unmit coeffs: `a_u=-0.0000000000000000e+00`, `b_u=0.0000000000000000e+00`
+- fitted rem coeffs: `a_r=-0.0000000000000000e+00`, `b_r=0.0000000000000000e+00`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=-5.4945054945054944e-02`, `x_rem=-7.1236694861309846e-02`, `y_exact=0.0000000000000000e+00`
   - train[1] t_remaining=2: `x_unmit=4.9504950495049507e-02`, `x_rem=6.4183556756229651e-02`, `y_exact=0.0000000000000000e+00`
@@ -209,6 +225,7 @@
 - target contribution to E_cdr_rem: `-0.0000000000000000e+00`
 
 ### term 10
+
 - pauli term from int row: `(5.7263977866494889e-03)*X(q(0))*Y(q(1))*Y(q(3))*X(q(4))`
 - int observable row: `[1, 2, 0, 2, 1, 0]`
 - Hamiltonian weight w_10: `5.7263977866494889e-03`
@@ -226,12 +243,13 @@
 - target contribution to E_cdr_rem: `0.0000000000000000e+00`
 
 ### term 11
+
 - pauli term from int row: `(4.5870037211547705e-03)*X(q(0))*Z(q(1))*X(q(2))*Z(q(3))`
 - int observable row: `[1, 3, 1, 3, 0, 0]`
 - Hamiltonian weight w_11: `4.5870037211547705e-03`
 - OGM effective shots used for this term: `414`
-- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=0.0000000000000000e+00`
-- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=0.0000000000000000e+00`
+- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=-0.0000000000000000e+00`
+- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=-0.0000000000000000e+00`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=-5.7142857142857141e-02`, `x_rem=-7.1693764410441077e-02`, `y_exact=0.0000000000000000e+00`
   - train[1] t_remaining=2: `x_unmit=9.6153846153846159e-03`, `x_rem=1.2063854588295371e-02`, `y_exact=0.0000000000000000e+00`
@@ -243,6 +261,7 @@
 - target contribution to E_cdr_rem: `0.0000000000000000e+00`
 
 ### term 12
+
 - pauli term from int row: `(-1.6982826390582351e-02)*X(q(0))*Z(q(1))*X(q(2))*Z(q(3))*Z(q(4))`
 - int observable row: `[1, 3, 1, 3, 3, 0]`
 - Hamiltonian weight w_12: `-1.6982826390582351e-02`
@@ -260,12 +279,13 @@
 - target contribution to E_cdr_rem: `-0.0000000000000000e+00`
 
 ### term 13
+
 - pauli term from int row: `(-2.3610110167205777e-02)*X(q(0))*Z(q(1))*X(q(2))*Z(q(3))*Z(q(4))*Z(q(5))`
 - int observable row: `[1, 3, 1, 3, 3, 3]`
 - Hamiltonian weight w_13: `-2.3610110167205777e-02`
 - OGM effective shots used for this term: `414`
-- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=0.0000000000000000e+00`
-- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=0.0000000000000000e+00`
+- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=-0.0000000000000000e+00`
+- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=-0.0000000000000000e+00`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=4.7619047619047623e-03`, `x_rem=7.2167099757699344e-03`, `y_exact=0.0000000000000000e+00`
   - train[1] t_remaining=2: `x_unmit=-1.9230769230769232e-02`, `x_rem=-2.9144405671378763e-02`, `y_exact=0.0000000000000000e+00`
@@ -277,6 +297,7 @@
 - target contribution to E_cdr_rem: `-0.0000000000000000e+00`
 
 ### term 14
+
 - pauli term from int row: `(-2.6709685222962787e-02)*X(q(0))*Z(q(1))*X(q(2))*Z(q(4))`
 - int observable row: `[1, 3, 1, 0, 3, 0]`
 - Hamiltonian weight w_14: `-2.6709685222962787e-02`
@@ -294,12 +315,13 @@
 - target contribution to E_cdr_rem: `-0.0000000000000000e+00`
 
 ### term 15
+
 - pauli term from int row: `(1.0106830583060904e-02)*X(q(0))*Z(q(1))*Y(q(2))*Z(q(3))*X(q(4))*Y(q(5))`
 - int observable row: `[1, 3, 2, 3, 1, 2]`
 - Hamiltonian weight w_15: `1.0106830583060904e-02`
 - OGM effective shots used for this term: `97`
-- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=0.0000000000000000e+00`
-- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=0.0000000000000000e+00`
+- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=-0.0000000000000000e+00`
+- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=-0.0000000000000000e+00`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=-1.7073170731707318e-01`, `x_rem=-2.5874545522882630e-01`, `y_exact=0.0000000000000000e+00`
   - train[1] t_remaining=2: `x_unmit=-1.1428571428571428e-01`, `x_rem=-1.7320103941847961e-01`, `y_exact=0.0000000000000000e+00`
@@ -311,12 +333,13 @@
 - target contribution to E_cdr_rem: `0.0000000000000000e+00`
 
 ### term 16
+
 - pauli term from int row: `(-1.0106830583060904e-02)*X(q(0))*Z(q(1))*Y(q(2))*Z(q(3))*Y(q(4))*X(q(5))`
 - int observable row: `[1, 3, 2, 3, 2, 1]`
 - Hamiltonian weight w_16: `-1.0106830583060904e-02`
 - OGM effective shots used for this term: `97`
-- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=0.0000000000000000e+00`
-- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=0.0000000000000000e+00`
+- fitted unmit coeffs: `a_u=-0.0000000000000000e+00`, `b_u=0.0000000000000000e+00`
+- fitted rem coeffs: `a_r=-0.0000000000000000e+00`, `b_r=0.0000000000000000e+00`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=1.7808219178082191e-01`, `x_rem=2.6988518128564470e-01`, `y_exact=0.0000000000000000e+00`
   - train[1] t_remaining=2: `x_unmit=4.0816326530612242e-02`, `x_rem=6.1857514078028399e-02`, `y_exact=0.0000000000000000e+00`
@@ -328,12 +351,13 @@
 - target contribution to E_cdr_rem: `-0.0000000000000000e+00`
 
 ### term 17
+
 - pauli term from int row: `(1.1507931652465444e-02)*X(q(0))*X(q(2))*X(q(3))*X(q(4))`
 - int observable row: `[1, 0, 1, 1, 1, 0]`
 - Hamiltonian weight w_17: `1.1507931652465444e-02`
 - OGM effective shots used for this term: `126`
-- fitted unmit coeffs: `a_u=2.3438609958361775e-01`, `b_u=-3.3196719843634544e-02`
-- fitted rem coeffs: `a_r=1.8040187565822907e-01`, `b_r=-3.3196719843634544e-02`
+- fitted unmit coeffs: `a_u=1.4841704519140000e+00`, `b_u=2.7012707468999999e-02`
+- fitted rem coeffs: `a_r=1.1423336699460001e+00`, `b_r=2.7012707468999999e-02`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=4.2735042735042736e-02`, `x_rem=5.5523258534085997e-02`, `y_exact=0.0000000000000000e+00`
   - train[1] t_remaining=2: `x_unmit=1.4285714285714285e-01`, `x_rem=1.8560632138537300e-01`, `y_exact=0.0000000000000000e+00`
@@ -345,12 +369,13 @@
 - target contribution to E_cdr_rem: `-4.5118710136187774e-04`
 
 ### term 18
+
 - pauli term from int row: `(1.1507931652465444e-02)*X(q(0))*X(q(2))*Y(q(3))*Y(q(4))`
 - int observable row: `[1, 0, 1, 2, 2, 0]`
 - Hamiltonian weight w_18: `1.1507931652465444e-02`
 - OGM effective shots used for this term: `139`
-- fitted unmit coeffs: `a_u=6.7071240820419908e-01`, `b_u=-3.1018618027779329e-02`
-- fitted rem coeffs: `a_r=5.1623273172869677e-01`, `b_r=-3.1018618027779339e-02`
+- fitted unmit coeffs: `a_u=1.8674615277960001e+00`, `b_u=8.5334342679000003e-02`
+- fitted rem coeffs: `a_r=1.4373444625450000e+00`, `b_r=8.5334342679000003e-02`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=6.0402684563758392e-02`, `x_rem=7.8477840585761766e-02`, `y_exact=0.0000000000000000e+00`
   - train[1] t_remaining=2: `x_unmit=8.6206896551724144e-02`, `x_rem=1.1200381462910440e-01`, `y_exact=0.0000000000000000e+00`
@@ -362,12 +387,13 @@
 - target contribution to E_cdr_rem: `-1.4596047865139629e-03`
 
 ### term 19
+
 - pauli term from int row: `(9.2962528164499229e-03)*X(q(0))*X(q(2))*Z(q(3))*Z(q(4))`
 - int observable row: `[1, 0, 1, 3, 3, 0]`
 - Hamiltonian weight w_19: `9.2962528164499229e-03`
 - OGM effective shots used for this term: `606`
-- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=0.0000000000000000e+00`
-- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=0.0000000000000000e+00`
+- fitted unmit coeffs: `a_u=-0.0000000000000000e+00`, `b_u=0.0000000000000000e+00`
+- fitted rem coeffs: `a_r=-0.0000000000000000e+00`, `b_r=0.0000000000000000e+00`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=-9.0016366612111293e-02`, `x_rem=-1.1695324669945757e-01`, `y_exact=0.0000000000000000e+00`
   - train[1] t_remaining=2: `x_unmit=-5.7471264367816091e-02`, `x_rem=-7.4669209752736221e-02`, `y_exact=0.0000000000000000e+00`
@@ -379,12 +405,13 @@
 - target contribution to E_cdr_rem: `0.0000000000000000e+00`
 
 ### term 20
+
 - pauli term from int row: `(-3.2798138198784431e-02)*X(q(0))*Y(q(2))*X(q(3))*Y(q(5))`
 - int observable row: `[1, 0, 2, 1, 0, 2]`
 - Hamiltonian weight w_20: `-3.2798138198784431e-02`
 - OGM effective shots used for this term: `277`
-- fitted unmit coeffs: `a_u=1.5604619408169729e-02`, `b_u=4.1967853108358877e-01`
-- fitted rem coeffs: `a_r=1.1824549187626354e-02`, `b_r=4.1967853108358893e-01`
+- fitted unmit coeffs: `a_u=2.2741797590620001e+00`, `b_u=3.6280269490000003e-02`
+- fitted rem coeffs: `a_r=1.7232814027150001e+00`, `b_r=3.6280269490000003e-02`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=2.8985507246376813e-01`, `x_rem=3.8251590124530743e-01`, `y_exact=4.1389769175218394e-01`
   - train[1] t_remaining=2: `x_unmit=4.1095890410958902e-02`, `x_rem=5.4233418875190828e-02`, `y_exact=4.1389769175218394e-01`
@@ -396,12 +423,13 @@
 - target contribution to E_cdr_rem: `-1.3881182339500770e-02`
 
 ### term 21
+
 - pauli term from int row: `(3.2798138198784431e-02)*X(q(0))*Y(q(2))*Y(q(3))*X(q(5))`
 - int observable row: `[1, 0, 2, 2, 0, 1]`
 - Hamiltonian weight w_21: `3.2798138198784431e-02`
 - OGM effective shots used for this term: `265`
-- fitted unmit coeffs: `a_u=8.2283784475808655e-02`, `b_u=-4.0506251874259497e-01`
-- fitted rem coeffs: `a_r=6.2351322478835437e-02`, `b_r=-4.0506251874259491e-01`
+- fitted unmit coeffs: `a_u=2.3170059349090000e+00`, `b_u=4.1163791799999998e-04`
+- fitted rem coeffs: `a_r=1.7557333459230000e+00`, `b_r=4.1163791799999998e-04`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=-2.3437500000000000e-01`, `x_rem=-3.0929996702257279e-01`, `y_exact=-4.1389769175218394e-01`
   - train[1] t_remaining=2: `x_unmit=-2.2264150943396227e-01`, `x_rem=-2.9381551584332949e-01`, `y_exact=-4.1389769175218394e-01`
@@ -413,12 +441,13 @@
 - target contribution to E_cdr_rem: `-1.3712372165613324e-02`
 
 ### term 22
+
 - pauli term from int row: `(-1.1507931652465444e-02)*Y(q(0))*X(q(1))*Z(q(2))*X(q(3))*Z(q(4))*Y(q(5))`
 - int observable row: `[2, 1, 3, 1, 3, 2]`
 - Hamiltonian weight w_22: `-1.1507931652465444e-02`
 - OGM effective shots used for this term: `105`
-- fitted unmit coeffs: `a_u=9.4586874953470135e-01`, `b_u=1.3987116591445273e-01`
-- fitted rem coeffs: `a_r=6.2412607928942443e-01`, `b_r=1.3987116591445270e-01`
+- fitted unmit coeffs: `a_u=9.4805694775299998e-01`, `b_u=4.8549541898000002e-02`
+- fitted rem coeffs: `a_r=6.2556994935700005e-01`, `b_r=4.8549541898000002e-02`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=2.0792079207920791e-01`, `x_rem=3.1510585141728348e-01`, `y_exact=3.8251825715179066e-01`
   - train[1] t_remaining=2: `x_unmit=1.5887850467289719e-01`, `x_rem=2.4078181881774630e-01`, `y_exact=3.8251825715179066e-01`
@@ -430,12 +459,13 @@
 - target contribution to E_cdr_rem: `-1.6096278174941745e-03`
 
 ### term 23
+
 - pauli term from int row: `(1.1507931652465444e-02)*Y(q(0))*X(q(1))*Z(q(2))*Y(q(3))*Z(q(4))*X(q(5))`
 - int observable row: `[2, 1, 3, 2, 3, 1]`
 - Hamiltonian weight w_23: `1.1507931652465444e-02`
 - OGM effective shots used for this term: `114`
-- fitted unmit coeffs: `a_u=1.5330301339120631e+00`, `b_u=-1.0568456867285936e-01`
-- fitted rem coeffs: `a_r=1.0115611572765828e+00`, `b_r=-1.0568456867285936e-01`
+- fitted unmit coeffs: `a_u=1.2862952309850000e+00`, `b_u=-1.1488450846999999e-01`
+- fitted rem coeffs: `a_r=8.4875454413600004e-01`, `b_r=-1.1488450846999999e-01`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=-7.5268817204301078e-02`, `x_rem=-1.1407057703636435e-01`, `y_exact=-3.8251825715179066e-01`
   - train[1] t_remaining=2: `x_unmit=-2.2580645161290322e-01`, `x_rem=-3.4221173110909286e-01`, `y_exact=-3.8251825715179066e-01`
@@ -447,12 +477,13 @@
 - target contribution to E_cdr_rem: `-1.0415374662528039e-03`
 
 ### term 24
+
 - pauli term from int row: `(5.7263977866494889e-03)*Y(q(0))*X(q(1))*X(q(3))*Y(q(4))`
 - int observable row: `[2, 1, 0, 1, 2, 0]`
 - Hamiltonian weight w_24: `5.7263977866494889e-03`
 - OGM effective shots used for this term: `96`
-- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=0.0000000000000000e+00`
-- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=0.0000000000000000e+00`
+- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=-0.0000000000000000e+00`
+- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=-0.0000000000000000e+00`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=1.0101010101010102e-02`, `x_rem=1.3096038853291293e-02`, `y_exact=0.0000000000000000e+00`
   - train[1] t_remaining=2: `x_unmit=8.6956521739130432e-02`, `x_rem=1.1273981273702946e-01`, `y_exact=0.0000000000000000e+00`
@@ -464,6 +495,7 @@
 - target contribution to E_cdr_rem: `0.0000000000000000e+00`
 
 ### term 25
+
 - pauli term from int row: `(-5.7263977866494889e-03)*Y(q(0))*X(q(1))*Y(q(3))*X(q(4))`
 - int observable row: `[2, 1, 0, 2, 1, 0]`
 - Hamiltonian weight w_25: `-5.7263977866494889e-03`
@@ -481,12 +513,13 @@
 - target contribution to E_cdr_rem: `-0.0000000000000000e+00`
 
 ### term 26
+
 - pauli term from int row: `(1.5264219777698207e-02)*Y(q(0))*Y(q(1))`
 - int observable row: `[2, 2, 0, 0, 0, 0]`
 - Hamiltonian weight w_26: `1.5264219777698207e-02`
 - OGM effective shots used for this term: `575`
-- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=0.0000000000000000e+00`
-- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=0.0000000000000000e+00`
+- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=-0.0000000000000000e+00`
+- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=-0.0000000000000000e+00`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=-2.2146507666098807e-02`, `x_rem=-2.4518432605170663e-02`, `y_exact=0.0000000000000000e+00`
   - train[1] t_remaining=2: `x_unmit=1.6274864376130200e-02`, `x_rem=1.8017927312994404e-02`, `y_exact=0.0000000000000000e+00`
@@ -498,6 +531,7 @@
 - target contribution to E_cdr_rem: `0.0000000000000000e+00`
 
 ### term 27
+
 - pauli term from int row: `(2.3326675518445836e-03)*Y(q(0))*Y(q(1))*Z(q(2))*Z(q(3))`
 - int observable row: `[2, 2, 3, 3, 0, 0]`
 - Hamiltonian weight w_27: `2.3326675518445836e-03`
@@ -515,12 +549,13 @@
 - target contribution to E_cdr_rem: `0.0000000000000000e+00`
 
 ### term 28
+
 - pauli term from int row: `(4.7092490952951533e-03)*Y(q(0))*Y(q(1))*Z(q(2))*Z(q(3))*X(q(4))*X(q(5))`
 - int observable row: `[2, 2, 3, 3, 1, 1]`
 - Hamiltonian weight w_28: `4.7092490952951533e-03`
 - OGM effective shots used for this term: `69`
-- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=0.0000000000000000e+00`
-- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=0.0000000000000000e+00`
+- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=-0.0000000000000000e+00`
+- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=-0.0000000000000000e+00`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=5.7142857142857141e-02`, `x_rem=8.6600519709240042e-02`, `y_exact=0.0000000000000000e+00`
   - train[1] t_remaining=2: `x_unmit=1.0714285714285714e-01`, `x_rem=1.6237597445482460e-01`, `y_exact=0.0000000000000000e+00`
@@ -532,12 +567,13 @@
 - target contribution to E_cdr_rem: `0.0000000000000000e+00`
 
 ### term 29
+
 - pauli term from int row: `(4.7092490952951533e-03)*Y(q(0))*Y(q(1))*Z(q(2))*Z(q(3))*Y(q(4))*Y(q(5))`
 - int observable row: `[2, 2, 3, 3, 2, 2]`
 - Hamiltonian weight w_29: `4.7092490952951533e-03`
 - OGM effective shots used for this term: `43`
-- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=0.0000000000000000e+00`
-- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=0.0000000000000000e+00`
+- fitted unmit coeffs: `a_u=-0.0000000000000000e+00`, `b_u=0.0000000000000000e+00`
+- fitted rem coeffs: `a_r=-0.0000000000000000e+00`, `b_r=0.0000000000000000e+00`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=-1.7647058823529413e-01`, `x_rem=-2.6744278145500527e-01`, `y_exact=0.0000000000000000e+00`
   - train[1] t_remaining=2: `x_unmit=9.6774193548387094e-02`, `x_rem=1.4666217047532554e-01`, `y_exact=0.0000000000000000e+00`
@@ -549,12 +585,13 @@
 - target contribution to E_cdr_rem: `0.0000000000000000e+00`
 
 ### term 30
+
 - pauli term from int row: `(4.2983656068340519e-03)*Y(q(0))*Y(q(1))*Z(q(3))`
 - int observable row: `[2, 2, 0, 3, 0, 0]`
 - Hamiltonian weight w_30: `4.2983656068340519e-03`
 - OGM effective shots used for this term: `311`
-- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=0.0000000000000000e+00`
-- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=0.0000000000000000e+00`
+- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=-0.0000000000000000e+00`
+- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=-0.0000000000000000e+00`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=-2.8391167192429023e-02`, `x_rem=-3.3754193239637520e-02`, `y_exact=0.0000000000000000e+00`
   - train[1] t_remaining=2: `x_unmit=-4.1666666666666664e-02`, `x_rem=-4.9537403967431011e-02`, `y_exact=0.0000000000000000e+00`
@@ -566,12 +603,13 @@
 - target contribution to E_cdr_rem: `0.0000000000000000e+00`
 
 ### term 31
+
 - pauli term from int row: `(-3.8063028881711678e-03)*Y(q(0))*Y(q(1))*Z(q(3))*Z(q(4))`
 - int observable row: `[2, 2, 0, 3, 3, 0]`
 - Hamiltonian weight w_31: `-3.8063028881711678e-03`
 - OGM effective shots used for this term: `199`
-- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=0.0000000000000000e+00`
-- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=0.0000000000000000e+00`
+- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=-0.0000000000000000e+00`
+- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=-0.0000000000000000e+00`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=0.0000000000000000e+00`, `x_rem=9.0630450989808690e-18`, `y_exact=0.0000000000000000e+00`
   - train[1] t_remaining=2: `x_unmit=0.0000000000000000e+00`, `x_rem=-1.0449157878825003e-17`, `y_exact=0.0000000000000000e+00`
@@ -583,12 +621,13 @@
 - target contribution to E_cdr_rem: `-0.0000000000000000e+00`
 
 ### term 32
+
 - pauli term from int row: `(1.2439498134905486e-02)*Y(q(0))*Y(q(1))*Z(q(3))*Z(q(5))`
 - int observable row: `[2, 2, 0, 3, 0, 3]`
 - Hamiltonian weight w_32: `1.2439498134905486e-02`
 - OGM effective shots used for this term: `199`
-- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=0.0000000000000000e+00`
-- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=0.0000000000000000e+00`
+- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=-0.0000000000000000e+00`
+- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=-0.0000000000000000e+00`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=5.1020408163265307e-02`, `x_rem=6.7188796715114477e-02`, `y_exact=0.0000000000000000e+00`
   - train[1] t_remaining=2: `x_unmit=4.7058823529411764e-02`, `x_rem=6.1971784264293797e-02`, `y_exact=0.0000000000000000e+00`
@@ -600,12 +639,13 @@
 - target contribution to E_cdr_rem: `0.0000000000000000e+00`
 
 ### term 33
+
 - pauli term from int row: `(-1.0106830583060904e-02)*Y(q(0))*Z(q(1))*X(q(2))*Z(q(3))*X(q(4))*Y(q(5))`
 - int observable row: `[2, 3, 1, 3, 1, 2]`
 - Hamiltonian weight w_33: `-1.0106830583060904e-02`
 - OGM effective shots used for this term: `77`
-- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=0.0000000000000000e+00`
-- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=0.0000000000000000e+00`
+- fitted unmit coeffs: `a_u=-0.0000000000000000e+00`, `b_u=0.0000000000000000e+00`
+- fitted rem coeffs: `a_r=-0.0000000000000000e+00`, `b_r=0.0000000000000000e+00`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=1.2244897959183673e-01`, `x_rem=1.8557254223408537e-01`, `y_exact=0.0000000000000000e+00`
   - train[1] t_remaining=2: `x_unmit=-9.5238095238095233e-02`, `x_rem=-1.4433419951539964e-01`, `y_exact=0.0000000000000000e+00`
@@ -617,12 +657,13 @@
 - target contribution to E_cdr_rem: `-0.0000000000000000e+00`
 
 ### term 34
+
 - pauli term from int row: `(1.0106830583060904e-02)*Y(q(0))*Z(q(1))*X(q(2))*Z(q(3))*Y(q(4))*X(q(5))`
 - int observable row: `[2, 3, 1, 3, 2, 1]`
 - Hamiltonian weight w_34: `1.0106830583060904e-02`
 - OGM effective shots used for this term: `76`
-- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=0.0000000000000000e+00`
-- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=0.0000000000000000e+00`
+- fitted unmit coeffs: `a_u=-0.0000000000000000e+00`, `b_u=0.0000000000000000e+00`
+- fitted rem coeffs: `a_r=-0.0000000000000000e+00`, `b_r=0.0000000000000000e+00`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=-6.0606060606060608e-02`, `x_rem=-9.1849036055254366e-02`, `y_exact=0.0000000000000000e+00`
   - train[1] t_remaining=2: `x_unmit=8.5714285714285715e-02`, `x_rem=1.2990077956385968e-01`, `y_exact=0.0000000000000000e+00`
@@ -634,6 +675,7 @@
 - target contribution to E_cdr_rem: `0.0000000000000000e+00`
 
 ### term 35
+
 - pauli term from int row: `(4.5870037211547705e-03)*Y(q(0))*Z(q(1))*Y(q(2))*Z(q(3))`
 - int observable row: `[2, 3, 2, 3, 0, 0]`
 - Hamiltonian weight w_35: `4.5870037211547705e-03`
@@ -651,12 +693,13 @@
 - target contribution to E_cdr_rem: `0.0000000000000000e+00`
 
 ### term 36
+
 - pauli term from int row: `(-1.6982826390582351e-02)*Y(q(0))*Z(q(1))*Y(q(2))*Z(q(3))*Z(q(4))`
 - int observable row: `[2, 3, 2, 3, 3, 0]`
 - Hamiltonian weight w_36: `-1.6982826390582351e-02`
 - OGM effective shots used for this term: `392`
-- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=0.0000000000000000e+00`
-- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=0.0000000000000000e+00`
+- fitted unmit coeffs: `a_u=-0.0000000000000000e+00`, `b_u=0.0000000000000000e+00`
+- fitted rem coeffs: `a_r=-0.0000000000000000e+00`, `b_r=0.0000000000000000e+00`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=2.6894865525672371e-02`, `x_rem=3.6797598336794864e-02`, `y_exact=0.0000000000000000e+00`
   - train[1] t_remaining=2: `x_unmit=-1.4778325123152709e-02`, `x_rem=-2.0219728239698743e-02`, `y_exact=0.0000000000000000e+00`
@@ -668,12 +711,13 @@
 - target contribution to E_cdr_rem: `-0.0000000000000000e+00`
 
 ### term 37
+
 - pauli term from int row: `(-2.3610110167205777e-02)*Y(q(0))*Z(q(1))*Y(q(2))*Z(q(3))*Z(q(4))*Z(q(5))`
 - int observable row: `[2, 3, 2, 3, 3, 3]`
 - Hamiltonian weight w_37: `-2.3610110167205777e-02`
 - OGM effective shots used for this term: `392`
-- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=0.0000000000000000e+00`
-- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=0.0000000000000000e+00`
+- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=-0.0000000000000000e+00`
+- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=-0.0000000000000000e+00`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=-2.4449877750611247e-03`, `x_rem=-3.7054012100530033e-03`, `y_exact=0.0000000000000000e+00`
   - train[1] t_remaining=2: `x_unmit=-6.4039408866995079e-02`, `x_rem=-9.7052306570699839e-02`, `y_exact=0.0000000000000000e+00`
@@ -685,12 +729,13 @@
 - target contribution to E_cdr_rem: `-0.0000000000000000e+00`
 
 ### term 38
+
 - pauli term from int row: `(-2.6709685222962787e-02)*Y(q(0))*Z(q(1))*Y(q(2))*Z(q(4))`
 - int observable row: `[2, 3, 2, 0, 3, 0]`
 - Hamiltonian weight w_38: `-2.6709685222962787e-02`
 - OGM effective shots used for this term: `392`
-- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=0.0000000000000000e+00`
-- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=0.0000000000000000e+00`
+- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=-0.0000000000000000e+00`
+- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=-0.0000000000000000e+00`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=3.1784841075794622e-02`, `x_rem=4.0496091493263969e-02`, `y_exact=0.0000000000000000e+00`
   - train[1] t_remaining=2: `x_unmit=7.8817733990147784e-02`, `x_rem=1.0041925832963973e-01`, `y_exact=0.0000000000000000e+00`
@@ -702,12 +747,13 @@
 - target contribution to E_cdr_rem: `-0.0000000000000000e+00`
 
 ### term 39
+
 - pauli term from int row: `(3.2798138198784431e-02)*Y(q(0))*X(q(2))*X(q(3))*Y(q(5))`
 - int observable row: `[2, 0, 1, 1, 0, 2]`
 - Hamiltonian weight w_39: `3.2798138198784431e-02`
 - OGM effective shots used for this term: `271`
-- fitted unmit coeffs: `a_u=2.4448350230106704e-07`, `b_u=-4.5855189427601856e-01`
-- fitted rem coeffs: `a_r=1.8525970597440256e-07`, `b_r=-4.5855189427601845e-01`
+- fitted unmit coeffs: `a_u=2.0591743434819998e+00`, `b_u=3.0957076534000001e-02`
+- fitted rem coeffs: `a_r=1.5603589984160000e+00`, `b_r=3.0957076534000001e-02`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=-1.8604651162790697e-01`, `x_rem=-2.4552183428768568e-01`, `y_exact=-4.5855193109831927e-01`
   - train[1] t_remaining=2: `x_unmit=-2.5868725868725867e-01`, `x_rem=-3.4138436514614984e-01`, `y_exact=-4.5855193109831927e-01`
@@ -719,12 +765,13 @@
 - target contribution to E_cdr_rem: `-1.5039650597470627e-02`
 
 ### term 40
+
 - pauli term from int row: `(-3.2798138198784431e-02)*Y(q(0))*X(q(2))*Y(q(3))*X(q(5))`
 - int observable row: `[2, 0, 1, 2, 0, 1]`
 - Hamiltonian weight w_40: `-3.2798138198784431e-02`
 - OGM effective shots used for this term: `297`
-- fitted unmit coeffs: `a_u=1.7256890077654307e-02`, `b_u=4.5347498058491859e-01`
-- fitted rem coeffs: `a_r=1.3076573046175181e-02`, `b_r=4.5347498058491859e-01`
+- fitted unmit coeffs: `a_u=2.3234635574990001e+00`, `b_u=-2.0929505189000001e-02`
+- fitted rem coeffs: `a_r=1.7606266710300000e+00`, `b_r=-2.0929505189000001e-02`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=2.2344322344322345e-01`, `x_rem=2.9487352167426722e-01`, `y_exact=4.5855193109831927e-01`
   - train[1] t_remaining=2: `x_unmit=2.9209621993127149e-01`, `x_rem=3.8547349841988449e-01`, `y_exact=4.5855193109831927e-01`
@@ -736,12 +783,13 @@
 - target contribution to E_cdr_rem: `-1.5064770801205562e-02`
 
 ### term 41
+
 - pauli term from int row: `(1.1507931652465444e-02)*Y(q(0))*Y(q(2))*X(q(3))*X(q(4))`
 - int observable row: `[2, 0, 2, 1, 1, 0]`
 - Hamiltonian weight w_41: `1.1507931652465444e-02`
 - OGM effective shots used for this term: `123`
-- fitted unmit coeffs: `a_u=1.5576850128424299e-01`, `b_u=-2.5320137813039278e-02`
-- fitted rem coeffs: `a_r=1.1989162262638213e-01`, `b_r=-2.5320137813039295e-02`
+- fitted unmit coeffs: `a_u=1.4729734094730000e+00`, `b_u=-3.7295581920000001e-02`
+- fitted rem coeffs: `a_r=1.1337155502639999e+00`, `b_r=-3.7295581920000001e-02`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=7.8740157480314960e-03`, `x_rem=1.0230269682658385e-02`, `y_exact=0.0000000000000000e+00`
   - train[1] t_remaining=2: `x_unmit=1.4084507042253521e-02`, `x_rem=1.8299214784473449e-02`, `y_exact=0.0000000000000000e+00`
@@ -753,12 +801,13 @@
 - target contribution to E_cdr_rem: `-4.0242677701799573e-04`
 
 ### term 42
+
 - pauli term from int row: `(1.1507931652465444e-02)*Y(q(0))*Y(q(2))*Y(q(3))*Y(q(4))`
 - int observable row: `[2, 0, 2, 2, 2, 0]`
 - Hamiltonian weight w_42: `1.1507931652465444e-02`
 - OGM effective shots used for this term: `141`
-- fitted unmit coeffs: `a_u=3.9041774012491504e-01`, `b_u=-5.0986621177249697e-02`
-- fitted rem coeffs: `a_r=3.0049603083929893e-01`, `b_r=-5.0986621177249648e-02`
+- fitted unmit coeffs: `a_u=1.9780552115659999e+00`, `b_u=6.8702224692999997e-02`
+- fitted rem coeffs: `a_r=1.5224660120880000e+00`, `b_r=6.8702224692999997e-02`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=4.8951048951048952e-02`, `x_rem=6.3599368866316605e-02`, `y_exact=0.0000000000000000e+00`
   - train[1] t_remaining=2: `x_unmit=1.5447154471544716e-01`, `x_rem=2.0069626621345216e-01`, `y_exact=0.0000000000000000e+00`
@@ -770,12 +819,13 @@
 - target contribution to E_cdr_rem: `-1.0781615623990733e-03`
 
 ### term 43
+
 - pauli term from int row: `(9.2962528164499229e-03)*Y(q(0))*Y(q(2))*Z(q(3))*Z(q(4))`
 - int observable row: `[2, 0, 2, 3, 3, 0]`
 - Hamiltonian weight w_43: `9.2962528164499229e-03`
 - OGM effective shots used for this term: `591`
-- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=0.0000000000000000e+00`
-- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=0.0000000000000000e+00`
+- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=-0.0000000000000000e+00`
+- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=-0.0000000000000000e+00`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=1.4876033057851240e-02`, `x_rem=1.9327600408724856e-02`, `y_exact=0.0000000000000000e+00`
   - train[1] t_remaining=2: `x_unmit=-8.6805555555555552e-02`, `x_rem=-1.1278161889736205e-01`, `y_exact=0.0000000000000000e+00`
@@ -787,12 +837,13 @@
 - target contribution to E_cdr_rem: `0.0000000000000000e+00`
 
 ### term 44
+
 - pauli term from int row: `(-4.8770671106108651e-02)*Z(q(0))`
 - int observable row: `[3, 0, 0, 0, 0, 0]`
 - Hamiltonian weight w_44: `-4.8770671106108651e-02`
 - OGM effective shots used for this term: `3965`
-- fitted unmit coeffs: `a_u=9.8458034868490074e-01`, `b_u=-1.9245356694859830e-01`
-- fitted rem coeffs: `a_r=9.3653282766907886e-01`, `b_r=-1.9245356694859719e-01`
+- fitted unmit coeffs: `a_u=1.4732125202290001e+00`, `b_u=1.2377437590000000e-02`
+- fitted rem coeffs: `a_r=1.4013197492420000e+00`, `b_r=1.2377437590000000e-02`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=-6.0583580613254207e-01`, `x_rem=-6.3691737398290815e-01`, `y_exact=-8.0212781855891135e-01`
   - train[1] t_remaining=2: `x_unmit=-6.3302752293577980e-01`, `x_rem=-6.6550412419657279e-01`, `y_exact=-8.0212781855891135e-01`
@@ -804,12 +855,13 @@
 - target contribution to E_cdr_rem: `3.8709475108004973e-02`
 
 ### term 45
+
 - pauli term from int row: `(3.2811891784718882e-03)*Z(q(0))*X(q(1))*X(q(2))*Z(q(4))`
 - int observable row: `[3, 1, 1, 0, 3, 0]`
 - Hamiltonian weight w_45: `3.2811891784718882e-03`
 - OGM effective shots used for this term: `61`
-- fitted unmit coeffs: `a_u=-4.0623729773789376e-08`, `b_u=-2.2888713876160586e-08`
-- fitted rem coeffs: `a_r=-3.1885022656586514e-08`, `b_r=-2.2888713876160592e-08`
+- fitted unmit coeffs: `a_u=-1.1788800000000000e-07`, `b_u=3.8460000000000002e-09`
+- fitted rem coeffs: `a_r=-9.2528999999999994e-08`, `b_r=3.8460000000000002e-09`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=-4.8780487804878050e-02`, `x_rem=-6.2149723905234350e-02`, `y_exact=-2.4375673923771046e-08`
   - train[1] t_remaining=2: `x_unmit=1.4084507042253521e-02`, `x_rem=1.7944638592356423e-02`, `y_exact=-2.4375673923771046e-08`
@@ -821,12 +873,13 @@
 - target contribution to E_cdr_rem: `-7.5102200279597498e-11`
 
 ### term 46
+
 - pauli term from int row: `(3.2811891784718882e-03)*Z(q(0))*Y(q(1))*Y(q(2))*Z(q(4))`
 - int observable row: `[3, 2, 2, 0, 3, 0]`
 - Hamiltonian weight w_46: `3.2811891784718882e-03`
 - OGM effective shots used for this term: `64`
-- fitted unmit coeffs: `a_u=6.5921663831320165e-01`, `b_u=-8.6895872031975616e-02`
-- fitted rem coeffs: `a_r=5.1741033049547558e-01`, `b_r=-8.6895872031975574e-02`
+- fitted unmit coeffs: `a_u=8.2824506918200003e-01`, `b_u=-9.0910771168999996e-02`
+- fitted rem coeffs: `a_r=6.5007848720799999e-01`, `b_r=-9.0910771168999996e-02`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=-4.6153846153846156e-02`, `x_rem=-5.8803200310337117e-02`, `y_exact=-1.9737926506148629e-01`
   - train[1] t_remaining=2: `x_unmit=-1.7142857142857143e-01`, `x_rem=-2.1841188686696622e-01`, `y_exact=-1.9737926506148629e-01`
@@ -838,12 +891,13 @@
 - target contribution to E_cdr_rem: `-5.3333657364246277e-04`
 
 ### term 47
+
 - pauli term from int row: `(4.7435147736005136e-02)*Z(q(0))*Z(q(1))`
 - int observable row: `[3, 3, 0, 0, 0, 0]`
 - Hamiltonian weight w_47: `4.7435147736005136e-02`
 - OGM effective shots used for this term: `3840`
-- fitted unmit coeffs: `a_u=-1.7079722400447761e-01`, `b_u=-9.9520295095485967e-01`
-- fitted rem coeffs: `a_r=-1.5427421857161713e-01`, `b_r=-9.9520295095485967e-01`
+- fitted unmit coeffs: `a_u=1.6627367437839999e+00`, `b_u=9.9782954740000006e-03`
+- fitted rem coeffs: `a_r=1.5018827930770000e+00`, `b_r=9.9782954740000006e-03`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=-6.2381318963305110e-01`, `x_rem=-6.9062453903951238e-01`, `y_exact=-8.8866712235826562e-01`
   - train[1] t_remaining=2: `x_unmit=-6.3412127440904420e-01`, `x_rem=-7.0203663550542417e-01`, `y_exact=-8.8866712235826562e-01`
@@ -855,12 +909,13 @@
 - target contribution to E_cdr_rem: `-4.2101803626393298e-02`
 
 ### term 48
+
 - pauli term from int row: `(-2.6709685222962787e-02)*Z(q(0))*Z(q(1))*Z(q(2))*X(q(3))*Z(q(4))*X(q(5))`
 - int observable row: `[3, 3, 3, 1, 3, 1]`
 - Hamiltonian weight w_48: `-2.6709685222962787e-02`
 - OGM effective shots used for this term: `359`
-- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=0.0000000000000000e+00`
-- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=0.0000000000000000e+00`
+- fitted unmit coeffs: `a_u=-0.0000000000000000e+00`, `b_u=0.0000000000000000e+00`
+- fitted rem coeffs: `a_r=-0.0000000000000000e+00`, `b_r=0.0000000000000000e+00`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=-5.4054054054054057e-03`, `x_rem=-8.1919410535767380e-03`, `y_exact=0.0000000000000000e+00`
   - train[1] t_remaining=2: `x_unmit=1.8867924528301886e-02`, `x_rem=2.8594511224749011e-02`, `y_exact=0.0000000000000000e+00`
@@ -872,12 +927,13 @@
 - target contribution to E_cdr_rem: `-0.0000000000000000e+00`
 
 ### term 49
+
 - pauli term from int row: `(-2.6709685222962787e-02)*Z(q(0))*Z(q(1))*Z(q(2))*Y(q(3))*Z(q(4))*Y(q(5))`
 - int observable row: `[3, 3, 3, 2, 3, 2]`
 - Hamiltonian weight w_49: `-2.6709685222962787e-02`
 - OGM effective shots used for this term: `383`
-- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=0.0000000000000000e+00`
-- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=0.0000000000000000e+00`
+- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=-0.0000000000000000e+00`
+- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=-0.0000000000000000e+00`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=-5.1813471502590670e-02`, `x_rem=-7.8523787301124262e-02`, `y_exact=0.0000000000000000e+00`
   - train[1] t_remaining=2: `x_unmit=-8.3969465648854963e-02`, `x_rem=-1.2725648888571500e-01`, `y_exact=0.0000000000000000e+00`
@@ -889,12 +945,13 @@
 - target contribution to E_cdr_rem: `-0.0000000000000000e+00`
 
 ### term 50
+
 - pauli term from int row: `(1.5264219777698207e-02)*Z(q(0))*Z(q(1))*X(q(3))*X(q(4))`
 - int observable row: `[3, 3, 0, 1, 1, 0]`
 - Hamiltonian weight w_50: `1.5264219777698207e-02`
 - OGM effective shots used for this term: `300`
-- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=0.0000000000000000e+00`
-- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=0.0000000000000000e+00`
+- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=-0.0000000000000000e+00`
+- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=-0.0000000000000000e+00`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=-3.3112582781456956e-02`, `x_rem=-4.2930723393239702e-02`, `y_exact=0.0000000000000000e+00`
   - train[1] t_remaining=2: `x_unmit=-2.6666666666666668e-02`, `x_rem=-3.4573542572689048e-02`, `y_exact=0.0000000000000000e+00`
@@ -906,12 +963,13 @@
 - target contribution to E_cdr_rem: `0.0000000000000000e+00`
 
 ### term 51
+
 - pauli term from int row: `(1.5264219777698207e-02)*Z(q(0))*Z(q(1))*Y(q(3))*Y(q(4))`
 - int observable row: `[3, 3, 0, 2, 2, 0]`
 - Hamiltonian weight w_51: `1.5264219777698207e-02`
 - OGM effective shots used for this term: `283`
-- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=0.0000000000000000e+00`
-- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=0.0000000000000000e+00`
+- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=-0.0000000000000000e+00`
+- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=-0.0000000000000000e+00`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=2.5316455696202531e-02`, `x_rem=3.2822983455084553e-02`, `y_exact=0.0000000000000000e+00`
   - train[1] t_remaining=2: `x_unmit=-7.6923076923076927e-02`, `x_rem=-9.9731372805833773e-02`, `y_exact=0.0000000000000000e+00`
@@ -923,12 +981,13 @@
 - target contribution to E_cdr_rem: `0.0000000000000000e+00`
 
 ### term 52
+
 - pauli term from int row: `(7.1866706378460071e-02)*Z(q(0))*Z(q(2))`
 - int observable row: `[3, 0, 3, 0, 0, 0]`
 - Hamiltonian weight w_52: `7.1866706378460071e-02`
 - OGM effective shots used for this term: `3840`
-- fitted unmit coeffs: `a_u=9.3920322009986779e-01`, `b_u=-2.5401065484754326e-01`
-- fitted rem coeffs: `a_r=8.4655750956394138e-01`, `b_r=-2.5401065484754409e-01`
+- fitted unmit coeffs: `a_u=1.4854958663919999e+00`, `b_u=1.2091062253999999e-02`
+- fitted rem coeffs: `a_r=1.3389622759030000e+00`, `b_r=1.2091062253999999e-02`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=-6.7616114960225815e-01`, `x_rem=-7.5015899314386969e-01`, `y_exact=-9.0261859971078762e-01`
   - train[1] t_remaining=2: `x_unmit=-6.9886947584789316e-01`, `x_rem=-7.7535247721557154e-01`, `y_exact=-9.0261859971078762e-01`
@@ -940,12 +999,13 @@
 - target contribution to E_cdr_rem: `-6.4449846908246150e-02`
 
 ### term 53
+
 - pauli term from int row: `(1.4789120830937334e-02)*Z(q(0))*Z(q(2))*X(q(4))*X(q(5))`
 - int observable row: `[3, 0, 3, 0, 1, 1]`
 - Hamiltonian weight w_53: `1.4789120830937334e-02`
 - OGM effective shots used for this term: `239`
-- fitted unmit coeffs: `a_u=-4.1889128806805515e-10`, `b_u=3.5838692876482089e-10`
-- fitted rem coeffs: `a_r=-3.1257850371165739e-10`, `b_r=3.5838692876482063e-10`
+- fitted unmit coeffs: `a_u=3.6687999999999997e-08`, `b_u=-1.9799999999999999e-10`
+- fitted rem coeffs: `a_r=2.7376000000000000e-08`, `b_r=-1.9799999999999999e-10`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=1.0204081632653061e-01`, `x_rem=1.3674647641785820e-01`, `y_exact=0.0000000000000000e+00`
   - train[1] t_remaining=2: `x_unmit=8.3333333333333332e-03`, `x_rem=1.1167628907458446e-02`, `y_exact=0.0000000000000000e+00`
@@ -957,12 +1017,13 @@
 - target contribution to E_cdr_rem: `4.6118904965908687e-12`
 
 ### term 54
+
 - pauli term from int row: `(1.4789120830937334e-02)*Z(q(0))*Z(q(2))*Y(q(4))*Y(q(5))`
 - int observable row: `[3, 0, 3, 0, 2, 2]`
 - Hamiltonian weight w_54: `1.4789120830937334e-02`
 - OGM effective shots used for this term: `214`
-- fitted unmit coeffs: `a_u=1.8226989650915315e-01`, `b_u=-2.4945085790137284e-02`
-- fitted rem coeffs: `a_r=1.3601059068398313e-01`, `b_r=-2.4945085790137309e-02`
+- fitted unmit coeffs: `a_u=1.7311425002930001e+00`, `b_u=-1.2625867836000001e-02`
+- fitted rem coeffs: `a_r=1.2917860740170000e+00`, `b_r=-1.2625867836000001e-02`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=1.2970711297071130e-01`, `x_rem=1.7382250851776287e-01`, `y_exact=0.0000000000000000e+00`
   - train[1] t_remaining=2: `x_unmit=4.2016806722689079e-02`, `x_rem=5.6307372642647527e-02`, `y_exact=0.0000000000000000e+00`
@@ -974,12 +1035,13 @@
 - target contribution to E_cdr_rem: `-2.7906217044456141e-04`
 
 ### term 55
+
 - pauli term from int row: `(1.1183806637694098e-01)*Z(q(0))*Z(q(3))`
 - int observable row: `[3, 0, 0, 3, 0, 0]`
 - Hamiltonian weight w_55: `1.1183806637694098e-01`
 - OGM effective shots used for this term: `2640`
-- fitted unmit coeffs: `a_u=5.1362161318808599e-07`, `b_u=9.9999925564746772e-01`
-- fitted rem coeffs: `a_r=4.5494416782792256e-07`, `b_r=9.9999925564746639e-01`
+- fitted unmit coeffs: `a_u=2.1543260000000001e-06`, `b_u=9.9999904798700001e-01`
+- fitted rem coeffs: `a_r=1.9082100000000001e-06`, `b_r=9.9999904798700001e-01`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=6.2022471910112364e-01`, `x_rem=7.0021959860830929e-01`, `y_exact=9.9999956393716483e-01`
   - train[1] t_remaining=2: `x_unmit=6.3546045089797476e-01`, `x_rem=7.1742039321507134e-01`, `y_exact=9.9999956393716483e-01`
@@ -991,12 +1053,13 @@
 - target contribution to E_cdr_rem: `1.1183801772358637e-01`
 
 ### term 56
+
 - pauli term from int row: `(5.3161545522654625e-02)*Z(q(0))*Z(q(4))`
 - int observable row: `[3, 0, 0, 0, 3, 0]`
 - Hamiltonian weight w_56: `5.3161545522654625e-02`
 - OGM effective shots used for this term: `3382`
-- fitted unmit coeffs: `a_u=1.1196995476566378e+00`, `b_u=-2.6538410568623116e-01`
-- fitted rem coeffs: `a_r=9.7665837832332048e-01`, `b_r=-2.6538410568623155e-01`
+- fitted unmit coeffs: `a_u=2.2928326685779998e+00`, `b_u=4.1457105870000002e-03`
+- fitted rem coeffs: `a_r=1.9999242123009999e+00`, `b_r=4.1457105870000002e-03`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=-4.6643315820198483e-01`, `x_rem=-5.3474685503381247e-01`, `y_exact=-8.0212781855891135e-01`
   - train[1] t_remaining=2: `x_unmit=-4.9155503785672683e-01`, `x_rem=-5.6354807960733178e-01`, `y_exact=-8.0212781855891135e-01`
@@ -1008,12 +1071,13 @@
 - target contribution to E_cdr_rem: `-4.1409929055316215e-02`
 
 ### term 57
+
 - pauli term from int row: `(1.0466484457724451e-01)*Z(q(0))*Z(q(5))`
 - int observable row: `[3, 0, 0, 0, 0, 3]`
 - Hamiltonian weight w_57: `1.0466484457724451e-01`
 - OGM effective shots used for this term: `2770`
-- fitted unmit coeffs: `a_u=1.8939752534764771e-02`, `b_u=-9.8569667180927967e-01`
-- fitted rem coeffs: `a_r=1.6264386729272880e-02`, `b_r=-9.8569667180927922e-01`
+- fitted unmit coeffs: `a_u=1.9191063921180000e+00`, `b_u=-1.7859709041000000e-02`
+- fitted rem coeffs: `a_r=1.6480198713650001e+00`, `b_r=-1.7859709041000000e-02`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=-6.4265335235378029e-01`, `x_rem=-7.4836485763777016e-01`, `y_exact=-9.9999956393716483e-01`
   - train[1] t_remaining=2: `x_unmit=-6.6106647187728274e-01`, `x_rem=-7.6980679289011644e-01`, `y_exact=-9.9999956393716483e-01`
@@ -1025,12 +1089,13 @@
 - target contribution to E_cdr_rem: `-1.0442091973302260e-01`
 
 ### term 58
+
 - pauli term from int row: `(-9.2111144935490188e-03)*X(q(1))*X(q(2))`
 - int observable row: `[0, 1, 1, 0, 0, 0]`
 - Hamiltonian weight w_58: `-9.2111144935490188e-03`
 - OGM effective shots used for this term: `1086`
-- fitted unmit coeffs: `a_u=1.4747947022700902e+00`, `b_u=-1.4476385016707116e-02`
-- fitted rem coeffs: `a_r=1.3270806806936319e+00`, `b_r=-1.4476385016707167e-02`
+- fitted unmit coeffs: `a_u=1.7010963833240000e+00`, `b_u=1.9498838920999999e-02`
+- fitted rem coeffs: `a_r=1.5307162026229999e+00`, `b_r=1.9498838920999999e-02`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=-1.4392523364485982e-01`, `x_rem=-1.5994519036437260e-01`, `y_exact=-1.9737926506148629e-01`
   - train[1] t_remaining=2: `x_unmit=-8.7121212121212127e-02`, `x_rem=-9.6818455698229305e-02`, `y_exact=-1.9737926506148629e-01`
@@ -1042,6 +1107,7 @@
 - target contribution to E_cdr_rem: `2.0258411752757887e-03`
 
 ### term 59
+
 - pauli term from int row: `(1.0106830583060904e-02)*X(q(1))*X(q(2))*X(q(3))*X(q(5))`
 - int observable row: `[0, 1, 1, 1, 0, 1]`
 - Hamiltonian weight w_59: `1.0106830583060904e-02`
@@ -1059,12 +1125,13 @@
 - target contribution to E_cdr_rem: `0.0000000000000000e+00`
 
 ### term 60
+
 - pauli term from int row: `(1.0106830583060904e-02)*X(q(1))*X(q(2))*Y(q(3))*Y(q(5))`
 - int observable row: `[0, 1, 1, 2, 0, 2]`
 - Hamiltonian weight w_60: `1.0106830583060904e-02`
 - OGM effective shots used for this term: `139`
-- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=0.0000000000000000e+00`
-- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=0.0000000000000000e+00`
+- fitted unmit coeffs: `a_u=-0.0000000000000000e+00`, `b_u=0.0000000000000000e+00`
+- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=-0.0000000000000000e+00`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=-2.0134228187919462e-02`, `x_rem=-2.6615504984705378e-02`, `y_exact=0.0000000000000000e+00`
   - train[1] t_remaining=2: `x_unmit=-1.2068965517241380e-01`, `x_rem=-1.5954006723590616e-01`, `y_exact=0.0000000000000000e+00`
@@ -1076,12 +1143,13 @@
 - target contribution to E_cdr_rem: `0.0000000000000000e+00`
 
 ### term 61
+
 - pauli term from int row: `(1.4789120830937334e-02)*X(q(1))*X(q(2))*Z(q(3))*Z(q(4))`
 - int observable row: `[0, 1, 1, 3, 3, 0]`
 - Hamiltonian weight w_61: `1.4789120830937334e-02`
 - OGM effective shots used for this term: `253`
-- fitted unmit coeffs: `a_u=6.8974480960272213e-08`, `b_u=-1.8148917996967049e-08`
-- fitted rem coeffs: `a_r=5.2998856821765912e-08`, `b_r=-1.8148917996967056e-08`
+- fitted unmit coeffs: `a_u=-3.3259000000000000e-08`, `b_u=5.7699999999999997e-09`
+- fitted rem coeffs: `a_r=-2.5556000000000001e-08`, `b_r=5.7699999999999997e-09`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=4.7619047619047616e-02`, `x_rem=6.1973017727382347e-02`, `y_exact=-2.4375673923771046e-08`
   - train[1] t_remaining=2: `x_unmit=-7.5757575757575760e-02`, `x_rem=-9.8593437293562833e-02`, `y_exact=-2.4375673923771046e-08`
@@ -1093,12 +1161,13 @@
 - target contribution to E_cdr_rem: `-3.3902690581217957e-10`
 
 ### term 62
+
 - pauli term from int row: `(1.5582981492557525e-02)*X(q(1))*X(q(2))*Z(q(4))`
 - int observable row: `[0, 1, 1, 0, 3, 0]`
 - Hamiltonian weight w_62: `1.5582981492557525e-02`
 - OGM effective shots used for this term: `821`
-- fitted unmit coeffs: `a_u=1.5302864470067317e+00`, `b_u=-3.1082057397752761e-02`
-- fitted rem coeffs: `a_r=1.2627222282289163e+00`, `b_r=-3.1082057397752619e-02`
+- fitted unmit coeffs: `a_u=2.2842692583000002e+00`, `b_u=-2.1960556704000000e-02`
+- fitted rem coeffs: `a_r=1.8848742817780000e+00`, `b_r=-2.1960556704000000e-02`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=-1.3432835820895522e-01`, `x_rem=-1.6279183293078456e-01`, `y_exact=-1.9737926506148629e-01`
   - train[1] t_remaining=2: `x_unmit=-7.6167076167076173e-02`, `x_rem=-9.2306480206726632e-02`, `y_exact=-1.9737926506148629e-01`
@@ -1110,12 +1179,13 @@
 - target contribution to E_cdr_rem: `-2.4309980951404044e-03`
 
 ### term 63
+
 - pauli term from int row: `(1.1698435536077332e-02)*X(q(1))*X(q(2))*Z(q(4))*Z(q(5))`
 - int observable row: `[0, 1, 1, 0, 3, 3]`
 - Hamiltonian weight w_63: `1.1698435536077332e-02`
 - OGM effective shots used for this term: `253`
-- fitted unmit coeffs: `a_u=2.5976151598038340e-08`, `b_u=1.9325827005317526e-08`
-- fitted rem coeffs: `a_r=1.9350912726970501e-08`, `b_r=1.9325827005317519e-08`
+- fitted unmit coeffs: `a_u=-8.3700000000000002e-08`, `b_u=-6.7569999999999997e-09`
+- fitted rem coeffs: `a_r=-6.2352000000000001e-08`, `b_r=-6.7569999999999997e-09`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=-9.1575091575091569e-02`, `x_rem=-1.2292797218000935e-01`, `y_exact=2.4375673923771046e-08`
   - train[1] t_remaining=2: `x_unmit=1.5151515151515152e-02`, `x_rem=2.0338991760692433e-02`, `y_exact=2.4375673923771046e-08`
@@ -1127,6 +1197,7 @@
 - target contribution to E_cdr_rem: `2.3543210555524395e-10`
 
 ### term 64
+
 - pauli term from int row: `(-4.7092490952951533e-03)*X(q(1))*Y(q(2))*X(q(3))*Y(q(4))`
 - int observable row: `[0, 1, 2, 1, 2, 0]`
 - Hamiltonian weight w_64: `-4.7092490952951533e-03`
@@ -1144,12 +1215,13 @@
 - target contribution to E_cdr_rem: `-0.0000000000000000e+00`
 
 ### term 65
+
 - pauli term from int row: `(4.7092490952951533e-03)*X(q(1))*Y(q(2))*Y(q(3))*X(q(4))`
 - int observable row: `[0, 1, 2, 2, 1, 0]`
 - Hamiltonian weight w_65: `4.7092490952951533e-03`
 - OGM effective shots used for this term: `99`
-- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=0.0000000000000000e+00`
-- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=0.0000000000000000e+00`
+- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=-0.0000000000000000e+00`
+- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=-0.0000000000000000e+00`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=-1.5909090909090909e-01`, `x_rem=-2.0704621831648201e-01`, `y_exact=0.0000000000000000e+00`
   - train[1] t_remaining=2: `x_unmit=7.5268817204301078e-02`, `x_rem=9.7957350601346305e-02`, `y_exact=0.0000000000000000e+00`
@@ -1161,12 +1233,13 @@
 - target contribution to E_cdr_rem: `0.0000000000000000e+00`
 
 ### term 66
+
 - pauli term from int row: `(-8.0778073309737148e-03)*X(q(1))*Y(q(2))*X(q(4))*Y(q(5))`
 - int observable row: `[0, 1, 2, 0, 1, 2]`
 - Hamiltonian weight w_66: `-8.0778073309737148e-03`
 - OGM effective shots used for this term: `99`
-- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=0.0000000000000000e+00`
-- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=0.0000000000000000e+00`
+- fitted unmit coeffs: `a_u=6.6299999999999996e-09`, `b_u=5.2879999999999999e-09`
+- fitted rem coeffs: `a_r=4.9389999999999996e-09`, `b_r=5.2879999999999999e-09`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=-4.5454545454545456e-02`, `x_rem=-6.1016975282077279e-02`, `y_exact=0.0000000000000000e+00`
   - train[1] t_remaining=2: `x_unmit=5.3763440860215055e-02`, `x_rem=7.2170615925037720e-02`, `y_exact=0.0000000000000000e+00`
@@ -1178,12 +1251,13 @@
 - target contribution to E_cdr_rem: `-0.0000000000000000e+00`
 
 ### term 67
+
 - pauli term from int row: `(8.0778073309737148e-03)*X(q(1))*Y(q(2))*Y(q(4))*X(q(5))`
 - int observable row: `[0, 1, 2, 0, 2, 1]`
 - Hamiltonian weight w_67: `8.0778073309737148e-03`
 - OGM effective shots used for this term: `96`
-- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=0.0000000000000000e+00`
-- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=0.0000000000000000e+00`
+- fitted unmit coeffs: `a_u=6.1460470177700000e-01`, `b_u=-6.4798830409999999e-03`
+- fitted rem coeffs: `a_r=4.5784926611499999e-01`, `b_r=-6.4798830409999999e-03`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=5.0505050505050504e-02`, `x_rem=6.7796639202308051e-02`, `y_exact=0.0000000000000000e+00`
   - train[1] t_remaining=2: `x_unmit=4.3478260869565216e-02`, `x_rem=5.8364063313291366e-02`, `y_exact=0.0000000000000000e+00`
@@ -1195,6 +1269,7 @@
 - target contribution to E_cdr_rem: `0.0000000000000000e+00`
 
 ### term 68
+
 - pauli term from int row: `(4.7092490952951533e-03)*Y(q(1))*X(q(2))*X(q(3))*Y(q(4))`
 - int observable row: `[0, 2, 1, 1, 2, 0]`
 - Hamiltonian weight w_68: `4.7092490952951533e-03`
@@ -1212,6 +1287,7 @@
 - target contribution to E_cdr_rem: `0.0000000000000000e+00`
 
 ### term 69
+
 - pauli term from int row: `(-4.7092490952951533e-03)*Y(q(1))*X(q(2))*Y(q(3))*X(q(4))`
 - int observable row: `[0, 2, 1, 2, 1, 0]`
 - Hamiltonian weight w_69: `-4.7092490952951533e-03`
@@ -1229,12 +1305,13 @@
 - target contribution to E_cdr_rem: `-0.0000000000000000e+00`
 
 ### term 70
+
 - pauli term from int row: `(8.0778073309737148e-03)*Y(q(1))*X(q(2))*X(q(4))*Y(q(5))`
 - int observable row: `[0, 2, 1, 0, 1, 2]`
 - Hamiltonian weight w_70: `8.0778073309737148e-03`
 - OGM effective shots used for this term: `106`
-- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=0.0000000000000000e+00`
-- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=0.0000000000000000e+00`
+- fitted unmit coeffs: `a_u=7.1968724619400004e-01`, `b_u=1.4688658833000001e-02`
+- fitted rem coeffs: `a_r=5.3613042098399999e-01`, `b_r=1.4688658833000001e-02`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=4.3478260869565216e-02`, `x_rem=5.8364063313291366e-02`, `y_exact=0.0000000000000000e+00`
   - train[1] t_remaining=2: `x_unmit=-1.2987012987012988e-02`, `x_rem=-1.7433421509164979e-02`, `y_exact=0.0000000000000000e+00`
@@ -1246,12 +1323,13 @@
 - target contribution to E_cdr_rem: `0.0000000000000000e+00`
 
 ### term 71
+
 - pauli term from int row: `(-8.0778073309737148e-03)*Y(q(1))*X(q(2))*Y(q(4))*X(q(5))`
 - int observable row: `[0, 2, 1, 0, 2, 1]`
 - Hamiltonian weight w_71: `-8.0778073309737148e-03`
 - OGM effective shots used for this term: `95`
-- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=0.0000000000000000e+00`
-- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=0.0000000000000000e+00`
+- fitted unmit coeffs: `a_u=-7.9700000000000004e-10`, `b_u=5.4459999999999996e-09`
+- fitted rem coeffs: `a_r=-5.9300000000000002e-10`, `b_r=5.4459999999999996e-09`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=1.6483516483516483e-01`, `x_rem=2.2127034992401676e-01`, `y_exact=0.0000000000000000e+00`
   - train[1] t_remaining=2: `x_unmit=-8.9108910891089105e-02`, `x_rem=-1.1961743669159711e-01`, `y_exact=0.0000000000000000e+00`
@@ -1263,12 +1341,13 @@
 - target contribution to E_cdr_rem: `-0.0000000000000000e+00`
 
 ### term 72
+
 - pauli term from int row: `(-9.2111144935490188e-03)*Y(q(1))*Y(q(2))`
 - int observable row: `[0, 2, 2, 0, 0, 0]`
 - Hamiltonian weight w_72: `-9.2111144935490188e-03`
 - OGM effective shots used for this term: `1069`
-- fitted unmit coeffs: `a_u=-3.2644541808335600e-07`, `b_u=-1.4614514582478385e-08`
-- fitted rem coeffs: `a_r=-2.9374895839572837e-07`, `b_r=-1.4614514582478382e-08`
+- fitted unmit coeffs: `a_u=-2.8548800000000000e-07`, `b_u=2.1780000000000001e-09`
+- fitted rem coeffs: `a_r=-2.5689400000000002e-07`, `b_r=2.1780000000000001e-09`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=1.9755409219190969e-02`, `x_rem=2.1954334262791256e-02`, `y_exact=-2.4375673923771046e-08`
   - train[1] t_remaining=2: `x_unmit=1.8832391713747645e-02`, `x_rem=2.0928577994213181e-02`, `y_exact=-2.4375673923771046e-08`
@@ -1280,12 +1359,13 @@
 - target contribution to E_cdr_rem: `9.7209230642655411e-11`
 
 ### term 73
+
 - pauli term from int row: `(1.0106830583060904e-02)*Y(q(1))*Y(q(2))*X(q(3))*X(q(5))`
 - int observable row: `[0, 2, 2, 1, 0, 1]`
 - Hamiltonian weight w_73: `1.0106830583060904e-02`
 - OGM effective shots used for this term: `123`
-- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=0.0000000000000000e+00`
-- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=0.0000000000000000e+00`
+- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=-0.0000000000000000e+00`
+- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=-0.0000000000000000e+00`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=-3.9370078740157480e-02`, `x_rem=-5.2043441505526214e-02`, `y_exact=0.0000000000000000e+00`
   - train[1] t_remaining=2: `x_unmit=0.0000000000000000e+00`, `x_rem=3.7528665621132051e-17`, `y_exact=0.0000000000000000e+00`
@@ -1297,12 +1377,13 @@
 - target contribution to E_cdr_rem: `0.0000000000000000e+00`
 
 ### term 74
+
 - pauli term from int row: `(1.0106830583060904e-02)*Y(q(1))*Y(q(2))*Y(q(3))*Y(q(5))`
 - int observable row: `[0, 2, 2, 2, 0, 2]`
 - Hamiltonian weight w_74: `1.0106830583060904e-02`
 - OGM effective shots used for this term: `141`
-- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=0.0000000000000000e+00`
-- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=0.0000000000000000e+00`
+- fitted unmit coeffs: `a_u=-0.0000000000000000e+00`, `b_u=0.0000000000000000e+00`
+- fitted rem coeffs: `a_r=-0.0000000000000000e+00`, `b_r=0.0000000000000000e+00`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=-7.6923076923076927e-02`, `x_rem=-1.0168487801848969e-01`, `y_exact=0.0000000000000000e+00`
   - train[1] t_remaining=2: `x_unmit=-8.1300813008130090e-03`, `x_rem=-1.0747182229596509e-02`, `y_exact=0.0000000000000000e+00`
@@ -1314,12 +1395,13 @@
 - target contribution to E_cdr_rem: `0.0000000000000000e+00`
 
 ### term 75
+
 - pauli term from int row: `(1.4789120830937334e-02)*Y(q(1))*Y(q(2))*Z(q(3))*Z(q(4))`
 - int observable row: `[0, 2, 2, 3, 3, 0]`
 - Hamiltonian weight w_75: `1.4789120830937334e-02`
 - OGM effective shots used for this term: `263`
-- fitted unmit coeffs: `a_u=5.3049808581878743e-01`, `b_u=-1.0332100181314141e-01`
-- fitted rem coeffs: `a_r=4.0762600461937304e-01`, `b_r=-1.0332100181314141e-01`
+- fitted unmit coeffs: `a_u=2.0325119011799999e+00`, `b_u=-3.0586562862000000e-02`
+- fitted rem coeffs: `a_r=1.5617487183590000e+00`, `b_r=-3.0586562862000000e-02`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=-1.2643678160919541e-01`, `x_rem=-1.6454904706925663e-01`, `y_exact=-1.9737926506148629e-01`
   - train[1] t_remaining=2: `x_unmit=-1.4999999999999999e-01`, `x_rem=-1.9521500584125442e-01`, `y_exact=-1.9737926506148629e-01`
@@ -1331,12 +1413,13 @@
 - target contribution to E_cdr_rem: `-1.9789233486797110e-03`
 
 ### term 76
+
 - pauli term from int row: `(1.5582981492557525e-02)*Y(q(1))*Y(q(2))*Z(q(4))`
 - int observable row: `[0, 2, 2, 0, 3, 0]`
 - Hamiltonian weight w_76: `1.5582981492557525e-02`
 - OGM effective shots used for this term: `805`
-- fitted unmit coeffs: `a_u=1.4059459376086709e-09`, `b_u=-1.9518118335687039e-08`
-- fitted rem coeffs: `a_r=1.1601221396029272e-09`, `b_r=-1.9518118335687033e-08`
+- fitted unmit coeffs: `a_u=-7.5222999999999998e-08`, `b_u=5.5050000000000003e-09`
+- fitted rem coeffs: `a_r=-6.2071000000000000e-08`, `b_r=5.5050000000000003e-09`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=-6.3051702395964691e-03`, `x_rem=-7.6412027507093876e-03`, `y_exact=-2.4375673923771046e-08`
   - train[1] t_remaining=2: `x_unmit=8.7829360100376407e-03`, `x_rem=1.0643994095153760e-02`, `y_exact=-2.4375673923771046e-08`
@@ -1348,12 +1431,13 @@
 - target contribution to E_cdr_rem: `-3.0442297467422659e-10`
 
 ### term 77
+
 - pauli term from int row: `(1.1698435536077332e-02)*Y(q(1))*Y(q(2))*Z(q(4))*Z(q(5))`
 - int observable row: `[0, 2, 2, 0, 3, 3]`
 - Hamiltonian weight w_77: `1.1698435536077332e-02`
 - OGM effective shots used for this term: `263`
-- fitted unmit coeffs: `a_u=1.0043905151937405e+00`, `b_u=6.2653934494115979e-02`
-- fitted rem coeffs: `a_r=7.4821988661241012e-01`, `b_r=6.2653934494116020e-02`
+- fitted unmit coeffs: `a_u=1.9611982009569999e+00`, `b_u=6.1968823779000003e-02`
+- fitted rem coeffs: `a_r=1.4609929836519999e+00`, `b_r=6.1968823779000003e-02`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=7.2796934865900387e-02`, `x_rem=9.7720673057120011e-02`, `y_exact=1.9737926506148629e-01`
   - train[1] t_remaining=2: `x_unmit=1.3333333333333333e-01`, `x_rem=1.7898312749409345e-01`, `y_exact=1.9737926506148629e-01`
@@ -1365,12 +1449,13 @@
 - target contribution to E_cdr_rem: `1.6783390352011450e-03`
 
 ### term 78
+
 - pauli term from int row: `(-1.2754595390400281e-01)*Z(q(1))`
 - int observable row: `[0, 3, 0, 0, 0, 0]`
 - Hamiltonian weight w_78: `-1.2754595390400281e-01`
 - OGM effective shots used for this term: `4993`
-- fitted unmit coeffs: `a_u=1.1196908323913901e+00`, `b_u=1.4183874260911616e-01`
-- fitted rem coeffs: `a_r=1.0632584144388637e+00`, `b_r=1.4183874260911605e-01`
+- fitted unmit coeffs: `a_u=1.5960033352670000e+00`, `b_u=-2.5158246850000001e-03`
+- fitted rem coeffs: `a_r=1.5155647671700001e+00`, `b_r=-2.5158246850000001e-03`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=6.8602576808721505e-01`, `x_rem=7.2243657127971295e-01`, `y_exact=9.0261859971078806e-01`
   - train[1] t_remaining=2: `x_unmit=6.8189038919777600e-01`, `x_rem=7.1808170724281417e-01`, `y_exact=9.0261859971078806e-01`
@@ -1382,12 +1467,13 @@
 - target contribution to E_cdr_rem: `-1.1671774762944807e-01`
 
 ### term 79
+
 - pauli term from int row: `(5.1610885078092486e-02)*Z(q(1))*Z(q(2))`
 - int observable row: `[0, 3, 3, 0, 0, 0]`
 - Hamiltonian weight w_79: `5.1610885078092486e-02`
 - OGM effective shots used for this term: `3840`
-- fitted unmit coeffs: `a_u=9.8535042409249618e-01`, `b_u=2.5071853956046997e-01`
-- fitted rem coeffs: `a_r=8.8665867155179834e-01`, `b_r=2.5071853956047002e-01`
+- fitted unmit coeffs: `a_u=1.6861988031340001e+00`, `b_u=-1.9886263891000001e-02`
+- fitted rem coeffs: `a_r=1.5173107497630001e+00`, `b_r=-1.9886263891000001e-02`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=5.4426481909160895e-01`, `x_rem=6.0484557081243451e-01`, `y_exact=8.0212781855891180e-01`
   - train[1] t_remaining=2: `x_unmit=5.6320657759506676e-01`, `x_rem=6.2589568893937331e-01`, `y_exact=8.0212781855891180e-01`
@@ -1399,12 +1485,13 @@
 - target contribution to E_cdr_rem: `4.2105407825486205e-02`
 
 ### term 80
+
 - pauli term from int row: `(1.2439498134905486e-02)*Z(q(1))*Z(q(2))*X(q(3))*X(q(4))`
 - int observable row: `[0, 3, 3, 1, 1, 0]`
 - Hamiltonian weight w_80: `1.2439498134905486e-02`
 - OGM effective shots used for this term: `300`
-- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=0.0000000000000000e+00`
-- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=0.0000000000000000e+00`
+- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=-0.0000000000000000e+00`
+- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=-0.0000000000000000e+00`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=3.3112582781456956e-02`, `x_rem=4.3093820274007613e-02`, `y_exact=0.0000000000000000e+00`
   - train[1] t_remaining=2: `x_unmit=2.6666666666666668e-02`, `x_rem=3.4704889927334129e-02`, `y_exact=0.0000000000000000e+00`
@@ -1416,12 +1503,13 @@
 - target contribution to E_cdr_rem: `0.0000000000000000e+00`
 
 ### term 81
+
 - pauli term from int row: `(-1.6982826390582344e-02)*Z(q(1))*Z(q(2))*X(q(3))*Z(q(4))*X(q(5))`
 - int observable row: `[0, 3, 3, 1, 3, 1]`
 - Hamiltonian weight w_81: `-1.6982826390582344e-02`
 - OGM effective shots used for this term: `359`
-- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=0.0000000000000000e+00`
-- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=0.0000000000000000e+00`
+- fitted unmit coeffs: `a_u=-0.0000000000000000e+00`, `b_u=0.0000000000000000e+00`
+- fitted rem coeffs: `a_r=-0.0000000000000000e+00`, `b_r=0.0000000000000000e+00`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=-1.0810810810810811e-02`, `x_rem=-1.5584348660324373e-02`, `y_exact=0.0000000000000000e+00`
   - train[1] t_remaining=2: `x_unmit=0.0000000000000000e+00`, `x_rem=0.0000000000000000e+00`, `y_exact=0.0000000000000000e+00`
@@ -1433,12 +1521,13 @@
 - target contribution to E_cdr_rem: `-0.0000000000000000e+00`
 
 ### term 82
+
 - pauli term from int row: `(9.2962528164499229e-03)*Z(q(1))*Z(q(2))*X(q(3))*X(q(5))`
 - int observable row: `[0, 3, 3, 1, 0, 1]`
 - Hamiltonian weight w_82: `9.2962528164499229e-03`
 - OGM effective shots used for this term: `598`
-- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=0.0000000000000000e+00`
-- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=0.0000000000000000e+00`
+- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=-0.0000000000000000e+00`
+- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=-0.0000000000000000e+00`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=1.4634146341463415e-02`, `x_rem=1.9344928013273657e-02`, `y_exact=0.0000000000000000e+00`
   - train[1] t_remaining=2: `x_unmit=1.2048192771084338e-02`, `x_rem=1.5926547159522471e-02`, `y_exact=0.0000000000000000e+00`
@@ -1450,12 +1539,13 @@
 - target contribution to E_cdr_rem: `0.0000000000000000e+00`
 
 ### term 83
+
 - pauli term from int row: `(1.2439498134905486e-02)*Z(q(1))*Z(q(2))*Y(q(3))*Y(q(4))`
 - int observable row: `[0, 3, 3, 2, 2, 0]`
 - Hamiltonian weight w_83: `1.2439498134905486e-02`
 - OGM effective shots used for this term: `283`
-- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=0.0000000000000000e+00`
-- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=0.0000000000000000e+00`
+- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=-0.0000000000000000e+00`
+- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=-0.0000000000000000e+00`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=-1.2658227848101267e-01`, `x_rem=-1.6473840155380121e-01`, `y_exact=0.0000000000000000e+00`
   - train[1] t_remaining=2: `x_unmit=4.3478260869565216e-02`, `x_rem=5.6584059664131721e-02`, `y_exact=0.0000000000000000e+00`
@@ -1467,12 +1557,13 @@
 - target contribution to E_cdr_rem: `0.0000000000000000e+00`
 
 ### term 84
+
 - pauli term from int row: `(-1.6982826390582344e-02)*Z(q(1))*Z(q(2))*Y(q(3))*Z(q(4))*Y(q(5))`
 - int observable row: `[0, 3, 3, 2, 3, 2]`
 - Hamiltonian weight w_84: `-1.6982826390582344e-02`
 - OGM effective shots used for this term: `383`
-- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=0.0000000000000000e+00`
-- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=0.0000000000000000e+00`
+- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=-0.0000000000000000e+00`
+- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=-0.0000000000000000e+00`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=1.2435233160621761e-01`, `x_rem=1.7926038355399043e-01`, `y_exact=0.0000000000000000e+00`
   - train[1] t_remaining=2: `x_unmit=5.8524173027989825e-02`, `x_rem=8.4365653371094515e-02`, `y_exact=0.0000000000000000e+00`
@@ -1484,12 +1575,13 @@
 - target contribution to E_cdr_rem: `-0.0000000000000000e+00`
 
 ### term 85
+
 - pauli term from int row: `(9.2962528164499229e-03)*Z(q(1))*Z(q(2))*Y(q(3))*Y(q(5))`
 - int observable row: `[0, 3, 3, 2, 0, 2]`
 - Hamiltonian weight w_85: `9.2962528164499229e-03`
 - OGM effective shots used for this term: `597`
-- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=0.0000000000000000e+00`
-- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=0.0000000000000000e+00`
+- fitted unmit coeffs: `a_u=-0.0000000000000000e+00`, `b_u=0.0000000000000000e+00`
+- fitted rem coeffs: `a_r=-0.0000000000000000e+00`, `b_r=0.0000000000000000e+00`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=5.2800000000000000e-02`, `x_rem=6.9796500271891312e-02`, `y_exact=0.0000000000000000e+00`
   - train[1] t_remaining=2: `x_unmit=4.2789223454833596e-02`, `x_rem=5.6563220577638462e-02`, `y_exact=0.0000000000000000e+00`
@@ -1501,12 +1593,13 @@
 - target contribution to E_cdr_rem: `0.0000000000000000e+00`
 
 ### term 86
+
 - pauli term from int row: `(-9.2111144935490188e-03)*Z(q(1))*Z(q(2))*X(q(4))*X(q(5))`
 - int observable row: `[0, 3, 3, 0, 1, 1]`
 - Hamiltonian weight w_86: `-9.2111144935490188e-03`
 - OGM effective shots used for this term: `239`
-- fitted unmit coeffs: `a_u=5.4189899777444883e-01`, `b_u=9.5274177201000853e-03`
-- fitted rem coeffs: `a_r=4.0368721183310524e-01`, `b_r=9.5274177201000836e-03`
+- fitted unmit coeffs: `a_u=1.7859223943300000e+00`, `b_u=4.4847637721999997e-02`
+- fitted rem coeffs: `a_r=1.3304214159440000e+00`, `b_r=4.4847637721999997e-02`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=-2.8571428571428571e-02`, `x_rem=-3.8353527320162908e-02`, `y_exact=0.0000000000000000e+00`
   - train[1] t_remaining=2: `x_unmit=-8.3333333333333332e-03`, `x_rem=-1.1186445468380843e-02`, `y_exact=0.0000000000000000e+00`
@@ -1518,12 +1611,13 @@
 - target contribution to E_cdr_rem: `3.2372700930540139e-04`
 
 ### term 87
+
 - pauli term from int row: `(-9.2111144935490188e-03)*Z(q(1))*Z(q(2))*Y(q(4))*Y(q(5))`
 - int observable row: `[0, 3, 3, 0, 2, 2]`
 - Hamiltonian weight w_87: `-9.2111144935490188e-03`
 - OGM effective shots used for this term: `214`
-- fitted unmit coeffs: `a_u=4.3694365583221412e-09`, `b_u=8.4619649064265452e-10`
-- fitted rem coeffs: `a_r=3.2550081634306261e-09`, `b_r=8.4619649064265493e-10`
+- fitted unmit coeffs: `a_u=-1.1316000000000000e-08`, `b_u=2.4900000000000002e-10`
+- fitted rem coeffs: `a_r=-8.4300000000000000e-09`, `b_r=2.4900000000000002e-10`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=-9.6234309623430964e-02`, `x_rem=-1.2918238281477465e-01`, `y_exact=0.0000000000000000e+00`
   - train[1] t_remaining=2: `x_unmit=-1.3445378151260504e-01`, `x_rem=-1.8048718738900194e-01`, `y_exact=0.0000000000000000e+00`
@@ -1535,12 +1629,13 @@
 - target contribution to E_cdr_rem: `-4.7758592285235723e-12`
 
 ### term 88
+
 - pauli term from int row: `(4.2983656068340519e-03)*Z(q(1))*X(q(3))*X(q(4))`
 - int observable row: `[0, 3, 0, 1, 1, 0]`
 - Hamiltonian weight w_88: `4.2983656068340519e-03`
 - OGM effective shots used for this term: `300`
-- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=0.0000000000000000e+00`
-- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=0.0000000000000000e+00`
+- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=-0.0000000000000000e+00`
+- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=-0.0000000000000000e+00`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=1.9867549668874173e-02`, `x_rem=2.4501422454989766e-02`, `y_exact=0.0000000000000000e+00`
   - train[1] t_remaining=2: `x_unmit=2.6666666666666668e-02`, `x_rem=3.2886353695141826e-02`, `y_exact=0.0000000000000000e+00`
@@ -1552,12 +1647,13 @@
 - target contribution to E_cdr_rem: `0.0000000000000000e+00`
 
 ### term 89
+
 - pauli term from int row: `(2.3326675518445836e-03)*Z(q(1))*X(q(3))*X(q(4))*Z(q(5))`
 - int observable row: `[0, 3, 0, 1, 1, 3]`
 - Hamiltonian weight w_89: `2.3326675518445836e-03`
 - OGM effective shots used for this term: `61`
-- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=0.0000000000000000e+00`
-- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=0.0000000000000000e+00`
+- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=-0.0000000000000000e+00`
+- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=-0.0000000000000000e+00`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=1.2280701754385964e-01`, `x_rem=1.6775621740112104e-01`, `y_exact=0.0000000000000000e+00`
   - train[1] t_remaining=2: `x_unmit=3.3333333333333333e-02`, `x_rem=4.5533830437447152e-02`, `y_exact=0.0000000000000000e+00`
@@ -1569,12 +1665,13 @@
 - target contribution to E_cdr_rem: `0.0000000000000000e+00`
 
 ### term 90
+
 - pauli term from int row: `(-2.3610110167205774e-02)*Z(q(1))*X(q(3))*Z(q(4))*X(q(5))`
 - int observable row: `[0, 3, 0, 1, 3, 1]`
 - Hamiltonian weight w_90: `-2.3610110167205774e-02`
 - OGM effective shots used for this term: `359`
-- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=0.0000000000000000e+00`
-- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=0.0000000000000000e+00`
+- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=-0.0000000000000000e+00`
+- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=-0.0000000000000000e+00`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=2.1621621621621623e-02`, `x_rem=2.9535457581046792e-02`, `y_exact=0.0000000000000000e+00`
   - train[1] t_remaining=2: `x_unmit=1.8867924528301886e-02`, `x_rem=2.5773866285347453e-02`, `y_exact=0.0000000000000000e+00`
@@ -1586,12 +1683,13 @@
 - target contribution to E_cdr_rem: `-0.0000000000000000e+00`
 
 ### term 91
+
 - pauli term from int row: `(4.2983656068340519e-03)*Z(q(1))*Y(q(3))*Y(q(4))`
 - int observable row: `[0, 3, 0, 2, 2, 0]`
 - Hamiltonian weight w_91: `4.2983656068340519e-03`
 - OGM effective shots used for this term: `283`
-- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=0.0000000000000000e+00`
-- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=0.0000000000000000e+00`
+- fitted unmit coeffs: `a_u=-0.0000000000000000e+00`, `b_u=0.0000000000000000e+00`
+- fitted rem coeffs: `a_r=-0.0000000000000000e+00`, `b_r=0.0000000000000000e+00`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=-1.2658227848101267e-01`, `x_rem=-1.5610610931238211e-01`, `y_exact=0.0000000000000000e+00`
   - train[1] t_remaining=2: `x_unmit=1.0033444816053512e-02`, `x_rem=1.2373628062553358e-02`, `y_exact=0.0000000000000000e+00`
@@ -1603,12 +1701,13 @@
 - target contribution to E_cdr_rem: `0.0000000000000000e+00`
 
 ### term 92
+
 - pauli term from int row: `(2.3326675518445836e-03)*Z(q(1))*Y(q(3))*Y(q(4))*Z(q(5))`
 - int observable row: `[0, 3, 0, 2, 2, 3]`
 - Hamiltonian weight w_92: `2.3326675518445836e-03`
 - OGM effective shots used for this term: `69`
-- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=0.0000000000000000e+00`
-- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=0.0000000000000000e+00`
+- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=-0.0000000000000000e+00`
+- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=-0.0000000000000000e+00`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=-3.8961038961038960e-02`, `x_rem=-5.3221360251561635e-02`, `y_exact=0.0000000000000000e+00`
   - train[1] t_remaining=2: `x_unmit=-1.1475409836065574e-01`, `x_rem=-1.5675580970268690e-01`, `y_exact=0.0000000000000000e+00`
@@ -1620,12 +1719,13 @@
 - target contribution to E_cdr_rem: `0.0000000000000000e+00`
 
 ### term 93
+
 - pauli term from int row: `(-2.3610110167205774e-02)*Z(q(1))*Y(q(3))*Z(q(4))*Y(q(5))`
 - int observable row: `[0, 3, 0, 2, 3, 2]`
 - Hamiltonian weight w_93: `-2.3610110167205774e-02`
 - OGM effective shots used for this term: `383`
-- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=0.0000000000000000e+00`
-- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=0.0000000000000000e+00`
+- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=-0.0000000000000000e+00`
+- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=-0.0000000000000000e+00`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=9.3264248704663211e-02`, `x_rem=1.2740035459182103e-01`, `y_exact=0.0000000000000000e+00`
   - train[1] t_remaining=2: `x_unmit=7.8880407124681931e-02`, `x_rem=1.0775181248556190e-01`, `y_exact=0.0000000000000000e+00`
@@ -1637,12 +1737,13 @@
 - target contribution to E_cdr_rem: `-0.0000000000000000e+00`
 
 ### term 94
+
 - pauli term from int row: `(5.3161545522654625e-02)*Z(q(1))*Z(q(3))`
 - int observable row: `[0, 3, 0, 3, 0, 0]`
 - Hamiltonian weight w_94: `5.3161545522654625e-02`
 - OGM effective shots used for this term: `3668`
-- fitted unmit coeffs: `a_u=-7.1235186264134762e-02`, `b_u=-9.2510194444893989e-01`
-- fitted rem coeffs: `a_r=-6.2990961494522935e-02`, `b_r=-9.2510194444893912e-01`
+- fitted unmit coeffs: `a_u=2.2411567791599998e+00`, `b_u=1.2447420270000000e-02`
+- fitted rem coeffs: `a_r=1.9817821470390000e+00`, `b_r=1.2447420270000000e-02`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=-5.1947698174884227e-01`, `x_rem=-5.8746586298775572e-01`, `y_exact=-8.8866712235826562e-01`
   - train[1] t_remaining=2: `x_unmit=-5.3756906077348066e-01`, `x_rem=-6.0792582404641637e-01`, `y_exact=-8.8866712235826562e-01`
@@ -1654,12 +1755,13 @@
 - target contribution to E_cdr_rem: `-4.7092276668010503e-02`
 
 ### term 95
+
 - pauli term from int row: `(8.1752954675092818e-02)*Z(q(1))*Z(q(4))`
 - int observable row: `[0, 3, 0, 0, 3, 0]`
 - Hamiltonian weight w_95: `8.1752954675092818e-02`
 - OGM effective shots used for this term: `4063`
-- fitted unmit coeffs: `a_u=1.1915918262496712e+00`, `b_u=2.6201192749911811e-01`
-- fitted rem coeffs: `a_r=1.0376181435555309e+00`, `b_r=2.6201192749911889e-01`
+- fitted unmit coeffs: `a_u=2.3042828093310002e+00`, `b_u=-6.4518980890000003e-03`
+- fitted rem coeffs: `a_r=2.0065307584140002e+00`, `b_r=-6.4518980890000003e-03`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=5.5744888023369032e-01`, `x_rem=6.4016953959802003e-01`, `y_exact=9.0261859971078806e-01`
   - train[1] t_remaining=2: `x_unmit=5.1883353584447145e-01`, `x_rem=5.9582400745038688e-01`, `y_exact=9.0261859971078806e-01`
@@ -1671,12 +1773,13 @@
 - target contribution to E_cdr_rem: `7.4400137954699352e-02`
 
 ### term 96
+
 - pauli term from int row: `(5.9688692409066199e-02)*Z(q(1))*Z(q(5))`
 - int observable row: `[0, 3, 0, 0, 0, 3]`
 - Hamiltonian weight w_96: `5.9688692409066199e-02`
 - OGM effective shots used for this term: `3451`
-- fitted unmit coeffs: `a_u=2.1325496243375907e-07`, `b_u=8.8866700542744859e-01`
-- fitted rem coeffs: `a_r=1.8282322746237694e-07`, `b_r=8.8866700542745691e-01`
+- fitted unmit coeffs: `a_u=2.0417909699529999e+00`, `b_u=-1.0531587798000000e-02`
+- fitted rem coeffs: `a_r=1.7504251117350000e+00`, `b_r=-1.0531587798000000e-02`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=5.4216867469879515e-01`, `x_rem=6.3241500408678408e-01`, `y_exact=8.8866712235826562e-01`
   - train[1] t_remaining=2: `x_unmit=5.8057911670078965e-01`, `x_rem=6.7721903089479152e-01`, `y_exact=8.8866712235826562e-01`
@@ -1688,12 +1791,13 @@
 - target contribution to E_cdr_rem: `5.3043379136692041e-02`
 
 ### term 97
+
 - pauli term from int row: `(-2.2856223074292265e-01)*Z(q(2))`
 - int observable row: `[0, 0, 3, 0, 0, 0]`
 - Hamiltonian weight w_97: `-2.2856223074292265e-01`
 - OGM effective shots used for this term: `4488`
-- fitted unmit coeffs: `a_u=1.0100367752083911e-01`, `b_u=8.0994763165526895e-01`
-- fitted rem coeffs: `a_r=9.5711084818747336e-02`, `b_r=8.0994763165526873e-01`
+- fitted unmit coeffs: `a_u=1.2487780663470001e+00`, `b_u=-8.9737612620000001e-03`
+- fitted rem coeffs: `a_r=1.1833420956709999e+00`, `b_r=-8.9737612620000001e-03`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=7.4807311164941648e-01`, `x_rem=7.8943975480098827e-01`, `y_exact=8.8866712235826606e-01`
   - train[1] t_remaining=2: `x_unmit=7.7534486533829650e-01`, `x_rem=8.1821957085088270e-01`, `y_exact=8.8866712235826606e-01`
@@ -1705,6 +1809,7 @@
 - target contribution to E_cdr_rem: `-2.0231035569267120e-01`
 
 ### term 98
+
 - pauli term from int row: `(4.5870037211547705e-03)*Z(q(2))*X(q(3))*Z(q(4))*X(q(5))`
 - int observable row: `[0, 0, 3, 1, 3, 1]`
 - Hamiltonian weight w_98: `4.5870037211547705e-03`
@@ -1722,12 +1827,13 @@
 - target contribution to E_cdr_rem: `0.0000000000000000e+00`
 
 ### term 99
+
 - pauli term from int row: `(4.5870037211547705e-03)*Z(q(2))*Y(q(3))*Z(q(4))*Y(q(5))`
 - int observable row: `[0, 0, 3, 2, 3, 2]`
 - Hamiltonian weight w_99: `4.5870037211547705e-03`
 - OGM effective shots used for this term: `383`
-- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=0.0000000000000000e+00`
-- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=0.0000000000000000e+00`
+- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=-0.0000000000000000e+00`
+- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=-0.0000000000000000e+00`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=4.1450777202072540e-02`, `x_rem=5.6741886740956440e-02`, `y_exact=0.0000000000000000e+00`
   - train[1] t_remaining=2: `x_unmit=2.7989821882951654e-02`, `x_rem=3.8315211689265417e-02`, `y_exact=0.0000000000000000e+00`
@@ -1739,12 +1845,13 @@
 - target contribution to E_cdr_rem: `0.0000000000000000e+00`
 
 ### term 100
+
 - pauli term from int row: `(1.0466484457724451e-01)*Z(q(2))*Z(q(3))`
 - int observable row: `[0, 0, 3, 3, 0, 0]`
 - Hamiltonian weight w_100: `1.0466484457724451e-01`
 - OGM effective shots used for this term: `2744`
-- fitted unmit coeffs: `a_u=1.2829030083769639e+00`, `b_u=-1.3590473137604842e-01`
-- fitted rem coeffs: `a_r=1.1320401830552351e+00`, `b_r=-1.3590473137604853e-01`
+- fitted unmit coeffs: `a_u=1.9023957567180001e+00`, `b_u=4.2719235790000002e-03`
+- fitted rem coeffs: `a_r=1.6786837559940000e+00`, `b_r=4.2719235790000002e-03`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=-6.0741548527808076e-01`, `x_rem=-6.8836350958398862e-01`, `y_exact=-9.0261859971078762e-01`
   - train[1] t_remaining=2: `x_unmit=-6.0415122312824310e-01`, `x_rem=-6.8466423124136366e-01`, `y_exact=-9.0261859971078762e-01`
@@ -1756,12 +1863,13 @@
 - target contribution to E_cdr_rem: `-9.4068807313510361e-02`
 
 ### term 101
+
 - pauli term from int row: `(3.2811891784718882e-03)*Z(q(2))*Z(q(3))*X(q(4))*X(q(5))`
 - int observable row: `[0, 0, 3, 3, 1, 1]`
 - Hamiltonian weight w_101: `3.2811891784718882e-03`
 - OGM effective shots used for this term: `118`
-- fitted unmit coeffs: `a_u=6.3160239936898431e-09`, `b_u=3.4270318473807945e-10`
-- fitted rem coeffs: `a_r=4.6139477976930097e-09`, `b_r=3.4270318473807945e-10`
+- fitted unmit coeffs: `a_u=2.0771999999999999e-08`, `b_u=5.2199999999999996e-10`
+- fitted rem coeffs: `a_r=1.5174000000000001e-08`, `b_r=5.2199999999999996e-10`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=-8.0645161290322578e-02`, `x_rem=-1.1039500142141723e-01`, `y_exact=0.0000000000000000e+00`
   - train[1] t_remaining=2: `x_unmit=-5.1724137931034482e-02`, `x_rem=-7.0805069877184823e-02`, `y_exact=0.0000000000000000e+00`
@@ -1773,12 +1881,13 @@
 - target contribution to E_cdr_rem: `3.0084803065598851e-12`
 
 ### term 102
+
 - pauli term from int row: `(3.2811891784718882e-03)*Z(q(2))*Z(q(3))*Y(q(4))*Y(q(5))`
 - int observable row: `[0, 0, 3, 3, 2, 2]`
 - Hamiltonian weight w_102: `3.2811891784718882e-03`
 - OGM effective shots used for this term: `111`
-- fitted unmit coeffs: `a_u=1.7874399849279107e-01`, `b_u=-9.7519090946980910e-03`
-- fitted rem coeffs: `a_r=1.3057510215613591e-01`, `b_r=-9.7519090946980840e-03`
+- fitted unmit coeffs: `a_u=9.7124582976700002e-01`, `b_u=1.4695102045000000e-02`
+- fitted rem coeffs: `a_r=7.0950926749900001e-01`, `b_r=1.4695102045000000e-02`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=-1.1538461538461539e-01`, `x_rem=-1.5794977126448922e-01`, `y_exact=0.0000000000000000e+00`
   - train[1] t_remaining=2: `x_unmit=9.4339622641509441e-02`, `x_rem=1.2914132241750692e-01`, `y_exact=0.0000000000000000e+00`
@@ -1790,12 +1899,13 @@
 - target contribution to E_cdr_rem: `-1.2974667085285528e-04`
 
 ### term 103
+
 - pauli term from int row: `(1.5582981492557527e-02)*Z(q(2))*X(q(4))*X(q(5))`
 - int observable row: `[0, 0, 3, 0, 1, 1]`
 - Hamiltonian weight w_103: `1.5582981492557527e-02`
 - OGM effective shots used for this term: `357`
-- fitted unmit coeffs: `a_u=6.8970390164587048e-01`, `b_u=-1.0001495508745019e-03`
-- fitted rem coeffs: `a_r=5.4106397764485381e-01`, `b_r=-1.0001495508744985e-03`
+- fitted unmit coeffs: `a_u=1.7595710437380001e+00`, `b_u=3.1305946926000000e-02`
+- fitted rem coeffs: `a_r=1.3803612037010000e+00`, `b_r=3.1305946926000000e-02`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=-1.3550135501355014e-02`, `x_rem=-1.7272599376869018e-02`, `y_exact=0.0000000000000000e+00`
   - train[1] t_remaining=2: `x_unmit=-1.1235955056179775e-02`, `x_rem=-1.4322672292280158e-02`, `y_exact=0.0000000000000000e+00`
@@ -1807,12 +1917,13 @@
 - target contribution to E_cdr_rem: `-1.5509629026113983e-03`
 
 ### term 104
+
 - pauli term from int row: `(1.5582981492557527e-02)*Z(q(2))*Y(q(4))*Y(q(5))`
 - int observable row: `[0, 0, 3, 0, 2, 2]`
 - Hamiltonian weight w_104: `1.5582981492557527e-02`
 - OGM effective shots used for this term: `325`
-- fitted unmit coeffs: `a_u=4.1610988268664123e-10`, `b_u=3.5127864814559573e-10`
-- fitted rem coeffs: `a_r=3.2643293408447197e-10`, `b_r=3.5127864814559583e-10`
+- fitted unmit coeffs: `a_u=-6.7510000000000004e-09`, `b_u=3.8200000000000003e-10`
+- fitted rem coeffs: `a_r=-5.2959999999999999e-09`, `b_r=3.8200000000000003e-10`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=2.6239067055393587e-02`, `x_rem=3.3447406723371445e-02`, `y_exact=0.0000000000000000e+00`
   - train[1] t_remaining=2: `x_unmit=-2.3255813953488372e-02`, `x_rem=-2.9644600790998489e-02`, `y_exact=0.0000000000000000e+00`
@@ -1824,12 +1935,13 @@
 - target contribution to E_cdr_rem: `5.8093600142029102e-12`
 
 ### term 105
+
 - pauli term from int row: `(5.9688692409066199e-02)*Z(q(2))*Z(q(4))`
 - int observable row: `[0, 0, 3, 0, 3, 0]`
 - Hamiltonian weight w_105: `5.9688692409066199e-02`
 - OGM effective shots used for this term: `3676`
-- fitted unmit coeffs: `a_u=-2.2150435026344101e-07`, `b_u=8.8866725506966726e-01`
-- fitted rem coeffs: `a_r=-1.9247602692332240e-07`, `b_r=8.8866725506966648e-01`
+- fitted unmit coeffs: `a_u=1.9339579238969999e+00`, `b_u=-3.3860033400000001e-04`
+- fitted rem coeffs: `a_r=1.6805111908040000e+00`, `b_r=-3.3860033400000001e-04`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=5.7726657645466850e-01`, `x_rem=6.6432718558768289e-01`, `y_exact=8.8866712235826606e-01`
   - train[1] t_remaining=2: `x_unmit=5.9369994660971703e-01`, `x_rem=6.8323895874432850e-01`, `y_exact=8.8866712235826606e-01`
@@ -1841,12 +1953,13 @@
 - target contribution to E_cdr_rem: `5.3043378868424140e-02`
 
 ### term 106
+
 - pauli term from int row: `(1.0340487754605730e-01)*Z(q(2))*Z(q(5))`
 - int observable row: `[0, 0, 3, 0, 0, 3]`
 - Hamiltonian weight w_106: `1.0340487754605730e-01`
 - OGM effective shots used for this term: `2645`
-- fitted unmit coeffs: `a_u=1.5036854817659171e+00`, `b_u=-4.5323804177099344e-02`
-- fitted rem coeffs: `a_r=1.2863928248843068e+00`, `b_r=-4.5323804177101225e-02`
+- fitted unmit coeffs: `a_u=1.7085692510199999e+00`, `b_u=-2.7891639070000002e-03`
+- fitted rem coeffs: `a_r=1.4616695126620001e+00`, `b_r=-2.7891639070000002e-03`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=6.3041023710952204e-01`, `x_rem=7.3689677271284004e-01`, `y_exact=9.0261859971078762e-01`
   - train[1] t_remaining=2: `x_unmit=6.3573353869849825e-01`, `x_rem=7.4311926646401993e-01`, `y_exact=9.0261859971078762e-01`
@@ -1858,6 +1971,7 @@
 - target contribution to E_cdr_rem: `8.9753861408928728e-02`
 
 ### term 107
+
 - pauli term from int row: `(-3.8063028881711678e-03)*X(q(3))*X(q(4))`
 - int observable row: `[0, 0, 0, 1, 1, 0]`
 - Hamiltonian weight w_107: `-3.8063028881711678e-03`
@@ -1875,12 +1989,13 @@
 - target contribution to E_cdr_rem: `-0.0000000000000000e+00`
 
 ### term 108
+
 - pauli term from int row: `(-3.8063028881711678e-03)*Y(q(3))*Y(q(4))`
 - int observable row: `[0, 0, 0, 2, 2, 0]`
 - Hamiltonian weight w_108: `-3.8063028881711678e-03`
 - OGM effective shots used for this term: `563`
-- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=0.0000000000000000e+00`
-- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=0.0000000000000000e+00`
+- fitted unmit coeffs: `a_u=0.0000000000000000e+00`, `b_u=-0.0000000000000000e+00`
+- fitted rem coeffs: `a_r=0.0000000000000000e+00`, `b_r=-0.0000000000000000e+00`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=-9.8684210526315784e-03`, `x_rem=-1.1556740675171059e-02`, `y_exact=0.0000000000000000e+00`
   - train[1] t_remaining=2: `x_unmit=-6.6914498141263934e-02`, `x_rem=-7.8362434912683993e-02`, `y_exact=0.0000000000000000e+00`
@@ -1892,12 +2007,13 @@
 - target contribution to E_cdr_rem: `-0.0000000000000000e+00`
 
 ### term 109
+
 - pauli term from int row: `(-4.8770671106108679e-02)*Z(q(3))`
 - int observable row: `[0, 0, 0, 3, 0, 0]`
 - Hamiltonian weight w_109: `-4.8770671106108679e-02`
 - OGM effective shots used for this term: `4413`
-- fitted unmit coeffs: `a_u=1.2832666241838431e+00`, `b_u=-5.1769128298425129e-02`
-- fitted rem coeffs: `a_r=1.1949778804399953e+00`, `b_r=-5.1769128298424838e-02`
+- fitted unmit coeffs: `a_u=1.6610033977200001e+00`, `b_u=2.2571537224000002e-02`
+- fitted rem coeffs: `a_r=1.5467263639569999e+00`, `b_r=2.2571537224000002e-02`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=-5.8222422738551771e-01`, `x_rem=-6.2524079401365729e-01`, `y_exact=-8.0212781855891135e-01`
   - train[1] t_remaining=2: `x_unmit=-5.7616198803497465e-01`, `x_rem=-6.1873065725405363e-01`, `y_exact=-8.0212781855891135e-01`
@@ -1909,12 +2025,13 @@
 - target contribution to E_cdr_rem: `4.0019959654399459e-02`
 
 ### term 110
+
 - pauli term from int row: `(4.7435147736005136e-02)*Z(q(3))*Z(q(4))`
 - int observable row: `[0, 0, 0, 3, 3, 0]`
 - Hamiltonian weight w_110: `4.7435147736005136e-02`
 - OGM effective shots used for this term: `3837`
-- fitted unmit coeffs: `a_u=1.1473691404385868e+00`, `b_u=-1.8463081456443439e-01`
-- fitted rem coeffs: `a_r=9.7975044165956671e-01`, `b_r=-1.8463081456443636e-01`
+- fitted unmit coeffs: `a_u=1.7850817041180000e+00`, `b_u=-2.5372162590000000e-03`
+- fitted rem coeffs: `a_r=1.5242998319959999e+00`, `b_r=-2.5372162590000000e-03`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=-5.5429747812660835e-01`, `x_rem=-6.4912838410986518e-01`, `y_exact=-8.0212781855891135e-01`
   - train[1] t_remaining=2: `x_unmit=-5.2498684902682802e-01`, `x_rem=-6.1480320303726033e-01`, `y_exact=-8.0212781855891135e-01`
@@ -1926,12 +2043,13 @@
 - target contribution to E_cdr_rem: `-3.8027625172409520e-02`
 
 ### term 111
+
 - pauli term from int row: `(7.1866706378460071e-02)*Z(q(3))*Z(q(5))`
 - int observable row: `[0, 0, 0, 3, 0, 3]`
 - Hamiltonian weight w_111: `7.1866706378460071e-02`
 - OGM effective shots used for this term: `3837`
-- fitted unmit coeffs: `a_u=5.0292795672879365e-01`, `b_u=-6.4044923600652626e-01`
-- fitted rem coeffs: `a_r=4.2280517621252467e-01`, `b_r=-6.4044923600652537e-01`
+- fitted unmit coeffs: `a_u=1.6778113933030001e+00`, `b_u=6.6154940949999996e-03`
+- fitted rem coeffs: `a_r=1.4105148308140001e+00`, `b_r=6.6154940949999996e-03`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=-7.1641791044776115e-01`, `x_rem=-8.5218113716823485e-01`, `y_exact=-9.9999956393716483e-01`
   - train[1] t_remaining=2: `x_unmit=-7.1699105733824298e-01`, `x_rem=-8.5286289702065099e-01`, `y_exact=-9.9999956393716483e-01`
@@ -1943,12 +2061,13 @@
 - target contribution to E_cdr_rem: `-7.0872929144169594e-02`
 
 ### term 112
+
 - pauli term from int row: `(1.1698435536077332e-02)*X(q(4))*X(q(5))`
 - int observable row: `[0, 0, 0, 0, 1, 1]`
 - Hamiltonian weight w_112: `1.1698435536077332e-02`
 - OGM effective shots used for this term: `606`
-- fitted unmit coeffs: `a_u=4.6283553309318922e-09`, `b_u=-2.9625388293553061e-10`
-- fitted rem coeffs: `a_r=3.8316654197657943e-09`, `b_r=-2.9625388293553097e-10`
+- fitted unmit coeffs: `a_u=5.0568000000000000e-08`, `b_u=-2.3700000000000001e-10`
+- fitted rem coeffs: `a_r=4.1863000000000002e-08`, `b_r=-2.3700000000000001e-10`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=1.7944535073409460e-02`, `x_rem=2.1675609811773609e-02`, `y_exact=0.0000000000000000e+00`
   - train[1] t_remaining=2: `x_unmit=-2.5641025641025640e-02`, `x_rem=-3.0972374859247590e-02`, `y_exact=0.0000000000000000e+00`
@@ -1960,12 +2079,13 @@
 - target contribution to E_cdr_rem: `-4.1781348002150496e-12`
 
 ### term 113
+
 - pauli term from int row: `(1.1698435536077332e-02)*Y(q(4))*Y(q(5))`
 - int observable row: `[0, 0, 0, 0, 2, 2]`
 - Hamiltonian weight w_113: `1.1698435536077332e-02`
 - OGM effective shots used for this term: `605`
-- fitted unmit coeffs: `a_u=4.4464763440058297e-01`, `b_u=1.2869930268696397e-02`
-- fitted rem coeffs: `a_r=3.6810936993688820e-01`, `b_r=1.2869930268696400e-02`
+- fitted unmit coeffs: `a_u=1.7702014282959999e+00`, `b_u=3.4531235248000003e-02`
+- fitted rem coeffs: `a_r=1.4654924079600000e+00`, `b_r=3.4531235248000003e-02`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=-3.9370078740157480e-02`, `x_rem=-4.7556008642151835e-02`, `y_exact=0.0000000000000000e+00`
   - train[1] t_remaining=2: `x_unmit=-3.9451114922813037e-02`, `x_rem=-4.7653894080180274e-02`, `y_exact=0.0000000000000000e+00`
@@ -1977,12 +2097,13 @@
 - target contribution to E_cdr_rem: `3.5929326979896524e-04`
 
 ### term 114
+
 - pauli term from int row: `(-1.2754595390400281e-01)*Z(q(4))`
 - int observable row: `[0, 0, 0, 0, 3, 0]`
 - Hamiltonian weight w_114: `-1.2754595390400281e-01`
 - OGM effective shots used for this term: `6108`
-- fitted unmit coeffs: `a_u=1.0780350046067112e-01`, `b_u=9.1819259224982053e-01`
-- fitted rem coeffs: `a_r=9.8855809922435908e-02`, `b_r=9.1819259224982008e-01`
+- fitted unmit coeffs: `a_u=1.6095505576500000e+00`, `b_u=2.4908369180000000e-03`
+- fitted rem coeffs: `a_r=1.4759578613650000e+00`, `b_r=2.4908369180000000e-03`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=7.4219898709361221e-01`, `x_rem=8.0937730326457169e-01`, `y_exact=9.9999956393716483e-01`
   - train[1] t_remaining=2: `x_unmit=7.3458488428548308e-01`, `x_rem=8.0107402866464916e-01`, `y_exact=9.9999956393716483e-01`
@@ -1994,12 +2115,13 @@
 - target contribution to E_cdr_rem: `-1.2713233009492134e-01`
 
 ### term 115
+
 - pauli term from int row: `(5.1610885078092486e-02)*Z(q(4))*Z(q(5))`
 - int observable row: `[0, 0, 0, 0, 3, 3]`
 - Hamiltonian weight w_115: `5.1610885078092486e-02`
 - OGM effective shots used for this term: `3837`
-- fitted unmit coeffs: `a_u=1.1378271170430549e+00`, `b_u=2.2098956629960151e-01`
-- fitted rem coeffs: `a_r=9.4197020460135095e-01`, `b_r=2.2098956629960317e-01`
+- fitted unmit coeffs: `a_u=1.9301605423079999e+00`, `b_u=-8.3141140680000006e-03`
+- fitted rem coeffs: `a_r=1.5979173757750000e+00`, `b_r=-8.3141140680000006e-03`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=5.3113741636644363e-01`, `x_rem=6.4157289929747652e-01`, `y_exact=8.0212781855891135e-01`
   - train[1] t_remaining=2: `x_unmit=4.9763282482903737e-01`, `x_rem=6.0110194532197836e-01`, `y_exact=8.0212781855891135e-01`
@@ -2011,12 +2133,13 @@
 - target contribution to E_cdr_rem: `4.1181362471464783e-02`
 
 ### term 116
+
 - pauli term from int row: `(-2.2856223074292262e-01)*Z(q(5))`
 - int observable row: `[0, 0, 0, 0, 0, 3]`
 - Hamiltonian weight w_116: `-2.2856223074292262e-01`
 - OGM effective shots used for this term: `3967`
-- fitted unmit coeffs: `a_u=1.0962090978712034e+00`, `b_u=1.0445079173486983e-01`
-- fitted rem coeffs: `a_r=9.8965757355812312e-01`, `b_r=1.0445079173486896e-01`
+- fitted unmit coeffs: `a_u=1.4159517453620001e+00`, `b_u=-1.8527273480000001e-03`
+- fitted rem coeffs: `a_r=1.2783212357130000e+00`, `b_r=-1.8527273480000001e-03`
 - training data pairs (`x_unmit`, `x_rem`, `y_exact`) by training circuit:
   - train[0] t_remaining=2: `x_unmit=6.4179104477611937e-01`, `x_rem=7.1088950462574163e-01`, `y_exact=8.0212781855891135e-01`
   - train[1] t_remaining=2: `x_unmit=6.3395360693346925e-01`, `x_rem=7.0220824870787468e-01`, `y_exact=8.0212781855891135e-01`
@@ -2028,13 +2151,19 @@
 - target contribution to E_cdr_rem: `-1.8671379928358353e-01`
 
 ## Complete expanded energy expressions (all summing terms)
+
 ### E_cdr_unmit
+
 `E_cdr_unmit = (-7.1586579073350247e+00) + (0.0000000000000000e+00) + (0.0000000000000000e+00) + (0.0000000000000000e+00) + (0.0000000000000000e+00) + (0.0000000000000000e+00) + (-0.0000000000000000e+00) + (0.0000000000000000e+00) + (-3.6212695980335891e-03) + (-4.1025047692791559e-03) + (-0.0000000000000000e+00) + (0.0000000000000000e+00) + (0.0000000000000000e+00) + (-0.0000000000000000e+00) + (-0.0000000000000000e+00) + (-0.0000000000000000e+00) + (0.0000000000000000e+00) + (-0.0000000000000000e+00) + (-4.5118710136187763e-04) + (-1.4596047865139635e-03) + (0.0000000000000000e+00) + (-1.3881182339500770e-02) + (-1.3712372165613327e-02) + (-1.6096278174941763e-03) + (-1.0415374662528039e-03) + (0.0000000000000000e+00) + (-0.0000000000000000e+00) + (0.0000000000000000e+00) + (0.0000000000000000e+00) + (0.0000000000000000e+00) + (0.0000000000000000e+00) + (0.0000000000000000e+00) + (-0.0000000000000000e+00) + (0.0000000000000000e+00) + (-0.0000000000000000e+00) + (0.0000000000000000e+00) + (0.0000000000000000e+00) + (-0.0000000000000000e+00) + (-0.0000000000000000e+00) + (-0.0000000000000000e+00) + (-1.5039650597470627e-02) + (-1.5064770801205560e-02) + (-4.0242677701799557e-04) + (-1.0781615623990737e-03) + (0.0000000000000000e+00) + (3.8709475108004980e-02) + (-7.5102200279597459e-11) + (-5.3333657364246288e-04) + (-4.2101803626393305e-02) + (-0.0000000000000000e+00) + (-0.0000000000000000e+00) + (0.0000000000000000e+00) + (0.0000000000000000e+00) + (-6.4449846908246164e-02) + (4.6118904965908623e-12) + (-2.7906217044456119e-04) + (1.1183801772358633e-01) + (-4.1409929055316215e-02) + (-1.0442091973302262e-01) + (2.0258411752757887e-03) + (0.0000000000000000e+00) + (0.0000000000000000e+00) + (-3.3902690581217936e-10) + (-2.4309980951404053e-03) + (2.3543210555524406e-10) + (-0.0000000000000000e+00) + (0.0000000000000000e+00) + (-0.0000000000000000e+00) + (0.0000000000000000e+00) + (0.0000000000000000e+00) + (-0.0000000000000000e+00) + (0.0000000000000000e+00) + (-0.0000000000000000e+00) + (9.7209230642655411e-11) + (0.0000000000000000e+00) + (0.0000000000000000e+00) + (-1.9789233486797110e-03) + (-3.0442297467422664e-10) + (1.6783390352011463e-03) + (-1.1671774762944807e-01) + (4.2105407825486205e-02) + (0.0000000000000000e+00) + (-0.0000000000000000e+00) + (0.0000000000000000e+00) + (0.0000000000000000e+00) + (-0.0000000000000000e+00) + (0.0000000000000000e+00) + (3.2372700930540145e-04) + (-4.7758592285235699e-12) + (0.0000000000000000e+00) + (0.0000000000000000e+00) + (-0.0000000000000000e+00) + (0.0000000000000000e+00) + (0.0000000000000000e+00) + (-0.0000000000000000e+00) + (-4.7092276668010490e-02) + (7.4400137954699325e-02) + (5.3043379136692083e-02) + (-2.0231035569267120e-01) + (0.0000000000000000e+00) + (0.0000000000000000e+00) + (-9.4068807313510389e-02) + (3.0084803065598851e-12) + (-1.2974667085285523e-04) + (-1.5509629026113979e-03) + (5.8093600142029054e-12) + (5.3043378868424147e-02) + (8.9753861408928742e-02) + (-0.0000000000000000e+00) + (-0.0000000000000000e+00) + (4.0019959654399445e-02) + (-3.8027625172409506e-02) + (-7.0872929144169622e-02) + (-4.1781348002150448e-12) + (3.5929326979896507e-04) + (-1.2713233009492134e-01) + (4.1181362471464762e-02) + (-1.8671379928358356e-01)`
 
 ### E_cdr_rem
+
 `E_cdr_rem = (-7.1586579073350247e+00) + (0.0000000000000000e+00) + (0.0000000000000000e+00) + (0.0000000000000000e+00) + (0.0000000000000000e+00) + (0.0000000000000000e+00) + (-0.0000000000000000e+00) + (0.0000000000000000e+00) + (-3.6212695980335865e-03) + (-4.1025047692791567e-03) + (-0.0000000000000000e+00) + (0.0000000000000000e+00) + (0.0000000000000000e+00) + (-0.0000000000000000e+00) + (-0.0000000000000000e+00) + (-0.0000000000000000e+00) + (0.0000000000000000e+00) + (-0.0000000000000000e+00) + (-4.5118710136187774e-04) + (-1.4596047865139629e-03) + (0.0000000000000000e+00) + (-1.3881182339500770e-02) + (-1.3712372165613324e-02) + (-1.6096278174941745e-03) + (-1.0415374662528039e-03) + (0.0000000000000000e+00) + (-0.0000000000000000e+00) + (0.0000000000000000e+00) + (0.0000000000000000e+00) + (0.0000000000000000e+00) + (0.0000000000000000e+00) + (0.0000000000000000e+00) + (-0.0000000000000000e+00) + (0.0000000000000000e+00) + (-0.0000000000000000e+00) + (0.0000000000000000e+00) + (0.0000000000000000e+00) + (-0.0000000000000000e+00) + (-0.0000000000000000e+00) + (-0.0000000000000000e+00) + (-1.5039650597470627e-02) + (-1.5064770801205562e-02) + (-4.0242677701799573e-04) + (-1.0781615623990733e-03) + (0.0000000000000000e+00) + (3.8709475108004973e-02) + (-7.5102200279597498e-11) + (-5.3333657364246277e-04) + (-4.2101803626393298e-02) + (-0.0000000000000000e+00) + (-0.0000000000000000e+00) + (0.0000000000000000e+00) + (0.0000000000000000e+00) + (-6.4449846908246150e-02) + (4.6118904965908687e-12) + (-2.7906217044456141e-04) + (1.1183801772358637e-01) + (-4.1409929055316215e-02) + (-1.0442091973302260e-01) + (2.0258411752757887e-03) + (0.0000000000000000e+00) + (0.0000000000000000e+00) + (-3.3902690581217957e-10) + (-2.4309980951404044e-03) + (2.3543210555524395e-10) + (-0.0000000000000000e+00) + (0.0000000000000000e+00) + (-0.0000000000000000e+00) + (0.0000000000000000e+00) + (0.0000000000000000e+00) + (-0.0000000000000000e+00) + (0.0000000000000000e+00) + (-0.0000000000000000e+00) + (9.7209230642655411e-11) + (0.0000000000000000e+00) + (0.0000000000000000e+00) + (-1.9789233486797110e-03) + (-3.0442297467422659e-10) + (1.6783390352011450e-03) + (-1.1671774762944807e-01) + (4.2105407825486205e-02) + (0.0000000000000000e+00) + (-0.0000000000000000e+00) + (0.0000000000000000e+00) + (0.0000000000000000e+00) + (-0.0000000000000000e+00) + (0.0000000000000000e+00) + (3.2372700930540139e-04) + (-4.7758592285235723e-12) + (0.0000000000000000e+00) + (0.0000000000000000e+00) + (-0.0000000000000000e+00) + (0.0000000000000000e+00) + (0.0000000000000000e+00) + (-0.0000000000000000e+00) + (-4.7092276668010503e-02) + (7.4400137954699352e-02) + (5.3043379136692041e-02) + (-2.0231035569267120e-01) + (0.0000000000000000e+00) + (0.0000000000000000e+00) + (-9.4068807313510361e-02) + (3.0084803065598851e-12) + (-1.2974667085285528e-04) + (-1.5509629026113983e-03) + (5.8093600142029102e-12) + (5.3043378868424140e-02) + (8.9753861408928728e-02) + (-0.0000000000000000e+00) + (-0.0000000000000000e+00) + (4.0019959654399459e-02) + (-3.8027625172409520e-02) + (-7.0872929144169594e-02) + (-4.1781348002150496e-12) + (3.5929326979896524e-04) + (-1.2713233009492134e-01) + (4.1181362471464783e-02) + (-1.8671379928358353e-01)`
 
 ## Headline values (target circuit)
-- raw finite-shot (unmit / REM): `-7.675756330218 / -7.727882418692 Eh`
-- cdr corrected (unmit / REM): `-7.823861422940 / -7.823861422940 Eh`
-- reference exact noiseless: `-7.829051243999 Eh`
+
+- raw finite-shot (unmit / REM): `-7.608572787115 / -7.650660660605 Eh`
+- cdr corrected (unmit / REM): `-7.843478792710 / -7.843478792710 Eh`
+- reference exact noiseless: `-7.829052399882 Eh`
+- Energy error (exact - cdr_rem): `0.014426392827 Eh`
+
