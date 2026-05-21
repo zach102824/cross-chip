@@ -164,6 +164,27 @@ def trace_energy(hamiltonian: np.ndarray, rho: np.ndarray) -> float:
     return np.trace(hamiltonian @ rho).real
 
 
+def stable_r2_from_sums(
+    ss_res: float,
+    ss_tot: float,
+    *,
+    ss_res_tol: float = 1e-4,
+    ss_tot_tol: float = 1e-4,
+) -> float:
+    """Numerically stable R^2 from residual/total sum of squares.
+
+    If residual error is already tiny, treat as a perfect fit to avoid noisy
+    or NaN-like behavior in near-degenerate terms.
+    """
+    ss_res_f = float(ss_res)
+    ss_tot_f = float(ss_tot)
+    if ss_res_f <= float(ss_res_tol):
+        return 1.0
+    if ss_tot_f <= float(ss_tot_tol):
+        return 1.0
+    return float(1.0 - ss_res_f / ss_tot_f)
+
+
 def scale_noise_params_for_zne(
     noise_scale: float,
     *,

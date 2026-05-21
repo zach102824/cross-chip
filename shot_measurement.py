@@ -684,6 +684,7 @@ def train_cf_models_per_pauli(
             "weights": [],
             "coeffs_unmit_to_exact_per_term": [],
             "coeffs_rem_to_exact_per_term": [],
+            "r2_rem_to_exact_per_term": [],
             "training_t_remaining": [0] * len(resolvers),
         }
 
@@ -726,6 +727,7 @@ def train_cf_models_per_pauli(
 
     coeffs_unmit: list[list[float]] = []
     coeffs_rem: list[list[float]] = []
+    r2_rem: list[float] = []
     for k in range(n_terms):
         xu = tunmit[:, k]
         xr = trem[:, k]
@@ -740,6 +742,13 @@ def train_cf_models_per_pauli(
             cr = np.array([1.0, float(np.mean(y - xr))])
         coeffs_unmit.append([float(cu[0]), float(cu[1])])
         coeffs_rem.append([float(cr[0]), float(cr[1])])
+        y_pred = float(cr[0]) * xr + float(cr[1])
+        ss_res = float(np.sum((y - y_pred) ** 2))
+        ss_tot = float(np.sum((y - float(np.mean(y))) ** 2))
+        if ss_tot <= 0.0:
+            r2_rem.append(1.0 if ss_res <= 0.0 else 0.0)
+        else:
+            r2_rem.append(1.0 - ss_res / ss_tot)
 
     return {
         "fit_scope": "per_pauli",
@@ -747,6 +756,7 @@ def train_cf_models_per_pauli(
         "weights": [float(w) for w in weights],
         "coeffs_unmit_to_exact_per_term": coeffs_unmit,
         "coeffs_rem_to_exact_per_term": coeffs_rem,
+        "r2_rem_to_exact_per_term": r2_rem,
         "training_t_remaining": t_rem_list,
     }
 

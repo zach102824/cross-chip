@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 """Optimize LiH compiled FIG.13 ansatz (three RX angles) with L-BFGS-B.
 
-Circuit matches ``lih_fig13_compiled_ansatz.ipynb``: three independent ``theta1``,
-``theta2``, ``theta3`` on ``LineQubit(1)``. Hamiltonian uses ``build_paper_lih_hamiltonian``.
+Circuit and Hamiltonian match ``lih_fig13_compiled_ansatz.ipynb``: three independent
+``theta1``, ``theta2``, ``theta3`` on ``LineQubit(1)``; Pauli sum from
+``Pauli_Ham/LiH_bond_<bond>.txt``.
 
 Example::
 
-    python optimize_lih_fig13_lbfgs.py --bond 2.2 --seed 0 --init-scale 0.1
+    python optimize_lih_fig13_lbfgs.py --bond 1.5
 """
 
 from __future__ import annotations
@@ -26,8 +27,36 @@ for _p in (REPO_ROOT, CASE_DIR):
     if str(_p) not in sys.path:
         sys.path.insert(0, str(_p))
 
-from generate_lih_hamiltonian_paper_lih import build_paper_lih_hamiltonian
-from main_cursor_lib import qubit_operator_to_pauli_sum
+def load_pauli_sum_from_numbered_file(path: Path, qubits: list[cirq.Qid]) -> cirq.PauliSum:
+    idx_to_pauli = {1: cirq.X, 2: cirq.Y, 3: cirq.Z}
+    out = cirq.PauliSum()
+
+    with path.open("r", encoding="utf-8") as f:
+        for lineno, line in enumerate(f, start=1):
+            line = line.strip()
+            if not line or line.startswith("#"):
+                continue
+            parts = line.split()
+            coeff = float(parts[0])
+            pauli_codes = [int(x) for x in parts[1:]]
+            if len(pauli_codes) != len(qubits):
+                raise ValueError(
+                    f"{path}:{lineno} has {len(pauli_codes)} Pauli indices, expected {len(qubits)}."
+                )
+
+            pauli_string = cirq.PauliString()
+            for q, code in zip(qubits, pauli_codes):
+                if code == 0:
+                    continue
+                if code not in idx_to_pauli:
+                    raise ValueError(
+                        f"{path}:{lineno} has invalid Pauli code {code}; expected 0/1/2/3."
+                    )
+                pauli_string *= idx_to_pauli[code](q)
+
+            out += coeff * pauli_string
+
+    return out
 
 
 def lih_fig13_circuit(
@@ -37,14 +66,25 @@ def lih_fig13_circuit(
 ) -> tuple[cirq.Circuit, list[cirq.LineQubit]]:
     """Compiled LiH ansatz (FIG. 13): three independent RX angles on q[1].
 
-    Same gate order as ``lih_fig13_compiled_ansatz.ipynb``.
+    Same gate order as ``lih_fig13_compiled_ansatz.ipynb`` (multi-reference prep, not bare HF).
     """
 
     q = cirq.LineQubit.range(6)
     q0, q1, q2, q3, q4, q5 = q
     c = cirq.Circuit()
+    c.append(cirq.ry(-0.1).on(q0))
+    c.append(cirq.H(q1))
+    c.append(cirq.CZ(q0, q1))
+    c.append(cirq.H(q1))
+    c.append(cirq.H(q4))
+    c.append(cirq.CZ(q1, q4))
+    c.append(cirq.H(q4))
+    c.append(cirq.H(q3))
+    c.append(cirq.CZ(q4, q3))
+    c.append(cirq.H(q3))
     c.append(cirq.X(q0))
     c.append(cirq.X(q3))
+    c.append(cirq.identity_each(*q))  # visual barrier: multi-ref prep | FIG. 13 ansatz
 
     c.append(cirq.rx(np.pi / 2).on(q0))
     c.append(cirq.H(q2))
@@ -105,14 +145,7 @@ def expectation_energy(
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--bond", type=float, default=2.2, help="Li–H bond length (Å)")
-    parser.add_argument("--seed", type=int, default=None, help="RNG seed for initial guess")
-    parser.add_argument(
-        "--init-scale",
-        type=float,
-        default=0.1,
-        help="Uniform [-scale, scale] for random initial theta1..3",
-    )
+    parser.add_argument("--bond", type=float, default=1.5, help="Li–H bond length (Å)")
     parser.add_argument("--maxiter", type=int, default=200, help="L-BFGS-B max iterations")
     parser.add_argument("--ftol", type=float, default=1e-12, help="L-BFGS-B ftol")
     parser.add_argument("--gtol", type=float, default=1e-8, help="L-BFGS-B gtol")
@@ -123,11 +156,12 @@ def main() -> None:
     theta3 = sympy.Symbol("theta3")
     circuit_template, qubits = lih_fig13_circuit(theta1, theta2, theta3)
 
-    h_op, meta = build_paper_lih_hamiltonian(args.bond)
-    pauli_sum = qubit_operator_to_pauli_sum(h_op, list(qubits))
+    ham_path = REPO_ROOT / "Pauli_Ham" / f"LiH_bond_{args.bond:.1f}.txt"
+    if not ham_path.is_file():
+        raise FileNotFoundError(f"Hamiltonian file not found: {ham_path}")
+    pauli_sum = load_pauli_sum_from_numbered_file(ham_path, list(qubits))
 
-    rng = np.random.default_rng(args.seed)
-    x0 = rng.uniform(low=-args.init_scale, high=args.init_scale, size=3)
+    x0 = np.array([0.0, 0.0, 0.0], dtype=float)
 
     def objective(x: np.ndarray) -> float:
         resolver = cirq.ParamResolver(
@@ -138,7 +172,7 @@ def main() -> None:
 
     e0 = objective(x0)
     print(f"bond length: {args.bond} Å")
-    print(f"layout / meta keys: rhf_bitstring_spin_blocked={meta.get('rhf_bitstring_spin_blocked')}")
+    print(f"Hamiltonian source: {ham_path}")
     print(f"initial θ = [{x0[0]:.10f}, {x0[1]:.10f}, {x0[2]:.10f}]")
     print(f"initial ⟨H⟩ = {e0:.12f} Eh")
 

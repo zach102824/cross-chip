@@ -172,7 +172,7 @@ def ground_state_energy_and_vector(qubit_hamiltonian: QubitOperator) -> tuple[fl
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--bond", type=float, default=2.2)
+    parser.add_argument("--bond", type=float, default=1.5)
     parser.add_argument(
         "--output-dir",
         type=Path,
