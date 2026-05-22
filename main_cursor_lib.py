@@ -8,345 +8,98 @@ import cirq
 import numpy as np
 import sympy
 
-CZ_NORMAL_TAG = "cz_normal"
-CZ_HIGH_TAG = "cz_high"
-CZ_ONSITE_TAG = "cz_onsite_normal"
-
 PAULI_CHAR_TO_GATE = {"I": None, "X": cirq.X, "Y": cirq.Y, "Z": cirq.Z}
 
-# Heuristic defaults loosely scaled to Google Weber/Sycamore typical medians (~0.1% 1Q RB,
-# ~0.9% isolated 2Q XEB); see docs/noise_model.md. Not a certified hardware calibration.
-DEFAULT_AMP_DAMP_GAMMA = 0
-DEFAULT_PHASE_DAMP_GAMMA = 0
-DEFAULT_DEPOL_PROB = 1.5e-2
-DEFAULT_LEAKAGE_APPROX_PROB = 1.5e-3
-DEFAULT_HIGH_CZ_MULTIPLIER = 1.0
+# LiH simplified gate-only noise: depolarizing strength depends only on gate arity (2Q vs 1Q).
+TWO_QUBIT_GATE_DEPOL_PROB = 0.01
+ONE_QUBIT_GATE_DEPOL_PROB = 0.0005
+
+# Legacy notebooks referred to a single “depol_prob”; that matched the two-qubit channel strength.
+DEFAULT_DEPOL_PROB = TWO_QUBIT_GATE_DEPOL_PROB
 
 
-def params_per_layer(num_spatial_orbitals: int) -> int:
-    return (num_spatial_orbitals // 2) + ((num_spatial_orbitals - 1) // 2) + num_spatial_orbitals
+class GateArityDepolarizingNoise(cirq.NoiseModel):
+    """Single-qubit depolarizing noise applied after each gate, keyed by arity.
 
+    - Two-qubit gates: ``two_qubit_depol_prob`` on each qubit (after the gate).
+    - One-qubit gates: ``one_qubit_depol_prob`` on that qubit.
 
-def ordered_parameter_symbols(num_spatial_orbitals: int, num_layers: int) -> list[sympy.Symbol]:
-    symbols = []
-    p_idx = 0
-    for layer in range(num_layers):
-        for _ in range(0, num_spatial_orbitals - 1, 2):
-            symbols.append(sympy.Symbol(f"th_{layer}_{p_idx}"))
-            p_idx += 1
-        for _ in range(1, num_spatial_orbitals - 1, 2):
-            symbols.append(sympy.Symbol(f"th_{layer}_{p_idx}"))
-            p_idx += 1
-        for _ in range(num_spatial_orbitals):
-            symbols.append(sympy.Symbol(f"ph_{layer}_{p_idx}"))
-            p_idx += 1
-    return symbols
+    Measurements are unchanged (readout error belongs in shot estimation).
 
+    ``depol_prob`` is accepted for backward compatibility but ignored; use the explicit
+    ``two_qubit_depol_prob`` / ``one_qubit_depol_prob`` kwargs or class defaults.
+    ``self.depol_prob`` mirrors ``two_qubit_depol_prob`` for legacy introspection.
+    """
 
-def cz_tag_for_horizontal_pair(q0: cirq.GridQubit, q1: cirq.GridQubit) -> str:
-    if q0.row == q1.row and abs(q0.col - q1.col) == 1:
-        return CZ_HIGH_TAG if min(q0.col, q1.col) % 2 == 1 else CZ_NORMAL_TAG
-    return CZ_NORMAL_TAG
-
-
-def tagged_cz(q0: cirq.Qid, q1: cirq.Qid, tag: str) -> cirq.Operation:
-    return cirq.CZ(q0, q1).with_tags(tag)
-
-
-def decompose_fsim_theta_symbolic(
-    theta: sympy.Symbol | float, q0: cirq.Qid, q1: cirq.Qid, cz_tag: str
-) -> list[list[cirq.Operation]]:
-    theta_exponent = theta / sympy.pi
-    return [
-        [
-            cirq.PhasedXPowGate(phase_exponent=-0.25, exponent=0.5).on(q0),
-            cirq.PhasedXPowGate(phase_exponent=-0.75, exponent=0.5).on(q1),
-        ],
-        [tagged_cz(q0, q1, cz_tag)],
-        [
-            cirq.PhasedXPowGate(phase_exponent=-0.25, exponent=theta_exponent).on(q0),
-            cirq.PhasedXPowGate(phase_exponent=0.25, exponent=theta_exponent).on(q1),
-        ],
-        [tagged_cz(q0, q1, cz_tag)],
-        [
-            cirq.PhasedXPowGate(phase_exponent=0.75, exponent=0.5).on(q0),
-            cirq.PhasedXPowGate(phase_exponent=0.25, exponent=0.5).on(q1),
-        ],
-    ]
-
-
-def decompose_fsim_phi_symbolic(
-    phi: sympy.Symbol | float, q0: cirq.Qid, q1: cirq.Qid, cz_tag: str = CZ_ONSITE_TAG
-) -> list[list[cirq.Operation]]:
-    t = -phi / sympy.pi
-    return [
-        [cirq.ZPowGate(exponent=t / 2).on(q0), cirq.ZPowGate(exponent=t / 2).on(q1)],
-        [cirq.H(q1)],
-        [tagged_cz(q0, q1, cz_tag)],
-        [cirq.H(q1)],
-        [cirq.ZPowGate(exponent=-t / 2).on(q1)],
-        [cirq.H(q1)],
-        [tagged_cz(q0, q1, cz_tag)],
-        [cirq.H(q1)],
-    ]
-
-
-def _phased_x_pow_rz_rx_rz_layers(
-    q0: cirq.Qid,
-    q1: cirq.Qid,
-    p0: sympy.Expr | float,
-    t0: sympy.Expr | float,
-    p1: sympy.Expr | float,
-    t1: sympy.Expr | float,
-) -> list[list[cirq.Operation]]:
-    """PhasedXPowGate(p, t) ≡ Z^{-p} X^{t} Z^{p} ≃ Rz(-πp) Rx(πt) Rz(πp) (same unitary up to global phase)."""
-
-    return [
-        [
-            cirq.rz(-sympy.pi * p0).on(q0),
-            cirq.rz(-sympy.pi * p1).on(q1),
-        ],
-        [
-            cirq.rx(sympy.pi * t0).on(q0),
-            cirq.rx(sympy.pi * t1).on(q1),
-        ],
-        [
-            cirq.rz(sympy.pi * p0).on(q0),
-            cirq.rz(sympy.pi * p1).on(q1),
-        ],
-    ]
-
-
-def _hadamard_as_rz_ry(q: cirq.Qid) -> list[list[cirq.Operation]]:
-    """H ≃ Rz(π) Ry(π/2) (same unitary up to global phase)."""
-
-    return [[cirq.rz(np.pi).on(q)], [cirq.ry(np.pi / 2).on(q)]]
-
-
-def decompose_fsim_theta_symbolic_rxryrz(
-    theta: sympy.Symbol | float, q0: cirq.Qid, q1: cirq.Qid, cz_tag: str
-) -> list[list[cirq.Operation]]:
-    """Same unitary as ``decompose_fsim_theta_symbolic`` using ``CZ`` + ``Rz`` / ``Rx`` only."""
-
-    theta_exponent = theta / sympy.pi
-    layers: list[list[cirq.Operation]] = []
-    layers.extend(_phased_x_pow_rz_rx_rz_layers(q0, q1, -0.25, 0.5, -0.75, 0.5))
-    layers.append([tagged_cz(q0, q1, cz_tag)])
-    layers.extend(
-        _phased_x_pow_rz_rx_rz_layers(
-            q0, q1, -0.25, theta_exponent, 0.25, theta_exponent
-        )
-    )
-    layers.append([tagged_cz(q0, q1, cz_tag)])
-    layers.extend(_phased_x_pow_rz_rx_rz_layers(q0, q1, 0.75, 0.5, 0.25, 0.5))
-    return layers
-
-
-def decompose_fsim_phi_symbolic_rxryrz(
-    phi: sympy.Symbol | float, q0: cirq.Qid, q1: cirq.Qid, cz_tag: str = CZ_ONSITE_TAG
-) -> list[list[cirq.Operation]]:
-    """Same unitary as ``decompose_fsim_phi_symbolic`` using ``CZ`` + ``Rz`` / ``Ry`` (no ``H`` / ``ZPowGate``)."""
-
-    t = -phi / sympy.pi
-    layers: list[list[cirq.Operation]] = [
-        [
-            cirq.rz(sympy.pi * t / 2).on(q0),
-            cirq.rz(sympy.pi * t / 2).on(q1),
-        ],
-    ]
-    layers.extend(_hadamard_as_rz_ry(q1))
-    layers.append([tagged_cz(q0, q1, cz_tag)])
-    layers.extend(_hadamard_as_rz_ry(q1))
-    layers.append([cirq.rz(-sympy.pi * t / 2).on(q1)])
-    layers.extend(_hadamard_as_rz_ry(q1))
-    layers.append([tagged_cz(q0, q1, cz_tag)])
-    layers.extend(_hadamard_as_rz_ry(q1))
-    return layers
-
-
-def append_depth_grouped_blocks(
-    circuit: cirq.Circuit, blocks: list[list[list[cirq.Operation]]]
-) -> None:
-    if not blocks:
-        return
-    for ops_at_depth in zip(*blocks):
-        flat_ops = [op for sublist in ops_at_depth for op in sublist]
-        circuit.append(flat_ops, strategy=cirq.InsertStrategy.NEW_THEN_INLINE)
-
-
-def prepare_decomposed_ansatz_cirq(
-    num_spatial_orbitals: int, num_layers: int = 1
-) -> tuple[cirq.Circuit, list[cirq.GridQubit]]:
-    qubits = [cirq.GridQubit(0, i) for i in range(num_spatial_orbitals)] + [
-        cirq.GridQubit(1, i) for i in range(num_spatial_orbitals)
-    ]
-
-    circuit = cirq.Circuit()
-    p_idx = 0
-    circuit.append([cirq.X(qubits[i]) for i in range(1, len(qubits), 2)])
-
-    for layer in range(num_layers):
-        even_odd_blocks = []
-        for i in range(0, num_spatial_orbitals - 1, 2):
-            theta = sympy.Symbol(f"th_{layer}_{p_idx}")
-            alpha_tag = cz_tag_for_horizontal_pair(qubits[i], qubits[i + 1])
-            beta_tag = cz_tag_for_horizontal_pair(
-                qubits[i + num_spatial_orbitals], qubits[i + 1 + num_spatial_orbitals]
-            )
-            even_odd_blocks.append(
-                decompose_fsim_theta_symbolic(theta, qubits[i], qubits[i + 1], alpha_tag)
-            )
-            even_odd_blocks.append(
-                decompose_fsim_theta_symbolic(
-                    theta,
-                    qubits[i + num_spatial_orbitals],
-                    qubits[i + 1 + num_spatial_orbitals],
-                    beta_tag,
-                )
-            )
-            p_idx += 1
-        append_depth_grouped_blocks(circuit, even_odd_blocks)
-
-        odd_even_blocks = []
-        for i in range(1, num_spatial_orbitals - 1, 2):
-            theta = sympy.Symbol(f"th_{layer}_{p_idx}")
-            alpha_tag = cz_tag_for_horizontal_pair(qubits[i], qubits[i + 1])
-            beta_tag = cz_tag_for_horizontal_pair(
-                qubits[i + num_spatial_orbitals], qubits[i + 1 + num_spatial_orbitals]
-            )
-            odd_even_blocks.append(
-                decompose_fsim_theta_symbolic(theta, qubits[i], qubits[i + 1], alpha_tag)
-            )
-            odd_even_blocks.append(
-                decompose_fsim_theta_symbolic(
-                    theta,
-                    qubits[i + num_spatial_orbitals],
-                    qubits[i + 1 + num_spatial_orbitals],
-                    beta_tag,
-                )
-            )
-            p_idx += 1
-        append_depth_grouped_blocks(circuit, odd_even_blocks)
-
-        onsite_blocks = []
-        for i in range(num_spatial_orbitals):
-            phi = sympy.Symbol(f"ph_{layer}_{p_idx}")
-            onsite_blocks.append(
-                decompose_fsim_phi_symbolic(
-                    phi,
-                    qubits[i],
-                    qubits[i + num_spatial_orbitals],
-                    CZ_ONSITE_TAG,
-                )
-            )
-            p_idx += 1
-        append_depth_grouped_blocks(circuit, onsite_blocks)
-
-    return circuit, qubits
-
-
-def prepare_original_fsim_ansatz_cirq(
-    num_spatial_orbitals: int, num_layers: int = 1
-) -> tuple[cirq.Circuit, list[cirq.GridQubit]]:
-    qubits = [cirq.GridQubit(0, i) for i in range(num_spatial_orbitals)] + [
-        cirq.GridQubit(1, i) for i in range(num_spatial_orbitals)
-    ]
-    circuit = cirq.Circuit()
-    p_idx = 0
-    circuit.append([cirq.X(qubits[i]) for i in range(1, len(qubits), 2)])
-
-    for layer in range(num_layers):
-        even_odd_moments = []
-        for i in range(0, num_spatial_orbitals - 1, 2):
-            theta = sympy.Symbol(f"th_{layer}_{p_idx}")
-            even_odd_moments.append(cirq.FSimGate(theta, 0).on(qubits[i], qubits[i + 1]))
-            even_odd_moments.append(
-                cirq.FSimGate(theta, 0).on(
-                    qubits[i + num_spatial_orbitals], qubits[i + 1 + num_spatial_orbitals]
-                )
-            )
-            p_idx += 1
-        circuit.append(even_odd_moments, strategy=cirq.InsertStrategy.NEW_THEN_INLINE)
-
-        odd_even_moments = []
-        for i in range(1, num_spatial_orbitals - 1, 2):
-            theta = sympy.Symbol(f"th_{layer}_{p_idx}")
-            odd_even_moments.append(cirq.FSimGate(theta, 0).on(qubits[i], qubits[i + 1]))
-            odd_even_moments.append(
-                cirq.FSimGate(theta, 0).on(
-                    qubits[i + num_spatial_orbitals], qubits[i + 1 + num_spatial_orbitals]
-                )
-            )
-            p_idx += 1
-        circuit.append(odd_even_moments, strategy=cirq.InsertStrategy.NEW_THEN_INLINE)
-
-        onsite_moments = []
-        for i in range(num_spatial_orbitals):
-            phi = sympy.Symbol(f"ph_{layer}_{p_idx}")
-            onsite_moments.append(cirq.FSimGate(0, phi).on(qubits[i], qubits[i + num_spatial_orbitals]))
-            p_idx += 1
-        circuit.append(onsite_moments, strategy=cirq.InsertStrategy.NEW_THEN_INLINE)
-
-    return circuit, qubits
-
-
-def operation_has_tag(operation: cirq.Operation, tag: str) -> bool:
-    return tag in getattr(operation, "tags", ())
-
-
-class LocationAwareDecomposedNoise(cirq.NoiseModel):
     def __init__(
         self,
-        amp_damp_gamma: float = DEFAULT_AMP_DAMP_GAMMA,
-        phase_damp_gamma: float = DEFAULT_PHASE_DAMP_GAMMA,
-        depol_prob: float = DEFAULT_DEPOL_PROB,
-        high_cz_multiplier: float = DEFAULT_HIGH_CZ_MULTIPLIER,
-        leakage_approx_prob: float = DEFAULT_LEAKAGE_APPROX_PROB,
+        *,
+        two_qubit_depol_prob: float | None = None,
+        one_qubit_depol_prob: float | None = None,
+        depol_prob: float | None = None,
     ):
-        self.amp_damp_gamma = amp_damp_gamma
-        self.phase_damp_gamma = phase_damp_gamma
-        self.depol_prob = depol_prob
-        self.high_cz_multiplier = high_cz_multiplier
-        self.leakage_approx_prob = leakage_approx_prob
+        _ = depol_prob
+        self.two_qubit_depol_prob = float(
+            two_qubit_depol_prob
+            if two_qubit_depol_prob is not None
+            else TWO_QUBIT_GATE_DEPOL_PROB
+        )
+        self.one_qubit_depol_prob = float(
+            one_qubit_depol_prob
+            if one_qubit_depol_prob is not None
+            else ONE_QUBIT_GATE_DEPOL_PROB
+        )
+        self.depol_prob = self.two_qubit_depol_prob
 
     def noisy_operation(self, operation: cirq.Operation):
         if isinstance(operation.gate, cirq.MeasurementGate):
             yield operation
             return
 
-        if isinstance(operation.gate, cirq.CZPowGate):
+        n = len(operation.qubits)
+        if n == 2:
             yield operation
-            multiplier = self.high_cz_multiplier if operation_has_tag(operation, CZ_HIGH_TAG) else 1.0
-            extra_depol = self.leakage_approx_prob if operation_has_tag(operation, CZ_HIGH_TAG) else 0.0
+            p2 = min(1.0, max(0.0, self.two_qubit_depol_prob))
             for q in operation.qubits:
-                yield cirq.amplitude_damp(min(1.0, self.amp_damp_gamma * multiplier)).on(q)
-                yield cirq.phase_damp(min(1.0, self.phase_damp_gamma * multiplier)).on(q)
-                total_depol = min(1.0, (self.depol_prob * multiplier) + extra_depol)
-                yield cirq.depolarize(total_depol).on(q)
+                yield cirq.depolarize(p2).on(q)
             return
-
-        if len(operation.qubits) == 1:
+        if n == 1:
             yield operation
-            for q in operation.qubits:
-                yield cirq.amplitude_damp(self.amp_damp_gamma / 10.0).on(q)
-                yield cirq.phase_damp(self.phase_damp_gamma / 10.0).on(q)
-                yield cirq.depolarize(self.depol_prob / 10.0).on(q)
+            p1 = min(1.0, max(0.0, self.one_qubit_depol_prob))
+            yield cirq.depolarize(p1).on(operation.qubits[0])
             return
 
         yield operation
 
 
-def load_hamiltonian_paths(workspace: Path, h_atom: int, bond_length: float | int) -> tuple[Path, Path, Path]:
+def load_hamiltonian_paths(
+    workspace: Path,
+    h_atom: int,
+    bond_length: float | int,
+    *,
+    hamiltonian_basename: str | None = None,
+) -> tuple[Path, Path, Path]:
     local_folder = workspace / "Pauli_Ham"
     colab_folder = Path("/content/drive/My Drive/Quantum_chemistry/pauli_Ham")
     save_folder = local_folder if local_folder.exists() else colab_folder
     bond_token = f"{bond_length}".rstrip("0").rstrip(".") if isinstance(bond_length, float) else str(bond_length)
-    pkl_path = save_folder / f"H{h_atom}_bond_{bond_token}.pkl"
-    text_path = save_folder / f"H{h_atom}_bond_{bond_token}_pauli_convention.txt"
+    if hamiltonian_basename is not None:
+        stem = f"{hamiltonian_basename}_bond_{bond_token}"
+    else:
+        stem = f"H{h_atom}_bond_{bond_token}"
+    # Prefer OpenFermion pickle name …_of.pkl; fall back to legacy … .pkl
+    pkl_path = save_folder / f"{stem}_of.pkl"
+    if not pkl_path.is_file():
+        legacy_pkl = save_folder / f"{stem}.pkl"
+        if legacy_pkl.is_file():
+            pkl_path = legacy_pkl
+    text_path = save_folder / f"{stem}_pauli_convention.txt"
     return save_folder, pkl_path, text_path
 
 
 def pauli_text_to_pauli_sum(path: Path, qubits: list[cirq.Qid]) -> cirq.PauliSum:
+    """Each Pauli word's characters map left-to-right to ``qubits[0], qubits[1], ...``."""
+
     lines = [line.strip() for line in path.read_text().splitlines() if line.strip()]
     if len(lines) % 2 != 0:
         raise ValueError(f"Expected alternating Pauli/coeff lines in {path}")
@@ -379,9 +132,16 @@ def qubit_operator_to_pauli_sum(qubit_operator, qubits: list[cirq.Qid]) -> cirq.
 
 
 def load_observable_h(
-    workspace: Path, ansatz_qubits: list[cirq.Qid], h_atom: int, bond_length: float | int
+    workspace: Path,
+    ansatz_qubits: list[cirq.Qid],
+    h_atom: int,
+    bond_length: float | int,
+    *,
+    hamiltonian_basename: str | None = None,
 ) -> cirq.PauliSum:
-    save_folder, pkl_path, text_path = load_hamiltonian_paths(workspace, h_atom, bond_length)
+    save_folder, pkl_path, text_path = load_hamiltonian_paths(
+        workspace, h_atom, bond_length, hamiltonian_basename=hamiltonian_basename
+    )
     if pkl_path.exists():
         try:
             import openfermion as of  # noqa: F401
@@ -404,14 +164,32 @@ def trace_energy(hamiltonian: np.ndarray, rho: np.ndarray) -> float:
     return np.trace(hamiltonian @ rho).real
 
 
+def stable_r2_from_sums(
+    ss_res: float,
+    ss_tot: float,
+    *,
+    ss_res_tol: float = 1e-4,
+    ss_tot_tol: float = 1e-4,
+) -> float:
+    """Numerically stable R^2 from residual/total sum of squares.
+
+    If residual error is already tiny, treat as a perfect fit to avoid noisy
+    or NaN-like behavior in near-degenerate terms.
+    """
+    ss_res_f = float(ss_res)
+    ss_tot_f = float(ss_tot)
+    if ss_res_f <= float(ss_res_tol):
+        return 1.0
+    if ss_tot_f <= float(ss_tot_tol):
+        return 1.0
+    return float(1.0 - ss_res_f / ss_tot_f)
+
+
 def scale_noise_params_for_zne(
     noise_scale: float,
     *,
-    amp_damp_gamma: float,
-    phase_damp_gamma: float,
-    depol_prob: float,
-    leakage_approx_prob: float,
-    high_cz_multiplier: float,
+    two_qubit_depol_prob: float = TWO_QUBIT_GATE_DEPOL_PROB,
+    one_qubit_depol_prob: float = ONE_QUBIT_GATE_DEPOL_PROB,
 ) -> dict[str, float]:
     if noise_scale <= 0:
         raise ValueError(f"noise_scale must be > 0, got {noise_scale}.")
@@ -420,11 +198,8 @@ def scale_noise_params_for_zne(
         return float(min(1.0, max(0.0, value)))
 
     return {
-        "amp_damp_gamma": clip01(amp_damp_gamma * noise_scale),
-        "phase_damp_gamma": clip01(phase_damp_gamma * noise_scale),
-        "depol_prob": clip01(depol_prob * noise_scale),
-        "high_cz_multiplier": float(high_cz_multiplier),
-        "leakage_approx_prob": clip01(leakage_approx_prob * noise_scale),
+        "two_qubit_depol_prob": clip01(two_qubit_depol_prob * noise_scale),
+        "one_qubit_depol_prob": clip01(one_qubit_depol_prob * noise_scale),
     }
 
 
@@ -435,22 +210,16 @@ def trace_energy_at_noise_scale(
     hamiltonian_matrix: np.ndarray,
     *,
     noise_scale: float,
-    amp_damp_gamma: float,
-    phase_damp_gamma: float,
-    depol_prob: float,
-    leakage_approx_prob: float,
-    high_cz_multiplier: float,
+    two_qubit_depol_prob: float = TWO_QUBIT_GATE_DEPOL_PROB,
+    one_qubit_depol_prob: float = ONE_QUBIT_GATE_DEPOL_PROB,
     simulator_seed: int = 1234,
 ) -> float:
     scaled = scale_noise_params_for_zne(
         noise_scale,
-        amp_damp_gamma=amp_damp_gamma,
-        phase_damp_gamma=phase_damp_gamma,
-        depol_prob=depol_prob,
-        leakage_approx_prob=leakage_approx_prob,
-        high_cz_multiplier=high_cz_multiplier,
+        two_qubit_depol_prob=two_qubit_depol_prob,
+        one_qubit_depol_prob=one_qubit_depol_prob,
     )
-    noise_model = LocationAwareDecomposedNoise(**scaled)
+    noise_model = GateArityDepolarizingNoise(**scaled)
     noisy_circuit = ansatz_circuit.with_noise(noise_model)
     resolved_noisy_circuit = cirq.resolve_parameters(noisy_circuit, resolver)
     rho_noisy = cirq.DensityMatrixSimulator(seed=simulator_seed).simulate(
@@ -499,11 +268,8 @@ def run_trace_zne(
     noise_scales: list[float] | tuple[float, ...] = (1.0, 2.0, 3.0),
     fit_order: int = 1,
     simulator_seed: int = 1234,
-    amp_damp_gamma: float = DEFAULT_AMP_DAMP_GAMMA,
-    phase_damp_gamma: float = DEFAULT_PHASE_DAMP_GAMMA,
-    depol_prob: float = DEFAULT_DEPOL_PROB,
-    high_cz_multiplier: float = DEFAULT_HIGH_CZ_MULTIPLIER,
-    leakage_approx_prob: float = DEFAULT_LEAKAGE_APPROX_PROB,
+    two_qubit_depol_prob: float = TWO_QUBIT_GATE_DEPOL_PROB,
+    one_qubit_depol_prob: float = ONE_QUBIT_GATE_DEPOL_PROB,
 ) -> dict[str, object]:
     scales = [float(s) for s in noise_scales]
     trace_energies = [
@@ -513,11 +279,8 @@ def run_trace_zne(
             qubits,
             hamiltonian_matrix,
             noise_scale=scale,
-            amp_damp_gamma=amp_damp_gamma,
-            phase_damp_gamma=phase_damp_gamma,
-            depol_prob=depol_prob,
-            leakage_approx_prob=leakage_approx_prob,
-            high_cz_multiplier=high_cz_multiplier,
+            two_qubit_depol_prob=two_qubit_depol_prob,
+            one_qubit_depol_prob=one_qubit_depol_prob,
             simulator_seed=simulator_seed,
         )
         for scale in scales
@@ -843,4 +606,88 @@ def generate_random_clifford_analogue_param_sets(
         resolvers.append(resolver)
 
     return resolvers
+
+
+def run_cdr_with_per_pauli_coeff_print(
+    *,
+    ansatz_circuit: cirq.Circuit,
+    observable_h: cirq.PauliSum,
+    qubits: list[cirq.Qid],
+    target_resolver: dict,
+    target_params: dict,
+    symbols: list,
+    base_noise_cfg: dict,
+    shot_cfg: dict,
+    readout_cal: dict,
+    cdr_cfg: dict | None = None,
+    simulator_seed: int = 1234,
+) -> dict[str, object]:
+    """Run CDR once and print per-Pauli affine coefficients (a_k, b_k).
+
+    This helper is opt-in and keeps the default CDR path silent in other cells.
+    """
+    # Local import avoids introducing a module-level dependency cycle.
+    from shot_measurement_test_LiH import run_mitigation
+
+    cdr_cfg_local = dict(cdr_cfg or {})
+    cdr_cfg_local.setdefault("cdr_fit_scope", "per_pauli")
+
+    out = run_mitigation(
+        "cdr",
+        ansatz_circuit=ansatz_circuit,
+        observable_h=observable_h,
+        qubits=qubits,
+        target_resolver=target_resolver,
+        target_params=target_params,
+        symbols=symbols,
+        base_noise_cfg=base_noise_cfg,
+        shot_cfg=shot_cfg,
+        readout_cal=readout_cal,
+        cdr_cfg=cdr_cfg_local,
+        simulator_seed=int(simulator_seed),
+    )
+
+    models = out.get("cdr_models", {})
+    coeffs_rem = np.asarray(models.get("coeffs_rem_to_exact_per_term", []), dtype=float)
+    coeffs_unmit = np.asarray(models.get("coeffs_unmit_to_exact_per_term", []), dtype=float)
+    weights = np.asarray(models.get("weights", []), dtype=float)
+
+    qubit_to_idx = {q: i for i, q in enumerate(qubits)}
+    term_labels: list[str] = []
+    for pauli_term in observable_h:
+        pauli_map = dict(pauli_term.items())
+        if len(pauli_map) == 0:
+            # Identity offset is not part of per-term CF coefficients.
+            continue
+        chars = ["I"] * len(qubits)
+        for q, op in pauli_map.items():
+            chars[qubit_to_idx[q]] = str(op)
+        term_labels.append("".join(chars))
+
+    print("CDR per-Pauli coefficients (exact_k ~= a_k * noisy_k + b_k)")
+    if coeffs_rem.size == 0:
+        print("No per-Pauli coefficients found. Ensure cdr_fit_scope='per_pauli'.")
+        return out
+
+    print(f"Number of Pauli terms: {len(coeffs_rem)}")
+    print("REM branch coefficients:")
+    for k, (a_k, b_k) in enumerate(coeffs_rem):
+        label = term_labels[k] if k < len(term_labels) else "UNKNOWN"
+        weight = float(weights[k]) if k < len(weights) else float("nan")
+        print(
+            f"term[{k:03d}] {label}  weight={weight: .12f}  "
+            f"a={float(a_k): .12f}, b={float(b_k): .12f}"
+        )
+
+    if coeffs_unmit.size:
+        print("UNMIT branch coefficients:")
+        for k, (a_k, b_k) in enumerate(coeffs_unmit):
+            label = term_labels[k] if k < len(term_labels) else "UNKNOWN"
+            weight = float(weights[k]) if k < len(weights) else float("nan")
+            print(
+                f"term[{k:03d}] {label}  weight={weight: .12f}  "
+                f"a={float(a_k): .12f}, b={float(b_k): .12f}"
+            )
+
+    return out
 

@@ -7,16 +7,18 @@ from typing import Any, Iterable
 import cirq
 import numpy as np
 
-from main_cursor_lib_test_LiH import (
-    GateArityDepolarizingNoise,
-    ONE_QUBIT_GATE_DEPOL_PROB,
-    TWO_QUBIT_GATE_DEPOL_PROB,
+from main_cursor_lib import (
+    DEFAULT_AMP_DAMP_GAMMA,
+    DEFAULT_DEPOL_PROB,
+    DEFAULT_HIGH_CZ_MULTIPLIER,
+    DEFAULT_LEAKAGE_APPROX_PROB,
+    DEFAULT_PHASE_DAMP_GAMMA,
+    LocationAwareDecomposedNoise,
     count_non_clifford_ops,
     generate_near_clifford_param_sets,
     generate_random_clifford_analogue_param_sets,
     run_trace_zne,
     scale_noise_params_for_zne,
-    stable_r2_from_sums,
     trace_energy,
     zne_extrapolate_energy,
 )
@@ -374,8 +376,11 @@ def run_shot_zne(
     noise_scales: list[float] | tuple[float, ...] = (1.0, 2.0, 3.0),
     fit_order: int = 1,
     simulator_seed: int = 1234,
-    two_qubit_depol_prob: float = TWO_QUBIT_GATE_DEPOL_PROB,
-    one_qubit_depol_prob: float = ONE_QUBIT_GATE_DEPOL_PROB,
+    amp_damp_gamma: float = DEFAULT_AMP_DAMP_GAMMA,
+    phase_damp_gamma: float = DEFAULT_PHASE_DAMP_GAMMA,
+    depol_prob: float = DEFAULT_DEPOL_PROB,
+    high_cz_multiplier: float = DEFAULT_HIGH_CZ_MULTIPLIER,
+    leakage_approx_prob: float = DEFAULT_LEAKAGE_APPROX_PROB,
     num_shots: int = 8192,
     measurement_scheme: str = "ogm",
     p_0_success: Iterable[float] | None = None,
@@ -399,10 +404,13 @@ def run_shot_zne(
     for scale in scales:
         scaled = scale_noise_params_for_zne(
             scale,
-            two_qubit_depol_prob=two_qubit_depol_prob,
-            one_qubit_depol_prob=one_qubit_depol_prob,
+            amp_damp_gamma=amp_damp_gamma,
+            phase_damp_gamma=phase_damp_gamma,
+            depol_prob=depol_prob,
+            leakage_approx_prob=leakage_approx_prob,
+            high_cz_multiplier=high_cz_multiplier,
         )
-        noise_model = GateArityDepolarizingNoise(**scaled)
+        noise_model = LocationAwareDecomposedNoise(**scaled)
         noisy_circuit = ansatz_circuit.with_noise(noise_model)
         resolved_noisy = cirq.resolve_parameters(noisy_circuit, resolver)
         rho_noisy = cirq.DensityMatrixSimulator(seed=simulator_seed).simulate(
@@ -516,7 +524,7 @@ def _simulate_noisy_rho_for_resolver(
     *,
     simulator_seed: int,
 ) -> np.ndarray:
-    noise_model = GateArityDepolarizingNoise(**noise_params)
+    noise_model = LocationAwareDecomposedNoise(**noise_params)
     noisy_circuit = ansatz_circuit.with_noise(noise_model)
     resolved_noisy = cirq.resolve_parameters(noisy_circuit, resolver)
     rho = cirq.DensityMatrixSimulator(seed=simulator_seed).simulate(
@@ -737,7 +745,10 @@ def train_cf_models_per_pauli(
         y_pred = float(cr[0]) * xr + float(cr[1])
         ss_res = float(np.sum((y - y_pred) ** 2))
         ss_tot = float(np.sum((y - float(np.mean(y))) ** 2))
-        r2_rem.append(stable_r2_from_sums(ss_res, ss_tot, ss_res_tol=1e-4))
+        if ss_tot <= 0.0:
+            r2_rem.append(1.0 if ss_res <= 0.0 else 0.0)
+        else:
+            r2_rem.append(1.0 - ss_res / ss_tot)
 
     return {
         "fit_scope": "per_pauli",
@@ -933,7 +944,8 @@ def run_mitigation(
 ) -> dict[str, object]:
     """Single dispatcher for `none | zne | cdr | both` mitigation pipelines.
 
-    `base_noise_cfg`: dict of `two_qubit_depol_prob`, `one_qubit_depol_prob`.
+    `base_noise_cfg`: dict of `amp_damp_gamma`, `phase_damp_gamma`, `depol_prob`,
+                     `leakage_approx_prob`, `high_cz_multiplier`.
     `shot_cfg`:      dict of `num_shots`, `measurement_scheme`, `apply_readout_noise`,
                      `sampling_seed`, `epsilon`, `ogm_file`, `shadowgrouping_root`.
     `readout_cal`:   dict with `p_0_success`, `p_1_success` (or None).
