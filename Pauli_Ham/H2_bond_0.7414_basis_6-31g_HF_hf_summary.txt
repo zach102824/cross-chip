@@ -1,0 +1,4 @@
+HF total energy (Hartree): -1.126733967117
+HF electronic energy (Hartree): -1.840487960804
+HF overlap |<HF|GS>|: 0.992742217561
+Exact ground energy (Hartree): -1.865436725798
