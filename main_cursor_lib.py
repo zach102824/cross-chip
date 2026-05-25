@@ -11,12 +11,12 @@ import sympy
 PAULI_CHAR_TO_GATE = {"I": None, "X": cirq.X, "Y": cirq.Y, "Z": cirq.Z}
 
 # Gate-only noise: depolarizing strength depends on gate arity (2Q vs 1Q).
-TWO_QUBIT_GATE_DEPOL_PROB = 0.01
-ONE_QUBIT_GATE_DEPOL_PROB = 0.0005
+TWO_QUBIT_GATE_DEPOL_PROB = 0.001
+ONE_QUBIT_GATE_DEPOL_PROB = 0.00005
 
 # Legacy notebooks referred to a single “depol_prob”; that matched the two-qubit channel strength.
 DEFAULT_DEPOL_PROB = TWO_QUBIT_GATE_DEPOL_PROB
-DEFAULT_HIGH_CZ_MULTIPLIER = 5.0
+DEFAULT_HIGH_CZ_MULTIPLIER = 1.0
 DEFAULT_AMP_DAMP_GAMMA = 0.0
 DEFAULT_PHASE_DAMP_GAMMA = 0.0
 DEFAULT_LEAKAGE_APPROX_PROB = 0.0
@@ -46,6 +46,174 @@ def cz_tag_for_qubit_pair(q0: cirq.Qid, q1: cirq.Qid) -> str:
         if q0.col == q1.col and abs(q0.row - q1.row) == 1:
             return CZ_ONSITE_TAG
     return CZ_NORMAL_TAG
+
+
+def ordered_parameter_symbols(
+    num_spatial_orbitals: int, num_layers: int
+) -> list[sympy.Symbol]:
+    """Match the ansatz symbol naming convention used in notebooks/tests."""
+    symbols: list[sympy.Symbol] = []
+    p_idx = 0
+    for layer in range(num_layers):
+        for _ in range(0, num_spatial_orbitals - 1, 2):
+            symbols.append(sympy.Symbol(f"th_{layer}_{p_idx}"))
+            p_idx += 1
+        for _ in range(1, num_spatial_orbitals - 1, 2):
+            symbols.append(sympy.Symbol(f"th_{layer}_{p_idx}"))
+            p_idx += 1
+        for _ in range(num_spatial_orbitals):
+            symbols.append(sympy.Symbol(f"ph_{layer}_{p_idx}"))
+            p_idx += 1
+    return symbols
+
+
+def prepare_original_fsim_ansatz_cirq(
+    num_spatial_orbitals: int, num_layers: int = 1
+) -> tuple[cirq.Circuit, list[cirq.GridQubit]]:
+    """Construct the original symbolic FSim ansatz."""
+    qubits = [cirq.GridQubit(0, i) for i in range(num_spatial_orbitals)] + [
+        cirq.GridQubit(1, i) for i in range(num_spatial_orbitals)
+    ]
+    circuit = cirq.Circuit()
+    p_idx = 0
+    circuit.append([cirq.X(qubits[i]) for i in range(1, len(qubits), 2)])
+
+    for layer in range(num_layers):
+        even_odd_moments = []
+        for i in range(0, num_spatial_orbitals - 1, 2):
+            theta = sympy.Symbol(f"th_{layer}_{p_idx}")
+            even_odd_moments.append(cirq.FSimGate(theta, 0).on(qubits[i], qubits[i + 1]))
+            even_odd_moments.append(
+                cirq.FSimGate(theta, 0).on(
+                    qubits[i + num_spatial_orbitals], qubits[i + 1 + num_spatial_orbitals]
+                )
+            )
+            p_idx += 1
+        circuit.append(even_odd_moments, strategy=cirq.InsertStrategy.NEW_THEN_INLINE)
+
+        odd_even_moments = []
+        for i in range(1, num_spatial_orbitals - 1, 2):
+            theta = sympy.Symbol(f"th_{layer}_{p_idx}")
+            odd_even_moments.append(cirq.FSimGate(theta, 0).on(qubits[i], qubits[i + 1]))
+            odd_even_moments.append(
+                cirq.FSimGate(theta, 0).on(
+                    qubits[i + num_spatial_orbitals], qubits[i + 1 + num_spatial_orbitals]
+                )
+            )
+            p_idx += 1
+        circuit.append(odd_even_moments, strategy=cirq.InsertStrategy.NEW_THEN_INLINE)
+
+        onsite_moments = []
+        for i in range(num_spatial_orbitals):
+            phi = sympy.Symbol(f"ph_{layer}_{p_idx}")
+            onsite_moments.append(
+                cirq.FSimGate(0, phi).on(qubits[i], qubits[i + num_spatial_orbitals])
+            )
+            p_idx += 1
+        circuit.append(onsite_moments, strategy=cirq.InsertStrategy.NEW_THEN_INLINE)
+
+    return circuit, qubits
+
+
+def _is_zero_like(value: object, atol: float = 1e-12) -> bool:
+    if isinstance(value, (int, float, np.floating)):
+        return bool(np.isclose(float(value), 0.0, atol=atol))
+    if isinstance(value, sympy.Basic):
+        return bool(sympy.simplify(value) == 0)
+    try:
+        return bool(np.isclose(float(value), 0.0, atol=atol))
+    except (TypeError, ValueError):
+        return False
+
+
+def _tag_cz_ops(ops: list[cirq.Operation], tag: str) -> list[cirq.Operation]:
+    tagged: list[cirq.Operation] = []
+    for op in ops:
+        if isinstance(op.gate, cirq.CZPowGate) and np.isclose(float(op.gate.exponent), 1.0):
+            tagged.append(op.with_tags(tag))
+        else:
+            tagged.append(op)
+    return tagged
+
+
+def decompose_ansatz_fsim_ops(fsim_circuit: cirq.Circuit) -> cirq.Circuit:
+    """Replace each FSim(theta,0)/(0,phi) with CZ+1Q decomposition and CZ tags."""
+    from decompose_fsim_gate import decompose_fsim_phi_only, decompose_fsim_theta_only
+
+    decomposed = cirq.Circuit()
+    for moment in fsim_circuit:
+        moment_ops: list[cirq.Operation] = []
+        for op in moment.operations:
+            gate = op.gate
+            if not isinstance(gate, cirq.FSimGate):
+                moment_ops.append(op)
+                continue
+
+            theta = gate.theta
+            phi = gate.phi
+            q0, q1 = op.qubits
+
+            if _is_zero_like(phi):
+                theta_ops = decompose_fsim_theta_only(theta, q0, q1)
+                theta_tag = cz_tag_for_horizontal_pair(q0, q1)
+                moment_ops.extend(_tag_cz_ops(theta_ops, theta_tag))
+            elif _is_zero_like(theta):
+                phi_ops = decompose_fsim_phi_only(phi, q0, q1)
+                moment_ops.extend(_tag_cz_ops(phi_ops, CZ_ONSITE_TAG))
+            else:
+                raise ValueError(
+                    "Encountered general FSim(theta, phi); expected theta-only or phi-only."
+                )
+        decomposed.append(moment_ops)
+    return decomposed
+
+
+def prepare_decomposed_ansatz_cirq(
+    num_spatial_orbitals: int, num_layers: int = 1
+) -> tuple[cirq.Circuit, list[cirq.GridQubit]]:
+    """Construct symbolic decomposed (CZ + 1Q) ansatz circuit."""
+    fsim_circuit, qubits = prepare_original_fsim_ansatz_cirq(
+        num_spatial_orbitals=num_spatial_orbitals, num_layers=num_layers
+    )
+    return decompose_ansatz_fsim_ops(fsim_circuit), qubits
+
+
+def build_cdr_parametrized_decomposed_template(
+    num_spatial_orbitals: int,
+    num_layers: int,
+) -> tuple[cirq.Circuit, list[cirq.GridQubit], list[sympy.Symbol], dict[str, object]]:
+    """Build symbolic decomposed template and coupled-symbol metadata for CDR."""
+    circuit, qubits = prepare_decomposed_ansatz_cirq(
+        num_spatial_orbitals=num_spatial_orbitals, num_layers=num_layers
+    )
+    symbols = ordered_parameter_symbols(
+        num_spatial_orbitals=num_spatial_orbitals, num_layers=num_layers
+    )
+    symbol_metadata: dict[str, dict[str, object]] = {}
+    for sym in symbols:
+        if _is_symbol_theta(sym):
+            symbol_metadata[str(sym)] = {
+                "group_type": "theta_pair",
+                "coupled_ops": 2,
+                "phase_type_noncliff": False,
+            }
+        elif _is_symbol_phi(sym):
+            symbol_metadata[str(sym)] = {
+                "group_type": "phi_onsite",
+                "coupled_ops": 3,
+                "phase_type_noncliff": True,
+            }
+        else:
+            symbol_metadata[str(sym)] = {
+                "group_type": "other",
+                "coupled_ops": 1,
+                "phase_type_noncliff": False,
+            }
+    metadata: dict[str, object] = {
+        "symbol_metadata": symbol_metadata,
+        "non_clifford_control_group": "parameter_symbol",
+    }
+    return circuit, qubits, symbols, metadata
 
 
 class GateArityDepolarizingNoise(cirq.NoiseModel):
@@ -355,6 +523,103 @@ def clifford_snap_value_for_symbol(symbol: sympy.Symbol, value: float) -> float:
     )
 
 
+def is_symbol_value_clifford(
+    symbol: sympy.Symbol, value: float, atol: float = 1e-9
+) -> bool:
+    """Return whether a symbol value lands on the Clifford grid."""
+    v = float(value)
+    if _is_symbol_theta(symbol):
+        return is_clifford_exponent(v / np.pi, atol=atol)
+    if _is_symbol_phi(symbol):
+        return is_clifford_exponent(v / (2.0 * np.pi), atol=atol)
+    raise ValueError(
+        f"Unrecognized symbol naming convention for Clifford check: {symbol}. "
+        "Expected names starting with 'th_' or 'ph_'."
+    )
+
+
+def summarize_non_clifford_param_distribution(
+    resolvers: list[dict[sympy.Symbol, float]],
+    symbols: list[sympy.Symbol],
+) -> dict[str, float]:
+    """Summarize achieved non-Clifford parameter budgets across resolvers."""
+    n_total = len(symbols)
+    phase_symbols = [s for s in symbols if _is_symbol_phi(s)]
+    n_phase = len(phase_symbols)
+    non_cliff_counts: list[int] = []
+    phase_snap_fracs: list[float] = []
+
+    for resolver in resolvers:
+        non_cliff = 0
+        phase_non_cliff = 0
+        for sym in symbols:
+            if not is_symbol_value_clifford(sym, float(resolver[sym])):
+                non_cliff += 1
+                if _is_symbol_phi(sym):
+                    phase_non_cliff += 1
+        non_cliff_counts.append(non_cliff)
+        if n_phase == 0:
+            phase_snap_fracs.append(1.0)
+        else:
+            phase_snap_fracs.append(1.0 - (float(phase_non_cliff) / float(n_phase)))
+
+    if not non_cliff_counts:
+        return {
+            "num_resolvers": 0.0,
+            "mean_non_clifford_params": 0.0,
+            "max_non_clifford_params": 0.0,
+            "min_non_clifford_params": 0.0,
+            "mean_phase_noncliff_snap_fraction": 1.0,
+        }
+    return {
+        "num_resolvers": float(len(non_cliff_counts)),
+        "mean_non_clifford_params": float(np.mean(non_cliff_counts)),
+        "max_non_clifford_params": float(np.max(non_cliff_counts)),
+        "min_non_clifford_params": float(np.min(non_cliff_counts)),
+        "mean_phase_noncliff_snap_fraction": float(np.mean(phase_snap_fracs)),
+    }
+
+
+def count_clifford_nonclifford_gates(
+    circuit: cirq.Circuit, resolver: dict | cirq.ParamResolver
+) -> dict[str, int]:
+    """Count total, Clifford, and non-Clifford gates after parameter resolution."""
+    resolved = cirq.resolve_parameters(circuit, resolver)
+    total = 0
+    clifford = 0
+    non_clifford = 0
+    for op in resolved.all_operations():
+        gate = op.gate
+        if gate is None or isinstance(gate, cirq.MeasurementGate):
+            continue
+        total += 1
+
+        is_cliff = False
+        if isinstance(gate, _EXPONENT_GATE_TYPES):
+            try:
+                is_cliff = is_clifford_exponent(float(gate.exponent))
+            except (TypeError, ValueError):
+                is_cliff = False
+        elif isinstance(gate, cirq.CZPowGate):
+            try:
+                is_cliff = is_clifford_exponent(float(gate.exponent))
+            except (TypeError, ValueError):
+                is_cliff = False
+        elif gate == cirq.H:
+            is_cliff = True
+
+        if is_cliff:
+            clifford += 1
+        else:
+            non_clifford += 1
+
+    return {
+        "total_gates": int(total),
+        "clifford_gates": int(clifford),
+        "non_clifford_gates": int(non_clifford),
+    }
+
+
 def count_non_clifford_ops(
     circuit: cirq.Circuit, resolver: dict | cirq.ParamResolver
 ) -> int:
@@ -384,7 +649,118 @@ def count_non_clifford_ops(
     return count
 
 
-def generate_near_clifford_param_sets(
+def _normalize_target_params(
+    target_params: dict[sympy.Symbol, float] | dict[str, float],
+    symbols: list[sympy.Symbol],
+) -> dict[sympy.Symbol, float]:
+    target_by_symbol: dict[sympy.Symbol, float] = {}
+    for sym in symbols:
+        if sym in target_params:
+            target_by_symbol[sym] = float(target_params[sym])
+        elif str(sym) in target_params:
+            target_by_symbol[sym] = float(target_params[str(sym)])
+        else:
+            raise KeyError(f"Target parameter missing for symbol {sym!s}.")
+    return target_by_symbol
+
+
+def _sample_non_clifford_value_for_symbol(
+    symbol: sympy.Symbol, rng: np.random.Generator
+) -> float:
+    """Sample a value deliberately away from the Clifford grid."""
+    for _ in range(64):
+        candidate = float(rng.uniform(0.0, 2.0 * np.pi))
+        if not is_symbol_value_clifford(symbol, candidate, atol=1e-5):
+            return candidate
+    # Fallback perturbation if random retries land on/near grid.
+    if _is_symbol_theta(symbol):
+        return float((np.pi / 7.0) % (2.0 * np.pi))
+    if _is_symbol_phi(symbol):
+        return float((np.pi / 3.0) % (2.0 * np.pi))
+    return float(rng.uniform(0.0, 2.0 * np.pi))
+
+
+def _generate_near_clifford_param_sets_symbol_budget(
+    target_params: dict[sympy.Symbol, float] | dict[str, float],
+    symbols: list[sympy.Symbol],
+    *,
+    num_circuits: int,
+    non_clifford_params_max: int,
+    target_phase_noncliff_snap_fraction: float | None,
+    seed: int,
+) -> list[dict[sympy.Symbol, float]]:
+    if num_circuits <= 0:
+        raise ValueError(f"num_circuits must be > 0, got {num_circuits}.")
+    if non_clifford_params_max < 0:
+        raise ValueError(
+            "non_clifford_params_max must be >= 0, "
+            f"got {non_clifford_params_max}."
+        )
+    if non_clifford_params_max > len(symbols):
+        raise ValueError(
+            "non_clifford_params_max cannot exceed number of symbols: "
+            f"{non_clifford_params_max} > {len(symbols)}."
+        )
+    if target_phase_noncliff_snap_fraction is None:
+        phase_snap_target = 0.0
+    else:
+        phase_snap_target = float(target_phase_noncliff_snap_fraction)
+        if not (0.0 <= phase_snap_target <= 1.0):
+            raise ValueError(
+                "target_phase_noncliff_snap_fraction must be in [0, 1], "
+                f"got {phase_snap_target}."
+            )
+
+    target_by_symbol = _normalize_target_params(target_params, symbols)
+    phase_symbols = [s for s in symbols if _is_symbol_phi(s)]
+    theta_symbols = [s for s in symbols if _is_symbol_theta(s)]
+    n_phase = len(phase_symbols)
+    desired_phase_snapped = int(np.ceil(phase_snap_target * n_phase))
+    max_unsnapped_phase = max(0, n_phase - desired_phase_snapped)
+
+    resolvers: list[dict[sympy.Symbol, float]] = []
+    for circ_idx in range(num_circuits):
+        local_rng = np.random.default_rng(int(seed) + 1000 * (circ_idx + 1))
+        resolver: dict[sympy.Symbol, float] = {
+            sym: clifford_snap_value_for_symbol(sym, target_by_symbol[sym])
+            for sym in symbols
+        }
+
+        unsnapped_total = int(non_clifford_params_max)
+        unsnapped_phase = min(
+            int(max_unsnapped_phase),
+            int(unsnapped_total),
+            len(phase_symbols),
+        )
+        unsnapped_theta = min(
+            int(unsnapped_total) - int(unsnapped_phase),
+            len(theta_symbols),
+        )
+
+        phase_order = list(phase_symbols)
+        theta_order = list(theta_symbols)
+        local_rng.shuffle(phase_order)
+        local_rng.shuffle(theta_order)
+        unsnapped_symbols = phase_order[:unsnapped_phase] + theta_order[:unsnapped_theta]
+
+        if len(unsnapped_symbols) < unsnapped_total:
+            remaining = [
+                s
+                for s in symbols
+                if s not in unsnapped_symbols
+            ]
+            local_rng.shuffle(remaining)
+            need = unsnapped_total - len(unsnapped_symbols)
+            unsnapped_symbols.extend(remaining[:need])
+
+        for sym in unsnapped_symbols:
+            resolver[sym] = _sample_non_clifford_value_for_symbol(sym, local_rng)
+        resolvers.append(resolver)
+
+    return resolvers
+
+
+def _generate_near_clifford_param_sets_legacy_op_budget(
     target_params: dict[sympy.Symbol, float] | dict[str, float],
     symbols: list[sympy.Symbol],
     *,
@@ -394,33 +770,13 @@ def generate_near_clifford_param_sets(
     min_snap_fraction: float = 0.0,
     seed: int = 0,
 ) -> list[dict[sympy.Symbol, float]]:
-    """Generate `num_circuits` near-Clifford resolvers in two explicit steps.
-
-    Step 1:
-      Randomly choose which parameterized gates are replaced by nearest
-      Clifford angles (snapped from target parameters), enforcing:
-      ``(total_count - non_clifford_count) == t_max``.
-
-    Step 2:
-      For the remaining parameterized gates (the non-Clifford part), assign
-      rotation angles independently and uniformly from ``[0, 2π]``.
-
-    ``min_snap_fraction`` is retained only for API compatibility and ignored.
-    """
     if num_circuits <= 0:
         raise ValueError(f"num_circuits must be > 0, got {num_circuits}.")
     if t_max < 0:
         raise ValueError(f"t_max must be >= 0, got {t_max}.")
     _ = float(min_snap_fraction)  # Backward-compatible no-op.
 
-    target_by_symbol: dict[sympy.Symbol, float] = {}
-    for sym in symbols:
-        if sym in target_params:
-            target_by_symbol[sym] = float(target_params[sym])
-        elif str(sym) in target_params:
-            target_by_symbol[sym] = float(target_params[str(sym)])
-        else:
-            raise KeyError(f"Target parameter missing for symbol {sym!s}.")
+    target_by_symbol = _normalize_target_params(target_params, symbols)
 
     # Estimate total count when all parameterized gates are non-Clifford.
     probe_rng = np.random.default_rng(int(seed) + 99991)
@@ -441,8 +797,6 @@ def generate_near_clifford_param_sets(
         found: dict[sympy.Symbol, float] | None = None
 
         for _attempt in range(96):
-            # Step 1: start fully Clifford, then randomize selected symbols
-            # until (total_count - non_clifford_count) == t_max.
             resolver: dict[sympy.Symbol, float] = {
                 sym: clifford_snap_value_for_symbol(sym, target_by_symbol[sym])
                 for sym in symbols
@@ -478,8 +832,6 @@ def generate_near_clifford_param_sets(
             if current_cliff != t_max:
                 continue
 
-            # Step 2: assign remaining (non-Clifford) symbols independently
-            # from Uniform[0, 2π], then keep exact Clifford count via repair.
             for sym in list(unsnapped):
                 resolver[sym] = float(local_rng.uniform(0.0, 2.0 * np.pi))
 
@@ -519,8 +871,53 @@ def generate_near_clifford_param_sets(
                 f"Could not construct resolver with exact Clifford count t_max={t_max}."
             )
         resolvers.append(found)
-
     return resolvers
+
+
+def generate_near_clifford_param_sets(
+    target_params: dict[sympy.Symbol, float] | dict[str, float],
+    symbols: list[sympy.Symbol],
+    *,
+    num_circuits: int,
+    t_max: int | None = None,
+    non_clifford_params_max: int | None = None,
+    target_phase_noncliff_snap_fraction: float | None = None,
+    circuit: cirq.Circuit,
+    min_snap_fraction: float = 0.0,
+    seed: int = 0,
+) -> list[dict[sympy.Symbol, float]]:
+    """Generate near-Clifford training resolvers.
+
+    Preferred mode:
+      - ``non_clifford_params_max``: cap number of unsnapped non-Clifford symbols.
+      - ``target_phase_noncliff_snap_fraction``: desired snapped proportion of
+        phase-type symbols (``ph_*``), covering T/Tdag and Z^(±3/4)-style blocks.
+
+    Backward-compatible legacy mode:
+      - ``t_max`` only: preserves the historical operation-count budget behavior.
+    """
+    if non_clifford_params_max is None and t_max is None:
+        raise ValueError(
+            "Either `non_clifford_params_max` (preferred) or legacy `t_max` must be provided."
+        )
+    if non_clifford_params_max is not None:
+        return _generate_near_clifford_param_sets_symbol_budget(
+            target_params,
+            symbols,
+            num_circuits=int(num_circuits),
+            non_clifford_params_max=int(non_clifford_params_max),
+            target_phase_noncliff_snap_fraction=target_phase_noncliff_snap_fraction,
+            seed=int(seed),
+        )
+    return _generate_near_clifford_param_sets_legacy_op_budget(
+        target_params,
+        symbols,
+        num_circuits=int(num_circuits),
+        t_max=int(t_max),
+        circuit=circuit,
+        min_snap_fraction=float(min_snap_fraction),
+        seed=int(seed),
+    )
 
 
 def random_clifford_theta(rng: np.random.Generator) -> float:
@@ -648,8 +1045,15 @@ def run_cdr_with_per_pauli_coeff_print(
         return out
 
     print(f"Number of Pauli terms: {len(coeffs_rem)}")
-    print("REM branch coefficients:")
-    for k, (a_k, b_k) in enumerate(coeffs_rem):
+    max_print_terms = min(30, len(coeffs_rem))
+    ranked_indices = np.argsort(-np.abs(weights)) if len(weights) else np.arange(len(coeffs_rem))
+    ranked_indices = ranked_indices[:max_print_terms]
+
+    print(
+        f"REM branch coefficients (top {max_print_terms} by |weight|):"
+    )
+    for k in ranked_indices:
+        a_k, b_k = coeffs_rem[k]
         label = term_labels[k] if k < len(term_labels) else "UNKNOWN"
         weight = float(weights[k]) if k < len(weights) else float("nan")
         print(
@@ -658,8 +1062,11 @@ def run_cdr_with_per_pauli_coeff_print(
         )
 
     if coeffs_unmit.size:
-        print("UNMIT branch coefficients:")
-        for k, (a_k, b_k) in enumerate(coeffs_unmit):
+        print(
+            f"UNMIT branch coefficients (top {max_print_terms} by |weight|):"
+        )
+        for k in ranked_indices:
+            a_k, b_k = coeffs_unmit[k]
             label = term_labels[k] if k < len(term_labels) else "UNKNOWN"
             weight = float(weights[k]) if k < len(weights) else float("nan")
             print(

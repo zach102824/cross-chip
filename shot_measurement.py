@@ -14,6 +14,7 @@ from main_cursor_lib import (
     count_non_clifford_ops,
     generate_near_clifford_param_sets,
     generate_random_clifford_analogue_param_sets,
+    summarize_non_clifford_param_distribution,
     stable_r2_from_sums,
     trace_energy,
 )
@@ -846,7 +847,8 @@ def run_mitigation(
     `shot_cfg`:      dict of `num_shots`, `measurement_scheme`, `apply_readout_noise`,
                      `sampling_seed`, `epsilon`, `ogm_file`, `shadowgrouping_root`.
     `readout_cal`:   dict with `p_0_success`, `p_1_success` (or None).
-    `cdr_cfg`:       dict with `num_circuits`, `t_max`, `min_snap_fraction`, `seed`,
+    `cdr_cfg`:       dict with `num_circuits`, `non_clifford_params_max`, `seed`,
+                     optional legacy `t_max`, optional `target_phase_noncliff_snap_fraction`,
                      optional `cdr_training` (`snap_greedy`|`random_clifford`),
                      optional `cdr_fit_scope` (`per_pauli`|`total_energy`, default `per_pauli`).
                      Also carries `target_params` and `symbols` if not provided at the top level.
@@ -918,13 +920,36 @@ def run_mitigation(
             )
 
         cdr_training = str(cdr_cfg.get("cdr_training", "snap_greedy"))
+        legacy_t_max = cdr_cfg.get("t_max")
+        non_clifford_params_max = cdr_cfg.get("non_clifford_params_max")
+        if non_clifford_params_max is None and legacy_t_max is not None:
+            non_clifford_params_max = legacy_t_max
+        target_phase_noncliff_snap_fraction = cdr_cfg.get(
+            "target_phase_noncliff_snap_fraction",
+            cdr_cfg.get("target_t_snap_fraction"),
+        )
         if cdr_training == "snap_greedy":
+            if non_clifford_params_max is None and legacy_t_max is None:
+                raise ValueError(
+                    "cdr_cfg for snap_greedy must provide `non_clifford_params_max` "
+                    "(preferred) or legacy `t_max`."
+                )
             try:
                 resolvers = generate_near_clifford_param_sets(
                     cdr_target_params,
                     list(cdr_symbols),
                     num_circuits=int(cdr_cfg["num_circuits"]),
-                    t_max=int(cdr_cfg["t_max"]),
+                    t_max=int(legacy_t_max) if legacy_t_max is not None else None,
+                    non_clifford_params_max=(
+                        int(non_clifford_params_max)
+                        if non_clifford_params_max is not None
+                        else None
+                    ),
+                    target_phase_noncliff_snap_fraction=(
+                        float(target_phase_noncliff_snap_fraction)
+                        if target_phase_noncliff_snap_fraction is not None
+                        else None
+                    ),
                     circuit=ansatz_circuit,
                     min_snap_fraction=float(cdr_cfg.get("min_snap_fraction", 0.0)),
                     seed=int(cdr_cfg.get("seed", 0)),
@@ -932,11 +957,16 @@ def run_mitigation(
             except ValueError as err:
                 if "Unrecognized symbol naming convention" not in str(err):
                     raise
+                fallback_t_max = (
+                    int(non_clifford_params_max)
+                    if non_clifford_params_max is not None
+                    else int(legacy_t_max)
+                )
                 resolvers = _generate_near_clifford_resolvers_fallback(
                     cdr_target_params,
                     list(cdr_symbols),
                     num_circuits=int(cdr_cfg["num_circuits"]),
-                    t_max=int(cdr_cfg["t_max"]),
+                    t_max=fallback_t_max,
                     circuit=ansatz_circuit,
                     min_snap_fraction=float(cdr_cfg.get("min_snap_fraction", 0.0)),
                     seed=int(cdr_cfg.get("seed", 0)),
@@ -956,6 +986,23 @@ def run_mitigation(
 
         out["cdr_training"] = cdr_training
         out["cdr_fit_scope"] = cdr_fit_scope
+        if cdr_training == "snap_greedy":
+            out["cdr_training_constraints"] = {
+                "non_clifford_params_max": (
+                    int(non_clifford_params_max)
+                    if non_clifford_params_max is not None
+                    else None
+                ),
+                "target_phase_noncliff_snap_fraction": (
+                    float(target_phase_noncliff_snap_fraction)
+                    if target_phase_noncliff_snap_fraction is not None
+                    else None
+                ),
+            }
+            out["cdr_training_summary"] = summarize_non_clifford_param_distribution(
+                resolvers,
+                list(cdr_symbols),
+            )
 
         def _train_and_apply_cdr(scaled_noise: dict) -> tuple[dict[str, object], dict[str, float]]:
             if cdr_fit_scope == "per_pauli":
