@@ -7,18 +7,15 @@ from typing import Any, Iterable
 import cirq
 import numpy as np
 
-from main_cursor_lib_test_LiH import (
+from main_cursor_lib import (
     GateArityDepolarizingNoise,
     ONE_QUBIT_GATE_DEPOL_PROB,
     TWO_QUBIT_GATE_DEPOL_PROB,
     count_non_clifford_ops,
     generate_near_clifford_param_sets,
     generate_random_clifford_analogue_param_sets,
-    run_trace_zne,
-    scale_noise_params_for_zne,
     stable_r2_from_sums,
     trace_energy,
-    zne_extrapolate_energy,
 )
 
 MEASUREMENT_SCHEMES = {
@@ -365,93 +362,6 @@ def estimate_energy_from_noisy_rho_shots(
     return result
 
 
-def run_shot_zne(
-    ansatz_circuit: cirq.Circuit,
-    resolver: cirq.ParamResolver,
-    observable_h: cirq.PauliSum,
-    qubits: list[cirq.Qid],
-    *,
-    noise_scales: list[float] | tuple[float, ...] = (1.0, 2.0, 3.0),
-    fit_order: int = 1,
-    simulator_seed: int = 1234,
-    two_qubit_depol_prob: float = TWO_QUBIT_GATE_DEPOL_PROB,
-    one_qubit_depol_prob: float = ONE_QUBIT_GATE_DEPOL_PROB,
-    num_shots: int = 8192,
-    measurement_scheme: str = "ogm",
-    p_0_success: Iterable[float] | None = None,
-    p_1_success: Iterable[float] | None = None,
-    apply_rem: bool = True,
-    apply_readout_noise: bool = True,
-    sampling_seed: int = 1234,
-    epsilon: float = 0.1,
-    ogm_file: str | Path | None = None,
-    shadowgrouping_root: str | Path | None = None,
-    extrapolate_rem: bool = False,
-) -> dict[str, object]:
-    scales = [float(s) for s in noise_scales]
-    if any(scale <= 0 for scale in scales):
-        raise ValueError(f"All noise scales must be > 0, got {scales}.")
-
-    shot_unmitigated: list[float] = []
-    shot_rem: list[float] = []
-    per_scale_results: list[dict[str, float]] = []
-
-    for scale in scales:
-        scaled = scale_noise_params_for_zne(
-            scale,
-            two_qubit_depol_prob=two_qubit_depol_prob,
-            one_qubit_depol_prob=one_qubit_depol_prob,
-        )
-        noise_model = GateArityDepolarizingNoise(**scaled)
-        noisy_circuit = ansatz_circuit.with_noise(noise_model)
-        resolved_noisy = cirq.resolve_parameters(noisy_circuit, resolver)
-        rho_noisy = cirq.DensityMatrixSimulator(seed=simulator_seed).simulate(
-            resolved_noisy, qubit_order=qubits
-        ).final_density_matrix
-        rho_noisy = _sanitize_rho(rho_noisy)
-
-        est = estimate_energy_from_noisy_rho_shots(
-            rho_noisy,
-            observable_h,
-            qubits,
-            num_shots=num_shots,
-            measurement_scheme=measurement_scheme,
-            p_0_success=p_0_success,
-            p_1_success=p_1_success,
-            apply_rem=apply_rem,
-            apply_readout_noise=apply_readout_noise,
-            sampling_seed=sampling_seed,
-            epsilon=epsilon,
-            ogm_file=ogm_file,
-            shadowgrouping_root=shadowgrouping_root,
-        )
-        shot_unmitigated.append(float(est["energy_unmitigated"]))
-        shot_rem.append(float(est["energy_rem"]))
-        per_scale_results.append(
-            {
-                "noise_scale": float(scale),
-                "energy_unmitigated": float(est["energy_unmitigated"]),
-                "energy_rem": float(est["energy_rem"]),
-            }
-        )
-
-    zne_unmit = zne_extrapolate_energy(scales, shot_unmitigated, fit_order=fit_order)
-    out: dict[str, object] = {
-        "noise_scales": [float(x) for x in scales],
-        "shot_unmitigated_energies": [float(x) for x in shot_unmitigated],
-        "shot_rem_energies": [float(x) for x in shot_rem],
-        "fit_order": int(fit_order),
-        "fit_coefficients_unmitigated": [float(x) for x in zne_unmit["fit_coefficients"]],
-        "zne_unmitigated": float(zne_unmit["energy_zne"]),
-        "per_scale_results": per_scale_results,
-    }
-    if extrapolate_rem:
-        zne_rem = zne_extrapolate_energy(scales, shot_rem, fit_order=fit_order)
-        out["fit_coefficients_rem"] = [float(x) for x in zne_rem["fit_coefficients"]]
-        out["zne_rem"] = float(zne_rem["energy_zne"])
-    return out
-
-
 def exact_noiseless_energy_from_statevector(
     state: np.ndarray, observable_h: cirq.PauliSum, qubits: list[cirq.Qid]
 ) -> float:
@@ -782,7 +692,7 @@ def apply_cf_models_per_pauli(
 # Unified mitigation-mode dispatcher
 # ---------------------------------------------------------------------------
 
-VALID_MITIGATION_MODES: tuple[str, ...] = ("none", "zne", "cdr", "both")
+VALID_MITIGATION_MODES: tuple[str, ...] = ("none", "cdr")
 
 
 def _generate_near_clifford_resolvers_fallback(
@@ -927,17 +837,15 @@ def run_mitigation(
     base_noise_cfg: dict,
     shot_cfg: dict,
     readout_cal: dict | None = None,
-    zne_cfg: dict | None = None,
     cdr_cfg: dict | None = None,
     simulator_seed: int = 1234,
 ) -> dict[str, object]:
-    """Single dispatcher for `none | zne | cdr | both` mitigation pipelines.
+    """Single dispatcher for `none | cdr` mitigation pipelines.
 
     `base_noise_cfg`: dict of `two_qubit_depol_prob`, `one_qubit_depol_prob`.
     `shot_cfg`:      dict of `num_shots`, `measurement_scheme`, `apply_readout_noise`,
                      `sampling_seed`, `epsilon`, `ogm_file`, `shadowgrouping_root`.
     `readout_cal`:   dict with `p_0_success`, `p_1_success` (or None).
-    `zne_cfg`:       dict with `noise_scales`, `fit_order` (required for `zne`/`both`).
     `cdr_cfg`:       dict with `num_circuits`, `t_max`, `min_snap_fraction`, `seed`,
                      optional `cdr_training` (`snap_greedy`|`random_clifford`),
                      optional `cdr_fit_scope` (`per_pauli`|`total_energy`, default `per_pauli`).
@@ -966,9 +874,9 @@ def run_mitigation(
     base_noise = dict(base_noise_cfg)
 
     cdr_fit_scope = "per_pauli"
-    if mode in ("cdr", "both"):
+    if mode == "cdr":
         if cdr_cfg is None:
-            raise ValueError(f"cdr_cfg is required when mitigation_mode={mode!r}.")
+            raise ValueError("cdr_cfg is required when mitigation_mode='cdr'.")
         cdr_fit_scope = str(cdr_cfg.get("cdr_fit_scope", "per_pauli"))
 
     baseline = _baseline_target_energies(
@@ -999,53 +907,7 @@ def run_mitigation(
     if mode == "none":
         return out
 
-    if mode in ("zne", "both"):
-        if zne_cfg is None:
-            raise ValueError(f"zne_cfg is required when mitigation_mode={mode!r}.")
-        zne_scales = list(zne_cfg["noise_scales"])
-        zne_fit_order = int(zne_cfg.get("fit_order", 1))
-        if mode == "zne" and len(zne_scales) < 2:
-            raise ValueError(
-                f"mitigation_mode='zne' requires zne_cfg['noise_scales'] of length >= 2, "
-                f"got {zne_scales}."
-            )
-        if len(zne_scales) >= 2:
-            h_matrix = observable_h.matrix(qubits=qubits)
-            trace_zne = run_trace_zne(
-                ansatz_circuit,
-                target_resolver,
-                qubits,
-                h_matrix,
-                noise_scales=zne_scales,
-                fit_order=zne_fit_order,
-                simulator_seed=simulator_seed,
-                **base_noise,
-            )
-            shot_zne = run_shot_zne(
-                ansatz_circuit,
-                target_resolver,
-                observable_h,
-                qubits,
-                noise_scales=zne_scales,
-                fit_order=zne_fit_order,
-                simulator_seed=simulator_seed,
-                num_shots=num_shots,
-                measurement_scheme=measurement_scheme,
-                p_0_success=p_0_success,
-                p_1_success=p_1_success,
-                apply_rem=True,
-                apply_readout_noise=apply_readout_noise,
-                sampling_seed=sampling_seed,
-                epsilon=epsilon,
-                ogm_file=ogm_file,
-                shadowgrouping_root=shadowgrouping_root,
-                extrapolate_rem=True,
-                **base_noise,
-            )
-            out["trace_zne"] = trace_zne
-            out["shot_zne"] = shot_zne
-
-    if mode in ("cdr", "both"):
+    if mode == "cdr":
         cdr_target_params = (
             target_params if target_params is not None else cdr_cfg.get("target_params")
         )
@@ -1176,74 +1038,10 @@ def run_mitigation(
             c = apply_cdr_models(bt["unmit_target"], bt["rem_target"], m)
             return m, c
 
-        if mode == "cdr":
-            models, corrected = _train_and_apply_cdr(base_noise)
-            out["cdr_models"] = models
-            out["cdr_unmit_corrected"] = corrected["cdr_unmit_corrected"]
-            out["cdr_rem_corrected"] = corrected["cdr_rem_corrected"]
-            return out
-
-        zne_scales = list(zne_cfg["noise_scales"])  # type: ignore[index]
-        zne_fit_order = int(zne_cfg.get("fit_order", 1))  # type: ignore[union-attr]
-        per_scale_cdr_unmit: list[float] = []
-        per_scale_cdr_rem: list[float] = []
-        per_scale_models: list[dict[str, object]] = []
-        per_scale_target_unmit: list[float] = []
-        per_scale_target_rem: list[float] = []
-
-        for scale in zne_scales:
-            scaled_noise = scale_noise_params_for_zne(float(scale), **base_noise)
-            target_at_scale = _baseline_target_energies(
-                ansatz_circuit,
-                target_resolver,
-                observable_h,
-                qubits,
-                noise_params=scaled_noise,
-                simulator_seed=simulator_seed,
-                num_shots=num_shots,
-                measurement_scheme=measurement_scheme,
-                p_0_success=p_0_success,
-                p_1_success=p_1_success,
-                apply_readout_noise=apply_readout_noise,
-                sampling_seed=sampling_seed,
-                epsilon=epsilon,
-                ogm_file=ogm_file,
-                shadowgrouping_root=shadowgrouping_root,
-                return_per_term=False,
-            )
-            models_at_scale, corrected = _train_and_apply_cdr(scaled_noise)
-            per_scale_cdr_unmit.append(corrected["cdr_unmit_corrected"])
-            per_scale_cdr_rem.append(corrected["cdr_rem_corrected"])
-            per_scale_models.append(models_at_scale)
-            per_scale_target_unmit.append(target_at_scale["unmit_target"])
-            per_scale_target_rem.append(target_at_scale["rem_target"])
-
-        scales_arr = np.asarray(zne_scales, dtype=float)
-        unmit_arr = np.asarray(per_scale_cdr_unmit, dtype=float)
-        rem_arr = np.asarray(per_scale_cdr_rem, dtype=float)
-
-        if zne_fit_order == 0 or len(zne_scales) < 2:
-            coeffs_unmit = np.array([float(np.mean(unmit_arr))])
-            coeffs_rem = np.array([float(np.mean(rem_arr))])
-            zne_unmit = float(coeffs_unmit[0])
-            zne_rem = float(coeffs_rem[0])
-        else:
-            coeffs_unmit = np.polyfit(scales_arr, unmit_arr, deg=zne_fit_order)
-            coeffs_rem = np.polyfit(scales_arr, rem_arr, deg=zne_fit_order)
-            zne_unmit = float(np.polyval(coeffs_unmit, 0.0))
-            zne_rem = float(np.polyval(coeffs_rem, 0.0))
-
-        out["per_scale_cdr_unmit"] = [float(v) for v in per_scale_cdr_unmit]
-        out["per_scale_cdr_rem"] = [float(v) for v in per_scale_cdr_rem]
-        out["per_scale_target_unmit"] = [float(v) for v in per_scale_target_unmit]
-        out["per_scale_target_rem"] = [float(v) for v in per_scale_target_rem]
-        out["per_scale_cdr_models"] = per_scale_models
-        out["zne_of_cdr_coeffs_unmit"] = [float(v) for v in coeffs_unmit.tolist()]
-        out["zne_of_cdr_coeffs_rem"] = [float(v) for v in coeffs_rem.tolist()]
-        out["zne_of_cdr_unmit_target"] = zne_unmit
-        out["zne_of_cdr_rem_target"] = zne_rem
-        out["zne_scales"] = [float(v) for v in zne_scales]
-        out["zne_fit_order"] = int(zne_fit_order)
+        models, corrected = _train_and_apply_cdr(base_noise)
+        out["cdr_models"] = models
+        out["cdr_unmit_corrected"] = corrected["cdr_unmit_corrected"]
+        out["cdr_rem_corrected"] = corrected["cdr_rem_corrected"]
 
     return out
 

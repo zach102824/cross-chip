@@ -10,18 +10,50 @@ import sympy
 
 PAULI_CHAR_TO_GATE = {"I": None, "X": cirq.X, "Y": cirq.Y, "Z": cirq.Z}
 
-# LiH simplified gate-only noise: depolarizing strength depends only on gate arity (2Q vs 1Q).
+# Gate-only noise: depolarizing strength depends on gate arity (2Q vs 1Q).
 TWO_QUBIT_GATE_DEPOL_PROB = 0.01
 ONE_QUBIT_GATE_DEPOL_PROB = 0.0005
 
 # Legacy notebooks referred to a single “depol_prob”; that matched the two-qubit channel strength.
 DEFAULT_DEPOL_PROB = TWO_QUBIT_GATE_DEPOL_PROB
+DEFAULT_HIGH_CZ_MULTIPLIER = 5.0
+DEFAULT_AMP_DAMP_GAMMA = 0.0
+DEFAULT_PHASE_DAMP_GAMMA = 0.0
+DEFAULT_LEAKAGE_APPROX_PROB = 0.0
+
+CZ_NORMAL_TAG = "cz_normal"
+CZ_HIGH_TAG = "cz_high"
+CZ_ONSITE_TAG = "cz_onsite_normal"
+
+
+def operation_has_tag(operation: cirq.Operation, tag: str) -> bool:
+    return tag in getattr(operation, "tags", ())
+
+
+def cz_tag_for_horizontal_pair(q0: cirq.Qid, q1: cirq.Qid) -> str:
+    if not (isinstance(q0, cirq.GridQubit) and isinstance(q1, cirq.GridQubit)):
+        raise ValueError("Horizontal CZ tagging requires GridQubit inputs.")
+    if q0.row != q1.row or abs(q0.col - q1.col) != 1:
+        raise ValueError(f"Qubits are not horizontal nearest neighbors: {q0}, {q1}.")
+    min_col = min(q0.col, q1.col)
+    return CZ_HIGH_TAG if (min_col % 2 == 1) else CZ_NORMAL_TAG
+
+
+def cz_tag_for_qubit_pair(q0: cirq.Qid, q1: cirq.Qid) -> str:
+    if isinstance(q0, cirq.GridQubit) and isinstance(q1, cirq.GridQubit):
+        if q0.row == q1.row and abs(q0.col - q1.col) == 1:
+            return cz_tag_for_horizontal_pair(q0, q1)
+        if q0.col == q1.col and abs(q0.row - q1.row) == 1:
+            return CZ_ONSITE_TAG
+    return CZ_NORMAL_TAG
 
 
 class GateArityDepolarizingNoise(cirq.NoiseModel):
     """Single-qubit depolarizing noise applied after each gate, keyed by arity.
 
     - Two-qubit gates: ``two_qubit_depol_prob`` on each qubit (after the gate).
+      For tagged full-CZ operations, ``CZ_HIGH_TAG`` scales this rate by
+      ``high_cz_multiplier``.
     - One-qubit gates: ``one_qubit_depol_prob`` on that qubit.
 
     Measurements are unchanged (readout error belongs in shot estimation).
@@ -36,6 +68,7 @@ class GateArityDepolarizingNoise(cirq.NoiseModel):
         *,
         two_qubit_depol_prob: float | None = None,
         one_qubit_depol_prob: float | None = None,
+        high_cz_multiplier: float = DEFAULT_HIGH_CZ_MULTIPLIER,
         depol_prob: float | None = None,
     ):
         _ = depol_prob
@@ -49,6 +82,7 @@ class GateArityDepolarizingNoise(cirq.NoiseModel):
             if one_qubit_depol_prob is not None
             else ONE_QUBIT_GATE_DEPOL_PROB
         )
+        self.high_cz_multiplier = float(high_cz_multiplier)
         self.depol_prob = self.two_qubit_depol_prob
 
     def noisy_operation(self, operation: cirq.Operation):
@@ -59,7 +93,13 @@ class GateArityDepolarizingNoise(cirq.NoiseModel):
         n = len(operation.qubits)
         if n == 2:
             yield operation
-            p2 = min(1.0, max(0.0, self.two_qubit_depol_prob))
+            p2 = float(self.two_qubit_depol_prob)
+            if isinstance(operation.gate, cirq.CZPowGate) and np.isclose(
+                float(operation.gate.exponent), 1.0
+            ):
+                if operation_has_tag(operation, CZ_HIGH_TAG):
+                    p2 *= self.high_cz_multiplier
+            p2 = min(1.0, max(0.0, p2))
             for q in operation.qubits:
                 yield cirq.depolarize(p2).on(q)
             return
@@ -67,6 +107,56 @@ class GateArityDepolarizingNoise(cirq.NoiseModel):
             yield operation
             p1 = min(1.0, max(0.0, self.one_qubit_depol_prob))
             yield cirq.depolarize(p1).on(operation.qubits[0])
+            return
+
+        yield operation
+
+
+class LocationAwareDecomposedNoise(cirq.NoiseModel):
+    """Location-aware channel model for decomposed CZ + 1Q circuits."""
+
+    def __init__(
+        self,
+        amp_damp_gamma: float = DEFAULT_AMP_DAMP_GAMMA,
+        phase_damp_gamma: float = DEFAULT_PHASE_DAMP_GAMMA,
+        depol_prob: float = DEFAULT_DEPOL_PROB,
+        one_qubit_depol_prob: float | None = None,
+        high_cz_multiplier: float = DEFAULT_HIGH_CZ_MULTIPLIER,
+        leakage_approx_prob: float = DEFAULT_LEAKAGE_APPROX_PROB,
+    ):
+        self.amp_damp_gamma = float(amp_damp_gamma)
+        self.phase_damp_gamma = float(phase_damp_gamma)
+        self.depol_prob = float(depol_prob)
+        self.one_qubit_depol_prob = (
+            float(one_qubit_depol_prob)
+            if one_qubit_depol_prob is not None
+            else float(depol_prob) / 10.0
+        )
+        self.high_cz_multiplier = float(high_cz_multiplier)
+        self.leakage_approx_prob = float(leakage_approx_prob)
+
+    def noisy_operation(self, operation: cirq.Operation):
+        if isinstance(operation.gate, cirq.MeasurementGate):
+            yield operation
+            return
+
+        if isinstance(operation.gate, cirq.CZPowGate):
+            yield operation
+            multiplier = self.high_cz_multiplier if operation_has_tag(operation, CZ_HIGH_TAG) else 1.0
+            extra_depol = self.leakage_approx_prob if operation_has_tag(operation, CZ_HIGH_TAG) else 0.0
+            for q in operation.qubits:
+                yield cirq.amplitude_damp(min(1.0, self.amp_damp_gamma * multiplier)).on(q)
+                yield cirq.phase_damp(min(1.0, self.phase_damp_gamma * multiplier)).on(q)
+                total_depol = min(1.0, (self.depol_prob * multiplier) + extra_depol)
+                yield cirq.depolarize(total_depol).on(q)
+            return
+
+        if len(operation.qubits) == 1:
+            yield operation
+            q = operation.qubits[0]
+            yield cirq.amplitude_damp(min(1.0, self.amp_damp_gamma / 10.0)).on(q)
+            yield cirq.phase_damp(min(1.0, self.phase_damp_gamma / 10.0)).on(q)
+            yield cirq.depolarize(min(1.0, self.one_qubit_depol_prob)).on(q)
             return
 
         yield operation
@@ -183,118 +273,6 @@ def stable_r2_from_sums(
     if ss_tot_f <= float(ss_tot_tol):
         return 1.0
     return float(1.0 - ss_res_f / ss_tot_f)
-
-
-def scale_noise_params_for_zne(
-    noise_scale: float,
-    *,
-    two_qubit_depol_prob: float = TWO_QUBIT_GATE_DEPOL_PROB,
-    one_qubit_depol_prob: float = ONE_QUBIT_GATE_DEPOL_PROB,
-) -> dict[str, float]:
-    if noise_scale <= 0:
-        raise ValueError(f"noise_scale must be > 0, got {noise_scale}.")
-
-    def clip01(value: float) -> float:
-        return float(min(1.0, max(0.0, value)))
-
-    return {
-        "two_qubit_depol_prob": clip01(two_qubit_depol_prob * noise_scale),
-        "one_qubit_depol_prob": clip01(one_qubit_depol_prob * noise_scale),
-    }
-
-
-def trace_energy_at_noise_scale(
-    ansatz_circuit: cirq.Circuit,
-    resolver: cirq.ParamResolver,
-    qubits: list[cirq.Qid],
-    hamiltonian_matrix: np.ndarray,
-    *,
-    noise_scale: float,
-    two_qubit_depol_prob: float = TWO_QUBIT_GATE_DEPOL_PROB,
-    one_qubit_depol_prob: float = ONE_QUBIT_GATE_DEPOL_PROB,
-    simulator_seed: int = 1234,
-) -> float:
-    scaled = scale_noise_params_for_zne(
-        noise_scale,
-        two_qubit_depol_prob=two_qubit_depol_prob,
-        one_qubit_depol_prob=one_qubit_depol_prob,
-    )
-    noise_model = GateArityDepolarizingNoise(**scaled)
-    noisy_circuit = ansatz_circuit.with_noise(noise_model)
-    resolved_noisy_circuit = cirq.resolve_parameters(noisy_circuit, resolver)
-    rho_noisy = cirq.DensityMatrixSimulator(seed=simulator_seed).simulate(
-        resolved_noisy_circuit, qubit_order=qubits
-    ).final_density_matrix
-    return float(trace_energy(hamiltonian_matrix, rho_noisy))
-
-
-def zne_extrapolate_energy(
-    noise_scales: list[float], energies: list[float], fit_order: int = 1
-) -> dict[str, object]:
-    if len(noise_scales) != len(energies):
-        raise ValueError(
-            f"noise_scales and energies must have same length, got {len(noise_scales)} and {len(energies)}."
-        )
-    if len(noise_scales) < 2:
-        raise ValueError("ZNE requires at least two scale points.")
-    if fit_order < 1:
-        raise ValueError(f"fit_order must be >= 1, got {fit_order}.")
-    if fit_order >= len(noise_scales):
-        raise ValueError(
-            f"fit_order must be < number of points, got fit_order={fit_order}, points={len(noise_scales)}."
-        )
-    if any(scale <= 0 for scale in noise_scales):
-        raise ValueError(f"All noise scales must be > 0, got {noise_scales}.")
-
-    scales = np.asarray(noise_scales, dtype=float)
-    values = np.asarray(energies, dtype=float)
-    coeffs = np.polyfit(scales, values, deg=fit_order)
-    energy_zne = float(np.polyval(coeffs, 0.0))
-    return {
-        "noise_scales": [float(x) for x in scales.tolist()],
-        "energies": [float(x) for x in values.tolist()],
-        "fit_order": int(fit_order),
-        "fit_coefficients": [float(x) for x in coeffs.tolist()],
-        "energy_zne": energy_zne,
-    }
-
-
-def run_trace_zne(
-    ansatz_circuit: cirq.Circuit,
-    resolver: cirq.ParamResolver,
-    qubits: list[cirq.Qid],
-    hamiltonian_matrix: np.ndarray,
-    *,
-    noise_scales: list[float] | tuple[float, ...] = (1.0, 2.0, 3.0),
-    fit_order: int = 1,
-    simulator_seed: int = 1234,
-    two_qubit_depol_prob: float = TWO_QUBIT_GATE_DEPOL_PROB,
-    one_qubit_depol_prob: float = ONE_QUBIT_GATE_DEPOL_PROB,
-) -> dict[str, object]:
-    scales = [float(s) for s in noise_scales]
-    trace_energies = [
-        trace_energy_at_noise_scale(
-            ansatz_circuit,
-            resolver,
-            qubits,
-            hamiltonian_matrix,
-            noise_scale=scale,
-            two_qubit_depol_prob=two_qubit_depol_prob,
-            one_qubit_depol_prob=one_qubit_depol_prob,
-            simulator_seed=simulator_seed,
-        )
-        for scale in scales
-    ]
-    zne = zne_extrapolate_energy(scales, trace_energies, fit_order=fit_order)
-    smallest_idx = int(np.argmin(np.asarray(scales)))
-    return {
-        "noise_scales": zne["noise_scales"],
-        "trace_energies": [float(x) for x in trace_energies],
-        "energy_zne": float(zne["energy_zne"]),
-        "fit_order": int(zne["fit_order"]),
-        "fit_coefficients": [float(x) for x in zne["fit_coefficients"]],
-        "baseline_noisy_energy": float(trace_energies[smallest_idx]),
-    }
 
 
 def states_equal_up_to_global_phase(lhs: np.ndarray, rhs: np.ndarray, atol: float = 1e-7) -> bool:
@@ -627,7 +605,7 @@ def run_cdr_with_per_pauli_coeff_print(
     This helper is opt-in and keeps the default CDR path silent in other cells.
     """
     # Local import avoids introducing a module-level dependency cycle.
-    from shot_measurement_test_LiH import run_mitigation
+    from shot_measurement import run_mitigation
 
     cdr_cfg_local = dict(cdr_cfg or {})
     cdr_cfg_local.setdefault("cdr_fit_scope", "per_pauli")
