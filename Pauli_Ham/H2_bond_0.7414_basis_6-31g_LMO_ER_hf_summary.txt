@@ -1,0 +1,4 @@
+Initial state: doubly occupied 1st spatial orbital
+Initial-state electronic energy (Hartree): 0.178468402213
+Initial-state overlap |<init|GS>|: 0.258797400043
+Exact ground energy (Hartree): -1.865436725798

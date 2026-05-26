@@ -1,7 +1,8 @@
-"""Build Pauli Hamiltonians from canonical HF orbitals and save under Pauli_Ham with _HF suffix."""
+"""Build H2 Pauli Hamiltonians from HF/LMO orbitals and save under Pauli_Ham."""
 
 from __future__ import annotations
 
+import argparse
 from math import comb
 from pathlib import Path
 import pickle
@@ -10,7 +11,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import openfermion as of
 import scipy.sparse.linalg
-from pyscf import ao2mo, fci, gto, scf
+from pyscf import ao2mo, fci, gto, lo, scf
 from qiskit_nature.second_q.hamiltonians import ElectronicEnergy
 from qiskit_nature.second_q.mappers import JordanWignerMapper
 
@@ -41,11 +42,25 @@ def openfermion_to_custom_format(of_op, num_qubits: int) -> list[list[float]]:
     return custom_hamiltonian
 
 
-def build_hf_pauli_hamiltonian(mol, mf, *, chop_threshold: float = 1e-6):
-    """Jordan–Wigner Pauli Hamiltonian from canonical HF MO integrals."""
-    nmo = mf.mo_coeff.shape[1]
-    h1 = mf.mo_coeff.T @ mf.get_hcore() @ mf.mo_coeff
-    eri = ao2mo.kernel(mol, mf.mo_coeff)
+def localize_mos(mol, mo_coeff, method: str = "er"):
+    """Localize orbitals with Boys / Pipek-Mezey / Edmiston-Ruedenberg."""
+    m = method.lower()
+    if m == "boys":
+        localizer = lo.Boys(mol, mo_coeff)
+    elif m in ("pm", "pipek-mezey"):
+        localizer = lo.PM(mol, mo_coeff)
+    elif m in ("er", "edmiston-ruedenberg"):
+        localizer = lo.ER(mol, mo_coeff)
+    else:
+        raise ValueError(f"Unknown localization method: {method!r}")
+    return localizer.kernel()
+
+
+def build_pauli_hamiltonian(mol, mf, mo_coeff, *, chop_threshold: float = 1e-6):
+    """Jordan–Wigner Pauli Hamiltonian from the supplied MO coefficients."""
+    nmo = mo_coeff.shape[1]
+    h1 = mo_coeff.T @ mf.get_hcore() @ mo_coeff
+    eri = ao2mo.kernel(mol, mo_coeff)
     h2 = ao2mo.restore(1, eri, nmo)
 
     electronic_energy = ElectronicEnergy.from_raw_integrals(h1, h2)
@@ -64,23 +79,38 @@ def lowest_eigenvalues(of_op: of.QubitOperator, k: int = 5) -> np.ndarray:
     return np.sort(eigvals.real)
 
 
-def hf_overlap_and_ground_energy(mol, mf) -> tuple[float, float]:
-    """Return HF-determinant overlap and exact electronic ground energy from FCI."""
-    exact_ground_energy, ci_vec = fci_ground_energy_and_state(mol, mf)
-    hf_overlap = float(abs(ci_vec[0, 0]))
-    return hf_overlap, exact_ground_energy
+def reference_overlap_and_ground_energy(mol, mf, mo_coeff) -> tuple[float, float]:
+    """Return reference determinant overlap and exact electronic ground energy from FCI."""
+    exact_ground_energy, ci_vec = fci_ground_energy_and_state(mol, mf, mo_coeff)
+    reference_overlap = float(abs(ci_vec[0, 0]))
+    return reference_overlap, exact_ground_energy
 
 
-def fci_ground_energy_and_state(mol, mf) -> tuple[float, np.ndarray]:
-    """Return exact electronic ground energy and FCI vector in canonical HF MOs."""
-    nmo = mf.mo_coeff.shape[1]
-    h1 = mf.mo_coeff.T @ mf.get_hcore() @ mf.mo_coeff
-    eri = ao2mo.kernel(mol, mf.mo_coeff)
+def mo_integrals(mol, mf, mo_coeff) -> tuple[np.ndarray, np.ndarray, int]:
+    """One- and two-electron integrals in the supplied MO basis."""
+    nmo = mo_coeff.shape[1]
+    h1 = mo_coeff.T @ mf.get_hcore() @ mo_coeff
+    eri = ao2mo.kernel(mol, mo_coeff)
     h2 = ao2mo.restore(1, eri, nmo)
+    return h1, h2, nmo
+
+
+def fci_ground_energy_and_state(mol, mf, mo_coeff=None) -> tuple[float, np.ndarray]:
+    """Return exact electronic ground energy and FCI vector in the supplied MO basis."""
+    coeff = mf.mo_coeff if mo_coeff is None else mo_coeff
+    h1, h2, nmo = mo_integrals(mol, mf, coeff)
 
     cisolver = fci.direct_spin1.FCI()
     exact_ground_energy, ci_vec = cisolver.kernel(h1, h2, nmo, mol.nelec)
     return float(exact_ground_energy), ci_vec
+
+
+def doubly_occupied_first_orbital_energy(mol, mf, mo_coeff) -> float:
+    """Electronic energy of the determinant with both electrons in spatial orbital 0."""
+    h1, h2, nmo = mo_integrals(mol, mf, mo_coeff)
+    ci_init = np.zeros((nmo, nmo))
+    ci_init[0, 0] = 1.0
+    return float(fci.direct_spin1.FCI().energy(h1, h2, ci_init, nmo, mol.nelec))
 
 
 def make_h2_molecule(bond_length: float, basis: str, *, verbose: int = 0):
@@ -247,7 +277,7 @@ def plot_exact_vs_hf_total_energy(
         mol_scan = make_h2_molecule(float(bond), basis, verbose=0)
         mf_scan = scf.RHF(mol_scan)
         mf_scan.kernel()
-        _, exact_elec = hf_overlap_and_ground_energy(mol_scan, mf_scan)
+        _, exact_elec = reference_overlap_and_ground_energy(mol_scan, mf_scan, mf_scan.mo_coeff)
         e_nuc = float(mol_scan.energy_nuc())
         hf_total_energies.append(float(mf_scan.e_tot))
         exact_total_energies.append(exact_elec + e_nuc)
@@ -255,7 +285,7 @@ def plot_exact_vs_hf_total_energy(
     eq_mol = make_h2_molecule(float(equilibrium_bond), basis, verbose=0)
     eq_mf = scf.RHF(eq_mol)
     eq_mf.kernel()
-    _, eq_exact_elec = hf_overlap_and_ground_energy(eq_mol, eq_mf)
+    _, eq_exact_elec = reference_overlap_and_ground_energy(eq_mol, eq_mf, eq_mf.mo_coeff)
     eq_exact_total = eq_exact_elec + float(eq_mol.energy_nuc())
     eq_hf_total = float(eq_mf.e_tot)
 
@@ -319,15 +349,18 @@ def save_hamiltonians(
     h_atom: int,
     bond_length: float | int,
     basis: str,
+    orbital_label: str,
     H_qiskit,
     H_of: of.QubitOperator,
     hf_total_energy: float,
     hf_electronic_energy: float,
     hf_overlap: float,
     exact_ground_energy: float,
+    include_hf_energies: bool = True,
+    initial_state_electronic_energy: float | None = None,
 ) -> None:
     basis_tag = basis.lower().replace(" ", "").replace("*", "s")
-    stem = f"H{h_atom}_bond_{bond_length}_basis_{basis_tag}_HF"
+    stem = f"H{h_atom}_bond_{bond_length}_basis_{basis_tag}_{orbital_label}"
     output_dir.mkdir(parents=True, exist_ok=True)
 
     pkl_path = output_dir / f"{stem}.pkl"
@@ -361,14 +394,38 @@ def save_hamiltonians(
 
     hf_summary_path = output_dir / f"{stem}_hf_summary.txt"
     with hf_summary_path.open("w", encoding="utf-8") as f:
-        f.write(f"HF total energy (Hartree): {hf_total_energy:.12f}\n")
-        f.write(f"HF electronic energy (Hartree): {hf_electronic_energy:.12f}\n")
-        f.write(f"HF overlap |<HF|GS>|: {hf_overlap:.12f}\n")
+        if include_hf_energies:
+            f.write(f"HF total energy (Hartree): {hf_total_energy:.12f}\n")
+            f.write(f"HF electronic energy (Hartree): {hf_electronic_energy:.12f}\n")
+            f.write(f"HF overlap |<HF|GS>|: {hf_overlap:.12f}\n")
+        else:
+            f.write("Initial state: doubly occupied 1st spatial orbital\n")
+            if initial_state_electronic_energy is not None:
+                f.write(
+                    "Initial-state electronic energy (Hartree): "
+                    f"{initial_state_electronic_energy:.12f}\n"
+                )
+            f.write(f"Initial-state overlap |<init|GS>|: {hf_overlap:.12f}\n")
         f.write(f"Exact ground energy (Hartree): {exact_ground_energy:.12f}\n")
     print(f"HF summary saved to {hf_summary_path}")
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser(description="Generate H2 Pauli Hamiltonians in HF/LMO orbital bases.")
+    parser.add_argument(
+        "--orbital-basis",
+        choices=["hf", "lmo", "both"],
+        default="both",
+        help="Choose Hamiltonian orbital basis: canonical HF, ER-localized MO, or both.",
+    )
+    parser.add_argument(
+        "--localization-method",
+        choices=["er", "boys", "pm"],
+        default="er",
+        help="Localization method used when --orbital-basis includes lmo.",
+    )
+    args = parser.parse_args()
+
     # ==== Parameters you can adjust ====
     n_h = 2
     bond_length = 0.7414  # H2 equilibrium bond length in Angstrom
@@ -389,37 +446,58 @@ def main() -> None:
     ci_dim = comb(n_orb, mol.nelec[0]) * comb(n_orb, mol.nelec[1])
     print(f"AOs = {n_ao}, MOs = {n_orb}, CI dim = {ci_dim}")
 
-    print("\n=== Building Pauli Hamiltonian (canonical HF orbitals) ===")
-    H_qiskit, H_of = build_hf_pauli_hamiltonian(mol, mf, chop_threshold=chop_threshold)
-    print(f"Pauli terms (chop={chop_threshold}): {len(H_qiskit)}")
-    print(f"Qubits: {H_qiskit.num_qubits}")
-
-    hf_total_energy = float(mf.e_tot)
-    hf_electronic_energy = hf_total_energy - float(mol.energy_nuc())
-    hf_overlap, exact_ground_energy = hf_overlap_and_ground_energy(mol, mf)
-    print(f"HF total energy (Hartree): {hf_total_energy:.12f}")
-    print(f"HF electronic energy (Hartree): {hf_electronic_energy:.12f}")
-    print(f"HF overlap |<HF|GS>|: {hf_overlap:.12f}")
-    print(f"Exact ground energy (Hartree): {exact_ground_energy:.12f}")
-
-    print("\n=== Lowest eigenvalues (electronic, no extra E_nuc add) ===")
-    for i, energy in enumerate(lowest_eigenvalues(H_of, k=5), start=1):
-        print(f"  State {i}: {energy:.12f}")
-
     output_dir = Path(__file__).resolve().parent / "Pauli_Ham"
-    print(f"\n=== Saving to {output_dir} (_HF suffix) ===")
-    save_hamiltonians(
-        output_dir,
-        h_atom=n_h,
-        bond_length=bond_length,
-        basis=basis,
-        H_qiskit=H_qiskit,
-        H_of=H_of,
-        hf_total_energy=hf_total_energy,
-        hf_electronic_energy=hf_electronic_energy,
-        hf_overlap=hf_overlap,
-        exact_ground_energy=exact_ground_energy,
-    )
+    selections: list[tuple[str, np.ndarray]] = []
+    if args.orbital_basis in ("hf", "both"):
+        selections.append(("HF", mf.mo_coeff))
+    if args.orbital_basis in ("lmo", "both"):
+        loc_coeff = localize_mos(mol, mf.mo_coeff, method=args.localization_method)
+        loc_label = f"LMO_{args.localization_method.upper()}"
+        selections.append((loc_label, loc_coeff))
+
+    for orbital_label, mo_coeff in selections:
+        print(f"\n=== Building Pauli Hamiltonian ({orbital_label} orbitals) ===")
+        H_qiskit, H_of = build_pauli_hamiltonian(
+            mol, mf, mo_coeff, chop_threshold=chop_threshold
+        )
+        print(f"Pauli terms (chop={chop_threshold}): {len(H_qiskit)}")
+        print(f"Qubits: {H_qiskit.num_qubits}")
+
+        hf_total_energy = float(mf.e_tot)
+        hf_electronic_energy = hf_total_energy - float(mol.energy_nuc())
+        ref_overlap, exact_ground_energy = reference_overlap_and_ground_energy(
+            mol, mf, mo_coeff
+        )
+        init_electronic_energy = None
+        if orbital_label != "HF":
+            init_electronic_energy = doubly_occupied_first_orbital_energy(mol, mf, mo_coeff)
+        print(f"HF total energy (Hartree): {hf_total_energy:.12f}")
+        print(f"HF electronic energy (Hartree): {hf_electronic_energy:.12f}")
+        print(f"Reference determinant overlap: {ref_overlap:.12f}")
+        if init_electronic_energy is not None:
+            print(f"Initial-state electronic energy (Hartree): {init_electronic_energy:.12f}")
+        print(f"Exact ground energy (Hartree): {exact_ground_energy:.12f}")
+
+        print("\n=== Lowest eigenvalues (electronic, no extra E_nuc add) ===")
+        for i, energy in enumerate(lowest_eigenvalues(H_of, k=5), start=1):
+            print(f"  State {i}: {energy:.12f}")
+
+        print(f"\n=== Saving to {output_dir} ({orbital_label}) ===")
+        save_hamiltonians(
+            output_dir,
+            h_atom=n_h,
+            bond_length=bond_length,
+            basis=basis,
+            orbital_label=orbital_label,
+            H_qiskit=H_qiskit,
+            H_of=H_of,
+            hf_total_energy=hf_total_energy,
+            hf_electronic_energy=hf_electronic_energy,
+            hf_overlap=ref_overlap,
+            exact_ground_energy=exact_ground_energy,
+            include_hf_energies=(orbital_label == "HF"),
+            initial_state_electronic_energy=init_electronic_energy,
+        )
 
     fig_energy_path = Path(__file__).resolve().parent / "h2_631g_exact_vs_hf_energy.png"
     plot_exact_vs_hf_total_energy(fig_energy_path, basis=basis, equilibrium_bond=float(bond_length))
