@@ -1,0 +1,34 @@
+Metadata-Version: 2.0
+Name: noisyopt
+Version: 0.2.2
+Summary: Python library for optimization of noisy functions
+Home-page: http://noisyopt.readthedocs.io/
+Author: Andreas Mayer
+Author-email: andisspam@gmail.com
+License: MIT
+Download-URL: http://github.com/andim/noisyopt
+Platform: OS Independent
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Environment :: Console
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 2
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.5
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Topic :: Scientific/Engineering
+Requires-Dist: numpy
+Requires-Dist: scipy
+
+Noisyopt is a library for local optimization of noisy objective functions.
+
+Optimization in the presence of stochasticity in the objective function
+evaluation is challenging. This library provides simple, robust algorithms
+to solve this problem.
+
+For more info see the `documentation <http://noisyopt.readthedocs.io/en/latest/>`_ or the `source code <http://github.com/andim/noisyopt>`_.
+
+
