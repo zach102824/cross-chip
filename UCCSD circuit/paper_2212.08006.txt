@@ -1,0 +1,2554 @@
+Experimental quantum computational chemistry with optimised unitary coupled
+cluster ansatz
+Shaojun Guo, 1, 2, 3,∗ Jinzhao Sun, 4, 5, 6,∗ Haoran Qian, 1, 2, 3,∗ Ming Gong, 1, 2, 3,∗ Yukun Zhang,4, 7 Fusheng
+Chen,1, 2, 3Yangsen Ye,1, 2, 3Yulin Wu,1, 2, 3Sirui Cao, 1, 2, 3Kun Liu, 4 Chen Zha,1, 2, 3Chong Ying,1, 2, 3Qingling
+Zhu,1, 2, 3He-Liang Huang,1, 2, 3Youwei Zhao,1, 2, 3Shaowei Li,1, 2, 3Shiyu Wang,1, 2, 3Jiale Yu,1, 2, 3Daojin Fan,1, 2, 3
+Dachao Wu,1, 2, 3Hong Su, 1, 2, 3Hui Deng, 1, 2, 3Hao Rong, 1, 2, 3Yuan Li,1, 2, 3Kaili Zhang, 1, 2, 3Tung-Hsun
+Chung,1, 2, 3Futian Liang,1, 2, 3Jin Lin,1, 2, 3Yu Xu,1, 2, 3Lihua Sun,1, 2, 3Cheng Guo,1, 2, 3Na Li,1, 2, 3Yong-Heng
+Huo,1, 2, 3Cheng-Zhi Peng,1, 2, 3Chao-Yang Lu,1, 2, 3Xiao Yuan,4, 7 Xiaobo Zhu, 1, 2, 3and Jian-Wei Pan1, 2, 3
+1Hefei National Research Center for Physical Sciences at the Microscale and School of
+Physical Sciences, University of Science and Technology of China, Hefei 230026, China
+2Shanghai Research Center for Quantum Science and CAS Center for Excellence in Quantum Information
+and Quantum Physics, University of Science and Technology of China, Shanghai 201315, China
+3Hefei National Laboratory, University of Science and Technology of China, Hefei 230088, China
+4Center on Frontiers of Computing Studies, Peking University, Beijing 100871, China
+5QOLS, Blackett Laboratory, Imperial College London, London SW7 2AZ, United Kingdom
+6Clarendon Laboratory, University of Oxford, Parks Road, Oxford OX1 3PU, United Kingdom
+7School of Computer Science, Peking University, Beijing 100871, China
+(Dated: June 18, 2024)
+Quantum computational chemistry has emerged as an important application of quan-
+tum computing [1–7]. Hybrid quantum-classical computing methods, such as varia-
+tional quantum eigensolvers (VQE) [8–10], have been designed as promising solutions
+to quantum chemistry problems, yet challenges due to theoretical complexity [11–14]
+and experimental imperfections [15] hinder progress in achieving reliable and accurate
+results. Experimental works for solving electronic structures are consequently still
+restricted to nonscalable (hardware efficient) [16, 17] or classically simulable (Hartree-
+F ock) ansatz [18], or limited to a few qubits with large errors [19–23]. The experimen-
+tal realisation of scalable and high-precision quantum chemistry simulation remains
+elusive. Here, we address the critical challenges associated with solving molecular
+electronic structures using noisy quantum processors. Our protocol presents signifi-
+cant improvements in the circuit depth and running time, key metrics for chemistry
+simulation. Through systematic hardware enhancements and the integration of error
+mitigation techniques [24–28], we push forward the limit of experimental quantum
+computational chemistry and successfully scale up the implementation of VQE with
+an optimised unitary coupled-cluster ansatz to 12 qubits. W e produce high-precision
+results of the ground-state energy for molecules with error suppression by around two
+orders of magnitude. W e achieve chemical accuracy for H 2 at all bond distances and
+LiH at small bond distances in the experiment, even beyond the two recent concurrent
+works [29, 30]. Our work demonstrates a feasible path towards a scalable solution to
+electronic structure calculation, validating the key technological features and identify-
+ing future challenges for this goal.
+Quantum computational chemistry, a high-potential application of quantum computing, has prompted extensive
+research in both theory and experiments [1–7]. Among the various approaches explored, variational quantum al-
+gorithms [8–10] emerge as a promising near-term solution with their potential for executing the task using shallow
+circuits. Despite the theoretical potential, due to the inherent complexity of molecular systems, quantum resources
+required for practical computation in terms of the gate count, measurement numbers and total running time are
+prohibitively large [14, 31–33]. Taking into account the noise levels (above error-correction thresholds) and limited
+allowed gate counts (a few hundred), achieving quantum chemistry simulation with noisy quantum processors remains
+elusive [12, 15]. Experiments in quantum chemistry are thus primarily restricted to proof-of-principle demonstrations
+with either small-scale [19–23] or limited circuit ansatz [16–18]. A notable gap exists between theoretical quantum
+chemistry algorithms and experimental realisations.
+The pursuit of quantum computational chemistry involves addressing critical challenges related to excessive demands
+due to the complexity of algorithms and experimental errors. Achieving high-accuracy simulation entails the use of
+a more complex and expressive ansatz, which, however, introduces more errors in practice and leads to less accurate
+∗ These authors contributed equally to this work.
+arXiv:2212.08006v3  [quant-ph]  17 Jun 2024
+2
+results. Many existing quantum chemistry experiments are consequently restricted to either nonscalable (hardware-
+efficient) [16, 17] or classically simulable (Hartree-Fock) ansatz [18], which, in theory, cannot be useful for practical
+problems. The experimental realisation of quantum chemistry simulations is further complicated by the presence of
+noise [15, 34], resulting in a sense of pessimism. Even small-scale demonstrations [19–21] face significant difficulties
+in achieving the desired level of precision known as chemical accuracy (1.6 milli-Hartree), which is vital for reliable
+calculations and predictions in quantum chemistry. Significant efforts are required in protocol optimisation, hardware
+improvements, and effective error mitigation in order to enable scalable and high-precision experimental quantum
+chemistry simulation with noisy quantum processors.
+In this work, we address those challenges associated with quantum chemistry simulation, and realise variational
+quantum eigensolver (VQE) for H2, LiH, and F2 on a noisy intermediate-scale superconducting quantum processor. We
+consider a multi-reference initial state and develop an optimised UCC ansatz [35–37] by selecting symmetry-conserving
+and dominant terms. We demonstrate significant improvements in critical metrics for quantum chemistry simulation,
+including the circuit depth, measurement cost and total running time. On the experimental side, we developed a
+systematic approach aimed at optimising hardware tailored for quantum chemistry simulations. We achieved high-
+fidelity parallel gates leveraging the advantage of the flip-chip structure and tunable couplers, which suppress the
+crosstalk significantly. We introduced a calibrated implementation of basic operations in UCC-type ansatz to improve
+the circuit accuracy. The correlated readout error in measurements is significantly suppressed with the optimisation
+of readout parameters, which is verified by random state measurement. Furthermore, we designed and implemented
+four quantum error mitigation (QEM) protocols [24–28] to mitigate decoherence, readout, and algorithmic errors
+accordingly, which is crucial to obtain reliable and accurate results for chemistry applications. The efficacy of QEM in
+mitigating different types of errors is validated, which enables two orders of magnitude improvement of the calculation
+accuracy for the three molecules studied in this work. With these improvements, we can finally push forward the
+implementation of VQE with chemically inspired UCC ansatz and scale up the error-mitigated simulation to 12 qubits.
+We report that our solution allows the saturation of chemical accuracy for H 2 at all bond distances and LiH at small
+bond distances, with relative errors compared to initial energies less than 1.00% for all these molecules. Our work
+explores the potential way for scalable and reliable quantum simulation, which is a pressing and unavoidable question
+that arises when utilising noisy processors.
+We briefly summarise the basic building blocks of our algorithm, which are outlined in Fig. 1, and refer to Supple-
+mentary Information for detailed discussions. We consider the molecular Hamiltonian under the Born-Oppenheimer
+approximation in second-quantisation and apply the Jordan-Wigner transformation to obtain its qubit form ˆH. We
+employ variational quantum eigensolvers to find the ground state of ˆH. The main idea is to prepare a parametrised
+quantum state |Ψ(θ)⟩ by a quantum processor and update the parameters classically. A chemically inspired choice
+for |Ψ(θ)⟩ is the UCC ansatz |Ψ(θ)⟩ = exp ( ˆT (θ) − ˆT †(θ))|Ψ0⟩, which effectively considers excitations and de-
+excitations above a reference state |Ψ0⟩ [20–23]. Here ˆT (θ) is the truncated cluster operator concerning first- and
+second-order excitations from occupied orbitals to virtual orbitals. However, direct implementation of UCC on a
+quantum computer requires CNOT gates scaling as O(N (N − η)2η2) with system size N and electron number η,
+which goes beyond the limit of current technology.
+To reduce the gate count, we design the circuit by selecting the operators from the UCC operator pool, which
+satisfies the symmetry constraint imposed by the selection rule [38, 39]. Moreover, since the operators in ˆT have
+different effects on the ground state [40], we select the qubit operators ˆV that contribute dominantly to the ground
+state energy decrease (see the top left column of Fig. 1 and Supplementary Section II). For instance, the total gate
+count is reduced by two orders of magnitude for N = 12. Furthermore, we compile the circuit according to the
+2D topology structure of the superconducting processor to reduce the circuit depth. The gate count and circuit
+depth reduction strategies are scalable and essential for efficient implementations of UCC ansatz. With the ansatz
+state |Ψ(θ)⟩, we now aim to solve a minimisation problem, min θ ⟨ ˆH⟩θ, with ⟨ ˆH⟩θ = ⟨Ψ(θ)| ˆH|Ψ(θ)⟩. We consider a
+classical optimiser of stochastic gradient descent with analytical gradients obtained via a linear combination of ⟨ ˆH⟩θ
+with different choices of parameters θ [41]. Each ⟨ ˆH⟩θ generally consists of O(N 4) terms, whose measurement cost
+could be prohibitively large in practice [32, 42]. However, as many of the observables have small coefficients and
+are qubit-wise compatible (hence could be measured simultaneously), more efficient measurement schemes could be
+exploited to alleviate the measurement cost [43, 44]. We develop an optimised overlapped grouping measurement
+scheme, illustrated in the top right column of Fig. 1, which reduces the required measurement count and hence the
+running time significantly (for instance, by two orders of magnitude for F 2 compared to importance sampling).
+In order to obtain reliable experimental results, we need to optimise the quantum processor and mitigate experi-
+mental errors. In our work, various strategies are employed to improve gate operations and mitigate errors, illustrated
+in the bottom column of Fig. 1. We adopt dynamical decoupling [45] sequences to suppress dephasing errors for
+idle qubits and introduce a calibrated implementation of basic operations in UCC to improve the circuit fidelity. We
+further integrate error mitigation methods for the remaining measurement and gate errors. Readout error mitiga-
+3
+::
+( ) ( )
+…
+( )
+Parametrised quantum circuit
+Stochas�c 
+gradient 
+decent
+UCC 
+Operator
+Selected 
+Pool
+{ }
+( ) =
+ 
+YZXX XZXY
+IZXZ
+IZXI
+X X
+…
+…
+Dynamical decoupling
+:
+circuit
+:
+REM
+REM
+REM
+REM
+Readout error mi�ga�on Cliﬀord ﬁ�ng
+Π Π Π Π
+≃
+Connected moment expansion
+Symmetry veriﬁca�on
+Quantum processor
+Distor�on correc�on
+XXXX YYYY
+IIIZ ZIII
+|Mul�-Ref⟩
+Grouping 
+measurement
+FIG. 1. A diagrammatic scheme for the variational quantum eigensolver on a superconducting quantum pro-
+cessor: device, quantum circuit, measurement, and error mitigation. Middle: The experimental circuit for 12-qubit
+VQE of F2 over a 2× 6 qubit grid on the “Zuchongzhi 2.0” quantum processor. Middle left: Topology of qubits on the quantum
+processor. The twelve selected qubits used in the experiments with the encoding of spin up and spin down are coloured. Middle
+right: Schematic diagram of the VQE process. Top left: Selection of the operators from the UCC operator pool that contribute
+dominantly to the energy decrease. Top middle: The elementary multi-qubit Pauli rotation gate in UCC, which is composed of
+CNOT gates, single-qubit Pauli rotation gates, and single-qubit Clifford gates. The single-qubit Pauli rotation is decomposed
+into a sequence of single-qubit gates R Y-RZ-RY in our experiment. Top right: An example of the overlapped grouping method
+for measuring observables, which exploits the qubit-wise compatibility of observables. Bottom: Hardware optimisation and
+error mitigation techniques integrated into the experiment. Distortion correction and dynamical decoupling are first applied
+to improve the fidelity of the elementary operators and suppress dephasing during idle times, respectively. Then readout error
+mitigation, Clifford circuit fitting, symmetry verification by parity ˆS, and connected moment expansion are applied sequentially
+to calculate the error-mitigated expectation values of observables.
+tion (REM) is applied to the classical measurement outcomes to mitigate measurement errors [24]. For gate errors,
+we apply three types of error mitigation methods sequentially to obtain the error-mitigate expectation values of ob-
+servables. Considering particle number conservation, we apply an effective symmetry verification (SV) of the particle
+number parity [46]; To mitigate dominant two-qubit gate errors, we apply Clifford fitting (CF) by learning the noise
+model from noisy and ideal Clifford circuits [25, 26]; Finally, we consider connected moment expansions (CMX),
+which effectively implement imaginary time evolution using Hamiltonian moments up to the third order, to correct
+the energy deviation due to incapable circuit ansatz and implementation errors [27, 28]. These techniques are essential
+for accurate experimental implementations of variational quantum algorithms.
+The experiment is conducted on a 66-qubit superconducting quantum processor “Zuchongzhi 2.0” [47]. We select
+12 high-quality qubits arranged in a two-dimensional array, as shown in the middle column of Fig. 1. We first optimise
+single-qubit gates, CZ gates and readout performance, following a series of optimisations. The readout fidelity is 96.3%
+on average, and the correlated readout error is verified to be negligible, characterised by random state measurements.
+This is achieved by optimising readout pulse and qubit frequencies, and suppressing the residual ZZ coupling (see
+Supplementary Information for the methods and results). The remaining uncorrelated readout errors are further
+alleviated by REM in our experiment. The parallel single-qubit and CZ gate fidelities are 99 .90% and 99 .19% on
+average, respectively (see Fig. 2a), characterised by cross-entropy benchmarking [48]. The high-fidelity parallel gates
+are achieved with the advantage of the flip-chip structure and tunable couplers, which suppresses the cross-talk error
+4
+10-3 10-2
+Gate and readout error
+0
+0.5
+1Intergrated histgram
+0.10%0.81%3.71%
+1Q gateCZReadout
+4 6 8 10Number of qubits
+0.75
+0.85
+0.95Operation accuracy
+EstimationAfter optimisationBefore optimisation
+-1 -0.5 0 0.5 1Experimental data
+-1
+-0.5
+0
+0.5
+1Ideal datay = 1.24x - 0.00438R2 = 0.999
+Fit curveDataVQE data HF
+Ground CMX
+0 3 6 9 1215Iteration
+-0.95
+-0.85
+-0.75
+-0.65Energy (Hartree)
+a
+c
+b
+d En rawREMREM+CFREM+CF+SV
+FIG. 2. Experimental optimisation and implementation of the algorithm. (a) Accumulated distribution of single-
+qubit gate (blue), CZ gate (red) and readout (yellow) errors. The number by the curve is the error on average. (b) Accuracy
+of multiple-qubit ˆV (θ) rotation gate versus the number of qubits. The operation accuracy is obtained by repeatedly executing
+different numbers of ˆV ˆV † pairs, measuring the Z projection of all qubits, and fitting the data with an exponential function.
+Under the depolarising error model, the operation accuracy equals the fidelity of ˆV (θ) (see Supplementary Section I). Direct
+estimation (blue dashed line) is obtained as a product of the fidelities of all quantum gates applied. The operation accuracy
+is closer to the direct estimation result after experimental optimisations, in which we used the Ry( −π/2)-Rz(θ)-Ry(π/2) gate
+sequence to replace the amplitude-based Rx( θ) gate and corrected the pulse distortion on relative couplers. (c) An example of
+Clifford fitting for H 2 with observable XXYY. The orange dots correspond to the ideal-noisy expectation values for Clifford-
+analogue circuits. The blue solid line is the linear fit of the data to learn the function, which is used to mitigate gate noise.
+The blue squares correspond to the ideal-noisy VQE data, which aligns well with the linear fit. (d) The optimisation procedure
+for H 2 with bond distance R = 2 .6. The ground state energy with chemical accuracy (blue region) is calculated by exact
+diagonalisation as a benchmark. The yellow square, orange triangle, blue diamond, and grey right triangle are the energies
+without error mitigation, with REM, with REM + CF, and with REM + CF + SV, respectively. The red dot is the final result
+of the ground state energy with CMX applied.
+significantly. We further optimise the elementary operations (consisting of multiple CZ gates and single-qubit gates)
+in the UCC circuit by correcting the Z pulse distortion on couplers and replacing the amplitude-based Rx(θ) gate. As
+shown in Fig. 2b, the operation accuracy notably increases after optimisation and matches the product of the fidelity
+of individual quantum gates, indicating its scalability for larger systems. We also highlight that the gate optimisation
+technique developed in this work holds potential for the preparation of multi-qubit Pauli rotation gates, which play
+a vital role in simulating systems with long-range interactions. All these hardware optimisations developed in our
+experiment are crucial for the reliable implementation of our algorithm.
+To obtain high-accuracy results, we further apply three error mitigation techniques, CF, SV, and CMX, to reduce
+the effects of gate errors. For the observable in the Hamiltonian, we aim to obtain an error-mitigated expectation
+value by learning a fitting function f , which maps a noisy expectation value obtained in experiments to an error-
+mitigated one. To get the function f , we construct Clifford-analogue circuits of the UCC ansatz by replacing most of
+the non-Clifford gates with random Clifford gates. The fitting function of the new circuit instances S is expected to be
+similar to the UCC circuit as the two-qubit gates which contribute to dominant errors are unchanged. Since Clifford
+circuits S are classically simulable, the function f can be learned by fitting the ideal and experimental results, which
+are obtained by classical calculation and quantum measurements, respectively. For example, for the XXYY observable
+in a 4-qubit H 2-molecule case, the noisy measurement results and the ideal results have a clear linear dependence, as
+5
+-1.1
+-0.9
+-0.7Energy (Hartree)
+HF
+Ground
+H2  4Q
+0.51 1.52 2.53Bond distance (Angstrom)
+10-8
+10-6
+10-4
+10-2Error (Hartree)
+RawREM+CFREM+CF+SV+CMXREM+CF+CMXNumerical
+-7.8
+-7.4
+-7
+HF
+Ground
+LiH  6Q
+0.51 1.52 2.53Bond distance (Angstrom)
+10-4
+10-3
+10-2
+10-1
+-196
+-195
+-194
+HF
+Ground
+F2  12Q
+1 1.52 2.53Bond distance (Angstrom)
+10-3
+10-2
+10-1
+100
+a
+d
+b
+e
+c
+f
+FIG. 3. The VQE simulations for potential energy curves for different molecules. (a-c) Potential energy curves
+as functions of the bond distance for H 2 (4 qubits), LiH (6 qubits) and F 2 (12 qubits) molecules with various error mitigation
+strategies. (d-f) Absolute errors are compared to the exact results. We compare the raw data (yellow squares) with the
+application of REM and CF (deep blue diamonds), SV (grey-blue triangles) and CMX (red circles). The results marked by
+green asterisks are energies calculated with the variational parameters searched in the experiment. The ground state energy
+with chemical accuracy (blue region) is calculated by exact diagonalisation as a reference.
+shown in Fig. 2c. With the fitting function that is learned prior to VQE experiments, we can obtain an error-mitigated
+result from a given noisy measurement outcome, referred to as the CF method. During the VQE process, for each
+observable, we first apply REM to mitigate readout errors and then obtain an error-mitigated observable expectation
+value by using CF. The symmetry-verified result can be obtained by measuring additional observables ˆH ˆS with the
+conserved symmetry ˆS, after which the final ground-state energy is estimated using CMX. As shown in Fig. 2d, error
+mitigation is critical in improving calculation accuracy. The combination of REM, CF, and SV clearly improves the
+energy accuracy along the optimisation iteration for the H 2 molecule. CMX further enhances the final energy within
+the chemical accuracy compared to the true ground state energy. The implementation and experimental comparisons
+of the error mitigation techniques can be found in Supplementary Section IV.
+Equipped with the theoretical and experimental improvements, we now show the calculation of the potential energy
+curves for H 2 (4 qubits), LiH (6 qubits) and F 2 (12 qubits) molecules. The selection of active spaces and problem
+encoding strategies are shown in Supplementary Section II. Fig. 3 shows a significant decrease in energy errors with
+error mitigation (around two orders of magnitude) for all three molecules. The raw experiment results indicate that
+the simulation becomes less accurate with increasing system size. For instance, the raw errors for LiH and F 2 are
+above 0.1 Hartree and 1 Hartree, respectively. This is because VQE experiments generally entail a large number of
+gates and measurement shots [15, 31, 49], which results in difficulties in the demonstration of large molecular systems
+on current hardware. In our experiment, we improve the simulation accuracy with dedicated device optimisation and
+error mitigation. In particular, the average absolute energy errors for H 2 and LiH are 0 .565 ± 0.542 milli-Hartree and
+0.815 ± 2.526 milli-Hartree (excluding distances above 2.6 ˚A), respectively, which are within the chemical accuracy
+threshold. The energy error for LiH increases for large bond distances since UCC becomes less accurate in the
+dissociation regime. This has been alleviated by an optimised initial state preparation with a multi-reference state
+which is a superposition of the Hartree-Fock state and the dissociated state (see Supplementary Information). To
+validate the effectiveness of our error mitigation schemes, we compare the error-mitigated energy with the one that is
+computed numerically using the experimentally found parameters. The error-mitigated energies are found to be close
+to the numerical ones, which indicates the reliability of our scheme.
+We further demonstrate the simulation for F2. Owing to the larger system size and deeper circuit, the energy errors
+for F2 are around 10 −2 to 10−1, above the chemical accuracy threshold. The average absolute energy error for F 2 is
+0.0174±0.0417 Hartree. Nevertheless, if the energy is calculated using the experimentally found parameters, the energy
+6
+4 6 12System Size
+101
+102
+103
+104Depth
+Original circuitOur circuit
+4 6 12System Size
+1
+3
+5
+7Running time (hour)
+1e7
+3e7
+5e7
+7e7
+Number shot 
+TimeNum Shot
+4 6 12System Size
+0  
+0.5
+1  
+1.5
+2  E (Hartree)
+a b c
+Residual errorGate errorReadout error
+FIG. 4. Resource estimation and error analysis with increasing system size. (a) Circuit depth reduction. The total
+circuit depth is compared with the original UCCSD circuit ansatz considering single and double excitations. The total circuit
+depth [50] concerning both single-qubit gates and CZ gates for H 2, LiH and F 2 are 18, 26 and 55, respectively. The number of
+CZ gates for H2, LiH and F2 are 10, 18 and 50, respectively, and the number of single-qubit gates are 14, 19 and 63, respectively.
+(b) The resource estimation in terms of average running time and measurement shots of a single bond distance for the three
+molecules. (c) The analysis of error sources for H 2 (R = 1.5), LiH (R = 1.5) and F 2 (R = 2.0). Here, we denote the energy
+before REM, after REM, after REM and Clifford fitting, and the numerical result as E1, E2, E3 and E4, respectively. The
+contributions from readout errors (blue), gate errors (red) and residual errors (yellow) are respectively obtained by E2 − E1,
+E3 − E2 and E4 − E3.
+error could be consistently suppressed below 10−2. The average absolute error for the numerically calculated energy is
+4.81 milli-Hartree, which is 370 times smaller compared to the initial point, i.e., the experimentally measured Hartree-
+Fock energy. This indicates that the parameters that characterise the ground state can be found approximately, and
+the variational scheme is still effective, even though the error cannot be fully mitigated for deep circuits. The gate
+and readout fidelities need further improvements to decrease simulation error below the chemical accuracy threshold.
+With the experimental results of the three molecules, we analyse the resource cost and scalability of VQE in our
+experiment. As shown in Fig. 4a, our circuit optimisation strategy consistently reduces the depth of UCC circuits for
+molecules with different system sizes. The circuit reduction strategy is efficient and crucial for extending our scheme
+to larger molecules. Since the VQE process essentially extracts the information from the measurement outcome, the
+number of measurements required is a critical concern in quantum chemistry simulation. While previous analyses of
+measurement resources appeared pessimistic [32, 33, 42], our optimised grouping measurement strategy significantly
+reduces the number of measurement bases. For instance, the number of measurements for estimating the energy of
+F2 is 8.7 × 105, with a running time of about three minutes. Comparing the three molecules in Fig. 4b, we observe
+that the resource cost (average running time and measurement shots) increases almost linearly in the system size.
+Nevertheless, we still need to be careful about device imperfections, where the primary error sources include readout
+and gate errors. We conduct an analysis to assess their respective contributions to the energy calculation, as shown
+in Fig. 4c. Our findings indicate that readout errors dominate for small molecules, while gate errors become more
+serious when the system size increases. Therefore, the readout and gate fidelities need to be improved systematically
+to achieve high accuracy for large molecules.
+In this work, we demonstrate an efficient and reliable quantum chemistry solution on a noisy intermediate-scale
+superconducting quantum processor. We develop a systemic way to reduce quantum resources in terms of circuit
+depths and measurement cost, and improve our hardware in gate operations and measurement. We integrate error
+mitigation techniques for mitigating different types of simulation errors due to decoherence and measurement read-
+out. With hardware optimisation tailored for chemistry simulation, we experimentally implement variational quantum
+eigensolvers with optimised chemically inspired ansatz and scale the simulation up to 12 qubits. Our solution enables
+us to achieve chemical accuracy for H 2 at all bond distances and LiH at small bond distances. We demonstrate a
+significant enhancement of the accuracy by around two orders of magnitude with error mitigation techniques. We
+examine the efficacy of error mitigation in mitigating gate and readout errors, which serves as a reference for under-
+standing the potential benefits and limitations of error mitigation approaches, aiding in the design and optimization
+of future implementations.
+7
+The optimisation process in VQE imposes strict demands on the stability of quantum devices. We monitored the
+parameter evolution and observed its stability throughout the optimisation process over several hours, which indicates
+the stability of our devices as discussed in Supplementary Sections IV. While owing to non-negligible hardware errors,
+the current quantum processor is insufficient for larger molecules, the variational scheme is tested to be effective and
+reliable in our experimental implementation. Compared to the energy of the initial input state, we achieved 0 .278%,
+0.778%, and 1 .00% relative errors for the final output states of the three molecules by applying a combination of
+REM, CF and CMX. We further compare the circuit error estimated using different methods to understand the effect
+of noise with an increasing system size. We observed that the circuit error obtained by fitting the experimental data
+is much lower than the error computed by multiplying the error of each individual gate, which is discussed in detail in
+Supplementary Section IV. Our experimental result and resource analysis indicate the potential of simulating larger
+molecules with improved gate and readout operations.
+ACKNOWLEDGMENTS
+The authors thank the USTC Center for Micro- and Nanoscale Research and Fabrication for supporting the sam-
+ple fabrication. The authors also thank QuantumCTek Co., Ltd. for supporting the fabrication and maintenance
+of room-temperature electronics. This research was supported by the Innovation Program for Quantum Science
+and Technology (Grant No. 2021ZD0300200), Shanghai Municipal Science and Technology Major Project (Grant
+No. 2019SHZDZX01), Anhui Initiative in Quantum Information Technologies, National Natural Science Foundation
+of China (Grants No. 11905217, No. 11774326, No. 12175003), Natural Science Foundation of Shandong Province,
+China (grant number ZR202209080019), and Special funds from Jinan science and Technology Bureau and Jinan high
+tech Zone Management Committee. H.-L. H. acknowledges support from the Youth Talent Lifting Project (Grant
+No. 2020-JCJQ-QT-030), National Natural Science Foundation of China (Grants No. 11905294, 12274464), China
+Postdoctoral Science Foundation, and the Open Research Fund from State Key Laboratory of High Performance
+Computing of China (Grant No. 201901-01). J. Sun acknowledges the Samsung GRC grant for financial support.
+M. Gong was supported by the Youth Innovation Promotion Association of CAS (Grant No. 2022460). X.B. Zhu
+acknowledges support from THE XPLORER PRIZE.
+AUTHOR CONTRIBUTIONS
+X.Y, M.G, J.S. initiated the project. J.S. developed the theoretical aspect of the project and built up the source
+code for numerical simulation with input from X.Y. and Y.Z.. J.S., Y.Z, and K.L carried out the numerical simulation
+under the supervision of X.Y.. Y.Z. and K.L. generated the measurement bases with the algorithm developed by
+J.S.. S.G., H.Q., M.G., F.C. and S.C. performed the measurements. S.G., J.S., H.Q., M.G., Y.Z. analysed the
+experimental data. Q.Z., Y.Y., C.Y., F.C. and S.L. designed the processor. S.C., Y.L., K.Z., S.G., H.Q., T.-H.C.,
+H.R., H.D. and Y.-H.H. fabricated the processor. M.G., S.W., C.Z., Y.Z., S.L., C.Y., J.Y., D.F., D.W. and H.S.
+contributed to the construction of the ultracold and low-noise measurement system. J.L., Y.X., F.L., C.G., L.S., N.L.
+and C.-Z.P. developed the room-temperature electronics. Experiments were performed using a quantum processor
+that was developed and fabricated with a large effort from the experimental team. J.S., S.G., Y.Z., X.Y. and M.G.
+wrote the manuscript with input from all the authors. All the authors contributed to writing up the manuscript.
+X.Y., X.Z., and J.-W.P. supervised the project.
+Competing Interests The authors declare no competing interests.
+Data and materials availability The data shown in this paper are available from the corresponding authors
+upon reasonable request.
+Note: During the preparation of this work, we became aware of two independent works realising the unitary
+pair-coupled cluster double ansatz with superconducting qubits [29] and trapped ions [30], respectively, for chemical
+systems with the problem size at most 10 and 12 qubits. Ref. [29] showcased the efficacy of purification-based error
+8
+mitigation; however, the circuits in their experiments were produced through classical computation.
+[1] Al´ an Aspuru-Guzik, Anthony D Dutoi, Peter J Love, and Martin Head-Gordon. Simulated quantum computation of
+molecular energies. Science, 309(5741):1704–1707, 2005.
+[2] Benjamin P Lanyon, James D Whitfield, Geoff G Gillett, Michael E Goggin, Marcelo P Almeida, Ivan Kassal, Jacob D
+Biamonte, Masoud Mohseni, Ben J Powell, Marco Barbieri, et al. Towards quantum chemistry on a quantum computer.
+Nature chemistry, 2(2):106–111, 2010.
+[3] Javier Arg¨ uello-Luengo, Alejandro Gonz´ alez-Tudela, Tao Shi, Peter Zoller, and J Ignacio Cirac. Analogue quantum
+chemistry simulation. Nature, 574(7777):215–218, 2019.
+[4] Markus Reiher, Nathan Wiebe, Krysta M Svore, Dave Wecker, and Matthias Troyer. Elucidating reaction mechanisms on
+quantum computers. Proc. Natl. Acad. Sci. U.S.A., 114(29):7555–7560, 2017.
+[5] Yudong Cao, Jonathan Romero, Jonathan P. Olson, Matthias Degroote, Peter D. Johnson, M´ aria Kieferov´ a, Ian D.
+Kivlichan, Tim Menke, Borja Peropadre, Nicolas P. D. Sawaya, Sukin Sim, Libor Veis, and Al´ an Aspuru-Guzik. Quantum
+chemistry in the age of quantum computing. Chemical Reviews, 119(19):10856–10915, Oct 2019.
+[6] Sam McArdle, Suguru Endo, Al´ an Aspuru-Guzik, Simon C. Benjamin, and Xiao Yuan. Quantum computational chemistry.
+Rev. Mod. Phys., 92:015003, Mar 2020.
+[7] Bela Bauer, Sergey Bravyi, Mario Motta, and Garnet Kin-Lic Chan. Quantum algorithms for quantum chemistry and
+quantum materials science. Chemical Reviews, 120(22):12685–12717, 2020.
+[8] Alberto Peruzzo, Jarrod McClean, Peter Shadbolt, Man-Hong Yung, Xiao-Qi Zhou, Peter J. Love, Al´ an Aspuru-Guzik,
+and Jeremy L. O’Brien. A variational eigenvalue solver on a photonic quantum processor. Nat. Commun., 5(1):4213, Jul
+2014.
+[9] Marco Cerezo, Andrew Arrasmith, Ryan Babbush, Simon C Benjamin, Suguru Endo, Keisuke Fujii, Jarrod R McClean,
+Kosuke Mitarai, Xiao Yuan, Lukasz Cincio, et al. Variational quantum algorithms. Nature Reviews Physics, 3(9):625–644,
+2021.
+[10] Kishor Bharti, Alba Cervera-Lierta, Thi Ha Kyaw, Tobias Haug, Sumner Alperin-Lea, Abhinav Anand, Matthias Degroote,
+Hermanni Heimonen, Jakob S. Kottmann, Tim Menke, Wai-Keong Mok, Sukin Sim, Leong-Chuan Kwek, and Al´ an Aspuru-
+Guzik. Noisy intermediate-scale quantum algorithms. Rev. Mod. Phys., 94:015004, Feb 2022.
+[11] Seunghoon Lee, Joonho Lee, Huanchen Zhai, Yu Tong, Alexander M Dalzell, Ashutosh Kumar, Phillip Helms, Johnnie
+Gray, Zhi-Hao Cui, Wenyuan Liu, et al. Evaluating the evidence for exponential quantum advantage in ground-state
+quantum chemistry. Nature Communications, 14(1):1952, 2023.
+[12] Daniel Stilck Fran¸ ca and Raul Garcia-Patron. Limitations of optimization algorithms on noisy quantum devices. Nature
+Physics, 17(11):1221–1227, 2021.
+[13] Joonho Lee, Dominic W Berry, Craig Gidney, William J Huggins, Jarrod R McClean, Nathan Wiebe, and Ryan Babbush.
+Even more efficient quantum computations of chemistry through tensor hypercontraction. PRX Quantum, 2(3):030305,
+2021.
+[14] Kieran Dalton, Christopher K Long, Yordan S Yordanov, Charles G Smith, Crispin HW Barnes, Normann Mertig, and
+David RM Arvidsson-Shukur. Variational quantum chemistry requires gate-error probabilities below the fault-tolerance
+threshold. arXiv preprint arXiv:2211.04505, 2022.
+[15] Samson Wang, Enrico Fontana, Marco Cerezo, Kunal Sharma, Akira Sone, Lukasz Cincio, and Patrick J Coles. Noise-
+induced barren plateaus in variational quantum algorithms. Nature communications, 12(1):6961, 2021.
+[16] Abhinav Kandala, Antonio Mezzacapo, Kristan Temme, Maika Takita, Markus Brink, Jerry M Chow, and Jay M Gambetta.
+Hardware-efficient variational quantum eigensolver for small molecules and quantum magnets. Nature, 549(7671):242–246,
+2017.
+[17] Abhinav Kandala, Kristan Temme, Antonio D C´ orcoles, Antonio Mezzacapo, Jerry M Chow, and Jay M Gambetta. Error
+mitigation extends the computational reach of a noisy quantum processor. Nature, 567(7749):491–495, 2019.
+[18] Frank Arute, Kunal Arya, Ryan Babbush, Dave Bacon, Joseph C Bardin, Rami Barends, Sergio Boixo, Michael Broughton,
+Bob B Buckley, David A Buell, et al. Hartree-Fock on a superconducting qubit quantum computer.Science, 369(6507):1084–
+1089, 2020.
+[19] Peter JJ O’Malley, Ryan Babbush, Ian D Kivlichan, Jonathan Romero, Jarrod R McClean, Rami Barends, Julian Kelly,
+Pedram Roushan, Andrew Tranter, Nan Ding, et al. Scalable quantum simulation of molecular energies. Phys. Rev. X,
+6(3):031007, 2016.
+[20] Yangchao Shen, Xiang Zhang, Shuaining Zhang, Jing-Ning Zhang, Man-Hong Yung, and Kihwan Kim. Quantum im-
+plementation of the unitary coupled cluster for simulating molecular electronic structure. Phys. Rev. A, 95:020501, Feb
+2017.
+[21] Cornelius Hempel, Christine Maier, Jonathan Romero, Jarrod McClean, Thomas Monz, Heng Shen, Petar Jurcevic,
+Ben P. Lanyon, Peter Love, Ryan Babbush, Al´ an Aspuru-Guzik, Rainer Blatt, and Christian F. Roos. Quantum chemistry
+calculations on a trapped-ion quantum simulator. Phys. Rev. X, 8:031022, Jul 2018.
+[22] James I Colless, Vinay V Ramasesh, Dar Dahlen, Machiel S Blok, Mollie E Kimchi-Schwartz, Jarrod R McClean, Jonathan
+Carter, Wibe A de Jong, and Irfan Siddiqi. Computation of molecular spectra on a quantum processor with an error-resilient
+algorithm. Physical Review X, 8(1):011021, 2018.
+9
+[23] Yunseong Nam, Jwo-Sy Chen, Neal C Pisenti, Kenneth Wright, Conor Delaney, Dmitri Maslov, Kenneth R Brown, Stewart
+Allen, Jason M Amini, Joel Apisdorf, et al. Ground-state energy estimation of the water molecule on a trapped-ion quantum
+computer. npj Quantum Inf., 6(1):1–6, 2020.
+[24] Sergey Bravyi, Sarah Sheldon, Abhinav Kandala, David C. Mckay, and Jay M. Gambetta. Mitigating measurement errors
+in multiqubit experiments. Phys. Rev. A, 103:042605, Apr 2021.
+[25] Piotr Czarnik, Andrew Arrasmith, Patrick J. Coles, and Lukasz Cincio. Error mitigation with clifford quantum-circuit
+data. Quantum, 5:592, nov 2021.
+[26] Angus Lowe, Max Hunter Gordon, Piotr Czarnik, Andrew Arrasmith, Patrick J Coles, and Lukasz Cincio. Unified approach
+to data-driven quantum error mitigation. Physical Review Research, 3(3):033098, 2021.
+[27] J. Cioslowski. Connected moments expansion: A new tool for quantum many-body theory. Phys. Rev. Lett., 58:83–85,
+Jan 1987.
+[28] Daniel Claudino, Bo Peng, Nicholas P Bauman, Karol Kowalski, and Travis S Humble. Improving the accuracy and
+efficiency of quantum connected moments expansions. Quantum Science and Technology, 6(3):034012, 2021.
+[29] T. E. O’Brien, G. Anselmetti, F. Gkritsis, V. E. Elfving, S. Polla, W. J. Huggins, O. Oumarou, K. Kechedzhi, D. Abanin,
+R. Acharya, I. Aleiner, R. Allen, T. I. Andersen, K. Anderson, M. Ansmann, F. Arute, K. Arya, A. Asfaw, J. Atalaya, J. C.
+Bardin, A. Bengtsson, G. Bortoli, A. Bourassa, J. Bovaird, L. Brill, M. Broughton, B. Buckley, D. A. Buell, T. Burger,
+B. Burkett, N. Bushnell, J. Campero, Z. Chen, B. Chiaro, D. Chik, J. Cogan, R. Collins, P. Conner, W. Courtney, A. L.
+Crook, B. Curtin, D. M. Debroy, S. Demura, I. Drozdov, A. Dunsworth, C. Erickson, L. Faoro, E. Farhi, R. Fatemi, V. S.
+Ferreira, L. Flores Burgos, E. Forati, A. G. Fowler, B. Foxen, W. Giang, C. Gidney, D. Gilboa, M. Giustina, R. Gosula,
+A. Grajales Dau, J. A. Gross, S. Habegger, M. C. Hamilton, M. Hansen, M. P. Harrigan, S. D. Harrington, P. Heu, M. R.
+Hoffmann, S. Hong, T. Huang, A. Huff, L. B. Ioffe, S. V. Isakov, J. Iveland, E. Jeffrey, Z. Jiang, C. Jones, P. Juhas, D. Kafri,
+T. Khattar, M. Khezri, M. Kieferov´ a, S. Kim, P. V. Klimov, A. R. Klots, A. N. Korotkov, F. Kostritsa, J. M. Kreikebaum,
+D. Landhuis, P. Laptev, K.-M. Lau, L. Laws, J. Lee, K. Lee, B. J. Lester, A. T. Lill, W. Liu, W. P. Livingston, A. Locharla,
+F. D. Malone, S. Mandr` a, O. Martin, S. Martin, J. R. McClean, T. McCourt, M. McEwen, X. Mi, A. Mieszala, K. C. Miao,
+M. Mohseni, S. Montazeri, A. Morvan, R. Movassagh, W. Mruczkiewicz, O. Naaman, M. Neeley, C. Neill, A. Nersisyan,
+M. Newman, J. H. Ng, A. Nguyen, M. Nguyen, M. Y. Niu, S. Omonije, A. Opremcak, A. Petukhov, R. Potter, L. P.
+Pryadko, C. Quintana, C. Rocque, P. Roushan, N. Saei, D. Sank, K. Sankaragomathi, K. J. Satzinger, H. F. Schurkus,
+C. Schuster, M. J. Shearn, A. Shorter, N. Shutty, V. Shvarts, J. Skruzny, W. C. Smith, R. D. Somma, G. Sterling, D. Strain,
+M. Szalay, D. Thor, A. Torres, G. Vidal, B. Villalonga, C. Vollgraff Heidweiller, T. White, B. W. K. Woo, C. Xing, Z. J.
+Yao, P. Yeh, J. Yoo, G. Young, A. Zalcman, Y. Zhang, N. Zhu, N. Zobrist, D. Bacon, S. Boixo, Y. Chen, J. Hilton, J. Kelly,
+E. Lucero, A. Megrant, H. Neven, V. Smelyanskiy, C. Gogolin, R. Babbush, and N. C. Rubin. Purification-based quantum
+error mitigation of pair-correlated electron simulations. Nature Physics, October 2023.
+[30] Luning Zhao, Joshua Goings, Kenneth Wright, Jason Nguyen, Jungsang Kim, Sonika Johri, Kyujin Shin, Woomin Kyoung,
+Johanna I. Fuks, June-Koo Kevin Rhee, and Young Min Rhee. Orbital-optimized pair-correlated electron simulations on
+trapped-ion quantum computers. arXiv e-prints, page arXiv:2212.02482, December 2022.
+[31] Lennart Bittel and Martin Kliesch. Training variational quantum algorithms is np-hard. Physical review letters,
+127(12):120502, 2021.
+[32] J´ erˆ ome F. Gonthier, Maxwell D. Radin, Corneliu Buda, Eric J. Doskocil, Clena M. Abuan, and Jhonathan Romero.
+Measurements as a roadblock to near-term practical quantum advantage in chemistry: Resource analysis. Phys. Rev. Res.,
+4:033154, Aug 2022.
+[33] Tzu-Ching Yen, Aadithya Ganeshram, and Artur F. Izmaylov. Deterministic improvements of quantum measurements
+with grouping of compatible operators, non-local transformations, and covariance estimates. npj Quantum Information,
+9(1):14, February 2023.
+[34] Yihui Quek, Daniel Stilck Fran¸ ca, Sumeet Khatri, Johannes Jakob Meyer, and Jens Eisert. Exponentially tighter bounds
+on limitations of quantum error mitigation. arXiv preprint arXiv:2210.11505, 2022.
+[35] Jonathan Romero, Ryan Babbush, Jarrod R McClean, Cornelius Hempel, Peter J Love, and Al´ an Aspuru-Guzik. Strategies
+for quantum computing molecular energies using the unitary coupled cluster ansatz. Quantum Science and Technology,
+4(1):014008, 2018.
+[36] Abhinav Anand, Philipp Schleich, Sumner Alperin-Lea, Phillip WK Jensen, Sukin Sim, Manuel D ´ ıaz-Tinoco, Jakob S
+Kottmann, Matthias Degroote, Artur F Izmaylov, and Al´ an Aspuru-Guzik. A quantum computing view on unitary
+coupled cluster theory. Chemical Society Reviews, 2022.
+[37] Rodney J. Bartlett, Stanislaw A. Kucharski, and Jozef Noga. Alternative coupled-cluster ans¨ atze II. the unitary coupled-
+cluster method. Chem. Phys. Lett., 155(1):133–140, 1989.
+[38] John F Stanton, J¨ urgen Gauss, John D Watts, and Rodney J Bartlett. A direct product decomposition approach for
+symmetry exploitation in many-body methods. i. energy calculations. The Journal of Chemical Physics, 94(6):4334–4345,
+1991.
+[39] Changsu Cao, Jiaqi Hu, Wengang Zhang, Xusheng Xu, Dechin Chen, Fan Yu, Jun Li, Han-Shi Hu, Dingshun Lv, and
+Man-Hong Yung. Progress toward larger molecular simulation on a quantum computer: Simulating a system with up to
+28 qubits accelerated by point-group symmetry. Phys. Rev. A, 105:062452, Jun 2022.
+[40] Yi Fan, Changsu Cao, Xusheng Xu, Zhenyu Li, Dingshun Lv, and Man-Hong Yung. Circuit-depth reduction of unitary-
+coupled-cluster ansatz by energy sorting. J. Phys. Chem. Lett. 2023, 14, 43, 9596–9603, 2023.
+[41] Maria Schuld, Ville Bergholm, Christian Gogolin, Josh Izaac, and Nathan Killoran. Evaluating analytic gradients on
+quantum hardware. Phys. Rev. A, 99:032331, Mar 2019.
+[42] Dave Wecker, Matthew B. Hastings, and Matthias Troyer. Progress towards practical quantum variational algorithms.
+10
+Phys. Rev. A, 92:042303, Oct 2015.
+[43] Bujiao Wu, Jinzhao Sun, Qi Huang, and Xiao Yuan. Overlapped grouping measurement: A unified framework for measuring
+quantum states. Quantum, 7:896, 2023.
+[44] Hsin-Yuan Huang, Richard Kueng, and John Preskill. Efficient estimation of pauli observables by derandomization.
+Physical review letters, 127(3):030503, 2021.
+[45] Simon Gustavsson, Fei Yan, Jonas Bylander, Fumiki Yoshihara, Yasunobu Nakamura, Terry P. Orlando, and William D.
+Oliver. Dynamical decoupling and dephasing in interacting two-level systems. Phys. Rev. Lett., 109:010502, Jul 2012.
+[46] X. Bonet-Monroig, R. Sagastizabal, M. Singh, and T. E. O’Brien. Low-cost error mitigation by symmetry verification.
+Phys. Rev. A, 98:062339, Dec 2018.
+[47] Yulin Wu, Wan-Su Bao, Sirui Cao, Fusheng Chen, Ming-Cheng Chen, Xiawei Chen, Tung-Hsun Chung, Hui Deng, Yajie
+Du, Daojin Fan, et al. Strong quantum computational advantage using a superconducting quantum processor. Physical
+review letters, 127(18):180501, 2021.
+[48] Frank Arute, Kunal Arya, Ryan Babbush, Dave Bacon, Joseph C. Bardin, Rami Barends, Rupak Biswas, Sergio Boixo,
+Fernando G. S. L. Brandao, David A. Buell, Brian Burkett, Yu Chen, Zijun Chen, Ben Chiaro, Roberto Collins, William
+Courtney, Andrew Dunsworth, Edward Farhi, Brooks Foxen, Austin Fowler, Craig Gidney, Marissa Giustina, Rob Graff,
+Keith Guerin, Steve Habegger, Matthew P. Harrigan, Michael J. Hartmann, Alan Ho, Markus Hoffmann, Trent Huang,
+Travis S. Humble, Sergei V. Isakov, Evan Jeffrey, Zhang Jiang, Dvir Kafri, Kostyantyn Kechedzhi, Julian Kelly, Paul V.
+Klimov, Sergey Knysh, Alexander Korotkov, Fedor Kostritsa, David Landhuis, Mike Lindmark, Erik Lucero, Dmitry
+Lyakh, Salvatore Mandr` a, Jarrod R. McClean, Matthew McEwen, Anthony Megrant, Xiao Mi, Kristel Michielsen, Ma-
+soud Mohseni, Josh Mutus, Ofer Naaman, Matthew Neeley, Charles Neill, Murphy Yuezhen Niu, Eric Ostby, Andre
+Petukhov, John C. Platt, Chris Quintana, Eleanor G. Rieffel, Pedram Roushan, Nicholas C. Rubin, Daniel Sank, Kevin J.
+Satzinger, Vadim Smelyanskiy, Kevin J. Sung, Matthew D. Trevithick, Amit Vainsencher, Benjamin Villalonga, Theodore
+White, Z. Jamie Yao, Ping Yeh, Adam Zalcman, Hartmut Neven, and John M. Martinis. Quantum supremacy using a
+programmable superconducting processor. Nature, 574(7779):505–510, Oct 2019.
+[49] Jules Tilly, Hongxiang Chen, Shuxiang Cao, Dario Picozzi, Kanav Setia, Ying Li, Edward Grant, Leonard Wossnig, Ivan
+Rungger, George H Booth, et al. The variational quantum eigensolver: a review of methods and best practices. Physics
+Reports, 986:1–128, 2022.
+[50] The total circuit depth serves as an indicator of the system’s performance to decoherence, as in our system the time
+duration for single-qubit and two-qubit gates are similar.
+[51] Z. R. Lin, K. Inomata, W. D. Oliver, K. Koshino, Y. Nakamura, J. S. Tsai, and T. Yamamoto. Single-shot readout of
+a superconducting flux qubit with a flux-driven josephson parametric amplifier. Applied Physics Letters, 103(13):132602,
+2013.
+[52] J. Y. Mutus, T. C. White, R. Barends, Yu Chen, Z. Chen, B. Chiaro, A. Dunsworth, E. Jeffrey, J. Kelly, A. Megrant,
+C. Neill, P. J. J. O’Malley, P. Roushan, D. Sank, A. Vainsencher, J. Wenner, K. M. Sundqvist, A. N. Cleland, and John M.
+Martinis. Strong environmental coupling in a josephson parametric amplifier. Applied Physics Letters, 104(26):263513,
+2014.
+[53] Zhiguang Yan, Yu-Ran Zhang, Ming Gong, Yulin Wu, Yarui Zheng, Shaowei Li, Can Wang, Futian Liang, Jin Lin,
+Yu Xu, Cheng Guo, Lihua Sun, Cheng-Zhi Peng, Keyu Xia, Hui Deng, Hao Rong, J. Q. You, Franco Nori, Heng Fan,
+Xiaobo Zhu, and Jian-Wei Pan. Strongly correlated quantum walks with a 12-qubit superconducting processor. Science,
+364(6442):753–756, 2019.
+[54] Yangsen Ye, Sirui Cao, Yulin Wu, Xiawei Chen, Qingling Zhu, Shaowei Li, Fusheng Chen, Ming Gong, Chen Zha, He-
+Liang Huang, Youwei Zhao, Shiyu Wang, Shaojun Guo, Haoran Qian, Futian Liang, Jin Lin, Yu Xu, Cheng Guo, Lihua
+Sun, Na Li, Hui Deng, Xiaobo Zhu, and Jian-Wei Pan. Realization of high-fidelity controlled-phase gates in extensible
+superconducting qubits design with a tunable coupler. Chinese Physics Letters, 38(10):100301, nov 2021.
+[55] Youngkyu Sung, Leon Ding, Jochen Braum¨ uller, Antti Veps¨ al¨ ainen, Bharath Kannan, Morten Kjaergaard, Ami Greene,
+Gabriel O. Samach, Chris McNally, David Kim, Alexander Melville, Bethany M. Niedzielski, Mollie E. Schwartz, Jonilyn L.
+Yoder, Terry P. Orlando, Simon Gustavsson, and William D. Oliver. Realization of high-fidelity cz and zz-free iswap gates
+with a tunable coupler. Phys. Rev. X, 11:021058, Jun 2021.
+[56] Julian Kelly, Peter O’Malley, Matthew Neeley, Hartmut Neven, and John M Martinis. Physical qubit calibration on a
+directed acyclic graph. arXiv preprint arXiv:1803.03226, 2018.
+[57] Qiming Sun, Timothy C Berkelbach, Nick S Blunt, George H Booth, Sheng Guo, Zhendong Li, Junzi Liu, James D
+McClain, Elvira R Sayfutyarova, Sandeep Sharma, et al. Pyscf: the python-based simulations of chemistry framework.
+Wiley Interdisciplinary Reviews: Computational Molecular Science, 8(1):e1340, 2018.
+[58] Dave Wecker, Matthew B. Hastings, and Matthias Troyer. Progress towards practical quantum variational algorithms.
+Phys. Rev. A, 92:042303, Oct 2015.
+[59] Joonho Lee, William J Huggins, Martin Head-Gordon, and K Birgitta Whaley. Generalized unitary coupled cluster wave
+functions for quantum computation. Journal of chemical theory and computation, 15(1):311–324, 2018.
+[60] Nicholas C. Rubin, Klaas Gunst, Alec White, Leon Freitag, Kyle Throssell, Garnet Kin-Lic Chan, Ryan Babbush, and
+Toru Shiozaki. The fermionic quantum emulator. Quantum, 5:568, Oct 2021.
+[61] Kosuke Mitarai, Makoto Negoro, Masahiro Kitagawa, and Keisuke Fujii. Quantum circuit learning. Physical Review A,
+98(3):032309, 2018.
+[62] Andrea Mari, Thomas R Bromley, and Nathan Killoran. Estimating the gradient and higher-order derivatives on quantum
+hardware. Physical Review A, 103(1):012405, 2021.
+[63] Charles Hadfield, Sergey Bravyi, Rudy Raymond, and Antonio Mezzacapo. Measurements of quantum hamiltonians with
+11
+locally-biased classical shadows. Communications in Mathematical Physics, 391(3):951–967, 2022.
+[64] Sergey Bravyi, Sarah Sheldon, Abhinav Kandala, David C Mckay, and Jay M Gambetta. Mitigating measurement errors
+in multiqubit experiments. Phys. Rev. A, 103(4):042605, 2021.
+[65] Piotr Czarnik, Andrew Arrasmith, Patrick J Coles, and Lukasz Cincio. Error mitigation with clifford quantum-circuit
+data. Quantum, 5:592, 2021.
+[66] Sergey Bravyi, Dan Browne, Padraic Calpin, Earl Campbell, David Gosset, and Mark Howard. Simulation of quantum
+circuits by low-rank stabilizer decompositions. Quantum, 3:181, 2019.
+[67] Karol Kowalski and Bo Peng. Quantum simulations employing connected moments expansions. The Journal of Chemical
+Physics, 153(20):201102, 2020.
+12
+SUPPLEMENT AR Y INFORMA TION
+CONTENTS
+Acknowledgments 7
+Author contributions 7
+References 8
+Supplementary Information 12
+I. Device and calibration 12
+A. Device 12
+B. System calibration 13
+C. Multi-qubit Pauli rotation gate calibration and optimisation 14
+D. Correlated readout error and random state measurements 17
+II. Variational quantum state preparation and measurement 18
+A. Problem encoding and qubit reduction 18
+B. Initial state preparation 18
+C. Quantum circuit ansatz design and compilation 20
+1. Unitary coupled cluster circuit ansatz 20
+2. Point group symmetry constraint 21
+3. Selection of excitation operators 22
+4. Quantum circuit compilation 23
+D. Optimisation by analytic stochastic gradient descent 24
+E. Quantum state measurement and classical post-processing 26
+1. Overlapped grouping measurement 26
+2. Optimisation process 27
+III. Error-mitigated observable estimation 28
+A. Readout error mitigation 28
+B. Gate error learning by Clifford fitting 30
+1. Methods 30
+2. Experimental procedure 30
+C. Symmetry verification 31
+D. Connected moments expansion 32
+E. Experimental procedure for observable estimation 33
+IV. Experimental implementation and results 33
+A. Experimental procedure 33
+B. Results 36
+C. Parameters iteration 38
+D. Noise analysis 39
+E. Challenges 39
+I. DEVICE AND CALIBRA TION
+A. Device
+The “Zuchongzhi 2.0” quantum processor contains 66 qubits and 110 couplers. In order to control and wire such
+a large-scale quantum processor, the qubit layer and wiring layer are prepared on separate chips, which are then
+combined using the flip-chip packaging process. High-purity aluminium thin films are grown on a sapphire substrate
+by molecular beam epitaxy (MBE) for both chips, which can reduce material loss and improve qubit decoherence
+performance. The wiring layer employs photolithography and etching processes to fabricate readout circuits and
+control circuits and utilizes a lift-off process for creating airbridges. These airbridges effectively establish grounding
+13
+connections, which prevent slot line modes, and simultaneously reduce crosstalk between control circuits. This results
+in superior qubit isolation and enables high-precision gate operations. The qubits and couplers are fabricated on the
+qubit layer. In this process, the capacitive elements of the qubits and couplers are defined using photolithography
+and etching. The Josephson junction is created by defining the junction area using electron beam equipment and
+then prepared using a dual-angle evaporation process followed by a lift-off process. During the fabrication process,
+we fine-tuned the junction’s critical current by adjusting the oxidation conditions and the size of the junction region.
+This allowed us to achieve the optimal frequency adjustment range for both qubits and couplers. Furthermore, a
+considerable number of indium bumps as superconducting interconnects are employed to establish a solid ground
+connection between the qubit layer and the wiring layer, effectively reducing parasitic modes.
+Following the chip fabrication process, the processor is wire-bonded to a printed circuit board located within a
+sample box. This sample box is equipped with gold-plated shielding inside and µ-metal shielding outside. Finally, the
+packaged processor is mounted to the plate of a dilution refrigerator and connected to room-temperature electronics
+via a series of attenuators, filters, and amplifiers.
+B. System calibration
+Our experiment is carried out on the “Zuchongzhi 2.0” quantum processor. We selected up to 12 qubits to run the
+quantum circuits. We turned off the coupling between used and unused qubits. Then, we optimised and calibrated
+the performance of the selected qubits, especially the quantum gates and readout performance.
+The optimisation procedure of our quantum processor can be summarised into the following steps:
+1. Select idle frequencies . Idle frequencies refer to the qubit operating frequencies when the qubits are in idle
+operations or single-qubit gates. As the qubit performance varies strongly with the frequency, setting the qubits
+in good idle frequencies is necessary to achieve high-fidelity gates. To arrange the idle frequencies, we need
+to consider a combination of factors, including coherence time, residual coupling between qubits, the distance
+between idle frequencies and CZ interaction frequencies (related to z distortions), two-level systems (TLSs),
+and XY-crosstalk. XY-crosstalk comes from the interaction between control lines and the distance of the driven
+frequencies.
+2. T urn off the coupling between qubits. In the setting of idle frequencies, the frequency distance between
+nearest-neighbour qubits is about 100MHz. Turning off the coupling to suppress the interaction between qubits
+is necessary to decrease parallel-gate errors. After setting qubit idle frequencies, we determine the coupler
+zero-coupling point by measuring the relative two-qubit conditional phase when varying the flux of the coupler.
+Then, we turn off the qubit-qubit coupling by adjusting the coupler flux bias to the selected zero-coupling point.
+3. Optimise single-qubit gates. We fine-tune the XY drive pulse amplitudes and apply Derivative Reduction
+by Adiabatic Gate (DRAG) correction to the pulse envelope with a length of 25 ns.
+4. Optimise the Josephson Parametric Amplifiers (JP As). The JPA can significantly improve the readout
+signal-to-noise ratio (SNR) and fidelity [51, 52]. First, we coarsely tune the JPA direct current (DC) bias, pump
+signal power and frequency according to our design. Then, these parameters are optimised by the Nelder–Mead
+algorithm, and the target function is the average SNRs of the qubit readout signals.
+5. Optimise the pulse distortion of each qubit. Distortion or reflection occurs when the pulse is transmitted
+from a waveform generator to qubits, and it will cause a shift in the qubit frequency which increases the gate
+error in the quantum circuit. In our experiment, we first measure the effect of pulse distortion on qubit phase
+accumulation over a fixed time of 400 ns. Then we calculate the waveform after distortion based on the result
+of phase accumulation and apply a reverse one to compensate for the pulse. The full protocol is detailed in Ref
+[53]
+6. Optimise the readout crosstalk. Readout crosstalk may be generated by factors such as the influence of
+neighbouring qubits on readout ones, coupling between readout resonators, frequency collision (caused by the
+overlap of demodulation frequencies, intermodulation of parametric amplifiers, etc.). It can reduce the readout
+fidelity and make REM unreliable. The readout crosstalk can be well suppressed by optimising the readout
+parameters, including frequencies and lengths of readout signal and qubits’ frequencies for readout.
+7. Calibrate the readout performance. After optimising the readout crosstalk, we need to confirm whether
+residual crosstalk is negligible. Here, we first calibrate the standard readout fidelity with qubits preparing in
+|0⟩⊗n and |1⟩⊗n. Then, we prepare the qubits in a random state set and calibrate the readout fidelity again. If
+the fidelities are close in both cases, the residual crosstalk is negligible.
+14
+8. Optimise CZ gates. In the UCC ansatz, the multi-qubit Pauli rotation gate ˆV (θ) is an elementary operator,
+which is compiled with single-qubit gates and CZ gates. The CZ gate with tunable-coupler structure has been
+investigated and realised with high fidelity [54, 55]. In our experiment, CZ gates are realised by utilising the
+resonance coupling between |11⟩ and |02⟩ states and optimised by the following steps:
+(a) According to the pattern in circuits, The CZ gates and single-qubit gates are divided into different groups.
+The next steps will be performed individually in these groups.
+(b) We collect coherence information (T1 and T2) for a large frequency range ( ∼100MHz) of qubits and
+determine the frequency region that is suitable for CZ interaction accordingly.
+(c) We first prepare the qubits in |11⟩ states. Then, we measure the conditional phase with varying coupling
+strength (tuning by coupler) for a fixed 50 ns gate time. Next, we measure the leakage of qubit states to
+|02⟩ or |20⟩ as qubit interaction frequencies vary. Finally, we coarsely determine the interaction frequencies
+and coupling strengths by minimising the cost function of conditional phase error and leakage error.
+(d) Select a CZ gate in the group and finely adjust its parameters by optimising the XEB (cross-entropy bench-
+marking) fidelity with a fixed cycle of 20 and fixed random circuits of 60 while keeping other parameters
+of the CZ gate unchanged.
+(e) We repeat step (d) for the CZ gate with the lowest fidelity in the group until the average fidelity no longer
+improves.
+9. Calibrate single-qubit gates and CZ gates. We utilise the SPB and XEB measurements to calibrate
+single-qubit and CZ gates. For CZ gates, the dynamical phases on both qubits are also determined in the XEB
+experiment.
+All steps can be realised automatically as a directed graph [56], except for step 6, which needs to be checked
+manually. We refer to Ref. [47] for more details about the performance calibration of quantum devices.
+After all the calibrations and optimisations, we summarised the qubit parameters in Fig. 5, and the errors for
+single-qubit gates, two-qubit gates and readout in Fig. 2a in the main text and Fig. 6. Fig. 2a in the main text shows
+the accumulated distribution of single-qubit gate, CZ gate and readout errors. Fig. 6 shows the spatial distribution
+of those gate errors for selected qubits on the “Zuchongzhi 2.0” quantum processor. There is no strong spatial error
+distribution in our qubit set. We run the automatic calibration steps 3, 7, 8, and 9 every three hours to maintain the
+system’s performance.
+C. Multi-qubit Pauli rotation gate calibration and optimisation
+The multi-qubit Pauli rotation gate ˆV (θ) is an elementary operator in the UCC ansatz. Consequently, the quality
+of ˆV (θ) directly determines the accuracy of our VQE experiment. In addition to high-fidelity single-qubit and CZ
+gates, two more experimental improvements are made to increase the quality of ˆV (θ).
+The Z-pulse distortion on the couplers could lead to a non-ideal coupling strength during the CZ gate and cause a
+residual wave trailing after the gate. Since ˆV (θ) is mainly composed of CZ gates, a non-ideal transmission characteristic
+will generate unwanted pulse distortion, thus increasing the error of the following gates. The residual effect is difficult to
+observe in the two-qubit XEB experiment. However, the trailing signal on the coupler will shift the qubit frequencies
+and reduce the fidelity of the gates in multi-qubit Pauli rotation. We first correct the Z-pulse distortion on the
+coupler to address this problem. We apply the Z waveform to the couplers and measure the phase accumulation
+of the adjacent coupled qubit. With the relation between coupler Z bias amplitude and qubit frequency, we could
+calculate the response function of the coupler control line, thereby achieving the correction through reverse waveform
+compensation.
+Secondly, Rx(θ) in ˆV (θ) is a non-Clifford gate, with different rotating angles originally realised with different pulse
+amplitude by linear adjustment. The error of R x(θ) is significantly larger than a standard single-qubit gate due to a
+non-linear response nonlinear response in the signal generation and transformation. On the other hand, the DRAG
+parameters are calibrated using π/2 gate, a fixed DRAG parameter for an arbitrary rotation gate R x(θ) would lead
+to additional control error and state leakage. Therefore, we replace the R x(θ) with R y(−π/2)-Rz(θ)-Ry(π/2). In our
+experiment, R z(θ) is a virtual gate. This replacement reduces the error of R x(θ) and guarantees the performance of
+Clifford fitting, which highly relies on the control accuracy in R x(θ), as introduced in Sec. III B.
+We benchmark the operation quality with and without the above two improvements by the following protocol:
+1. Initialise all qubits in the state |0⟩⊗n.
+15
+Qubit idle frequency(GHz)
+4.5594.4374.7634.7344.5634.5184.6314.4824.7114.6054.6674.567
+2 4 6Qubit index X
+2
+4
+6
+8
+10Qubit index Y
+4.45
+4.5
+4.55
+4.6
+4.65
+4.7
+4.75 Qubit T1 at idle frequency(us)
+35.031.237.140.136.031.625.040.242.933.833.934.5
+2 4 6Qubit index X
+2
+4
+6
+8
+10Qubit index Y
+25
+30
+35
+40
+Qubit T2* at idle frequency(us)
+4.12.37.14.23.74.52.75.92.45.88.73.7
+2 4 6Qubit index X
+2
+4
+6
+8
+10Qubit index Y
+3
+4
+5
+6
+7
+8
+Qubit anharmonicity(MHz)
+-249.5-249.5-244.0-243.0-247.0-245.5-246.5-249.0-245.0-245.0-244.0-248.5
+2 4 6Qubit index X
+2
+4
+6
+8
+10Qubit index Y
+-249
+-248
+-247
+-246
+-245
+-244
+-243 Qubit dispersive shift(MHz)
+0.750.800.850.850.720.720.820.720.600.750.750.60
+2 4 6Qubit index X
+2
+4
+6
+8
+10Qubit index Y
+0.6
+0.65
+0.7
+0.75
+0.8
+0.85
+FIG. 5. The typical distribution of the qubit parameters . Idle frequency, T1, T ∗
+2 , anharmonicity and dispersive shift for
+the selected 12 qubits.
+Single-qubit gate XEB average error x 1000
+1.28
+0.89 0.96
+0.70 1.21
+1.48 0.95
+0.78 1.11
+1.30 0.85
+0.75
+2 4 6
+Qubit index X
+2
+4
+6
+8
+10 Qubit index Y
+0.8
+0.9
+1
+1.1
+1.2
+1.3
+1.4
+CZ gate XEB average error x 100
+0.5
+0.6 0.8 0.5
+0.9 0.6 0.6
+1.3 1.2 1.3
+0.7 0.7 1.0
+0.7
+2 4 6 8 10
+Coupler index X
+2
+4
+6
+8
+10 Coupler index Y
+0.6
+0.8
+1
+1.2
+Readout error x 100
+2.44
+3.44 2.52
+4.31 4.80
+4.86 2.62
+4.45 4.41
+2.86 3.63
+4.15
+2 4 6
+Qubit index X
+2
+4
+6
+8
+10 Qubit index Y
+2.5
+3
+3.5
+4
+4.5
+FIG. 6. The performance of the quantum processor after calibration . Error for readout, single-qubit, and CZ gates
+for the selected 12 qubits.
+2. Apply a sequence consisting of m sets of ˆV ˆV † pairs with different random-selected rotating angle θ.
+3. Perform projection measurements along the Z direction to obtain the projection probability to |0⟩⊗n.
+4. Repeat steps 2 and 3 for k times to obtain a stable average probability.
+5. Change the length m and repeat steps 2, 3 and 4.
+Note that when the noise is sufficiently small, ˆV ˆV † should be close to identity, and hence the projection probability
+should be close to 1. Therefore, the projection probability value reflects the implemented gate’s quality. Let us denote
+the implemented noisy gates as ˜V and ˜V †. Here, in order to see a more explicit relation, we make the following
+assumptions:
+1. The implemented noisy gates ˜V and ˜V † are the corresponding noiseless gates V and V † concatenated by an
+error process E(ρ).
+16
+2. The error process E of the implemented noisy ˜V is gate-independent, time-independent, and parameter-
+independent, and can be described by a depolarising channel E(ρ) = pρ + (1 − p)I/2n with the identity
+operation I and the error rate 1 − p.
+Under the above assumptions, the averaged gate fidelity of the noisy ˜V is
+Favg =
+Z
+dψTr[V(ψ) ˜V(ψ)] ≈ p (1)
+Here V(·) = ˆV (·) ˆV †, ˜V(·) = ˜V (·) ˜V †, and we have neglected exponential dependence of O(1/2n).
+Now, consider m sets of noisy ˜V ˜V † on ρ0 = |¯0⟩ ⟨¯0|, we have
+ρ =
+mY
+i=1
+EV †EV (ρ0) = p2mρ0 + (1 − p2m)I/2n. (2)
+The probability to obtain |¯0⟩ ⟨¯0| is given by Tr(|¯0⟩ ⟨¯0| ρ) ≈ p2m, where we again neglect exponential small dependence
+of O(1/2n). Considering state preparation and measurement errors (assuming the stochastic noise model), we can
+show that the expectation value of Z takes the form of Ap2m + B. Therefore, the error rate p can be obtained by
+fitting the measurement outcomes with different choices of m.
+In the experiment, we use the fitting curve as a benchmark of the noisy ˜V (θ), as shown in Fig. 7. This figure clearly
+shows the difference in the quality before and after optimisation for the number of qubits as 4, 6, 8 and 10. After
+optimisation, there is an average 6% improvement for the ˜V (θ) gate. This experiment demonstrates a fast, scalable,
+and efficient protocol to benchmark a multi-qubit quantum computational chemistry operation.
+0 5 10 15 200
+0.2
+0.4
+0.6
+0.8
+1Probability
+Number of qubit = 4
+p = 0.8750.013p = 0.9280.011
+0 5 10 150
+0.2
+0.4
+0.6
+0.8 Number of qubit = 6
+p = 0.8070.014p = 0.8720.007
+0 5 10Layers m
+0
+0.2
+0.4
+0.6
+0.8Probability
+Number of qubit = 8
+p = 0.7990.014p = 0.8400.016
+0 5 10Layers m
+0
+0.2
+0.4
+0.6
+Number of qubit = 10
+p = 0.7450.008p = 0.8190.004
+a
+c
+b
+d
+Before optimisationAfter optimisation
+FIG. 7. Benchmark of multi-qubit Pauli rotation gate. The error rate of each sequence, as a characteristic of the
+averaged fidelity, can be obtained by measuring the probability of |0⟩⊗n. The data points are the average values at each
+sequence length.
+17
+4 6 8 12
+Number of qubits
+0.65
+0.75
+0.85Fidelity
+Standard readout fidelity
+Union readout fidelity
+FIG. 8. Union readout fidelity . Comparison of average union readout fidelity (orange dots) and standard readout fidelity
+(blue dashed line) for four qubits, six qubits, eight qubits and twelve qubits.
+D. Correlated readout error and random state measurements
+Quantum state measurements determine the information that we can extract from quantum experiments. Mea-
+surement errors can significantly impact simulation accuracy since they introduce a bias in the expectation value.
+Therefore, it is essential to mitigate measurement errors to ensure reliable results.
+To mitigate measurement errors, the first step is to learn the measurement noise matrix Λ from readout calibration
+measurements. Provided an invertible measurement noise matrix Λ, we can mitigate measurement readout errors by
+applying an inverse matrix Λ −1 to the noisy measurement outcomes.
+There are two types of measurement calibration matrices, one takes a tensor product form, a tensor product of
+local single-qubit calibration matrices, while the other one characterises correlated noise. The latter requires more
+experimental resources, which is not desirable in experiments. When the correlated readout error is negligible, noise
+can be well described by a measurement noise matrix with a tensor product form.
+In general, correlated readout error arises from the residual coupling and the spectral overlap of readout resonators.
+We make two improvements to ensure that the correlations of measurement errors are weak enough to be neglected.
+Firstly, we suppressed the residual coupling by adjusting the working point of the coupler delicately. Secondly, we
+optimised readout parameters simultaneously, including readout pulse frequencies, readout pulse amplitudes, readout
+pulse length and qubit readout frequencies.
+After these improvements, we verified the correlated readout error was suppressed by comparing the results of
+standard measurement and random state measurement. The verification by in the following steps:
+1. Prepare all qubits in |0⟩⊗n and |1⟩⊗n to acquire F00 and F11. Here, F00 (F11) means the probability to get a
+measure result of |0⟩ (|1⟩) when the qubit was prepared in |0⟩ (|1⟩).
+2. Random state measurements. Randomly prepare the qubit state and use the same discrimination line of the
+readout signal demodulated IQ clouds to calculate fidelity. Multiply the fidelities for all qubits, and we refer to
+the multiplication as the union readout fidelity.
+3. With hundreds of repeated experiments, averaged union readout fidelity is computed.
+Fig. 8 compares the average standard and union readout fidelity. These two types of readout fidelity show a good
+agreement, and the correlated readout error is negligible, which ensures the tensor product form is applicable in this
+experiment.
+18
+II. V ARIA TIONAL QUANTUM ST A TE PREP ARA TION AND MEASUREMENT
+This section discusses quantum algorithms for quantum chemistry problems, including variational state preparation,
+optimisation, and quantum state measurement. This section is organised as follows. In Sec. II B, we first demonstrate
+multi-reference state preparation on a quantum processor and illustrate the corresponding circuit. In Sec. II C, we
+introduce quantum circuit design strategies based on unitary coupled cluster ansatz, and propose a circuit reduction
+strategy to enable the simulation on current hardware. Quantum circuits for the three molecules are shown in
+Sec. II C 4. In Sec. II D, we introduce an optimisation scheme by analytic stochastic gradient descent and present the
+analytical form of the gradient estimation. In Sec. II E, we introduce an efficient quantum state measurement strategy
+for measuring multiple observables.
+A. Problem encoding and qubit reduction
+This work considers second-quantised molecular Hamiltonians represented in a discrete basis set in the active space.
+We implement qubit reduction by separating the full space of molecular orbitals into three parts: the core, active,
+and virtual space. We select the core orbitals as those that stay chemically inert. That is, their occupation numbers
+are sufficiently close to two when expanding the ground state of the Hamiltonian as a linear combination of Slater
+determinants, and virtual orbitals as those whose occupation numbers are close to zero. By classifying molecular
+orbitals into these three categories, we only need to compute the ground state in the selected active space, and thus
+the number of qubits required is reduced. As discussed in Ref. [6], a generic way to determine the classification
+of molecular orbitals is by computing the one-particle reduced density matrix (1-RDM) using an approximation of
+the ground state generated by a classical tractable method, such as the coupled cluster method. The 1-RDM is
+defined as 1Di
+j = ⟨ˆa†
+i ˆaj⟩ . By diagonalising the 1-RDM by a basis rotation operation, we obtain the natural orbital
+occupied numbers (NOONs) for every molecular orbital. NOON indicates the expected occupation number for the
+corresponding orbital, based on which we can determine the core, active and virtual spaces by the pre-determined
+thresholds.
+We show the irreducible representations (irreps) of orbitals in the selected active space for the molecules that are
+considered in this work. The Hamiltonians for various molecules are generated in the minimal basis set, known as
+the STO-3G basis, using the PySCF package [57]. For the H 2 molecule, we do not implement qubit reduction. The
+irreps of Hartree Fock orbitals of the LiH and F 2 molecules at different bond distances are plotted in Fig. 9. The
+point group of the LiH molecule is C∞v. Four Hartree Fock orbitals of LiH are of irreps a1 and the other two are of
+e1. We freeze the lowest orbitals with 1 a1 and 2a1 irreps, and remove the orbitals with 1 e1 and 2e1 irreps. The point
+group of F 2 is D∞h. We freeze the four lowest core orbitals with irreps 1 a1, 2a1, 3a1 and 4a1. The other orbitals of
+1e1, 2e1, 3e1, 4e1, 5a1 and 6a1 irreps are selected in the active space.
+With the selected orbitals in the active space, these molecular Hamiltonian can be expressed in the second quanti-
+sation as
+ˆH =
+X
+i,j
+hij ˆa†
+i ˆaj + 1
+2
+X
+i,j,k,l
+gijkl ˆa†
+i ˆa†
+j ˆakˆal, (3)
+where ˆa†
+i and ˆai denote the fermionic creation and annihilation operators associated with ith molecular orbitals in the
+active space, respectively. The coefficients hij and gijkl are the one- and two-electron integrals that can be evaluated
+classically provided the spin-orbital basis function.
+Under the Jordan-Wignar transformation, the fermionic Hamiltonian can be mapped to a qubit form which is
+suitable for evaluation on a quantum processor. The Jordan-Wigner transformation maps the fermionic operators ˆ aj
+and ˆa†
+j on each fermionic mode to the qubit Pauli operators as
+ˆaj 7→ 1
+2 (Xj + iYj)
+j−1O
+i=1
+Zi, ˆa†
+j 7→ 1
+2 (Xj − iYj)
+j−1O
+i=1
+Zi (4)
+with Pauli operators X, Y , Z acting on the jth qubit.
+B. Initial state preparation
+As the spin Hamiltonian is constructed according to the SU(2) symmetry, we consider the initial state or the
+reference state obeying this symmetry by assigning an equal number of electrons to the spin α and β sectors. Also,
+19
+0.5 1 1.5 2 2.5 3Bond distance (Angstrom)
+-3
+-2.5
+-2
+-1.5
+-1
+-0.5
+0
+0.5Molecular orbital energy (Hartree)
+1a12a13a11e1,2e14a1
+1 1.5 2 2.5 3Bond distance (Angstrom)
+-25
+-20
+-15
+-10
+-5
+0Molecuar orbital energy (Hartree)
+a b
+1a1,2a13a14a11e1,2e15a16a1
+FIG. 9. Hartree Fock orbital energies for the (a) LiH and (b) F 2 molecules. Each Hartree Fock is represented by a coloured
+node in the figure, indexed by its irrep. Molecular orbitals with close energy are combined.
+as only closed-shell molecules are considered, the reference state is restricted to a singlet state. In the first step of
+generating the molecular Hamiltonians, we adopt the restricted Hartree-Fock (RHF) method, where the ground-state
+wave function Ψ 0 is expressed by a single Slater determinant of molecular orbitals. The energy E = ⟨Ψ0|H|Ψ0⟩
+is then minimised subject to orbital orthogonality. We first consider the initial state to be a single reference state
+(i.e., a product state in the computational basis). Suppose the total number of electrons is 2 η. The single reference
+state is constructed in a way that η of electrons occupy the lowest energy spin orbitals in the spin α and β sectors,
+respectively, which is referred to as the Hartree-Fock state |ΨHF⟩.
+In this work, qubits are arranged in the following way: i) From left to right, each qubit corresponds to a spin-
+orbital that increases in its molecular-orbital energy; ii) The spin α and β sector are arranged separately; the spin
+α is assigned first in the left part, then followed by the spin β part. For example, the HF state of the 6-qbuit,
+2-electron LiH molecule reads |100100⟩, where the first and last 3-qubit state |100⟩ correspond to the spin α and β
+parts, respectively.
+Conventionally, the HF state is a good initial guess when the molecule is close to equilibrium. However, the closer
+the molecule approaches dissociation, the worse the HF state behaves due to the quasi-degeneration of different
+configurations. Consequently, the correlation energy, defined as the difference between the ground state energy and
+HF energy, becomes larger when the bond distance of a bi-atomic molecule stretches. To address this point, we
+consider the reference state to be a superposition of multi-configurations,
+|Ψref ⟩ =
+X
+i
+ci |Ψi⟩ , (5)
+where {|Ψi⟩} is the collection of configurations in the reference state with coefficients {ci}. The configurations |Ψi⟩
+are chosen by identifying the fermionic modes that are related to the bond-breaking process and the size |{|Ψi⟩}| is
+a constant as they are only related to a constant number of fermionic modes. Thus, we can optimise efficiently on a
+classical device to determine the optimal coefficients. This approach is known as a multi-reference method [6] in the
+quantum chemistry literature. We apply the method for the LiH and F 2 molecule and observe that higher accuracy is
+achieved compared to the HF state in the dissociation regime. As the two molecules we considered here are bi-atomic,
+the molecule can be seen as two individual atoms with negligible interaction in the large bond-distance limit. Also,
+the molecular orbitals are constructed as a linear combination of atomic orbitals in a symmetry-adapted way such
+that two atomic orbitals with the same symmetry are combined in a linear way to two molecular orbitals. For the
+LiH molecule, the lowest two molecular orbitals in the active space are established from atomic orbitals in this way.
+Hence, in the dissociation limit, one decouples the molecular orbitals to atomic ones by the equal-superposition state
+1√
+2 |100100⟩ −1√
+2 |010010⟩ where the other configuration is selected as |010010⟩ for the reference. The same logic
+follows for other molecules. As the molecule is in the intermediate state that interpolates between the equilibrium
+20
+and the dissociation regimes, it is expected the reference state to be a superposition of the above-mentioned two
+configurations. We elaborate on the compilation of quantum circuits and optimise the coefficients of the reference
+state in the following.
+In this work, we prepare the reference state as
+|Ψref⟩ = 1p
+1 + β2 (1 − βˆa†
+η+N/2ˆa†
+ηˆaη+N/2−1ˆaη−1) |ΨHF⟩ , (6)
+which considers the excitations from the highest occupied molecular orbitals of the Hartree-Fock state, and the qubits
+are numbered from 0. When β = 0, the initial state reduces to the Hartree-Fock state. The quantum circuit for
+preparing the multi-reference state in Eq. (6) is first creating a rotation along the y-axis on the qubit indexed by
+(η − 1) as
+Ry |0⟩⊗N = 1p
+1 + β2 |0⟩⊗(η−1) ⊗ (|0⟩ −β |1⟩) ⊗ |0⟩⊗N −η , (7)
+followed by 3 CNOT gates and single-qubit X gates, which can be explicitly expressed as
+
+
+η+N/2−1O
+i=N/2
+Xi
+η−1O
+i=0
+Xi
+
+ CNOT(N/2+η−1)→(N/2+η)CNOTη→(N/2+η−1)CNOT(η−1)→η. (8)
+It is easy to find that compared to the Hartree-Fock state, the state preparation for Eq. (6) only introduces additional
+3 CNOT gates. For instance, we prepare |Ψ0⟩ = 1√
+1+β2 (|100100⟩ −β |010010⟩) for the LiH molecule. The circuit for
+initial state preparation is shown in Fig. 10.
+FIG. 10. The initial state preparation for LiH molecule |Ψ0⟩ = 1√
+1+β2 (|100100⟩ −β |010010⟩). The Pauli rotation along the
+y-axis prepares the state R y |0⟩ = 1√
+1+β2 (|0⟩ −β |1⟩).
+The parameter β is determined by minimising the energy on the state, i.e., min β ⟨Ψ0| ˆH|Ψ0⟩. It is easy to check
+that this minimisation problem can be computed efficiently.
+A comparison of the initial state energy associated with the multi-reference state, Hartree-Fock state energy, and
+the true ground state energy is shown in Fig. 11. The multi-reference state outperforms the Hartree-Fock state at a
+large bond distance and thus serves as a better initial state in this case.
+C. Quantum circuit ansatz design and compilation
+1. Unitary coupled cluster circuit ansatz
+One crucial step for simulating large molecular systems by variational quantum algorithms is to design an appropri-
+ate quantum circuit that can effectively represent the ground state of the target system, and meanwhile, circuit depth
+is shallow. The unitary coupled cluster (UCC) ansatz has been widely used in the context of quantum computational
+chemistry [37]. As shown in the main text, the quantum state can be constructed as
+|Ψ(θ)⟩ = e
+ˆT (θ)− ˆT †(θ)|Ψ0⟩, (9)
+21
+0.5 1 1.5 2 2.5 3 3.5 4Bond distance(Angstrom)
+-7.9
+-7.8
+-7.7
+-7.6
+-7.5
+-7.4
+-7.3
+-7.2
+-7.1
+-7Energy(Hartree)
+HFMulti-referenceGround
+FIG. 11. Comparison of different energies associated with the Hartree-Fock state, the multi-reference state, and the ground
+state.
+where ˆT (θ) is the coupled-cluster excitations, and |Ψ0⟩ is the initial state. The coupled-cluster excitations are usually
+truncated to single and double excitations, which are also called unitary coupled-cluster singles-and-doubles (UCCSD).
+The cluster operator truncated at single- and double-excitations has the form
+ˆT (θ) =
+X
+p∈vir
+i∈occ
+θpi ˆTpi +
+X
+p,q∈vir
+i,j∈occ
+θpqji ˆTpqji , (10)
+where the one- and two-body terms are defined as ˆTpi = ˆa†
+pˆai and ˆTpqji = ˆa†
+pˆa†
+qˆaj ˆai, respectively. As the molecular
+Hamiltonian conserves particles with definite spins, the ansatz is designed to conserve this symmetry as well, whereas
+the spin degree of freedom is abbreviated for simplicity.
+To implement the VQE circuit of UCC ansatz on a quantum device, we apply the first-order Trotter-Suzuki
+expansion. and the circuit ansatz becomes
+|Ψ(θ)⟩ =
+Y
+ˆTi∈O
+e
+ˆTi− ˆT †
+i |Ψ0⟩, (11)
+where we denote the operator pool as O := { ˆTi} with ˆTi representing the excitation operators in Eq. (10). Here, it is
+worth remarking that the order of ˆTi will result in a different performance of the circuit.
+As can be found from Eq. (10) and Eq. (11), the original UCCSD ansatz considering the single- and double-
+excitations is composed of a large number of operators scaling as O((N − η)2η2) with electron number η, and the
+circuit depth with respect to the two-qubit entangling gates scales as O(N (N − η)2η2), As shown in the main text,
+the CZ gate counts for H 2, LiH, and F 2 are 56, 280, 2920, respectively. Note that the multi-qubit rotation gate is
+complied into a ladder of CZ gates and a single-qubit Pauli rotation gate, exp( −iθˆσ/2), with ˆσ = {X, Y, Z} being the
+single-qubit Pauli operator. The high demand for the CZ gates constraints practical implementation of the original
+UCC ansatz.
+2. Point group symmetry constraint
+There has been considerable progress in reducing the number of operators in the circuit ansatz, such as using
+classical pre-calculation to screen out the terms that are small enough [35] or only choosing the important excitation
+operators [58], for instance, paired double excitation operators in ansatz [59]. In the following, we discuss the circuit
+reduction strategy using the point group symmetry constraint.
+To reduce the circuit depth without sacrificing accuracy, we consider using the point group property to reduce the
+UCC ansatz operators. Point group symmetry (spatial symmetry) is a fundamental property of molecular systems that
+22
+characterises molecules’ geometric and electronic structures. The amplitude associated with the one- and two-electron
+excitations in both coupled cluster and unitary coupled cluster ansatz is proven to be zero unless the corresponding
+term preserves the symmetry of the initial state [38]. This indicates that the expansion of the unitary coupled
+cluster wavefunction will only contain the terms with the same irreducible representation (irrep) as the reference
+wavefunction [39]. For the simple closed-shell molecules, the excitation operations should preserve the symmetry, and
+thus the irrep of the ground state should be A g, which is a totally symmetric irreducible representation, A g, of which
+the characters are all 1. This applies to all the cases considered in this work.
+In our implementation, we filter out the operators that break the symmetry of the reference Hartree-Fock state
+when constructing the UCC ansatz. Only the terms excite |Ψ0⟩ to Ag states remain, and the rest of the terms in the
+exciting operator are excluded in constructing the cluster operator. As such, we select the operators ˆTi that satisfy
+the constraint of symmetry, that is,
+O :=
+n
+ˆTi | D
+
+e
+ˆTi− ˆT †
+i |Ψ0⟩
+
+= D (|Ψ0⟩)
+o
+(12)
+where D is the irrep of the corresponding wavefunction.
+The point group of LiH is C ∞v, which has three irreducible representations D, i.e. D∈{Ag, E1x, E1y}. All the
+UCCSD excitation operators satisfy the symmetry constraint in Eq. (12), and thus there is no circuit reduction for
+LiH. However, for large molecules, quantum circuits can be reduced without sacrificing accuracy. The point group
+of F 2 is D ∞h. F 2 has six irreducible representations D, D∈{A1g, E1gx, E1gy , A1u, E1uy, E1ux}. In total, there are
+ten single excitation operators and 25 double excitation operators. Only nine excitations have the same irreducible
+representation of A1g and need to be included in the circuit ansatz.
+However, we note that the strategy based on Point group symmetry constraints may not yield significant reductions
+in circuit depth for larger molecules which tend to be less symmetric. Below, we introduce a circuit reduction strategy
+by selecting the dominant excitation operations.
+3. Selection of excitation operators
+The above circuit reduction exploits intrinsic information of the molecules. We can further construct a more
+compact quantum circuit by selecting operators that contribute dominantly to the energy decrease from a reference
+state, which has been proposed in [40]. We start from the initial state |Ψ0⟩, which is a Hartree-Fock state or a
+multi-reference state. The excitation operators are selected from the UCCSD operator pool O in Eq. (10) composed
+of the possible single- and double-excitation operators ˆTpi and ˆTpqji that satisfy the symmetry constraints.
+This relies on the fact that the quantum circuit with a single operator can be efficiently simulated. The quantum
+state under one excitation becomes
+|Ψ⟩ = eθ( ˆTi− ˆTi
+†
+) |Ψ0⟩ , (13)
+where ˆTi ∈ Ois a one-body or two-body excitation operator in the operator pool O with the form ˆTi = ˆa†
+pˆai or
+ˆa†
+pˆa†
+qˆaj ˆai. The VQE optimisation iteration is carried for each operator ˆTi ∈ Ofor Ei. The minimised energy is
+obtained by the variational principle
+Ei = min
+θi
+⟨Ψ0|e−θi( ˆTi− ˆT †
+i ) ˆHe θi( ˆTi− ˆT †
+i )|Ψ0⟩ . (14)
+The importance of the operator is evaluated by calculating the energy difference with respect to the initial state energy,
+∆Ei = |E0 − Ei|, with E0 = ⟨Ψ0| ˆH|Ψ0⟩. The list {(∆Ei, ˆTi)}sorted is recorded. The operators are sorted according
+to the energy difference in descending order. The operators with contributions above a threshold |∆Ei| > εthres are
+picked out and used to perform the VQE optimisation. In what follows, we show that this selection procedure is
+classically efficient.
+The circuit operator eθ( ˆTi− ˆT †
+i ) can be expanded by the Taylor series as
+eθ( ˆTi− ˆT †
+i ) =
+∞X
+n=0
+θn( ˆTi − ˆT †
+i )n
+n!
+= I +
+∞X
+n=1
+(−1)nθ2n ( ˆTi ˆT †
+i )n + ( ˆT †
+i ˆTi)n
+(2n)! +
+∞X
+n=0
+(−1)nθ2n+1 − ˆT †
+i ( ˆTi ˆT †
+i )n + ˆTi( ˆT †
+i ˆTi)n
+(2n + 1)!
+= cos(θ
+q
+ˆTi ˆT †
+i ) + cos(θ
+q
+ˆT †
+i ˆTi) −
+ˆT †
+iq
+ˆTi ˆT †
+i
+sin(θ
+q
+ˆTi ˆT †
+i ) +
+ˆTiq
+ˆT †
+i ˆTi
+sin(θ
+q
+ˆT †
+i ˆTi)
+(15)
+23
+where we have used ˆT 2
+i = ( ˆT †
+i )2 = 0. From Eq. (15), the circuit operator comprises four terms only, and each term can
+be simulated classically [60]. Let us take cos( θ
+q
+ˆTi ˆT †
+i ) for example. Without loss of generality, ˆTi can be expressed
+as ˆTi = ˆa†
+3ˆa†
+1ˆa2ˆa0, and then
+ˆTi ˆT †
+i = ˆa†
+3ˆa†
+1ˆa2ˆa0ˆa†
+0ˆa†
+2ˆa1ˆa3 = ˆn3 ˆn1 (1 − ˆn2) (1 − ˆn0) . (16)
+Since the action of the number operator gives 0 or 1 and ˆTi ˆT †
+i is idempotent, the square root of ˆTi ˆT †
+i can be defined
+as
+q
+ˆTi ˆT †
+i ≡ ˆn3 ˆn1 (1 − ˆn2) (1 − ˆn0) , (17)
+and we have
+cos(θ
+q
+ˆTi ˆT †
+i ) = cos θ
+q
+ˆTi ˆT †
+i = cos θˆn3 ˆn1 (1 − ˆn2) (1 − ˆn0) . (18)
+The energy expectation ⟨Ψ0|e−θ( ˆTi− ˆT †
+i ) ˆHe θ( ˆTi− ˆT †
+i )|Ψ0⟩ contains 16 terms, each of which can be simulated classically.
+Therefore, the optimisation process described by Eq. (14) can be simulated classically.
+The above discussion holds for any operators, and hence their actions on any states. The expression can be further
+simplified when we consider the action of the operator on the Hartree-Fock state. Define ˆG := −i( ˆTi − ˆT †
+i ). It is easy
+to check that G is Hermitian ˆG = G†. For T contains only one excitation, the action of G on the HF state |ΨHF⟩ is
+ˆG2 |ΨHF⟩ = −( ˆT 2
+i + ( ˆT †
+i )2 − ˆTi ˆT †
+i − ˆT †
+i ˆTi) |ΨHF⟩ = |ΨHF⟩ . (19)
+Therefore, we have
+|Ψ⟩ = eiθ ˆG |ΨHF⟩ = (cos θ ˆI + i sin θ ˆG) |ΨHF⟩ . (20)
+The energy can now be calculated as
+⟨ΨHF|e−θ( ˆTi− ˆT †
+i ) ˆHe θ( ˆTi− ˆT †
+i )|ΨHF⟩ = E0 cos2 θ + sin2 θ ⟨ΨHF| ˆG ˆH ˆG|ΨHF⟩ (21)
+with E0 = ⟨ΨHF| ˆH |ΨHF⟩. It is straightforward to see that this optimisation process with one excitation operator
+acting on the Hartree-Fock state can be simulated classically.
+Suppose we have selected the operator set { ˆTi} in its qubit form. We map ˆTi to its qubit form under the Jordon-
+Wigner transformation. Since each term is symmetric and the contribution of each term is the same, we only choose
+one term in the qubit form to further reduce the gate count and hence circuit depth. In the next section, we display
+the quantum circuits for the three molecules.
+4. Quantum circuit compilation
+In this section, we present the dominant operators and quantum circuits for the three molecules after circuit
+compilation. The dominant excitation operators for H 2 are a†
+3a†
+1a2a0. The dominant excitation operators for LiH are
+a†
+5a†
+1a3a0, a†
+4a†
+2a3a0, and a†
+5a†
+2a3a0. The dominant excitation operators for F 2 are a†
+11a†
+5a6a0, a†
+11a†
+5a7a1, a†
+11a†
+5a8a2,
+a†
+11a†
+5a9a3, and a†
+11a†
+5a10a4.
+Next, we optimise the quantum circuits with respect to the circuit depth of CZ gates. We exploit the 2D geometry
+of the qubit layout of the quantum processor to encode the spin-ups and spin-downs, and we optimise the depth by
+parallelisation of CZ gates. The parameterised quantum circuits for H 2, LiH and F 2 are
+UH2 = exp(iθX0Y1X2X3) exp(−iθY0X1X2X3), (22)
+ULiH = exp(−iθ3Y0Z1X2X3Z4X5) exp(−iθ2Y0Z1X2X3X4) exp(−iθ1Y0X1X3Z4X5), (23)
+and
+UF2 = exp(−iθ5X4X5Y10X11) exp(−iθ4Y3Z4X5X9Z10X11) exp(−iθ3Y2Z3Z4X5X8Z9Z10X11)
+exp(−iθ2Y1Z2Z3Z4X5X7Z8Z9Z10X11) exp(−iθ1Y0Z1Z2Z3Z4X5X6Z7Z8Z9Z10X11), (24)
+respectively.
+The compiled quantum circuits (excluding the initial state preparation and measurement) for H 2, LiH, and F 2 are
+shown in Fig. 12, Fig. 13, and Fig. 14, respectively. Here, the parameters are chosen as ±π/5 as an example. The
+circuit for initial preparation has been discussed in Sec. II B, and the circuit for LiH is shown in Fig. 10.
+24
+FIG. 12. The compiled quantum circuit ansatz for H 2.
+FIG. 13. The compiled quantum circuit ansatz for LiH
+D. Optimisation by analytic stochastic gradient descent
+Now, we show how to analytically estimate the gradient of expectation values of the observable ˆO. In VQE, the
+ground state is approximated by solving L(θ) = minθ ⟨Ψ0|U †(θ) ˆOU (θ)Ψ0⟩θ with ˆO = ˆH using a classical optimiser.
+The circuit that is constructed using the methods developed in Sec. II C takes the form of
+U (θ) =
+Y
+j
+LjY
+lj
+Vj,lj (θj), (25)
+where each gate operation Vj,lj is a multi-qubit Pauli rotation Vj,lj = exp(−iθjPj,lj /2) with Pj,lj ∈ {I, X, Y, Z}⊗N
+being the tensor product of single-qubit Pauli operators over N qubits. Prior works usually consider Lj = 1, that is,
+each parameter is associated with only one term. However, in quantum chemistry experiments, the parameters are
+often associated with many terms. The objective is to get the first-order derivative with respect to the jth parameter,
+i.e., gj(θ) = ∂L(θ)/∂θj. Using the Leibniz rule, the gradient is given by
+gj =
+X
+lj
+⟨Φj,lj | ∂ ¯Vj,lj (θj,lj )
+∂θj,lj
+|Φj,lj ⟩ (26)
+where we introduce θj,lj to represent the parameter associated with the operator Vj,lj with θj,lj = θj, and we have
+|Φj,lj ⟩ =
+Y
+k<lj
+Vj,k(θj,k)
+Y
+k<j
+Y
+lk
+Vk,lk (θk,lk ) |Ψ0⟩ (27)
+and
+¯Vj,lj (θj,lj ) = Vj,lj (θj,lj )† ¯OVj,lj (θj,lj ) (28)
+FIG. 14. The compiled quantum circuit ansatz for F 2
+25
+with
+¯O =
+
+Y
+k>j
+Y
+lk
+Vk,lk (θk,lk )
+Y
+k>lj
+Vj,k(θj,k)
+
+
+†
+O
+Y
+k>j
+Y
+lk
+Vk,lk (θk,lk )
+Y
+k>lj
+Vj,k(θj,k). (29)
+Since P 2
+j,lj = I, each of the gate can be written as
+Vj,lj (θj,lj ) = cos(θj,lj /2)I − i sin(θj,lj /2)Pj,lj , (30)
+and thus ¯Vj,lj (θj,lj ) can be written as
+¯Vj,lj (θj,lj ) = A + B cos(θj,lj ) + C sin(θj,lj ) (31)
+where A, B, and C are operators that rely on Vj,lj and ¯O yet independent of the parameters θj,lj From Eq. (31), we
+can show that the summand in the gradient is related to a parameter-shifted ¯Vj,lj (θj,lj ± s) with a shift s, which is
+given by
+∂ ¯Vj,lj (θj,lj )
+θj,lj
+=
+¯Vj,lj (θj,lj + s) − ¯Vj,lj (θj,lj − s)
+2 sins . (32)
+The gradient is thus given by
+gj =
+P
+lj
+ 
+⟨Φj,lj | ¯Vj,lj (θ + sej,lj )|Φj,lj ⟩ − ⟨Φj,lj | ¯Vj,lj (θ − sej,lj )|Φj,lj ⟩
+
+2 sin(s)
+=
+P
+lj L(θ + sej,lj ) − L(θ − sej,lj )
+2 sin(s)
+(33)
+with unit vector e. Eq. (33) indicates that we can get the gradient of the energy expectation analytically by measuring
+the energy expectation by shifting parameters, termed the parameter-shift rule [61, 62].
+In the experiment, the gradient is estimated by measuring the two parameter-shifted quantities. Due to statistical
+fluctuation, the gradient can only be estimated up to certain precision. The estimator of gj is given by
+ˆgj =
+P
+lj
+ˆL(θ + sej,lj ) − ˆL(θ − sej,lj )
+2 sin(s) . (34)
+The estimation by the parameter-shift rule has an unbiased estimation of the gradient as
+Eˆgj = gj. (35)
+In what follows, we discuss the variance of the estimator. Assume that energy estimation has the same variance as
+Var[ ˆL] = Var[ ˆL(θ + sej,lj )], ∀j, ∀lj. (36)
+Then the variance of the gradient estimation is given by
+Var[ˆgj] = Lj
+sin2(s) Var[ ˆL] ≥ Lj Var[ ˆL]. (37)
+It is straightforward that the variance of the estimator is minimised when s = π/2.
+The gradient estimation by the parameter-shift rule shows a clear advantage over the finite difference method where
+the gradient is estimated as
+ˆgFD
+j =
+P
+lj
+ˆL(θ + δej,lj ) − ˆL(θ − δej,lj )
+2δ . (38)
+The estimation is unbiased when the step size approaches zero, δ → 0. To make the estimation close to the true
+gradient, the step δ should be taken to be a small number. However, the variance of the estimation is
+Var[ˆgFD
+j ] = Lj
+δ2 Var[ ˆL], (39)
+26
+which can be much larger than the variance in Eq. (37).
+To make it more efficient, we adopt a stochastic gradient descent strategy. For the kth iteration with parameters
+θk, we obtain the gradient element gk
+j (θk) by the parameter shift rule
+ˆgSGD,k
+j (θk) =
+ˆL(θ+) − ˆL(θ−)
+2 (40)
+where we define
+ˆL(θ±) =
+X
+lj
+ˆL(θ ± π∆jej,lj /2). (41)
+In experiments, the parameters to be optimised are chosen stochastically by ∆k
+j = 0 or 1 and satisfying |∆k| > Np/2
+to reduce the sample cost for the gradients. We update the parameters by θk+1 = θk + αkgk(θk) with an appropriate
+learning rate αk. The estimation of the gradient is also unbiased
+EˆgSGD,k
+j (θk) = gk
+j (θk). (42)
+E. Quantum state measurement and classical post-processing
+The power of variational quantum algorithms is at the expense of measurements. This becomes a severe problem
+in molecular systems, in which the number of measurements at each iteration scales up to O(N 4) with the problem
+size N . However, as many of the observables have small coefficients and are qubit-wise compatible (hence could be
+measured simultaneously), we could exploit more efficient measurement schemes to alleviate the measurement cost.
+In this section, we discuss how to measure the observable efficiently by exploiting the qubit-wise compatibility of the
+target observable.
+1. Overlapped grouping measurement
+The observables in our experiment include the Hamiltonian ˆH, the projected Hamiltonian in the symmetry verified
+space Π ˆHΠ with the projector Π, and Hamiltonian moments ˆH k for k ≥ 2. The target observable O can be
+decomposed into the Pauli basis as
+O =
+X
+l
+αlOl, (43)
+with Ol ∈ {I, X, Y, Z}⊗n being the tensor product of single-qubit Pauli operators. The main idea is that if two
+observables Ol and Ol′ are qubit-wise compatible, we can measure the two observables simultaneously in one mea-
+surement basis. Formally, for a multi-qubit Pauli operator Q = ⊗n
+i=1Qi with Qi ∈ {I, X, Y, Z} being a single-qubit
+Pauli operator acting on the ith qubit, its expectation value can be obtained by measurements in any Pauli basis
+P = ⊗n
+i=1Pi whenever Qi = Pi or Qi = I for any i. We refer to this circumstance as P hits Q and denote by Q ▷ P.
+We say that Ol and Ol′ are compatible with each other when Ol ▷ P and Ol′ ▷ P, i.e., they are hit by the same basis
+P.
+To estimate Tr(ρO) for an n-qubit unknown quantum state ρ, we randomly select the measurement basis P and
+generate an estimation of Tr( ρO) by measuring in the measurement basis P with probability K(P). An estimator of
+the target observable O is expressed as
+ˆo(P) =
+X
+l
+αlf (P, Ol, K)µ(P, supp(Ol)) (44)
+where µ(P, supp(Ol)) = Q
+i∈supp(Ol) µ(Pi) with µ(Pi) being the single-shot outcome of measurement Pi on the ith
+qubit, supp(Q) = {i|Qi ̸= I}. Suppose we have chosen the measurement basis set{Pj)} and the associated probability
+distribution {K(Pj)}, the function f is defined as
+f (P, Q, K) = χ(Q)−1δQ▷P, (45)
+27
+where χ(Q) = P
+P:Q▷P K(P) represents the probability that Q is effectively measured with the measurement basis
+P. Eq. (44) gives an unbiased estimation
+E[ˆo] = Tr(Oρ), (46)
+where the average is over the probability distribution K(P). The variance of the estimator in Eq. (44) for a single
+sample could be calculated by the definition as
+Var[ˆo] = EP
+X
+l,l′
+αlαl′Tr(ρOlOl′)f (P, Ol, K)f (P, Ol′, K) − Tr(ρO)2, (47)
+where we use the equality Eµ(P)µ(P, supp(Ol))µ(P, supp(Ol′)) = Eµ(P)µ(P, supp(OlOl′)) = Tr( ρOlOl′). The de-
+tailed proof can be found in Refs. [43, 63].
+We assign the observables {Ol} into overlapped grouping sets,
+S = {e1, . . . ,es}, (48)
+where each set ej is composed of compatible observables that can be measured in basis Pj and it satisfies
+∪jej = O, ej = {Q ▷ Pj}, ∀Q ∈ ej. (49)
+The strategy to determine the overlapped grouping sets is that we add an observable Ol that has not been accessed
+into a new set and all compatible observables into this set. Observables with larger absolute weights are given high
+priority since they have more contributions to the variance, as can be found from Eq. (47). The algorithm generates
+the measurements {P} with non-optimised probabilities {K}.
+2. Optimisation process
+The probability distribution associated with set ej by default is the weight of the set. We choose to use the strategy
+proposed in [43] to optimise the probability distribution {K} such that the variance of the estimator can be further
+minimised. We consider a diagonal approximation of Var ( ˆo), which is explicitly expressed as
+l(K) =
+X
+l
+α2
+l
+χ(Ol, K) , (50)
+where χ(Ol, K) = P
+P:Ol▷P K(P) and K := ( K1, · · ·, Ks) represents all the corresponding probabilities. In our
+experiment, since changing to another measurement basis requires a certain initialization time, we attempt to reduce
+the total number of basis sets to as few as possible. We delete observable sets with small weights. As such, we consider
+the final cost function as
+l(K) =
+X
+Ol∈S
+α2
+l
+χ (Ol) +
+X
+Ol̸∈S
+α2
+l Ns, (51)
+where Ns is the total number of samples, Ol ∈ Sif there exists a set e such that Ol ∈ e, and P
+Ol̸∈S is the penalty
+caused by deleting some sets. The selection of the final cost function in Eq. (51) is inspired by the linear dependence
+of the variance and the number of samplings, which is indicated by Chebyshev inequality Ns ≥ Var(ˆo)/
+ 
+δε2
+.The
+regularised term α2
+j Ns compensates the initial error ε0| for excluding the observable Ol in the estimation of O. The
+initial error, which can be expressed as ε0 = | P
+j:Ol̸∈S αlTr (ρOl) |, implies a bias of our estimation since Ol will not
+be covered by any set.
+It’s important to note that we optimise the overlapped grouping strategy which was possibly used for comparison
+in [33] whose results appear pessimistic regarding the measurement cost. Specifically, we prioritise the measurement
+bases with large coefficients while discarding those with very small coefficients. This initial selection may introduce
+some level of error into our computations, termed initial errors. However, we can set a tolerance threshold and ensure
+the errors due to insufficient measurement bases are below such a threshold. This approach, while introducing certain
+errors, can significantly reduce the total number of measurements, and thus make it possible to run the algorithm on
+our device.
+In our experiment, we reduce the total number of basis sets by decreasing the default number of samples Ns and cut
+down sets with a weight smaller than a threshold. This strategy will generate a small number of sets and could reduce
+28
+the running time for measurement. We could search for an optimised Ns in a real experiment with a small-scale input
+size with an initial Ns0. Since the cost function in Eq. (51) is not convex, we could find a local minimum solution
+using the nonconvex optimisation methods.
+Since our overlapped grouping measurement strategy assumes measurements drawn from the probability distri-
+bution, the measurement accuracy may fluctuate. In our experiment, we derandomise the scheme by fixing the
+measurement basis P. Suppose that we have determined the measurement basis sets S = {e1, . . . ,es} and the op-
+timised probability distribution {(P, K(P))} using the above strategy. For the jth measurement Pj with sampling
+probability Kj, we choose the number of measurements for Pj to be ⌊NsKj⌋, and select an additional one Pj with
+probability NsKj − ⌊NsKj⌋, where the total number of measurements is Ns.
+With these improvement, in our experiment, the average number of shots for measuring the energy of H 2, LiH, and
+F2 is 1.3e5, 3.7e5, and 8.7e5, respectively, and the average running time for H 2, LiH, and F 2 is 0.4min, 1.2min, and
+2.9min, respectively.
+III. ERROR-MITIGA TED OBSER V ABLE ESTIMA TION
+The VQE process requires the evaluation of gradient and energy. However, due to gate and measurement errors,
+these values unavoidably deviate from the ideal ones. It is crucial to mitigate the errors in order to get reliable results.
+In this section, we show how to obtain error-mitigated expectation values for observables.
+A. Readout error mitigation
+In experiments, we extract quantum state information by performing projective measurements on a computational
+basis and analysing the measurement outcomes. The quantum state |Ψ⟩ collapses onto the computational basis
+|i⟩ ∈ {|0⟩ , |1⟩}⊗N with probability pi = | ⟨i|Ψ⟩ |2 by Born’s rule, which can be obtained by sampling the classical
+measurement outcomes. Getting unbiased probability {pi} is central for us to estimate the property of the quantum
+state. However, due to readout noise, the probability distribution deviates from the ideal one, which results in an
+error in the estimation. In what follows, we show how to mitigate the measurement readout errors.
+The measurement error can be described as a classical random process, where any given ideal probabilistic measured
+result is transformed into a noisy one. Thus, the error can be fully described by a size 2 n × 2n transition matrix, also
+known as the calibration matrix Λ. The noisy measurement outcomes ˜bnoisy = {˜b1, · · ·, ˜bn} is related to the ideal
+measurement outcomes bideal = {b1, · · ·, bn} via the calibration matrix by
+˜bnoisy = Λbideal. (52)
+To circumvent the intractability of acquiring the complete calibration matrix, one can model the measurement error
+by taking tensor products of each local single-qubit calibration matrix of size 2 × 2. The underlying assumption is
+that the measurement crosstalk in the quantum device is small enough that it can be completely omitted.
+In our experiment, we optimise qubit-qubit residual coupling and readout parameters and check the correlated
+readout errors by random state measurement experiments. As shown in Fig. 8, correlated readout errors are negligible.
+Therefore, it is reasonable to assume that the measurement calibration matrix Λ admits a tensor product form as
+Λ =
+NO
+j=1
+Λj, (53)
+where Λj is the calibration matrix for the jth qubit, and it is expressed by
+Λj =
+
+p(0|0) p(0|1)
+p(1|0) p(1|1)
+
+=:
+
+1 − ϵj γj
+ϵj 1 − γj
+
+, (54)
+where p(x|y) represents the probability of the measured basis is |x⟩ given the prepared state |y⟩ under computational
+bases {|0⟩, |1⟩}. With Eq. (54), 2 n parameters, {εj, γj} for j ∈ [1, n], can be used to describe the measurement error.
+Next, we conduct the calibration process to learn the tensor product model parameters. We first select a set of
+product states T . For each state x ∈ T, we prepare the state on the quantum device and collect the measured product
+state y at each time for Nc times. We denote m(y, x) as the number of times for y is observed when we prepare the
+29
+state x. Then, as shown in Ref. [64] the estimated two parameters ϵj and γj for the jth qubit is given by
+ϵj =
+P
+x,y m(y, x) ⟨1|yj⟩ ⟨xj|0⟩P
+x,y m(y, x) ⟨xj|0⟩ ,
+γj =
+P
+x,y m(y, x) ⟨0|yj⟩ ⟨xj|1⟩P
+x,y m(y, x) ⟨xj|1⟩ .
+(55)
+Remark that to effectively learn the parameters, we are supposed to let the selected, prepared product state set T
+contain at least once xj = 0 and 1 for each qubit j.
+The REM process essentially applies the inverse of Eq. (53) to the noisy measurement result for estimating the
+expectation value of an observable. Given an arbitrary Hermitian observable in the form of Eq. (43), and each Ol
+can be expressed in a tensor product form, Ol = NN
+k=1 Ok
+l , where Ok
+l acts on the kth qubit. The estimator of the
+expectation value of Ol after REM is given by
+ˆol = 1
+M
+MX
+m=1
+NY
+k=1
+D
+e
+Ok
+l Λ−1
+k
+ sm
+k
+E
+, (56)
+where M is the measurement shots assigned for observable Ol, |e⟩ = |0⟩ + |1⟩, and sm
+k ∈ {0, 1} is the obtained
+measurement outcome for the kth qubit in the mth measurement.
+Now, we discuss the estimator of the observable within the grouping measurement framework. Suppose we have
+determined the measurement basis set {Pj} and the associated measurement times Nj. Similarly to the grouping
+method, we denote Sj containing all Ol hitted by Pj (element-wise commute with Pj). The estimator of the
+expectation value of the observable O can be expressed by
+ˆo =
+X
+l
+αlˆol, (57)
+where ˆol denotes the estimator of Ol measured in basis Pj. In our experiment, we estimate the expectation value of
+the observable Ol by
+ˆol =
+P
+j:Ol▷Sj ˆol,j
+sl
+. (58)
+Here, the denominator sl = P
+j δOl▷Sj is the total number of times Ol being hit by Pj. As such, the variance of ˆo
+with a single measurement can be estimated as
+Var[ˆo] =
+X
+l
+α2
+l
+P
+j:Ol▷Sj
+Var[ˆol,j]
+s2
+l
+. (59)
+Without REM, when the observable Ol is measured by Pj, it yields two potential outcomes: either +1 or −1.
+Let tl,j represent the count of measurements resulting in an outcome of +1. It is straightforward to see that the
+measurement result (i.e. estimator) associated with the measurement Pj for observable Ol is ˆol,j = 2tl,j/Nj − 1.
+With REM, ˆol,j is given by Eq. (56). For later convenience, we give the explicit form of the observable estimation
+as
+ˆoREM
+l = 1
+Nj
+X
+j:Ol▷Sj
+NjX
+m=1
+NY
+k=1
+D
+e
+Ok
+l Λ−1
+k
+ sm
+k
+E
+. (60)
+It is thus straightforward that the readout error mitigated estimator of the expectation value of observable O can be
+explicitly expressed as
+ˆoREM =
+X
+l
+αl
+sl
+X
+j:Ol▷Sj
+NjX
+m=1
+NY
+k=1
+D
+e
+Ok
+l Λ−1
+k
+ sm
+k
+E
+. (61)
+The readout error mitigated estimation in Eq. (61) is unbiased if every observable is assigned at least one measurement
+basis Nj ≥ 1, otherwise, the estimation has an initial error.
+30
+B. Gate error learning by Clifford fitting
+1. Methods
+We consider Clifford fitting (also called Clifford data regression) [65] to mitigate the dominant CZ gate error. The
+key idea is to obtain an error-mitigated expectation value by fitting a regression function f CF which maps a noisy
+expectation value to an error-mitigated one as
+oideal = f CF(onoisy).
+The regression function is obtained in a learning style using data pairs of ideal and noisy results generated from
+classically simulable (near)-Clifford circuits and noisy quantum circuits. Here, we choose the fitting function to be
+linear,
+f CF(·) = a(·) + b,
+where a and b are the coefficients to be fitted.
+For Clifford fitting in quantum chemistry simulation, which relies on a parameterised quantum circuit, we choose a
+collection of quantum circuits by randomly replacing the parameterised gates with Clifford gates, and the remaining
+parameterised gates are assigned with a rotating angle choosing independently, uniformly from [0 , 2π]. Here, we
+denote np as the total number of parameterised gates in a parameterised quantum circuit, K as the number of gates
+not being substituted, and Su = {ui} as the set of the randomly assigned circuit. Hence, the remaining np − K gates
+are replaced with single-qubit Clifford gates.
+For a given Pauli observable Oj ∈ P ⊗n \ I ⊗n with P ∈ {I, X, Y, Z}, we aim to establish a training data set consists
+of data pairs of ideal expectation value simulated on a classical computer and noisy value measured from the quantum
+device with the set of quantum circuits we construct above. For efficient classical simulation, it is crucial that they
+are “nearly Clifford” in the sense that the stabiliser rank, i.e. the number of non-Clifford gates K in the quantum
+circuit, of each quantum circuit is a constant. In this case, these quantum circuits can be simulated classically [66].
+Compared to other error mitigation methods, such as zero noise extrapolation approaches, the Clifford fitting method
+does not require stretching the implementation time of the gates. Besides, the effect of noise on the training and
+corresponding testing (experimental) circuit on the expectation values of observables is expected to remain the same as
+only single-qubit rotation gates are replaced by Clifford gates through changing the rotation angle and the two-qubit
+CZ gates are unchanged.
+2. Experimental procedure
+For our goal to estimate the energy, we run the Clifford fitting process for each observable in the Hamiltonian. The
+number of quantum circuits could be enormous and impractical for experimental realisation. Here, we discuss how to
+reduce instances of the circuit to be implemented for Clifford fitting.
+We observe that in practical computation, some observables’ expectation values remain unchanged or change in
+a negligible small range for different parameters in different quantum circuits, called unchanged observables. It is,
+therefore, unnecessary to run the algorithm for these unchanged observables on quantum hardware, upon evaluating
+the energy of the quantum system. We elaborate on the complete protocol in the following.
+1. In the first step, we identify and record all the changed and unchanged observables in the Hamiltonian. For
+each Pauli observable Oj in the Hamiltonian ˆH, randomly assign all the parameters uniformly from [0 , 2π] and
+obtain a L-size quantum circuit instance set S (Z)
+u = {ui}L
+i=1, where the upper-script Z stands for the number
+of non-Clifford gates in the circuit, and ui denotes the ith quantum circuit instance obtained from the random-
+parameter assignment. The size L needs to be sufficiently large to create enough quantum circuit instances to
+determine if the expected value of an observable changes. Compute the expectation value {⟨Oj⟩ui
+}L
+i=1 classically
+for each circuit instance in S (Z)
+u for each observable. Compute the range value σj and the variance µj of the
+expectation values. If both σj and µj are greater than the thresholds σT and µT we chose, then Oj is labelled
+as a changed observable, otherwise, an unchanged observable. We record the invariant observables, which will
+not be measured on quantum hardware. Record its value for estimating the energy in the final step.
+2. Let M be the total number of parameterised gates. Randomly choose K out of M parameterised gates and
+assign value independently to each parameter from [0 , 2π] to construct the quantum circuits set S (K)
+u of size
+R. Set the left M − K gates to the identity gate. R is chosen to be sufficient for fitting a line for the linear
+regression, such as 10.
+31
+3. We refer to the set of changed observables as {OC}, run step 4 for each observable in OC. Then go to step 5.
+4. For a given observable Oj, calculate the ideal expected value {⟨Oj⟩ui
+}R
+i=1 with respect to state prepared by
+each ui. Here, we want the ideal values to be as spread out between [ −1, 1] as possible. The purpose is that at
+least these different instances will appear in different intervals so that the values are dispersed enough for better
+linear regression. To this end, we classify different expected values according to their intervals, such as selecting
+instances in the intervals of [-1,0.9], [-0.9,0.8],. . . ,[0.9,1].
+5. Set {OS} = ∅. Update {OS} by adding all the observables that satisfy the dispersion condition in step 4. Repeat
+step 4 for multiple times for observables in {OC} ∩{OS} until {OC} ∩{OS} is empty. At each repetition, add
+qualified observables to {OS}, and record the quantum circuit set S (K)
+u as well.
+6. For each recorded quantum circuit run on the quantum device to get the noisy expectation value for all its
+corresponding observables. For each observable O, feed the ideal and corresponding noisy value to fit the linear
+regression function and optimise the loss function
+C =
+X
+ϕi∈S (K)
+ψ
+
+⟨O⟩exact
+ui −
+
+a ⟨O⟩noisy
+ui + b
+2
+. (62)
+Therefore we get different linear mapping functions for different observables.
+7. Use the fitting function to mitigate the error in expectation value for the corresponding observable.
+The estimation of an observable O can be obtained by Eq. (57), and is formally expressed as
+ˆoCF =
+X
+l
+αlˆoCF
+l , (63)
+where the estimator for Ol after REM and CF is given by
+ˆoCF
+l = f CF
+l (ˆoREM
+l ), (64)
+and fl is the fitting function associated with Ol.
+C. Symmetry verification
+Error mitigation by symmetry verification takes advantage of prior knowledge of the physical subspace where we
+search for the solution to the problem. There are two types of symmetries in the molecular problems considered here,
+which are the conservation of particle number and singlet state for the ground state, need to be satisfied. The particle
+number, hence the parity, of the ground state should be conserved throughout the simulation process. In addition, it
+is known in the quantum chemistry community that for closed-shell molecules, the ground state is bound to be a spin
+singlet state.
+Below, we briefly review error mitigation by symmetry verification introduced in [46]. For each symmetry verification
+operator ˆSi, we have,
+ˆSi|ψ⟩ = si|ψ⟩, (65)
+where the si ∈ ±1. The density matrix, which is projected into the subspace that conserves the symmetry, can be
+expressed as,
+ρsi = Πsi ρΠsi
+Tr(Πsi ρ) , (66)
+with Πsi = I+si ˆSi
+2 . Specifically, as a result of the closed shell molecule that we deal with, the trial wave function we
+pick is in an even-parity sub-manifold for total particle number and spin. Therefore, the eigenvalues of parity check
+operators for the correct symmetry are always one, i.e., si = 1. We project the target molecular Hamiltonian H to
+the even-parity subspace. For this purpose, we have
+Tr( ˆHρ si ) = Tr( ˆHρ) + Tr(ˆH ˆSiρ)
+1 + Tr(ˆSiρ)
+, (67)
+32
+which effectively conserves the symmetry of the quantum subspace. This is achieved by measuring Tr(Hρ), Tr(H ˆSiρ),
+and Tr( ˆSiρ).
+We have the particle number or parity conservation for the molecular problems considered here, i.e., [ˆH, ˆS] = 0 with
+ˆS = N
+i ˆZi. This symmetry verification expands the to-be-measured observable set, which is composed of the elements
+in the decomposition of H and H ˆS. The symmetry verification EM has three ingredients ⟨ ˆH⟩, ⟨ ˆH ˆS⟩, and ⟨ ˆS⟩. Each
+of them is estimated by measuring the predetermined basis, introduced in Sec. II E. The final error mitigated results
+by SV are computed classically by Eq. (67) as
+ˆo = ⟨ ˆH⟩
+CF
++ ⟨ ˆH ˆS⟩
+CF
+1 + ⟨ ˆS⟩
+CF . (68)
+Here, ⟨ ˆH⟩
+CF
+, ⟨ ˆH ˆS⟩
+CF
+, and ⟨ ˆS⟩
+CF
+are the estimator obtained by sequentially applying REM in Eq. (60) and CF in
+Eq. (63), and classical post-processing by Eq. (57).
+In our experiment, we found that a combination of Clifford fitting and symmetry verification might not perform
+well. This is because, in our experiment, symmetry verification requires measuring many large-support observables,
+which demands high-precision measurement for these observables. In Fig. 18, we study the performance of symmetry
+verification and explain why it results in large fluctuations in the energy estimation, which will be elaborated on
+below.
+D. Connected moments expansion
+The connected moments expansion (CMX) method [67] is derived from the imaginary time evolution (ITE) approach
+that can be expressed in the following formula
+E(β) = ⟨Φ|He −β ˆH |Φ⟩
+⟨Φ|e−β ˆH |Φ⟩
+=
+∞X
+k=0
+(−β)kIk+1
+k! , (69)
+where β is the evolution time of the ITE method, and we expand the formula as the expansion of the connected
+moments Ik taking advantage of the Taylor expansion. The mechanism of the ITE method is to project the state |Ψ⟩
+towards the ground state of H, and Eq. (69) gives the exact ground state energy as β goes to infinity as long as the
+state |Ψ⟩ is non-orthogonal to the ground state. The evolution time β in practice is chosen to be a finite number and
+is essentially related to the overlap between the state |Ψ⟩ and the ground state.
+The ITE operator e−β ˆH is nonunitary and thus generally hard to implement on a quantum device. The CMX method
+provides a way to circumvent this problem through measuring the higher moments of ˆH in Eq. (69). Specifically, the
+connected moment is defined recursively by
+Ik = ⟨Φ| ˆH k|Φ⟩ −
+k−2X
+i=0
+
+k − 1
+i
+
+Ii+1
+D
+Φ
+ ˆH k−i−1
+ Φ
+E
+. (70)
+The analytical form for exact energy as β goes to infinity can be represented by
+Eground = I1 − S2
+2,1
+S3,1
+ 
+1 + S2
+2,2
+S2
+2,1S3,2
+. . .
+ 
+1 + S2
+2,m
+S2
+2,m−1S3,m
+!
+. . .
+!
+, (71)
+where Sk,1 = Ik, Sk,i+1 = Sk,1Sk+2,i − S2
+k+1,i and it is straightforward to have S2,1 = I2 = ⟨ ˆH 2⟩ − ⟨ˆH⟩
+2
+and
+S3,1 = ⟨ ˆH 3⟩ −3 ⟨ ˆH⟩ ⟨ˆH 2⟩ + 2 ⟨ ˆH⟩
+3
+. For practical concerns, one truncates the expansion up some order k. In our
+experiment, we measure the higher-order moment ⟨Φ|H k|Φ⟩ for k ≤ 3 using the grouping measurement schemes
+introduced in Sec. II E. It is reasonable for our choice of k ≤ 3 in that we expect the application of various quantum
+error mitigation (QEM) methods to be able to reproduce most parts of the ground state energy, but in some cases, it
+may not be able to reach the chemical-accuracy requirement. As such, the state we prepared in the energy estimation
+step corresponds to an effective state which has a fairly good overlap with the ground state, but is not exactly the
+same. Assuming to perform the ITE approach in this case, it follows that the evolution time β of the ITE method can
+be chosen to a relatively small one. Thus one can equivalently truncate the expansion Eq. (70) up to some constant
+order as the expansion is monotonically decreasing. Truncating the expansion to a low order also makes the method
+33
+affordable experimentally. Note that CMX is not a variational method, and thus the energies obtained by CMX may
+be lower than the true ground state energy.
+In the experiment, after the VQE procedure, we would obtain the final circuit parameters. We then execute the
+circuit under different measurement bases to measure the expectation values of different observables ( ˆH, ˆH 2 and ˆH 3).
+Finally, the ground state energy is estimated by Eq. (71).
+The variance of the energy estimation using the connected moments’ expansion up to the second order is calculated
+by
+Var[Eground] =
+ ∂Eground
+∂a
+2
+Var[a] +
+ ∂Eground
+∂b
+2
+Var[b] +
+ ∂Eground
+∂c
+2
+Var[c], (72)
+and it takes the form of
+Var[Eground] =
+ 
+1 + 4aS2,1
+S3,1
+− S2
+2,1(−3b + 6a2)
+S2
+3,1
+!2
+Var[a] +
+ 
+2S2,1
+S3,1
++ 3S2
+2,1a
+S2
+3,1
+!2
+Var[b] + S4
+2,1
+S4
+3,1
+Var[c] (73)
+where we have defined a := ⟨ ˆH⟩, b := ⟨ ˆH 2⟩ and c := ⟨ ˆH 3⟩. It is worth noting that this calculation for the variance is
+based on the variance propagation, and the actual variance could be smaller. The error bar for the energy estimation
+using CMX is calculated according to Eq. (73).
+E. Experimental procedure for observable estimation
+In the experiment, according to the target observable set, {Ol}, including the Hamiltonian ˆH, the symmetry
+verified Hamiltonian ˆH ˆS, parity ˆS, and the Hamiltonian power ˆH k, the measurement basis {P} and the associated
+measurement shots are generated using the method introduced in Sec. II E. The experimental procedure for obtaining
+error-mitigated observable estimation in order is summarised as follows.
+1. Experimental benchmark for measurement noise. Test whether the measurement errors admit a tensor product
+type by random state measurement. Obtain the calibration matrix Λ by measurement error calibration.
+2. Generate a series of random quantum circuits for Clifford noise learning. Measure the state prepared by Clifford
+circuits in the predetermined basis {P} and obtain the fitting function f CF for each observable.
+3. During the VQE process, measure the observable on the state in basis {P}. For each Ol, apply readout error
+mitigation by Eq. (60). Get the observable estimation after CF in Eq. (63) or Eq. (64).
+4. Get symmetry verified results using Eq. (67). In our experiment, we apply symmetry verification to correct the
+energy for H 2 and LiH.
+5. The final ground state energy is estimated using the CMX in Eq. (71).
+IV. EXPERIMENT AL IMPLEMENT A TION AND RESUL TS
+In Sec. , we show how to optimise the Zuchongzhi processor to obtain high-fidelity gates and readout. In Sec. II,
+we discuss quantum algorithms for the ground state search and quantum state measurement with fewer quantum
+resources. Subsequently, in Sec. III, we show how to obtain error-mitigated ground state energy estimation. With
+these experimental and theoretical advances, we study systematically the ground state energy estimation for three
+molecules, H2, LiH, F 2. Finally, we point out the challenges in experimental quantum computational chemistry.
+A. Experimental procedure
+Benchmarking:
+Prior to experiments, we first calibrate the qubits and couplers set used in our experiment to obtain the performance
+with high enough gate fidelity and readout fidelity, as well as to ensure there are no correlated readout errors. The
+calibrations contain the following steps.
+34
+1 3 5
+Fit slope
+0
+0.2
+0.4
+0.6
+0.8
+1
+Intergrated histgram
+-0.1 0 0.1
+Fit intercept
+0
+0.2
+0.4
+0.6
+0.8
+1
+H2 LiH F2
+0.8 0.9 1
+Fit R2
+0
+0.2
+0.4
+0.6
+0.8
+1a b c
+FIG. 15. Distribution of Clifford fit parameters. The accumulated distribution of slope, intercept and goodness of fit
+for H 2 (R=2.6), LiH (R=1.5) and F 2 (R=2.0) are shown in the diagram. With the system size and circuit depth increasing,
+we can observe that (a) the slopes of Clifford fit become larger due to the impact of decoherence. (b) the variance of intercept
+becomes larger, and the mean value is off zero, which may be caused by gate correlated errors. (c) the goodness of fit becomes
+worse. Two main issues may cause it. One is gate-correlated errors that make our model nonlinear. The other is insufficient
+fit data, which will increase our experiment resources.
+1. Calibrate the qubit frequency and Rabi amplitude, update the readout IQ clouds discrimination lines and the
+readout error mitigation (REM) matrix by standard readout experiment. The REM matrix for single-qubit is
+described as Eq. (54), where p(x|y) represents the probability of the measured basis is |x⟩ given the prepared
+state |y⟩ under computational bases {|0⟩, |1⟩}. We prepare the qubit in |0⟩ and |1⟩ in the experiment and select
+the perpendicular bisector of the two IQ clouds centres as the discrimination line to separate the |0⟩ and |1⟩ as
+well as acquire p(x|y). This step runs prior to each VQE experiment for a molecule with a single bond length,
+as well as before every complete experiment for calibration and benchmark.
+2. Benchmark single-qubit and CZ gates, and update the control parameters in CZ gates. Count the fidelities for
+all single-qubit gates and CZ gates, and ensure the fidelities are high enough and stable. This step will be run
+every 3 hours.
+3. Check the correlated readout error. Comparing the average union readout fidelity and standard readout fidelity
+with the random state readout experiment to check whether the corrected readout error is negligible. This step
+will also be run every 3 hours.
+Experiments:
+A crucial step in optimisation is to get the gradient with respect to a parameter, which is estimated by measuring
+the parameter-shifted quantum state, as indicated by Eq. (40). We apply error mitigation techniques, including REM,
+CF, and SV, to obtain an error-mitigated gradient and energy. In the following, we elaborate on the experimental
+procedures. The experimental Clifford fitting is composed of the following steps:
+1. Determine a set of Clifford circuits with the random parameters generated using the method described in
+Sec. III B. For each Pauli measurement basis Pj and the associated observable set ej = {Ol|Ol ▷ Pj}, record
+instances of quantum circuit Cj. Note that Cj could be identical to make the experiments friendly.
+2. Run noisy Clifford circuits {Cj} with the pre-determined random parameters. Measure in Pauli basis {P}
+generated using the overlapped grouping methods in Sec. II E and record the noisy expectation value for each
+observable Ol.
+3. Simulate Clifford circuits {Cj} classically and record the ideal expectation value for every observable.
+4. Fitting the ideal and noisy expectation value with a linear function f CF
+l (·) = a(·) + b for every observable, we
+get the error mitigation function. Record those fitting functions f CF
+l , and we could use them to mitigate the
+errors in the observable estimation by Eq. (64).
+35
+Ground0 5 10 15
+-0.9
+-0.8
+-0.7Energy (Hartree)
+RawREMREM+PSREM+CFREM+CF+SVREM+CF+CMXNumerical
+0 5 10 15Iteration
+10-4
+10-3
+10-2
+10-1E (Hartree)
+Ground0 5 10
+-7.85
+-7.75
+-7.65
+0 5 10 15Iteration
+10-4
+10-3
+10-2
+10-1
+Ground0 5 10 15
+-196
+-195
+-194
+0 5 10 15Iteration
+10-3
+10-2
+10-1
+100
+a b c
+d e f
+FIG. 16. Optimisation procedure. The optimisation procedure traces of energy and abs energy error for H 2 (R=2.6), LiH
+(R=2.2) and F2 (R=2.6) are shown in the picture. Here in (a)(b)(c), we add energy with REM + PS (purple leftward triangles),
+while the others are the same as in Figure 2b. Figure (d)(e)(f) show the traces of abs energy error during the optimisation
+procedure.
+In the VQE experiment, we first prepare the initial state as a Hartree-Fock state or multi-reference state which is
+described in Sec. II B. Then, we measure the Hamiltonian to get the initial state energy Eexpm
+0 . In our experiment,
+the observables are measured in Pauli bases, which are generated using the overlapped grouping strategy introduced
+in Sec. II E. We search the ground state by optimising the parameters in the circuit. A key component in our
+VQE experiment is to get the error-mitigated expectation value for observables. To do so, we apply the above error
+mitigation schemes for each measurement outcome. The experimental procedures for error mitigation have been
+shown in Sec. III E
+The VQE optimisation is summarised as follows:
+1. Gradient estimation and optimisation. Determine θ associated with the single-qubit Pauli-rotation gate, in
+which we select N/2 parameters to update. For each selected parameter, the gradient is estimated using
+Eq. (40), which requires measuring the Hamiltonian on the parameter-shifted state. Get the gradient for all
+selected parameters and update the parameters. Here, we obtain the error-mitigated measurement outcome
+L(θ±) defined in Eq. II D by REM and CF error mitigation schemes.
+2. For each iteration, we measure the energy with the updated parameters and hence record the optimisation trace.
+3. Run the 1 and 2 steps to update the parameters until convergence. For all the molecules, the energy converges
+within 15 iterations.
+Finally, we measure the state with the optimised parameters. We correct the ground state energy using connected
+moments expansion (CMX), which requires measuring ⟨ ˆH 2⟩ and ⟨ ˆH 3⟩, as described in Sec. III D. The expectation
+value of ⟨ ˆH k⟩ for k ≤ 3 will be measured and then error mitigated in a similar fashion to that of ⟨ ˆH⟩. With the error
+mitigated results, we calculate the CMX energy using equations Eq. (70) and Eq. (71).
+36
+-1.1
+-0.9
+-0.7Energy (Hartree)
+HF
+Ground
+H2  4Q
+0.51 1.52 2.53Bond distance (Angstrom)
+10-8
+10-6
+10-4
+10-2Error (Hartree)
+RawREMREM+PSREM+CFREM+CF+SVREM+CF+CMXNumerical
+-7.8
+-7.4
+-7
+HF
+Ground
+LiH  6Q
+0.51 1.52 2.53Bond distance (Angstrom)
+10-4
+10-3
+10-2
+10-1
+-196
+-195
+-194
+HF
+Ground
+F2  12Q
+1 1.52 2.53Bond distance (Angstrom)
+10-3
+10-2
+10-1
+100
+a
+d
+b
+e
+c
+f
+FIG. 17. The VQE simulations for potential energy curves for different molecules. Similar to Figure 3, more results
+with different error mitigation strategies are shown here. (a-c) Potential energy curves as functions of the bond distance for
+H2 (4 qubits), LiH (6 qubits) and F 2 (12 qubits) molecules with various error mitigation strategies. (d-f) Absolute errors are
+compared to the FCI results. We compare the raw data (yellow squares) with the application of REM (orange triangles), REM
+and PS (purple triangles), REM and CF (deep blue diamonds), SV (blue triangles) and CMX (red circles). The results marked
+by green asterisks are energies calculated by classical simulation with the parameters searched in the experiment. The ground
+state energy with chemical accuracy (blue regime) is calculated theoretically as a reference.
+B. Results
+This section shows experimental results for the ground state search and ground state energy estimation.
+We select at most 12 qubits on the Zuchongzhi 2.0 quantum processor. Several patterns of 12 qubits are available in
+our processor. Different pattern choices could lead to significantly different results in our experiment. Since learning
+the gate error is crucial in our experiment, we run the Clifford fitting experiment with different qubit patterns to
+characterise the performance and finally select the pattern based on the goodness of fit and the fit slope.
+We first select three bond distances for different molecules, including H 2 (R=2.6), LiH (R=2.2) and F 2 (R=2.6),
+to study the performance of the Clifford fitting. Fig. 15 shows the performance of the Clifford fitting for the three
+molecules at the selected bond distances by the accumulated distribution of the slope, intercept, and the R2 value.
+Through the comparison of a,b, and c, we find that the fitting becomes worse with the system size increases, which
+may be attributed to the correlated gate errors and the fluctuations of the data.
+Then, we show the ground state searching with the variational algorithms for the three molecules. We show
+the optimisation processes for H 2 (R=2.6), LiH (R=2.2) and F 2 (R=2.6) in Fig. 16. The figure presents error-
+mitigated energy estimations with different error mitigation schemes, including REM, PS, CF, SV, CMX, and their
+combinations. Fig. 16 shows that although measured energies (yellow square) have fluctuations, energies after applying
+the combination of REM and CF clearly improve the energy accuracy along the optimisation. Error-mitigated energies
+tend to decrease consistently in successive iterations.
+Next, we show the calculation of potential energy curves in Fig. 17. Fig. 17a, b, c show the energy iteration during
+the VQE optimisation process for H 2 (R=2.6), LiH (R=1.5) and F 2 (R=2.0), respectively. These results provide a
+much more detailed comparison of the error mitigation schemes used in the experiment. In the following, we discuss
+the performance of these error mitigation schemes.
+We first discuss error mitigation with symmetry verification. As can be found in Fig. 16 ad Fig. 17, SV results in a
+large fluctuation in the energy estimation. In particular, as illustrated in Fig. 17(b), the energy with REM, CF and
+37
+1 1.5 2 2.5Fit slope
+0
+0.2
+0.4
+0.6
+0.8
+1Intergrated histgram
+HHP
+-0.1-0.050 0.050.1Fit intercept
+0
+0.2
+0.4
+0.6
+0.8
+1Intergrated histgram
+HHP
+0.950.960.970.980.991Fit R2
+0
+0.2
+0.4
+0.6
+0.8
+1Intergrated histgram
+HHP
+0.5 1 1.5 2 2.5 3Bond distance (Angstrom)
+10-4
+10-3
+10-2
+10-1Error (Hartree)
+a b
+c d
+REM+CF+SV+CMXREM+CF+CMX
+FIG. 18. Symmetry V erification.(a)The comparison of the abs energy error with different error mitigation setups for LiH.
+The red dot is the energy with REM + Clifford fitting + CMX, and the grey-blue triangle is the energy with REM + Clifford
+fitting + CMX + SV. (b)(c)(d) are the slope, intercept and R2 of the LiH(R = 2.2), respectively. “H” refers to the original
+Hamiltonian ˆH and “HP” refers to the symmetry verified Hamiltonian ˆH ˆS.
+0 5 10 15Iteration
+0
+0.2
+0.4
+0.6angle (rad)
+Y0X1X2X3
+0 5 10Iteration
+-0.2
+0
+0.2
+0.4
+Y0X1X3X4X5Y0Z1X2X3X4Y0Z1X2X3X4X5
+0 5 10 15Iteration
+0
+0.4
+0.8
+1.2
+a b c Y0Z1Z2Z3Z4X5X6Z7Z8Z9Z10X11Y1Z2Z3Z4X5X7X8Z9Z10Z11Y2Z3Z4X5X8Z9Z10X11Y3Z4X5X9Z10X11X4X5Y10X11
+FIG. 19. Parameter optimisation processes. The evolution of variational parameters in optimisation processes for H 2
+(a), LiH (b) and F 2 (c), respectively. For each iteration, we select N/2 parameters to update, and the parameter converges
+within 15 iterations for all the molecules.
+SV (grey right triangles) have a greater fluctuation than REM + CF during the optimisation procedure. The energy
+with REM, CF and SV show a larger error than REM and CF for all bond distances, as can be found in Fig. 18(a).
+This can be understood as follows. The fitting coefficient for the symmetry verified Hamiltonian ˆH ˆS is much larger
+than ˆH and thus results in large fluctuation after applying the combination of CF and SV. This is verified by the
+slope in Fig. 18b and the fitting performance in Fig. 18d.
+These results indicate the combination of SV and CF could bring a large fluctuation. Therefore, we mainly focused
+on the readout error mitigation, Clifford fitting and ground state energy correction by using connected moment
+expansion in the main text, while we did not show the results energy of LiH and F 2 using symmetry verification.
+38
+In addition, we add the energy with REM and post-selection (PS). In this scheme, the measurement result of
+Z ⊗n Pauli basis is post-selected based on the conservation of particle numbers, and other Puali bases are still error-
+mitigated with REM. The REM and post-selection (PS) energy perform better than single REM yet worse than
+REM and CF. With an increasing system size, a combination of REM and PS shows diminishing energy accuracy
+improvements, implying PS is not a suitable error mitigation strategy for scalable quantum computational chemistry.
+Finally, we show the performance of VQE after the optimisation process. Fig. 20 shows the relative error compared
+to the initial energy for the three molecules at different bond distances. The relative error compared to the initial
+state energy is calculated by
+Ei − Eground
+Eexpm
+0 − Eground
+, (74)
+where Ei is the error-mitigated energy or the energy, which is computed using the parameters that are found until
+convergence, Eexpm
+0 is the energy measured on the initial state, Eground is the ideal ground state energy. This relative
+error characterises the improvement with respect to the initial state energy by VQE.
+We can see from Fig. 20 that compared to the initial state energy, the relative average energy errors with only REM
+for the three molecules are 28 .98%, 78.86% and 75 .42%.
+The results are improved by 0 .278%, 0 .778% (0 .326% except R2.6 and R3.0), and 1 .00% for molecules with
+REM+CF+CMX EM schemes, and by 1.56 × 10−7, 0.783% (0.392% except R2.6 and R3.0), and 0.268% for numerical
+result. The average absolute error associated with different methods, including REM, REM + PS, REM+CF+SV,
+REM+CF, REM+CF+CMX, and numerical, are displayed in Table I.
+Molecules Raw REM REM + PS REM+CF+SV REM+CF REM+CF+CMX Numerical
+H2 (milli-Hartree) 143.661 ± 0.807 60.580 ± 1.015 38.650 ± 2.367 4.552 ± 0.740 4.254 ± 0.997 0.565 ± 0.542 2.96 × 10−5
+LiH (milli-Hartree) 233.564 ± 2.704 191.358 ± 3.313 169.987 ± 3.110 43.888 ± 2.383 9.965 ± 2.923 1.802 ± 2.423 1.794
+F2 (Hartree) 1.8315 ± 0.0264 1.3419 ± 0.0387 1.2231 ± 0.0382 – 0.2378 ± 0.0354 0.0174 ± 0.0417 0.0048
+TABLE I. Comparison of average absolute energy error for H 2, LiH and F 2 using different error mitigation schemes. The first
+two rows use milli-Hartree.
+0.51 1.52 2.53Bond distance (Angstrom)
+10-8
+10-6
+10-4
+10-2
+100
+Relative error
+0.51 1.52 2.53Bond distance (Angstrom)
+10-3
+10-2
+10-1
+100
+REMREM+CFREM+CF+CMXNumercial
+1 1.52 2.53Bond distance (Angstrom)
+10-3
+10-2
+10-1
+100a b c
+FIG. 20. Relative error compared to the initial state energy . Relative errors for H 2, LiH and F 2 with different error
+mitigation schemes, only REM (yellow triangles), REM and Clifford fitting schemes (blue diamonds), REM and Clifford fitting
+and CMX (red circles), the numerical result (green stars).
+C. Parameters iteration
+In Fig. 19, we present the parameters iteration for H 2 (R=2.6), LiH (R=1.5) and F 2 (R=2.0). For H 2, LiH and F 2,
+there are 1, 3 and 5 parameters in total to iterate respectively. All parameters are optimised from zero. 1, 2 and 3
+39
+parameters are randomly selected to optimise during each iteration for H 2, LiH and F2, respectively. All optimisation
+runs for 5 to 15 iterations.
+D. Noise analysis
+In this section, we analyse the noise effect in our chemistry simulation. We assume noise in the circuit can be
+described by a depolarising channel
+E(ρ) = pρ + (1 − p) I
+2N , (75)
+where 1 − p characterises the error rate, and p characterises the fidelity of the quantum state. Under depolarising
+noise, the energy is given by
+Enoisy = Tr(ρideal ˆH) = pTr(ρideal) = pEideal. (76)
+Here, the identity operator in the Hamiltonian has been excluded so that Tr( ˆH) = 0. We can get the error rate p by
+fitting the measured energies Enoisy and the corresponding ideal energies Eideal.
+We show the ideal energies and measured noisy energies in Fig. 21 along the optimisation iterations for H 2 (a),
+LiH (b) and F 2 (c) at all the bond distances. The measured noisy energies represent the measurement energies only
+with Readout Error Mitigation (REM). We observe that the ideal energies and measured energies have a well-linear
+dependence. The slope of the fitting curves gives us the depolarising fidelity p, which decreases with a deeper circuit.
+To further our understanding of noise with an increasing circuit size, we compare the circuit fidelity estimated using
+different methods. As a reference, we calculate the circuit fidelity by multiplying the fidelity of each individual gate,
+which is obtained by individual XEB. Specifically, we first calculate the fidelity of each layer using the Pauli fidelity,
+and calculate the whole circuit fidelity using the depolarising fidelity of different layers. Since dynamical decoupling
+is used in our experiment to avoid dephasing during the idle time, we also take account of the idle time decay. The
+idle time fidelity is calculated by the fidelity of a single-qubit gate with an equal time length.
+Fig. 21d shows the comparison of the estimation using individual XEB results with (red) and without idle time decay
+(blue), and the fitted depolarising fidelity by fitting the ideal energies and measured energies (orange). Remarkably,
+we can find that the actual circuit error rate is much lower than the error estimated with individual XEB results
+when the system size increases. This result implies the potential for the simulation of larger molecules. A detailed
+investigation will be an interesting future work.
+E. Challenges
+As we have discussed here and in the main text, there are many challenges in VQE experiments. Compared to
+dynamics simulation or random circuit sampling, VQE experiments are more challenging. The former examples only
+require running one instance on a quantum processor. In contrast, in the VQE experiment, the final results are highly
+related to the results that are obtained in the prior incidents. In spite of these challenges, our experiments for the first
+time achieved chemical accuracy for the six-qubit VQE simulation of molecular systems. Good control of hardware
+and efficient quantum algorithms enable such high-precision simulation.
+For future large-scale quantum computational chemistry experiments, it is crucial to suppress gates and measure-
+ment readout errors in order to achieve chimerical accuracy with quantum hardware. We point out these challenges
+as follows.
+Stability during experiments. For large-scale problems, VQE experiments could take several hours or days to
+obtain the ground state. Therefore, the performance of VQE highly depends on the stability of the experimental
+system. In our experiment, the readout error mitigation and Clifford fitting schemes are applied. These techniques
+require maintaining the system feature during the REM matrix extraction experiment, Clifford fitting experiment and
+VQE experiment. Only when the system float is suppressed can we make the error mitigation schemes work. The
+fluctuation mainly comes from the following:
+1. Electronic outcome fluctuation. The electronic outcome determines the system conditions and manipulation
+accuracy, such as the qubit frequencies, coupler flux bias and the control pulse amplitude. The fluctuation of
+electronics directly affects gate fidelities as well as the results of the quantum circuit. The outcome accuracy of
+the electronic itself could be suppressed by increasing the samples, but the average outcome amplitude is greatly
+influenced by ambient temperature.
+40
+-1.5 -1 -0.5 0E numercial (Hartree)
+-1.5
+-1
+-0.5
+0E noise (Hartree)
+p = 0.8820.004
+Fit curveData
+-0.9 -0.7 -0.5 -0.3E numercial (Hartree)
+-0.9
+-0.7
+-0.5
+-0.3E noise (Hartree)
+p = 0.8680.016
+Fit curveData
+-7.5-6.5-5.5-4.5E numercial (Hartree)
+-7.5
+-6.5
+-5.5
+-4.5E noise (Hartree)
+p = 0.8260.024
+Fit curveData
+4 6 12Number of qubits
+0
+0.25
+0.5
+0.75
+1Estimation
+a
+c
+b
+d
+Individual gates XEBIndividual gates XEB (with idle)Fitted
+FIG. 21. Fitted results using a depolarising noise model. The figures show the ideal energies and measured energies
+along the optimisation iterations for H 2 (a), LiH (b) and F 2 (c) at all the bond distances. The noisy energies represent the
+measurement energies only with Readout Error Mitigation (REM). The ideal energies and measured energies have a linear
+dependence. The slope of the fitting curves characterises the depolarising fidelity p. (d) The circuit fidelity estimation by
+individual XEB results with and without idle time decay, and the fitted depolarising fidelity obtained by fitting the data points
+in (a)(b)(c).
+2. Unstable Two Level System (TLSs). When the unstable TLSs near close to qubit operating frequency, the
+coherence of qubits would decrease abruptly. The noisy model changed which make the Clifford fitting fail.
+Errors and samples. In our experiment, as we pointed out, we require the expectation values of observables
+for the optimisation and energy evaluation, instead of single-shot measurements. To suppress the statistical errors
+less than ϵ, the number of samples scales as 1 /ϵ2. With the increase of qubit number, coherent errors become a
+main error source, which leads to a large slope for the Clifford fitting function f CF, as shown in Fig. 15, and hence
+a large variance. As a result of fitting, more samples are required for a larger system to suppress the fluctuation.
+Nevertheless, this can be overcome by further improving hardware performance. This is because a smaller error rate
+will lower the inherent expectation value variance, and hence fewer samples are required. In addition, the number
+of observable increases with the system size, and thus more samples are needed in a larger VQE experiment. This
+requires a long time to run experiments, and it could be hard to stabilise the system for a long time.

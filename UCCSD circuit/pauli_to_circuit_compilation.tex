@@ -1,0 +1,321 @@
+% =====================================================================
+%  From exp(-i theta/2 P) to a CZ-native quantum circuit:
+%  the compilation algorithm of "improved create UCCSD circuit .py"
+%
+%  Companion to UCCSD_circuit_explainer.tex.  That file explains the
+%  physics pipeline of arXiv:2212.08006 (operator selection, one string
+%  per double, the paper's figures).  THIS file documents the general
+%  compiler that turns an ordered list of Pauli-string exponentials into
+%  the hardware circuit, exactly as implemented (function names below
+%  match the Python code).  Compile with pdfLaTeX on Overleaf.
+% =====================================================================
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath, amssymb}
+\usepackage{physics}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{listings}
+\lstset{basicstyle=\ttfamily\small, columns=fullflexible}
+
+\newcommand{\RX}{R_X}
+\newcommand{\CZ}{\mathrm{CZ}}
+\newcommand{\code}[1]{\texttt{#1}}
+
+\title{From $e^{-i\frac{\theta}{2}P}$ to a CZ-native quantum circuit:\\
+the compilation algorithm in \code{improved create UCCSD circuit .py}}
+\author{Working notes --- every step is asserted symbolically and verified
+by statevector simulation}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Input: an ordered list of Pauli strings $P_1,\dots,P_n$ on $N$ qubits
+(one per selected UCCSD double) and angles $\theta_k$.
+Output: a circuit over $\{H,\ \RX(\pm\tfrac{\pi}{2}),\ \RX(\theta),\ \CZ\}$
+implementing $\prod_k e^{-i\theta_k P_k/2}$, with the CZ count of the
+hand-tuned circuits of arXiv:2212.08006 (H$_2$: 10, LiH: 18, F$_2$: 50).
+The construction rests on a single identity --- the \emph{Pauli-frame}
+formula --- plus four engineering rules: two-row hub ladders, hub
+continuity, a CZ-commuting cancellation pass, and adjacent-overlap
+ordering.
+\end{abstract}
+
+% =====================================================================
+\section{The one identity that does all the work}
+% =====================================================================
+Conventions: $\RX(t)=e^{-itX/2}$, qubit $q_i$ hosts spin orbital $i$,
+spin-$\alpha$ orbitals on the ``top row'' $q_0\dots q_{N/2-1}$,
+spin-$\beta$ on the ``bottom row'' $q_{N/2}\dots q_{N-1}$
+(so $q_i$ and $q_{i+N/2}$ are vertically adjacent on the chip).
+
+For any Clifford $D$ and any Pauli $X_p$ on a \emph{pivot} qubit $p$,
+\begin{equation}
+\label{eq:frame}
+  D^{\dagger}\,\RX(\theta)_p\,D
+  \;=\;
+  \exp\!\Big(-i\,\tfrac{\theta}{2}\, D^{\dagger} X_p D\Big).
+\end{equation}
+So to realise $e^{-i\frac{\theta}{2}P}$ we only need a Clifford $D$
+(called the \emph{frame}) with $D^{\dagger} X_p D = \pm P$; the sign is
+absorbed into $\theta$. The compiler builds $D$ from three native
+conjugation rules (\code{\_conj} in the code):
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+gate & rule & role \\
+\midrule
+$\CZ_{ab}$ & $\CZ\, X_b\, \CZ = Z_a X_b$ & \emph{hangs} a $Z$ on a neighbour\\
+$H_q$      & $H Z H = X$ (and $X\!\to\!Z$, $Y\!\to\!-Y$) & \emph{opens} a qubit so more CZs can attach\\
+$\RX(\pm\frac{\pi}{2})_q$ & $\RX(\tfrac{\pi}{2})^{\dagger} Z\, \RX(\tfrac{\pi}{2}) = Y$ & converts $Z \leftrightarrow Y$ (the odd-$Y$ end)\\
+\bottomrule
+\end{tabular}
+\end{center}
+Note there is \textbf{no CNOT and no $R_Z$-on-parity staircase} anywhere:
+the rotation is a plain $\RX(\theta)$ on one physical qubit and all
+entanglement is produced by CZs, which is exactly the native gate of the
+processor in arXiv:2212.08006.
+
+\paragraph{Reading a circuit.}
+Conversely, given a circuit
+$C_n \RX^{(n)} \cdots C_1 \RX^{(1)} C_0$ (Clifford layers $C_k$
+alternating with rotations on pivots $p_k$), regrouping with
+Eq.~\eqref{eq:frame} gives
+\begin{equation}
+\label{eq:regroup}
+\boxed{\;
+\text{circuit} = \prod_{k=n}^{1}
+  \exp\!\Big(-i\tfrac{\theta_k}{2}\, D_k^{\dagger} X_{p_k} D_k\Big),
+\qquad
+D_k = C_{k-1}\cdots C_0,
+\quad\text{provided } C_n\cdots C_0=\mathbb{1}. \;}
+\end{equation}
+This formula is the compiler's \emph{specification}: after all
+optimisations, the code re-derives every $D_k^{\dagger}X_{p_k}D_k$
+symbolically (\code{\_frame}) and asserts it equals the intended $P_k$,
+and checks the residual Clifford is the identity
+(\code{\_verify\_program}). Nothing is trusted; everything is checked.
+
+% =====================================================================
+\section{Compiling a single rotation (\code{\_compile\_tworow})}
+% =====================================================================
+Each block is emitted as
+\begin{equation}
+  \underbrace{B}_{\text{basis layer}}\;
+  \underbrace{L}_{\text{CZ ladder}}\;
+  \RX(\pm\theta)_p\;
+  L^{\dagger}\; B^{\dagger},
+\end{equation}
+with $D = L\,B$ in Eq.~\eqref{eq:frame}. The construction has three parts.
+
+\subsection{The two-row hub ladder $L$ (\code{\_row\_chain})}
+Let $S=\{q: P_q\neq I\}$ be the support, split into the $\alpha$-row part
+and the $\beta$-row part. Choose:
+\begin{itemize}
+\item the \textbf{pivot} $p$ = a hub qubit in the $\alpha$ part
+  (median of the row support, unless \emph{hub continuity},
+  Sec.~\ref{sec:multi}, overrides it);
+\item the \textbf{$\beta$-hub} $h$ = the $\beta$-support qubit closest to
+  $p+N/2$, i.e.\ vertically below the pivot whenever possible.
+\end{itemize}
+Each row is fanned into its hub by CZ/H chains running inwards from both
+row ends; then the $\beta$-hub is opened with one $H$ and linked to the
+pivot by a \emph{single} CZ:
+\begin{align}
+L \;=\;& \underbrace{\CZ_{a_1 a_2}\, H_{a_2}\, \CZ_{a_2 a_3}\cdots
+        \CZ_{a_{r} p}}_{\alpha\text{-row chains into } p}\;\;
+        \underbrace{\CZ_{b_1 b_2}\, H_{b_2}\cdots \CZ_{b_s h}}_{
+        \beta\text{-row chains into } h}\;\;
+        H_h\;\; \CZ_{p\,h}.
+\end{align}
+($H$ after every \emph{internal} chain node; none after terminals, none
+after the pivot.) Dragging $X_p$ backwards through $L$ with the rules of
+Sec.~1 yields the \emph{ladder letters}
+\begin{equation}
+\lambda_q=\begin{cases}
+ X & q=p,\ \text{internal nodes, and the }\beta\text{-hub},\\
+ Z & \text{chain terminals},
+\end{cases}
+\end{equation}
+i.e.\ $L^{\dagger}X_pL = \pm\bigotimes_{q\in S}\lambda_q$.
+On the chip every CZ is nearest-neighbour, the two rows run in
+\emph{parallel}, and the rows meet through one vertical CZ
+$(p,\,p{+}N/2)$ --- this is the balanced-tree layout of Figs.~13/14 and
+costs depth $\mathcal{O}(\log)$ instead of a linear staircase.
+
+\subsection{The basis layer $B$ (\code{\_basis\_for})}
+The ladder letters $\lambda_q$ must be rotated into the target letters
+$P_q$. For each support qubit the code brute-forces the shortest word
+over $\{H,\ \RX(\pm\frac{\pi}{2})\}$ (at most two gates, eight
+candidates) whose conjugation maps $P_q \to \lambda_q$ up to a $\pm$
+sign. Typical outcomes:
+\begin{center}
+\begin{tabular}{llll}
+\toprule
+$\lambda_q$ & target $P_q$ & basis gates & where it appears\\
+\midrule
+$Z$ & $Z$ & --- & inside JW chains at terminals\\
+$Z$ & $X$ & $H$ & $X$-ends of the string\\
+$Z$ & $Y$ & $\RX(\frac{\pi}{2})$ & the single odd-$Y$ end\\
+$X$ & $X$ & --- & internal $X$, pivot with $X$\\
+$X$ & $Z$ & $H$ & JW $Z$-chain on internal nodes / hubs / pivot\\
+$X$ & $Y$ & $\RX(\frac{\pi}{2})\,H$ & rare (pair mode)\\
+\bottomrule
+\end{tabular}
+\end{center}
+Any leftover $-1$ from the conjugations is returned as the block sign and
+folded into the rotation angle.
+
+\subsection{Worked example: $P_1 = Y_0X_1\,X_3Z_4X_5$ (LiH, first block)}
+$\alpha$-support $\{0,1\}$, pivot $p=1$; $\beta$-support $\{3,4,5\}$,
+$\beta$-hub $h=1+3=4$. Time-ordered prefix $D=BL$:
+\begin{equation*}
+\underbrace{\RX(\tfrac{\pi}{2})_0,\ H_3,\ H_4,\ H_5}_{B}\;\Big|\;
+\underbrace{\CZ_{01}}_{\alpha}\;
+\underbrace{\CZ_{34},\ \CZ_{45}}_{\beta\ \text{chains into }4}\;
+\underbrace{H_4}_{\text{open hub}}\;
+\underbrace{\CZ_{14}}_{\text{vertical link}}
+\end{equation*}
+Drag $X_1$ backwards (innermost gate first):
+\begin{equation*}
+X_1
+\xrightarrow{\CZ_{14}} X_1Z_4
+\xrightarrow{H_4} X_1X_4
+\xrightarrow{\CZ_{45}} X_1X_4Z_5
+\xrightarrow{\CZ_{34}} X_1Z_3X_4Z_5
+\xrightarrow{\CZ_{01}} Z_0X_1Z_3X_4Z_5
+\xrightarrow{H_3,H_4,H_5} Z_0X_1X_3Z_4X_5
+\xrightarrow{\RX(\frac{\pi}{2})_0} Y_0X_1X_3Z_4X_5 .
+\end{equation*}
+Then $\RX(\theta)_1$ performs $e^{-i\frac{\theta}{2}P_1}$, and the mirror
+$L^{\dagger}B^{\dagger}$ would close the block. This prefix is
+\emph{identical} to the first five columns of Fig.~13 of the paper.
+
+% =====================================================================
+\section{Compiling a product of rotations}
+\label{sec:multi}
+% =====================================================================
+Emitting (block)$\cdot$(block)$\cdots$ naively would mirror-close each
+ladder and rebuild the next from scratch. Three rules recover the
+paper's savings; all are general.
+
+\subsection{Hub continuity}
+The pivot/hubs of block $k{+}1$ are kept on the same qubits as block $k$
+whenever they lie in the new support (\code{hub\_hint}). Because the
+selected doubles share creation/annihilation indices (every F$_2$ double
+contains $\hat a^{\dagger}_{11}\hat a^{\dagger}_5$; the LiH doubles share
+$\hat a^{\dagger}\hat a$ pairs pairwise), consecutive strings agree on
+whole row segments, and with a common hub those segments compile to
+\emph{letter-for-letter identical gates} in $L_k^{\dagger}$ and $L_{k+1}$.
+
+\subsection{The cancellation pass (\code{\_peephole}), and why CZ--CZ
+commutation matters}
+The optimiser repeatedly deletes adjacent inverse pairs
+($H_qH_q$, $\CZ\,\CZ$ on the same pair,
+$\RX(t)\RX(-t)$), where ``adjacent'' means: every gate in between
+\emph{commutes} with the candidate. Sound commutation rules used:
+\begin{enumerate}
+\item gates on disjoint qubits commute;
+\item \textbf{any two CZs commute, even sharing a qubit} (both are
+  diagonal in the $Z$ basis).
+\end{enumerate}
+Rule 2 is the single biggest improvement over the naive pass: interface
+patterns like
+$\CZ_{14}\,\big[\CZ_{01}\,H_1\,\CZ_{01}\big]\,\CZ_{14}$ or
+$\CZ_{34}\cdots\CZ_{34}$ straddled by gates on other qubits only cancel
+once CZs may slide past each other. It alone takes LiH from 20 to 18 CZ
+and F$_2$ from 58 to 50 CZ.
+
+\paragraph{Worked interface (LiH, $P_1\!\to\!P_3$,
+$P_3=Y_0Z_1X_2X_3Z_4X_5$).}
+Concatenate $L_1^{\dagger}B_1^{\dagger}$ with $B_3L_3$ (same pivot 1, same
+hub 4 by continuity) and cancel:
+\begin{itemize}
+\item $\RX(-\frac{\pi}{2})_0\,\RX(\frac{\pi}{2})_0$, $H_2H_2$, $H_3H_3$,
+  $H_5H_5$ vanish ($Y_0$ and the letters on $q_2,q_3,q_5$ are unchanged);
+\item $\CZ_{34}\cdots\CZ_{34}$ and $\CZ_{45}\cdots\CZ_{45}$ cancel through
+  the disjoint $q_0,q_1,q_2$ gates, then $H_4 \cdots H_4$ cancels, then
+  the whole shared $\beta$ subtree is gone;
+\item what survives is exactly the paper's interface
+\begin{equation*}
+  C_1 \;=\; \CZ_{14}\;\; \CZ_{01}\;\; H_1\;\; \CZ_{01}\;\; \CZ_{12}\;\;
+  \CZ_{14},
+\end{equation*}
+  read: re-hang $Z_4$, toggle the pivot letter $X_1\!\to\!Z_1$ by the
+  $\CZ_{01} H_1 \CZ_{01}$ sandwich \emph{without releasing} $Y_0$, hang
+  the new $X_2$ ($H_2$ was pre-placed in the very first basis layer), and
+  re-link the hub. The two $\CZ_{14}$ survive because $H_1$ stands
+  between them --- precisely what Fig.~13 shows.
+\end{itemize}
+
+\subsection{Ordering (\code{\_auto\_order})}
+The interfaces are cheap only between strings that overlap. The compiler
+brute-forces the order of the (few) doubles to maximise
+$\sum_k |\{q: P^{(k)}_q = P^{(k+1)}_q \neq I\}|$. For LiH, given
+Eq.~(23)'s order $(P_1,P_2,P_3)$ with overlaps $(2,4)$, it finds the
+figure's order $(P_1,P_3,P_2)$ with overlaps $(4,4)$. For the nested
+F$_2$ strings the given order is already optimal.
+
+\subsection{Optional exact pair (\code{pair=True})}
+For one double, the two-string ``qubit excitation''
+\begin{equation}
+e^{-i\frac{\theta}{2}\,Y_aX_bX_cX_e\cdots}\;
+e^{+i\frac{\theta}{2}\,X_aY_bX_cX_e\cdots}
+=\exp\Big(\!-i\tfrac{\theta}{2}\big(Y_aX_b-X_aY_b\big)X_cX_e\cdots\Big)
+\end{equation}
+(the factors commute) realises a determinant-pair Givens rotation with no
+spurious phases on \emph{any} input state. Fig.~12 (H$_2$) is exactly
+this pair; the interface between the two strings only swaps
+$Y_aX_b \leftrightarrow X_aY_b$, so the shared remainder cancels and the
+pair costs 10 CZ instead of $2\times 6$. The default single string (6 CZ)
+is variationally equivalent when acting on the reference determinant.
+
+% =====================================================================
+\section{The full algorithm and its guarantees}
+% =====================================================================
+\begin{enumerate}
+\item map each double $(k,l,i,j)$ to its odd-$Y$ JW representative
+  (\code{jw\_string\_for\_double}); optionally add the partner string
+  (\code{pair});
+\item order the strings by adjacent overlap (\code{\_auto\_order});
+\item for each string: build $B$, $L$ with the two-row hub layout and hub
+  continuity (\code{\_compile\_tworow}), emit
+  $B\,L\,\RX(\pm\theta)\,L^{\dagger}B^{\dagger}$;
+\item run the CZ-commuting cancellation pass (\code{\_peephole});
+\item verify (\code{\_verify\_program}): every rotation's frame
+  $D_k^{\dagger}X_{p_k}D_k$ equals its intended $\pm P_k$, and the
+  Clifford product of the whole program is the identity
+  (Eq.~\eqref{eq:regroup});
+\item emit the Qiskit circuit.
+\end{enumerate}
+
+Results (statevector-verified against
+$\prod_k e^{-i s_k\theta_k P_k/2}$ to $\sim\!10^{-15}$):
+\begin{center}
+\begin{tabular}{lcccc}
+\toprule
+ & this compiler & paper (Figs.~12--14) &
+ \begin{tabular}{@{}c@{}}8 staircases\\per selected double\end{tabular} &
+ \begin{tabular}{@{}c@{}}full textbook UCCSD\\(paper's count)\end{tabular}\\
+\midrule
+H$_2$ (pair / single) & 10 / 6 & 10 & 48  & 56\\
+LiH                   & 18     & 18 & 208 & 280\\
+F$_2$                 & 50     & 50 & 560 & 2920\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\paragraph{Relation to the standard construction.}
+The CNOT staircase of arXiv:2005.14475 is the special case of
+Eq.~\eqref{eq:frame} with a linear ladder, $R_Z$ pivot and
+CNOT $= (I\otimes H)\,\CZ\,(I\otimes H)$; it spends $2(m{-}1)$
+entanglers per weight-$m$ string and uncomputes everything between
+rotations. The improvements here --- one string per double, CZ-native
+frames, row-parallel hub trees, shared-segment reuse --- are what close
+the gap from 48 to 6--10 CZs per double while keeping the circuit
+mathematically identical to the advertised product of exponentials.
+
+\end{document}

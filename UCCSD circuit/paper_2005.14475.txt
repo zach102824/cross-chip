@@ -1,0 +1,957 @@
+arXiv:2005.14475v2  [quant-ph]  5 Nov 2020
+Eﬃcient quantum circuits for quantum computational chemis try
+Yordan S. Yordanov, 1 David R. M. Arvidsson-Shukur, 1, 2 and Crispin H. W. Barnes 1
+1Cavendish Laboratory, Department of Physics, University o f Cambridge, Cambridge CB3 0HE, United Kingdom
+2Research Laboratory of Electronics, Massachusetts Instit ute of Technology, Cambridge, Massachusetts 02139, USA
+Molecular quantum simulations with the variational quantu m eigensolver (VQE) rely on ansatz
+states that approximate the molecular ground states. These ansatz states are generally deﬁned
+by parametrized fermionic excitation operators and an init ial reference state. Eﬃcient ways to
+perform fermionic excitations are vital for the realizatio n of the VQE on noisy intermediate-scale
+quantum computers. Here, we address this issue by ﬁrst demon strating circuits that perform qubit
+excitations, excitations that do not account for fermionic anticommutation relations. We then
+extend the functionality of these circuits to perform fermi onic excitations. Compared to circuits
+constructed with the standard use of “ CN OT staircases”, our circuits oﬀer a linear reduction in the
+number of CN OT gates, by a factor of 2 and 8 per single and double excitation, respectively. Our
+results reduce the requirements for near-term realization s of quantum molecular simulations.
+I. INTRODUCTION
+It is anticipated that quantum computers will be
+able to simulate quantum systems exponentially faster
+than classical computers [
+1–3]. A promising method
+to perform this task on emerging noisy intermediate-
+scale quantum (NISQ) computers [
+4, 5] is the variational-
+quantum-eigensolver (VQE) algorithm [ 6–9]. The VQE
+is a hybrid classical-quantum variational algorithm that
+determines the eigenvalues of a Hamiltonian operator
+by minimizing its expectation value, with respect to a
+parametrized ansatz state. The VQE can be used to
+solve the electronic structure problem, determining the
+ground-state energy eigenvalue of a molecular Hamilto-
+nian [
+10, 11]. Compared to other purely quantum algo-
+rithms for eigenvalue-determination, e.g., the quantum
+phase-estimation algorithm [
+12, 13], the VQE uses shal-
+lower quantum circuits and is more error tolerant [ 6], at
+the expense of requiring a greater number of measure-
+ments and more classical processing.
+Two major challenges in the practical realization of
+the VQE on NISQ computers, are the design of ansatz
+states, and the construction of eﬃcient circuits to cre-
+ate these states. Most ansatz states, currently consid-
+ered by the scientiﬁc community, correspond to apply-
+ing a series of fermionic unitary evolutions to an ini-
+tial reference state, e.g., the Hartree-Fock state. These
+fermionic unitary evolutions, which we will refer to as
+“fermionic excitations”, are exponentials of parametrized
+single- and double-fermionic-excitation operators. Ex-
+amples of such fermionic ansatz states include unitary
+coupled cluster (UCC) ansatz states [
+6, 14–16], and states
+constructed by iterative-VQE algorithms, e.g. the adap-
+tive derivative-assembled pseudo-trotter (ADAPT) VQE
+[
+17, 18]. The standard circuits for fermionic excitations
+[10, 14, 19, 20] use “ CN OT staircases” (see Sec. II A)
+ineﬃciently, in terms of CN OT gates. The ability to im-
+plement a suﬃcient number of entangling gates with high
+enough ﬁdelity is the current bottleneck in NISQ com-
+puting [
+4, 21, 22]. Therefore, more eﬃcient fermionic-
+excitation circuits will improve the prospects of near-
+term realization of the VQE on NISQ computers.
+In this work, we demonstrate a methodology to con-
+struct circuits, optimized in the number of CN OT gates
+and in the CN OT circuit depth, that perform single and
+double fermionic excitations. First, we construct sim-
+pler excitations that do not account for fermionic anti-
+commutation relations. We call these simpliﬁed excita-
+tions “qubit excitations”. Single qubit excitations can
+be implemented by an exchange-interaction circuit [
+23–
+26]. Second, we use this exchange-interaction circuit as
+a subcircuit to construct a double qubit excitation cir-
+cuit. Finally, we modify these qubit excitations circuits,
+to account for fermionic anticommutation relations. In
+this way we construct circuits that oﬀer a linear reduc-
+tion in the number of CN OT gates by a factor of 2 and 8
+per single and double fermionic excitation, respectively,
+compared to circuits constructed entirely with CN OT
+staircases.
+The paper is organised as follows: In Sec.
+II A, we
+review the standard way of using CN OT staircases to
+construct fermionic-excitation circuits. In Sec. II B, we
+outline a method, which is used throughout the paper,
+to implement multi-qubit-controlled rotations. In Sec.
+III A, we design circuits that perform single and double
+qubit excitations. In Sec. III B, we utilise our qubit
+excitations to construct circuits that perform fermionic
+excitations. We summarize our results in Sec.
+IV.
+II. THEOR Y
+Throughout this paper we assume the Jordan-Wigner
+encoding [ 10, 27], where the occupancy of the ith molec-
+ular spin orbital is represented by the state of qubit qi.
+We denote spin orbitals with indices i, j, k, l , ordered as
+i < j < k < l .
+2
+A. Fermionic excitations
+In this section, we provide a brief description of what
+a fermionic excitation is, within the context of molecular
+VQE simulations. We also review the standard method
+to construct circuits that perform fermionic excitations
+[
+10, 14, 19, 20].
+We use the term fermionic excitation to refer to an
+exponential of θ-parametrized fermionic excitation oper-
+ators. Single and double fermionic excitation operators
+are deﬁned, respectively, by the skew-Hermitian opera-
+tors
+T k
+i (θ) ≡ θ(a†
+kai − a†
+i ak) and (1)
+T kl
+ij (θ) ≡ θ(a†
+ka†
+l aiaj − a†
+i a†
+jakal), (2)
+where a†
+i and ai denote fermionic creation and annihila-
+tion operators, respectively. Single and double fermionic
+excitations are expressed, respectively, by the unitary op-
+erators
+U (sf)
+ki (θ) = eT k
+i (θ) and (3)
+U (df)
+klij (θ) = eT kl
+ij (θ). (4)
+The operators ai and a†
+i obey the anticommutation rela-
+tions
+{ai, a †
+j} = δi,j and {ai, a j} = {a†
+i , a †
+j} = 0. (5)
+Within the Jordan-Wigner encoding, a and a† can be
+written in terms of quantum-gate operators as
+ai = Qi
+i− 1∏
+r=0
+Zr = 1
+2 (Xi + iYi)
+i− 1∏
+r=0
+Zr and (6)
+a†
+i = Q†
+i
+i− 1∏
+r=0
+Zr = 1
+2 (Xi − iYi)
+i− 1∏
+r=0
+Zr, (7)
+where the qubit creation and annihilation operators are
+Q†
+i ≡ 1
+2 (Xi − iYi) and Qi ≡ 1
+2 (Xi + iYi), (8)
+respectively. Qi and Q†
+i (discussed further in Sec.
+III A)
+act to change the occupancy of orbital i. The product
+of Pauli-z operators, ∏ i− 1
+r=0 Zr, acts as an exchange-phase
+factor, accounting for the anti-commutation relations of
+a and a†.
+Using Eqs. (
+6) and ( 7), a single fermionic excitation
+[Eq. ( 3)] can be re-expressed in terms of quantum-gate
+operators:
+U (sf)
+ki (θ) = exp
+[
+− i θ
+2 (XiYk − YiXk)
+k− 1∏
+r=i+1
+Zr
+]
+(9)
+= exp
+[
+− i θ
+2 XiYk
+k− 1∏
+r=i+1
+Zr
+]
+× exp
+[
+i θ
+2 YiXk
+k− 1∏
+r=i+1
+Zr
+]
+. (10)
+The exponential exp
+[
+− i θ
+2 XiYk
+∏ k− 1
+r=i+1 Zr
+]
+in Eq. ( 10),
+can be implemented by the circuit in Fig. 1. The two
+CN OT “staircases” together with the Rz(θ) rotation in
+between them (Fig. 1), are referred to as a “ CN OT -
+staircase construction”. This construction implements
+Ustair ≡ exp
+[
+iθ ∏ k
+r=i Zr
+]
+. The H and Rx(± π
+2 ) gates,
+on both sides of the CN OT staircase construction in
+Fig. 1 act to transform the Zi and the Zk operators,
+in Ustair, to Xi or Yk operators, respectively. Similarly,
+by sandwiching a CN OT staircase construction between
+single-qubit rotations that transform individual Pauli- z
+operators to Pauli- x or Pauli- y operators, any exponen-
+tial of a product of Pauli operators can be constructed.
+Hence, the single fermionic excitation [Eq. (
+10)] can be
+implemented by a circuit that contains 2 CN OT staircase
+constructions. The full circuit for a single fermionic ex-
+citation, constructed using the aforementioned method,
+is included in appendix
+A Fig. 10.
+A double fermionic excitation [Eq. ( 4)] can be re-
+expressed in terms of quantum-gate operators:
+U (df)
+klij (θ) = exp
+[
+− i θ
+8 (XiYjXkXl + YiXjXkXl
++ YiYj YkXl + YiYjXkYl − XiXjYkXl − XiXjXkYl
+− YiXjYkYl − XiYjYkYl)
+j− 1∏
+r=i+1
+Zr
+l− 1∏
+r′=k+1
+Zr′
+]
+. (11)
+U (df)
+klij (θ) can be implemented by 8 CN OT -staircase con-
+structions. The full circuit for a double fermionic exci-
+tation, constructed using the aforementioned method, is
+included in appendix
+A Fig. 11.
+qk Rx( π
+2 ) • • Rx(− π
+2 )
+qk− 1 • •
+.
+.
+.
+.
+.
+.
+.
+.
+.qi+1
+• •
+qi H Rz(θ) H
+FIG. 1. A circuit implementing the exponential exp
+[
+−
+iθXiYk
+∏ k− 1
+r=i+1 Zr
+]
+.
+3
+B. Multi-qubit-controlled rotations
+In this section, we outline a method, used in [ 28], to
+construct circuits that implement multi-qubit-controlled
+rotations. The circuits use no ancilla qubits. Later, we
+use this method to construct circuits for qubit excitations
+(see Sec.
+III A).
+We denote a Ry(θ) rotation on a target qubit q0, con-
+trolled by the {q1..q m} qubits being in the state |1.. 1⟩, as
+Ry
+(
+θ, {q1..q m}, q 0
+)
+. We then write an m-qubit-controlled
+rotation by decomposing it into two opposite half-way ro-
+tations, controlled by ( m − 1) qubits:
+Ry
+(
+θ, {q1..q m}, q 0
+)
+=
+CN OT (q1, q 0)Ry
+(
+− θ
+2 , {q2..q m}, q 0
+)
+×CN OT (q1, q 0)Ry
+( θ
+2 , {q2..q m}, q 0
+)
+, (12)
+or equivalently, as
+Ry
+(
+θ, {q1..q m}, q 0
+)
+=
+Ry
+( θ
+2 , {q2..q m}, q 0
+)
+CN OT (q1, q 0)
+×Ry
+(
+− θ
+2 , {q2..q m}, q 0
+)
+CN OT (q1, q 0). (13)
+By decomposing the controlled rotations further, the
+overall operation is brought down to CN OT s and single-
+qubit rotations. Implementing directly Eqs. (
+12) or ( 13),
+results in a circuit with (2 m+1−2) CN OT s. However, for
+m > 2, Eqs. ( 12) and (13) can be combined alternately to
+cancel adjacent CN OT s (see Fig. 2), and obtain a circuit
+with (2 m− 1 + 2) CN OT s. Rz- and Rx-controlled rota-
+tions can be obtained by additional single-qubit rotations
+on the target qubit. Equivalently, CZ (controlled-phase)
+gates can be used instead of CN OT gates in Eqs. (
+12)
+and ( 13); in some scenarios this can be used to cancel
+adjacent two-qubit gates (see Sec. III A).
+q0 Ry( θ
+4 ) Ry(− θ
+4 ) Ry( θ
+4 ) Ry(− θ
+4 )
+q1 • • • •
+q2 • •
+FIG. 2. A circuit implementing Ry(θ, {q1, q 2}, q 0). The ﬁrst
+half-way rotation Ry( θ
+2 , {q1}, q 0) (left dotted rectangle) is im-
+plement as in Eq. ( 12), and the second half-way rotation
+Ry(− θ
+2 , {q1}, q 0) ( right dotted rectangle) as in Eq. ( 13). In
+this way, the two middle CN OT s between qubits q0 and q1
+can be cancelled.
+III. RESULTS
+In this section we present our main results. We begin
+by deﬁning qubit excitations. Then, we construct circuits
+to perform single and double qubit excitations. Last,
+we modify these circuits to perform single and double
+fermionic excitations instead.
+A. Qubit excitations
+We use the term qubit excitation to describe the uni-
+tary evolution of an exponential of a parametrized qubit
+excitation operator. Single- and double-qubit-excitation
+operators are generated by the qubit annihilation and
+creation operators, Q and Q† [Eq. (
+8)], and are given by
+the skew-Hermitian operators
+˜T k
+i (θ) ≡ θ(Q†
+kQi − Q†
+i Qk) and (14)
+˜T kl
+ij (θ) ≡ θ(Q†
+kQ†
+l QiQj − Q†
+i Q†
+jQkQl). (15)
+The operators Q and Q† satisfy the relations
+{Qi, Q †
+i } = I, [Qi, Q †
+j] = 0 if i ̸= j, and
+[Qi, Q j] = [ Q†
+i , Q †
+j] = 0 for all i, j. (16)
+These relations are neither bosonic nor fermionic; some
+authors have referred to them as parafermionic [
+29].
+Single and double qubit excitations are expressed, re-
+spectively, by the unitaries
+U (sq)
+ki (θ) = e
+˜T k
+i (θ) and (17)
+U (dq)
+klij (θ) = e
+˜T kl
+ij (θ). (18)
+These unitary operations are similar to the single and
+double fermionic excitations [Eqs. (
+3) and ( 4)], apart
+from the absence of the exponentials of products of Pauli-
+z operators that account for the fermionic anticommuta-
+tion relations [Eq. (
+5)]. Previously, these operations have
+been considered in the context of VQE-ansatz construc-
+tion [
+30, 31].
+1. Circuit for single qubit excitations
+A single qubit excitation [Eq. ( 17)] can be re-expressed
+in terms of quantum-gate operators:
+U (sq)
+ki (θ) = exp
+[
+− i θ
+2 (XiYk − YiXk)
+]
+. (19)
+This unitary is equivalent to an evolution under the ex-
+change interaction, which can be performed by the circuit
+in Fig.
+3. We implement the controlled Ry(θ) rotation
+in the circuit in Fig. 3a as in Eq. ( 13), and apply the
+circuit identity in Fig. 4 to cancel a CN OT . In this way
+we obtain the explicit circuit, for single qubit excitation,
+shown in Fig.
+3b.1
+1 The circuit in Fig. 3b is not optimal in the number of CN OT
+gates. A single qubit excitation, as deﬁned in Eq. ( 19), can be
+implemented by a circuit with only two CN OT s. W e use the
+circuit in Fig. 3b because it is used to construct the circuits in
+Figs. 5, 8 and 9 in an optimal way.
+4
+a) qk • Ry(θ) •
+=
+qi •
+b) qk Rz( π
+2 ) • Ry( θ
+2 ) • Ry(− θ
+2 ) •
+qi Ry(− π
+2 ) Rz(− π
+2 ) Rz(− π
+2 ) H
+FIG. 3. a) A circuit performing an exchange-interaction op-
+eration equivalent to the single qubit excitation in Eq. ( 19).
+b) An explicit circuit for a) obtained by implementing the
+controlled-Ry(θ) rotation as in Eq. ( 13), and using the cir-
+cuit identity in Fig. 4.
+• Ry(− π
+2 ) Rz(− π
+2 ) Rz( π
+2 ) Ry( π
+2 )
+=
+• • Rz( π
+2 ) •
+FIG. 4. A circuit identity for an operation equivalent to a
+CN OT followed by a CZ .
+2. Circuit for double qubit excitations
+A double qubit excitation [Eq. ( 20)] can be re-
+expressed in terms of quantum-gate operators:
+U (dq)
+klij (θ) = exp
+[
+− i θ
+8 (XiYjXkXl + YiXjXkXl
++ YiYjYkXl + YiYjXkYl − XiXjYkXl − XiXjXkYl
+− YiXjYkYl − XiYjYkYl)
+]
+. (20)
+Equation ( 20) is a unitary operation that continuously
+exchanges the |1i1j0k0l⟩ and |0i0j1k1l⟩ states, but does
+not alter other states. To implement this operation, we
+use a similar circuit to the one for the single qubit exci-
+tation. However, to ensure that the operation exchanges
+only the states |1i1j0k0l⟩ and |0i0j1k1l⟩, it must act non-
+trivially only if the parities of the qubit pairs {qkql} and
+{qiqj} are even. To perform this kind of parity-controlled
+exchange operation, we use the circuit in Fig.
+5. The ﬁrst
+two CN OT s, between qubits qk and ql, and qubits qi and
+qj, encode the parities of the two respective qubit pairs
+on qubits qk and qi, respectively. Then qubits qk and qi
+are used as control qubits for a controlled exchange op-
+eration, the dotted rectangle in Fig.
+5, between qubits
+ql and qj. The last two CN OT s between qubits qk and
+ql, and qubits qi and qj, respectively, reverse the parity-
+encoding action of the ﬁrst two CN OT s.
+We implement the controlled Ry(θ) rotation in Fig. 5
+with the circuit in Fig. 6, and use the circuit identity
+in Fig. 4 to cancel a CN OT . In this way, we obtain
+the explicit circuit for a double qubit excitation, shown
+in Fig.
+7. The explicit circuit has a CN OT count of 13
+and CN OT depth of 11. The circuit suggested in Refs.
+[31, 32], for the same operation, also has a CN OT count
+of 13, but a higher CN OT depth of 13 2.
+ql • • Ry(θ) • •
+qk
+qj • • •
+qi
+FIG. 5. A circuit performing a double qubit excitation [Eq.
+(
+20)]. The explicit circuit is given in Fig. 7.
+q0 Ry( θ
+8 ) • Ry(− θ
+8 ) • Ry( θ
+8 ) • Ry(− θ
+8 ) • Ry( θ
+8 ) • Ry(− θ
+8 ) • Ry( θ
+8 ) • Ry(− θ
+4 ) •
+q1 H H
+q2 H H
+q3 H H
+FIG. 6. An explicit circuit implementing the controlled rot ation Ry(θ, {q1, q 2, q 3}, q 0). The circuit is obtained with the method
+described in Sec. II B.
+2 An anonymous referee has pointed out that another advantage of
+the circuit on Fig. 7 is that it reduces the number of long-range
+CN OT s compared to the circuits in Refs. [ 31, 32]
+5
+ql • • Ry( θ
+8 ) • Ry(− θ
+8 ) • Ry( θ
+8 ) • Ry(− θ
+8 ) • Ry( θ
+8 ) • Ry(− θ
+8 ) • Ry( θ
+8 ) • Ry(− θ
+8 ) • Rz( π
+2 ) •
+qk X H H X
+qj • H Rz(− π
+2 ) Rz(− π
+2 ) Ry(− π
+2 ) •
+qi X H H X
+FIG. 7. An explicit circuit implementing a double qubit exci tation [Eq. ( 20)].
+B. Eﬃcient Fermionic excitations
+The quantum-gate operator expressions for fermionic
+excitations [Eqs. ( 10) and (11)] diﬀer from those for qubit
+excitations [Eqs. ( 19) and ( 20)] only by the additional
+products of Pauli- z operators in their exponents. These
+products account for the fermionic anticommutation re-
+lations [Eq. (
+5)]: In the single (double) fermionic exci-
+tation, the operator product changes the sign before the
+excitation parameter θ if the parity of the set of qubits
+{qi+1..q k− 1} ({qi+1..q j− 1qk+1..q l− 1}) is odd. We can re-
+express the fermionic excitations in terms of qubit exci-
+tations:
+U (sf)
+ki (θ)=
+
+
+
+
+
+U (sq)
+ki (θ) if P (qi+1..q k− 1)=0
+U (sq)
+ki (-θ) if P (qi+1..q k− 1)=1
+, (21)
+U (df)
+klij (θ)=
+
+
+
+
+
+U (dq)
+klij (θ) if P (qi+1..q j− 1qk+1..q l− 1)=0
+U (dq)
+klij (-θ) if P (qi+1..q j− 1qk+1..q l− 1)=1
+.
+(22)
+We can adapt the circuits for qubit excitations in Figs.
+3 and 5 to perform fermionic excitation, by sandwiching
+the controlled- Ry(θ) rotation in each of them between
+two CN OT staircases [see Figs. 8 and 9]. In this way
+the sign before the excitation parameter θ is changed if
+the parity of the relevant qubits is odd, in accordance
+with Eqs. (
+21) and ( 22). Compared to the standard
+circuits for fermionic excitations, (see appendix A), the
+circuits outlined here utilizes only 2 CN OT staircases,
+instead of 4 or 16, per single or double fermionic excita-
+tion, respectively.
+1. Circuit for single fermionic excitations
+Figure
+8 shows our modiﬁed circuit for a single
+fermionic excitation, based on the circuit in Fig. 3a.
+The parity of {qi+1..q k− 1} is encoded in qubit qi+1 by
+a CN OT staircase. Conditioned on qubit qi− 1 being in
+state |1⟩ (odd parity), the two CZ gates between qubits
+qk and qi+1 reverse the direction of the Ry(θ) rotation:
+Ry(θ) → Ry(−θ). The controlled Ry(θ) rotation is im-
+plemented as in the single-qubit-excitation circuit, and
+similarly the circuit identity from Fig.
+4 is used to can-
+cel a CN OT between qubits qk and qi. A single fermionic
+excitation, Eq. ( 10), involves operations on qubits qi to
+qk. We deﬁne the total number of qubits involved in the
+excitation as n(sf) ≡ k − i + 1. For n(sf) ≥ 3, the circuit
+in Fig. 8 has a CN OT count of 2 n(sf) − 1 and a CN OT
+depth of max[5 , 2n(sf) − 3]. For n(sf) = 2, the circuit in
+Fig. 8 is equivalent to that for a single qubit excitation
+(Fig. 3b). For comparison, the standard construction
+(Sec. II A) for single-fermionic-excitation circuits, yields
+a circuit (appendix A Fig. 10) with a CN OT count and
+a CN OT depth of 4( n(sf) − 1).
+qk− 1 • •
+qk− 2 • •
+.
+.
+.
+.
+.
+.
+.
+.
+.qi+1
+• •
+qk • • Ry(θ) • •
+qi •
+FIG. 8. A circuit performing a single fermionic excitation [ Eq.
+(10)]. The vertical dots denote CN OT staircases on qubits
+qi+1 to qk− 1.
+2. Circuit for double fermionic excitations
+Figure 9 shows our modiﬁed circuit for a double
+fermionic excitation, based on the circuit in Fig. 5. The
+parity of {qi+1..q j− 1qk+1..q l− 1} is encoded in qubit qi+1
+by a staircase CN OT structure. Conditioned on qubit
+qi+1 being in state |1⟩, the two CZ gates between qubits
+ql and qi+1 reverse the direction of the controlled Ry(θ)
+rotation: Ry(θ) → Ry(−θ). The controlled Ry(θ) rota-
+tion is implemented as in Fig. 6, and the circuit identity
+from Fig. 4 is used to cancel a CN OT between qubits
+ql and qj . A double fermionic excitations, Eq. ( 11),
+involves operations on qubits qi to qj and qk to ql. We
+deﬁne the total number of qubits participating in the ex-
+citation as n(df) ≡ j − i + l − k + 2. The circuit in Fig.
+9 has a CN OT count of 2 n(df) + 5 and a CN OT depth
+of max[13 , 2n(df) − 1] for n(df) ≥ 5. For n(df) = 4, the
+circuit in Fig. 9 is equivalent to that for a double qubit
+excitation (Figs. 5 and 7). For comparison, the standard
+6
+ql− 1 • •
+ql− 2 • •
+.
+.
+.
+.
+.
+.
+.
+.
+.qi+1
+• •
+ql • • • Ry(θ) • • •
+qk
+qj • • •
+qi
+FIG. 9. A circuit performing a double fermionic excitation
+[Eq.(
+11)]. The vertical dots denote CN OT staircases on
+qubits qi+1 to qj− 1, and qk+1 to ql− 1.
+construction (Sec. II A) for fermionic-excitation circuits,
+yields a circuit (appendix A Fig. 11) with a CN OT count
+and a CN OT depth of 16( n(df) − 1). Additionaly, using
+the method of “balanced trees”, suggested in Ref. [ 33],
+one can rearrange the CN OT s in the fermionic excita-
+tion circuits (Figs. 8 and 9), so that their CN OT depths
+grow logarithmically rather than linearly.
+IV. SUMMAR Y
+In this work, we constructed circuits, optimized in
+terms of CN OT gates, to perform eﬃciently single and
+double qubit excitations, excitations generated by qubit
+creation and annihilation operators. We then expanded
+the circuits’ functionality to account for fermionic an-
+ticommutation relations, and to perform fermionic ex-
+citations. Our single-fermionic-excitation circuits use
+2n(sf) − 1 CN OT s, and have CN OT depths of 3 for
+n(sf) = 2, and max[5 , 2n(sf) − 3] for n(sf) ≥ 3, where n(sf)
+is the number of orbitals on which the single fermionic
+excitation acts. Our double-fermionic-excitation circuits
+use 2 n(df) + 5 CN OT s, and have CN OT depths of 11
+for n(df) = 4, and max[13 , 2n(df) − 1] for n(df) ≥ 5,
+where n(df) is the number of orbitals on which the double
+fermionic excitation acts. To our knowledge, our circuits
+are more eﬃcient than all previous methods for imple-
+menting double qubit and double fermionic excitations—
+both in CN OT count and in CN OT depth. Our opti-
+mized circuits present a signiﬁcant step towards imple-
+mentations of VQE algorithms on NISQ devices.
+ACKNOWLEDGMENTS
+The authors wish to thank V. Armaos for useful discus-
+sions, and an anonymous referee for pointing out the ad-
+vantage of our methods mentioned in Footnote 2. Y.S.Y.
+acknowledges ﬁnancial support from the EPSRC and Hi-
+tachi via CASE studentship RG97399. D.R.M.A.-S. was
+supported by the EPSRC, Lars Hierta’s Memorial Foun-
+dation and Girton College.
+Appendix A: Standard single and double fermionic
+excitations circuits
+In this appendix, we present the full circuits for sin-
+gle and double fermionic excitations constructed with the
+standard use of CN OT staircases. As described in Sec.
+II A, a single fermionic excitation [Eq. ( 10)] can be imple-
+mented by the circuit in Fig. 10, which contains 2 CN OT
+staircase constructions. Similarly, a double fermionic ex-
+citations [Eq. (
+11)] can be implemented by the circuit in
+Fig. 11, which contains 8 CN OT staircase constructions.
+qk Rx( π
+2 ) • • Rx(− π
+2 ) H • • H
+qk− 1 • • • •
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.qi+1
+• • • •
+qi H Rz(θ) H Rx( π
+2 ) Rz(− θ) Rx(− π
+2 )
+FIG. 10. A standard circuit performing a single fermionic ex citation [Eq. ( 10)]. The vertical dots denote CN OT staircases on
+qubits qi+1 to qk− 1.
+7
+qk H • • H H • • H . . .
+ql H • • H H • • H . . .
+ql− 1 • • • • . . .
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.qi+1
+• • • • . . .
+qj Rx( π
+2 ) • • Rx(− π
+2 ) H • • H . . .
+qi H Rz(− θ) H Rx( π
+2 ) Rz(− θ) Rx(− π
+2 ) . . .
+H • • H Rx( π
+2 ) • • Rx(− π
+2 ) . . .
+Rx( π
+2 ) • • Rx(− π
+2 ) H • • H . . .
+• • • • . . .
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+• • • • . . .
+Rx( π
+2 ) • • Rx(− π
+2 ) Rx( π
+2 ) • • Rx(− π
+2 ) . . .
+Rx( π
+2 ) Rz(− θ) Rx(− π
+2 ) Rx( π
+2 ) Rz(− θ) Rx(− π
+2 ) . . .
+H • • H Rx( π
+2 ) • • Rx(− π
+2 ) . . .
+Rx( π
+2 ) • • Rx(− π
+2 ) H • • H . . .
+• • • • . . .
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+• • • •
+H • • H H • • H . . .
+H Rz(θ) H H Rz(θ) H . . .
+Rx( π
+2 ) • • Rx(− π
+2 ) Rx( π
+2 ) • • Rx(− π
+2 )
+Rx( π
+2 ) • • Rx(− π
+2 ) Rx( π
+2 ) • • Rx(− π
+2 )
+• • • •
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+• • • •
+H • • H Rx( π
+2 ) • • Rx(− π
+2 )
+Rx( π
+2 ) Rz(θ) Rx( π
+2 ) H Rz(θ) H
+FIG. 11. A standard circuit performing a double fermionic ex citation [Eq. ( 11)]. The vertical dots denote CN OT staircases
+on qubits qi+1 to qj− 1, and qk+1 to ql− 1.
+[1] P. Benioﬀ, Journal of statistical physics 22, 563 (1980) .
+[2] R. P. Feynman, Int. J. Theor. Phys 21 (1999).
+[3] S. Lloyd, Science , 1073 (1996) .
+[4] J. Preskill, Quantum 2, 79 (2018) .
+[5] F. Arute, K. Arya, R. Babbush, D. Bacon, J. C. Bardin,
+R. Barends, R. Biswas, S. Boixo, F. G. Brandao, D. A.
+Buell, et al. ,
+Nature 574, 505 (2019) .
+[6] A. Peruzzo, J. McClean, P. Shadbolt, M.-H. Yung, X.-Q.
+Zhou, P. J. Love, A. Aspuru-Guzik, and J. L. O’brien,
+Nature communications 5, 4213 (2014) .
+[7] P. J. J. O’Malley, R. Babbush, I. D. Kivlichan,
+J. Romero, J. R. McClean, R. Barends, J. Kelly,
+P. Roushan, A. Tranter, N. Ding, B. Campbell, Y. Chen,
+Z. Chen, B. Chiaro, A. Dunsworth, A. G. Fowler, E. Jef-
+frey, E. Lucero, A. Megrant, J. Y. Mutus, M. Nee-
+8
+ley, C. Neill, C. Quintana, D. Sank, A. Vainsencher,
+J. Wenner, T. C. White, P. V. Coveney, P. J. Love,
+H. Neven, A. Aspuru-Guzik, and J. M. Martinis,
+Phys. Rev. X 6, 031007 (2016) .
+[8] D. Wang, O. Higgott, and S. Brierley,
+Phys. Rev. Lett. 122, 140504 (2019) .
+[9] F. Arute, K. Arya, R. Babbush, D. Bacon, J. C. Bardin,
+R. Barends, S. Boixo, M. Broughton, B. B. Buckley, D. A.
+Buell, et al. ,
+arXiv preprint arXiv:2004.04174 (2020) .
+[10] S. McArdle, S. Endo, A. Aspuru-Guzik, S. C. Benjamin,
+and X. Yuan,
+Rev. Mod. Phys. 92, 015003 (2020) .
+[11] T. Helgaker, P. Jorgensen, and J. Olsen,
+Molecular electronic-structure theory (John Wiley
+& Sons, 2014).
+[12] M. A. Nielsen and I. Chuang,
+“Quantum computation and quantum information,”
+(2002).
+[13] U. Dorner, R. Demkowicz-Dobrzanski, B. J. Smith, J. S.
+Lundeen, W. Wasilewski, K. Banaszek, and I. A. Walm-
+sley,
+Phys. Rev. Lett. 102, 040403 (2009) .
+[14] C. Hempel, C. Maier, J. Romero, J. McClean, T. Monz,
+H. Shen, P. Jurcevic, B. P. Lanyon, P. Love, R. Bab-
+bush, A. Aspuru-Guzik, R. Blatt, and C. F. Roos,
+Phys. Rev. X 8, 031022 (2018) .
+[15] J. Romero, R. Babbush, J. R. McClean,
+C. Hempel, P. J. Love, and A. Aspuru-Guzik,
+Quantum Science and Technology 4, 014008 (2018) .
+[16] J. Lee, W. J. Huggins, M. Head-
+Gordon, and K. B. Whaley,
+Journal of chemical theory and computation 15, 311 (2018) .
+[17] H. R. Grimsley, S. E. Economou, E. Barnes, and N. J.
+Mayhall,
+Nature communications 10, 1 (2019) .
+[18] A. J. M. Daniel Claudino, Jerimiah Wright and T. S.
+Humble,
+arXiv preprint arXiv:2011.01279 (2020) .
+[19] J. D. Whitﬁeld, J. Biamonte, and A. Aspuru-
+Guzik,
+Molecular Physics 109, 735 (2011) ,
+https://doi.org/10.1080/00268976.2011.552441.
+[20] G. Salis and N. Moll,
+arXiv preprint arXiv:1908.09533 (2019) .
+[21] D. M. Zajac, A. J. Sigillito, M. Russ, F. Bor-
+jans, J. M. Taylor, G. Burkard, and J. R. Petta,
+Science 359, 439 (2018) .
+[22] F. A. Calderon-Vargas, G. S. Barron, X.-H. Deng,
+A. J. Sigillito, E. Barnes, and S. E. Economou,
+Phys. Rev. B 100, 035304 (2019) .
+[23] P. K. Barkoutsos, J. F. Gonthier, I. Sokolov, N. Moll,
+G. Salis, A. Fuhrer, M. Ganzhorn, D. J. Egger,
+M. Troyer, A. Mezzacapo, S. Filipp, and I. Tavernelli,
+Phys. Rev. A 98, 022322 (2018) .
+[24] M. Ganzhorn, D. Egger, P. Barkoutsos, P. Olli-
+trault, G. Salis, N. Moll, M. Roth, A. Fuhrer,
+P. Mueller, S. Woerner, I. Tavernelli, and S. Filipp,
+Phys. Rev. Applied 11, 044092 (2019) .
+[25] H. V. Lepage, A. A. Lasek, D. R. M. Arvidsson-Shukur,
+and C. H. W. Barnes,
+Phys. Rev. A 101, 022329 (2020) .
+[26] B. T. Gard, L. Zhu, G. S. Barron, N. J.
+Mayhall, S. E. Economou, and E. Barnes,
+npj Quantum Information 6, 1 (2020) .
+[27] A. Aspuru-Guzik, A. D. Dutoi, P. J. Love, and M. Head-
+Gordon,
+Science 309, 1704 (2005) .
+[28] Y. S. Yordanov and C. H. W. Barnes,
+Phys. Rev. A 100, 062317 (2019) .
+[29] L.-A. Wu and D. Lidar,
+Journal of Mathematical Physics 43, 4506 (2002) .
+[30] R. Xia and S. Kais, Quantum Science and Technology (2020) .
+[31] Y. Nam, J.-S. Chen, N. C. Pisenti, K. Wright, C. Delaney,
+D. Maslov, K. R. Brown, S. Allen, J. M. Amini, J. Apis-
+dorf, et al. ,
+npj Quantum Information 6, 1 (2020) .
+[32] Q. Wang, M. Li, C. Monroe, and Y. Nam,
+arXiv preprint arXiv:2004.04151 (2020) .
+[33] A. Cowtan, S. Dilkes, R. Dun-
+can, W. Simmons, and S. Sivarajah,
+arXiv preprint arXiv:1906.01734 (2019), 10.4204/EPTCS.3 18.13.
