@@ -430,9 +430,9 @@ if __name__ == "__main__":
 
     rng = np.random.default_rng(1)
     cases = {
-        # "H2  (4q, pair=True, Fig.12)": (4, [(3, 1, 2, 0)], True, 10),
-        # "H2  (4q, single string)":     (4, [(3, 1, 2, 0)], False, 6),
-        # "LiH (6q, Fig.13)":  (6, [(5, 1, 3, 0), (4, 2, 3, 0), (5, 2, 3, 0)], False, 18),
+        "H2  (4q, pair=True, Fig.12)": (4, [(3, 1, 2, 0)], True, 10),
+        "H2  (4q, single string)":     (4, [(3, 1, 2, 0)], False, 6),
+        "LiH (6q, Fig.13)":  (6, [(5, 1, 3, 0), (4, 2, 3, 0), (5, 2, 3, 0)], False, 18),
         "F2  (12q, Fig.14)": (12, [(11, 5, k + 6, k) for k in range(5)], False, 50),
     }
     for name, (n, dbls, pair, paper_cz) in cases.items():

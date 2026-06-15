@@ -1,3 +1,0 @@
-HF total energy (Hartree): -7.861992688741
-Exact ground energy (Hartree): -7.881653021952
-

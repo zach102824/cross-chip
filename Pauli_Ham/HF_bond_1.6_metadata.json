@@ -1,0 +1,54 @@
+{
+  "molecule": "HF",
+  "bond_angstrom": 1.6,
+  "basis": "sto-3g",
+  "charge": 0,
+  "multiplicity": 1,
+  "geometry": [
+    [
+      "H",
+      [
+        0.0,
+        0.0,
+        -0.8
+      ]
+    ],
+    [
+      "F",
+      [
+        0.0,
+        0.0,
+        0.8
+      ]
+    ]
+  ],
+  "active_space": [
+    6,
+    4
+  ],
+  "occupied_indices": [
+    0,
+    1
+  ],
+  "active_indices": [
+    2,
+    3,
+    4,
+    5
+  ],
+  "n_qubits": 8,
+  "n_terms": 105,
+  "rhf_energy": -98.3783275165847,
+  "export_qubit_layout": "[alpha spatial orbitals..., beta spatial orbitals...]",
+  "openfermion_spin_orb_to_export_qubit": [
+    0,
+    4,
+    1,
+    5,
+    2,
+    6,
+    3,
+    7
+  ],
+  "exact_ground_state_energy": -98.50099273041803
+}
