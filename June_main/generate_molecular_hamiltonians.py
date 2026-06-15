@@ -3,7 +3,7 @@
 
 The molecule presets mirror the active-space choices used in ``UCCSD_Mole``.
 By default this script generates the HF molecule over the bond grid used there
-and saves numbered Pauli Hamiltonians under ``Pauli_Ham``:
+and saves one numbered Pauli Hamiltonian per bond under ``Pauli_Ham``:
 
     coefficient I/X/Y/Z-as-number-for-qubit-0 ...
 
@@ -15,8 +15,6 @@ with ``I=0, X=1, Y=2, Z=3``.  Qubits are exported in spin-block order:
 from __future__ import annotations
 
 import argparse
-import json
-import pickle
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable
@@ -204,36 +202,18 @@ def save_hamiltonian(
     output_dir: Path,
     stem: str,
     metadata: dict[str, object],
-) -> tuple[Path, Path, Path, Path]:
+) -> Path:
     output_dir.mkdir(parents=True, exist_ok=True)
     num_qubits = int(metadata["n_qubits"])
 
-    pkl_path = output_dir / f"{stem}_of.pkl"
     number_path = output_dir / f"{stem}.txt"
-    pauli_path = output_dir / f"{stem}_pauli_convention.txt"
-    metadata_path = output_dir / f"{stem}_metadata.json"
-
-    with pkl_path.open("wb") as file:
-        pickle.dump(qubit_hamiltonian, file)
 
     numbered_terms = openfermion_to_numbered_paulis(qubit_hamiltonian, num_qubits)
     with number_path.open("w", encoding="utf-8") as file:
         for term in numbered_terms:
             file.write(" ".join(map(str, term)) + "\n")
 
-    num_to_char = {0: "I", 1: "X", 2: "Y", 3: "Z"}
-    with pauli_path.open("w", encoding="utf-8") as file:
-        for term in numbered_terms:
-            coeff = term[0]
-            pauli = "".join(num_to_char[int(p)] for p in term[1:])
-            file.write(f"{pauli}\n")
-            file.write(f"{complex(coeff)}\n")
-
-    with metadata_path.open("w", encoding="utf-8") as file:
-        json.dump(metadata, file, indent=2)
-        file.write("\n")
-
-    return pkl_path, number_path, pauli_path, metadata_path
+    return number_path
 
 
 def parse_args() -> argparse.Namespace:
@@ -285,7 +265,7 @@ def main() -> None:
             metadata["exact_ground_state_energy"] = gs_energy
 
         stem = f"{preset.name}_bond_{bond_token(bond)}"
-        paths = save_hamiltonian(qubit_hamiltonian, output_dir, stem, metadata)
+        saved_path = save_hamiltonian(qubit_hamiltonian, output_dir, stem, metadata)
         print(
             f"{stem}: n_qubits={metadata['n_qubits']}, n_terms={metadata['n_terms']}, "
             f"rhf={metadata['rhf_energy']:.12f}"
@@ -295,7 +275,7 @@ def main() -> None:
                 else ""
             )
         )
-        print(f"  saved: {paths[1]}")
+        print(f"  saved: {saved_path}")
 
 
 if __name__ == "__main__":
