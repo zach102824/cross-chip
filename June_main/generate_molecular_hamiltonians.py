@@ -216,6 +216,37 @@ def save_hamiltonian(
     return number_path
 
 
+def write_bond_energy_summary(
+    output_dir: Path,
+    molecule_name: str,
+    active_space: tuple[int, int],
+    basis: str,
+    rows: list[dict[str, float | None]],
+) -> Path:
+    """Write HF and ground-state energies for each bond length."""
+
+    summary_path = output_dir / f"{molecule_name}_bond_scan_summary.txt"
+    with summary_path.open("w", encoding="utf-8") as file:
+        file.write(f"# {molecule_name} active-space bond scan\n")
+        file.write(f"# active_space: {active_space}\n")
+        file.write(f"# basis: {basis}\n")
+        file.write("# energies in Hartree; HF_minus_GS in milli-Hartree\n")
+        file.write("bond_angstrom\tE_HF_Ha\tE_GS_Ha\tHF_minus_GS_mHa\n")
+        for row in rows:
+            bond = float(row["bond_angstrom"])
+            hf_energy = float(row["rhf_energy"])
+            gs_energy = row.get("exact_ground_state_energy")
+            if gs_energy is None:
+                file.write(f"{bond_token(bond)}\t{hf_energy:.12f}\t\t\n")
+            else:
+                gs_energy = float(gs_energy)
+                hf_minus_gs_mha = (hf_energy - gs_energy) * 1000.0
+                file.write(
+                    f"{bond_token(bond)}\t{hf_energy:.12f}\t{gs_energy:.12f}\t{hf_minus_gs_mha:.6f}\n"
+                )
+    return summary_path
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -258,14 +289,24 @@ def main() -> None:
     print(f"output_dir={output_dir}")
     print()
 
+    summary_rows: list[dict[str, float | None]] = []
+    basis = args.basis or preset.basis
+
     for bond in bonds:
-        qubit_hamiltonian, metadata = build_molecular_hamiltonian(args.molecule, bond, args.basis)
+        qubit_hamiltonian, metadata = build_molecular_hamiltonian(args.molecule, bond, basis)
         if not args.skip_ground_state:
             gs_energy, _ = ground_state_energy_and_vector(qubit_hamiltonian, int(metadata["n_qubits"]))
             metadata["exact_ground_state_energy"] = gs_energy
 
         stem = f"{preset.name}_bond_{bond_token(bond)}"
         saved_path = save_hamiltonian(qubit_hamiltonian, output_dir, stem, metadata)
+        summary_rows.append(
+            {
+                "bond_angstrom": float(bond),
+                "rhf_energy": float(metadata["rhf_energy"]),
+                "exact_ground_state_energy": metadata.get("exact_ground_state_energy"),
+            }
+        )
         print(
             f"{stem}: n_qubits={metadata['n_qubits']}, n_terms={metadata['n_terms']}, "
             f"rhf={metadata['rhf_energy']:.12f}"
@@ -276,6 +317,16 @@ def main() -> None:
             )
         )
         print(f"  saved: {saved_path}")
+
+    summary_path = write_bond_energy_summary(
+        output_dir,
+        preset.name,
+        preset.active_space,
+        basis,
+        summary_rows,
+    )
+    print()
+    print(f"Energy summary saved: {summary_path}")
 
 
 if __name__ == "__main__":
