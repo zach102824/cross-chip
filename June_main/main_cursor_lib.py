@@ -11,12 +11,12 @@ import sympy
 PAULI_CHAR_TO_GATE = {"I": None, "X": cirq.X, "Y": cirq.Y, "Z": cirq.Z}
 
 # Simplified gate-only noise: depolarizing strength depends on gate arity (2Q vs 1Q).
-TWO_QUBIT_GATE_DEPOL_PROB = 0.018
-ONE_QUBIT_GATE_DEPOL_PROB = 0.0018
+TWO_QUBIT_GATE_DEPOL_PROB = 0.0001
+ONE_QUBIT_GATE_DEPOL_PROB = 0.005
 
 # Cross-chip two-qubit gates (the curvy links in the chip sketch) are noisier:
 # a CZ that spans two chips gets this higher depolarizing probability.
-CROSS_CHIP_TWO_QUBIT_GATE_DEPOL_PROB = 0.05
+CROSS_CHIP_TWO_QUBIT_GATE_DEPOL_PROB = 0.12
 
 # Tag carried by cross-chip two-qubit gates so the noise model can find them.
 # (The notebook attaches this tag when loading the circuit JSON.)
