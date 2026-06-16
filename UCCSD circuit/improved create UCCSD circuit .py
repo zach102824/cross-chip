@@ -49,6 +49,8 @@ intended string and the residual Clifford is the identity.  Run the file
 for a demo + statevector check against the product of Pauli exponentials.
 """
 import itertools
+from pathlib import Path
+
 import numpy as np
 from qiskit import QuantumCircuit
 from qiskit.circuit import Parameter
@@ -405,50 +407,190 @@ def create_uccsd_circuit(num_qubits, doubles, thetas=None, optimize=True,
     return qc, strings, signs, theta_idx
 
 # ----------------------------------------------------------------------
-# Demo + statevector self-test
+# Diagram helpers (shared by the generation pipeline below)
 # ----------------------------------------------------------------------
+# Qiskit "iqp" palette, hard-coded so the look is identical regardless of the
+# installed qiskit version: salmon H, blue X/CX, maroon rotations, light-blue
+# CZ/RZX links -- same palette as June_main/circuits2read/plot_hf_circuits_compare.ipynb.
+IQP_STYLE = {
+    "name": "iqp",
+    "displaycolor": {
+        "h": ["#FA4D56", "#000000"],
+        "x": ["#002D9C", "#FFFFFF"],
+        "rx": ["#9F1853", "#FFFFFF"],
+        "ry": ["#9F1853", "#FFFFFF"],
+        "rz": ["#33B1FF", "#000000"],
+        "rzx": ["#33B1FF", "#000000"],
+        "cz": ["#33B1FF", "#000000"],
+        "cx": ["#002D9C", "#000000"],
+    },
+}
+
+
+def qc_from_logical_gates(gates, num_qubits):
+    """Rebuild a Qiskit circuit from a saved logical/decomposed gate list
+    (the same JSON schema produced by uccsd_circuit_io.save_circuit_json),
+    so it can be drawn.  Symbolic rotations keep their parameter name."""
+    qc = QuantumCircuit(num_qubits)
+    params: dict[str, Parameter] = {}
+
+    def angle(g):
+        if "param" in g:
+            p = params.setdefault(g["param"], Parameter(g["param"]))
+            return float(g.get("coeff", 1.0)) * p
+        return float(g.get("value", g.get("angle", 0.0)))
+
+    for g in gates:
+        op = g["op"].lower()
+        qs = g["qubits"]
+        if op == "x":
+            qc.x(qs[0])
+        elif op == "h":
+            qc.h(qs[0])
+        elif op == "cx":
+            qc.cx(qs[0], qs[1])
+        elif op == "cz":
+            qc.cz(qs[0], qs[1])
+        elif op == "rx":
+            qc.rx(angle(g), qs[0])
+        elif op == "ry":
+            qc.ry(angle(g), qs[0])
+        elif op == "rz":
+            qc.rz(angle(g), qs[0])
+        elif op == "rzx":
+            qc.rzx(angle(g), qs[0], qs[1])
+        else:
+            raise ValueError(f"unsupported gate op {op!r}")
+    return qc
+
+
+def save_circuit_diagram(gates, num_qubits, out_png, title):
+    """Draw a logical/decomposed gate list as a folded-out Qiskit mpl PNG."""
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    qc = qc_from_logical_gates(gates, num_qubits)
+    # fold=-1 -> one continuous row (no wrapping), matching the reference PNGs.
+    fig = qc.draw(output="mpl", style=IQP_STYLE, fold=-1)
+    fig.suptitle(title, fontsize=14)
+    fig.savefig(out_png, dpi=220, bbox_inches="tight")
+    plt.close(fig)
+    return out_png
+
+
+# ----------------------------------------------------------------------
+# Generation pipeline
+# ----------------------------------------------------------------------
+# Run this file directly to turn the doubles you picked (in CASES below) into:
+#   1.  <tag>.json                              -- bare ansatz, NO init-state prep
+#   2.  <tag>_circuit.png                       -- its Qiskit diagram
+#   3.  <tag>_decomposed_simplified.json        -- cross-chip CZ -> RZX + peephole
+#   4.  <tag>_decomposed_simplified_circuit.png -- its Qiskit diagram
+# All four files are written to June_main/circuits2read/.
 if __name__ == "__main__":
-    from qiskit.quantum_info import Statevector
+    import importlib.util
+    import sys
 
-    def apply_pauli(psi, string):
-        n = len(string)
-        out = np.zeros_like(psi)
-        flip = sum(1 << q for q in range(n) if string[q] in 'XY')
-        for b in np.nonzero(psi)[0]:
-            ph = 1.0 + 0j
-            for q in range(n):
-                c, bit = string[q], (b >> q) & 1
-                if c == 'Y':
-                    ph *= 1j if bit == 0 else -1j
-                elif c == 'Z' and bit:
-                    ph *= -1
-            out[b ^ flip] += ph * psi[b]
-        return out
+    _THIS_DIR = Path(__file__).resolve().parent
+    if str(_THIS_DIR) not in sys.path:
+        sys.path.insert(0, str(_THIS_DIR))
+    import uccsd_circuit_io as cio
 
-    def expm_pauli(psi, string, alpha):
-        return np.cos(alpha/2)*psi - 1j*np.sin(alpha/2)*apply_pauli(psi, string)
+    # "simplify decomposed circuit.py" has spaces in its name -> load by path.
+    _spec = importlib.util.spec_from_file_location(
+        "simplify_decomposed_circuit", str(_THIS_DIR / "simplify decomposed circuit.py")
+    )
+    simplify = importlib.util.module_from_spec(_spec)
+    _spec.loader.exec_module(simplify)
 
-    rng = np.random.default_rng(1)
-    cases = {
-        # "H2  (4q, pair=True, Fig.12)": (4, [(3, 1, 2, 0)], True, 10),
-        # "H2  (4q, single string)":     (4, [(3, 1, 2, 0)], False, 6),
-        # "LiH (6q, Fig.13)":  (6, [(5, 1, 3, 0), (4, 2, 3, 0), (5, 2, 3, 0)], False, 18),
-        "F2  (12q, Fig.14)": (12, [(11, 5, k + 6, k) for k in range(5)], False, 50),
+    OUT_DIR = _THIS_DIR.parent / "June_main" / "circuits2read"
+    OUT_DIR.mkdir(parents=True, exist_ok=True)
+
+    # ------------------------------------------------------------------
+    # INPUT: the doubles to simulate (pick them in the UCCSD_Mole notebook,
+    # then paste here).  NO initial-state prep is added, so the diagrams show
+    # the bare ansatz -- no X / Ry / CX prep layer.
+    #   tag           : output filename stem (also the diagram title)
+    #   num_qubits    : spin-up on 0..N/2-1, spin-down on N/2..N-1
+    #   doubles       : list of (k, l, i, j) for a_k^dag a_l^dag a_i a_j
+    #   pair          : True -> exact two-string-per-double (Fig.12 style)
+    #   molecule/bond_length/n_electrons : metadata only (no prep is built)
+    # ------------------------------------------------------------------
+    CASES = {
+        "F2_12q_5doubles": dict(
+            molecule="F2",
+            bond_length=1.0,
+            num_qubits=12,
+            n_electrons=10,
+            # Top-5 MP2-ranked doubles from UCCSD_Mole/F2.ipynb (active_space=(10, 6)).
+            # Same set as the notebook's op_terms, listed in the paper's nested order
+            # (a11^ a5^ a_{k+6} a_k, k=0..4) so the shared a11^a5^ subtree cancels and
+            # the circuit reaches the published 50 CZ (Fig. 14).
+            doubles=[(11, 5, k + 6, k) for k in range(5)],
+            pair=False,
+        ),
+        # "br2_16q_3doubles": dict(
+        #     molecule="Br2",
+        #     bond_length=2.3,
+        #     num_qubits=16,
+        #     n_electrons=14,
+        #     doubles=[(7, 15, 12, 4), (7, 15, 11, 3), (7, 15, 14, 6)],
+        #     pair=False,
+        # ),
     }
-    for name, (n, dbls, pair, paper_cz) in cases.items():
-        th = list(rng.uniform(0.3, 1.2, size=len(dbls)))
-        qc, strings, signs, tidx = create_uccsd_circuit(n, dbls, thetas=th,
-                                                        pair=pair)
-        ncz = qc.count_ops().get('cz', 0)
-        # statevector check vs product of Pauli exponentials
-        psi0 = rng.normal(size=2**n) + 1j*rng.normal(size=2**n)
-        psi0 /= np.linalg.norm(psi0)
-        psi_c = np.asarray(Statevector(psi0).evolve(qc).data)
-        psi_r = psi0.copy()
-        for k, s in enumerate(strings):
-            psi_r = expm_pauli(psi_r, s, signs[k] * th[tidx[k]])
-        err = np.linalg.norm(psi_c - psi_r)
-        status = "OK " if err < 1e-10 else "BAD"
-        mark = "==" if ncz == paper_cz else "!="
-        print(f"{name:32s} CZ = {ncz:3d} {mark} paper {paper_cz:3d} | "
-              f"statevector err = {err:.2e} [{status}]")
+
+    for tag, cfg in CASES.items():
+        num_qubits = cfg["num_qubits"]
+        doubles = cfg["doubles"]
+        n_spatial = num_qubits // 2
+
+        # ---- Step 2: bare ansatz (init_state=None -> no prep gates) ----
+        thetas = [Parameter(f"t{d}") for d in range(len(doubles))]
+        qc, strings, signs, theta_idx = create_uccsd_circuit(
+            num_qubits,
+            doubles,
+            thetas=thetas,
+            optimize=True,
+            order="auto",
+            pair=cfg["pair"],
+            init_state=None,
+        )
+        logical_gates = cio.circuit_to_logical_gates(qc, num_qubits)
+        logical_path = OUT_DIR / f"{tag}.json"
+        cio.save_circuit_json(
+            logical_path,
+            molecule=cfg["molecule"],
+            bond_length=cfg["bond_length"],
+            num_qubits=num_qubits,
+            n_spatial=n_spatial,
+            n_electrons=cfg["n_electrons"],
+            doubles=doubles,
+            signs=signs,
+            theta_idx=theta_idx,
+            logical_gates=logical_gates,
+            init_state=None,
+            beta=None,
+        )
+        n_cz = sum(1 for g in logical_gates if g["op"] == "cz")
+        n_cross = sum(1 for g in logical_gates if g["op"] == "cz" and g["cross_chip"])
+        print(
+            f"[{tag}] logical: {logical_path.name}  "
+            f"(qubits={num_qubits}, CZ={n_cz}, cross-chip CZ={n_cross}, "
+            f"params={len(set(theta_idx))})"
+        )
+        logical_png = save_circuit_diagram(
+            logical_gates, num_qubits, OUT_DIR / f"{tag}_circuit.png", title=tag
+        )
+        print(f"[{tag}] logical diagram: {logical_png.name}")
+
+        # ---- Step 3: cross-chip CZ -> RZX + peephole, then diagram ----
+        decomposed_path = simplify.simplify_file(logical_path)
+        dec_data = cio.load_circuit_json(decomposed_path)
+        dec_png = save_circuit_diagram(
+            dec_data["gates"],
+            num_qubits,
+            OUT_DIR / f"{decomposed_path.stem}_circuit.png",
+            title=f"{tag} (cross-chip CZ -> RZX)",
+        )
+        print(f"[{tag}] decomposed diagram: {dec_png.name}")
