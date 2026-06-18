@@ -30,8 +30,11 @@ DEFAULT_DEPOL_PROB = TWO_QUBIT_GATE_DEPOL_PROB
 # These represent a fixed, systematic over-rotation on the gate's natural generator
 # (Z⊗Z for CZ, Z⊗X for RZX, X for single-qubit gates). Because they are unitary and
 # accumulate under gate folding, Pauli twirling becomes meaningful.
-TWO_QUBIT_COHERENT_OVERROTATION = 0.0
-ONE_QUBIT_COHERENT_OVERROTATION = 0.0
+# Willow-class residual coherent over-rotation after calibration (radians).
+# 2Q: ~0.03 rad (~1.7°) -> ε²/5 ≈ 1.8e-4 infidelity, comparable to the 2Q depol budget.
+# 1Q: ~0.01 rad (~0.6°) -> ε²/6 ≈ 1.7e-5 infidelity, well below the 1Q depol budget.
+TWO_QUBIT_COHERENT_OVERROTATION = 0.03
+ONE_QUBIT_COHERENT_OVERROTATION = 0.01
 
 # Tag attached to inserted Pauli-twirl / compensator gates. Identification only:
 # these remain ordinary single-qubit gates and still receive the standard 1Q noise.
