@@ -464,6 +464,75 @@ def qc_from_logical_gates(gates, num_qubits):
     return qc
 
 
+def fuse_cz_rot_cz_to_rzx(gates):
+    """Fuse every  CZ(a,b) . RX(theta)@q . CZ(a,b)  sandwich (q in {a,b}) into a
+    single continuous-angle native RZX gate.
+
+    Why this is exact.  CZ is symmetric and Z-diagonal, so it conjugates the
+    X on the rotated qubit into an X (x) Z two-body Pauli:
+        CZ(a,b) . exp(-i th/2 X_q) . CZ(a,b)  ==  exp(-i th/2  X_q (x) Z_other)
+    and that is precisely Qiskit's  RZX(th)  with the Z on `other` and the X on
+    `q`, i.e.  rzx(th, other, q)  (verified by Operator equality up to global
+    phase).  Each fused block therefore turns 2 CZ + 1 single-qubit rotation
+    into ONE continuous-theta RZX, keeping the angle symbolic.
+
+    The sandwich is exactly what every double leaves behind on the alpha<->beta
+    vertical link: the ladder ends on CZ(pivot, hub_b), the RX(theta) pivot
+    rotation follows, and the inverse ladder re-applies CZ(pivot, hub_b); the
+    ROT in between blocks the two CZs from cancelling in `_peephole`.
+
+    Operates on the JSON logical gate-list (the schema of
+    uccsd_circuit_io.circuit_to_logical_gates).  Gates on qubits disjoint from
+    {a,b} between the two CZs are left untouched (they commute through).
+    Returns a new list; rotations may be symbolic (param/coeff) or numeric.
+    """
+    gates = [dict(g) for g in gates]
+    changed = True
+    while changed:
+        changed = False
+        n = len(gates)
+        for i in range(n):
+            g = gates[i]
+            if g["op"] != "cz":
+                continue
+            pair = set(g["qubits"])
+            a, b = g["qubits"]
+            mid_rot = mid_idx = close_idx = None
+            ok = True
+            for j in range(i + 1, n):
+                gj = gates[j]
+                touched = set(gj["qubits"]) & pair
+                if not touched:
+                    continue                      # disjoint -> commutes through
+                if gj["op"] == "cz" and set(gj["qubits"]) == pair:
+                    close_idx = j
+                    break
+                if (gj["op"] == "rx" and len(gj["qubits"]) == 1
+                        and gj["qubits"][0] in pair and mid_rot is None):
+                    mid_rot, mid_idx = gj, j
+                    continue
+                ok = False                        # anything else blocks the fuse
+                break
+            if not (ok and close_idx is not None and mid_rot is not None):
+                continue
+            q = mid_rot["qubits"][0]
+            other = b if q == a else a
+            rzx = {"op": "rzx", "qubits": [other, q]}     # Z on other, X on q
+            if "param" in mid_rot:
+                rzx["param"] = mid_rot["param"]
+                rzx["coeff"] = float(mid_rot.get("coeff", 1.0))
+            else:
+                rzx["angle"] = float(mid_rot.get("value", mid_rot.get("angle", 0.0)))
+            if g.get("cross_chip") or gates[close_idx].get("cross_chip"):
+                rzx["cross_chip"] = True
+            for idx in sorted((close_idx, mid_idx, i), reverse=True):
+                del gates[idx]
+            gates.insert(i, rzx)
+            changed = True
+            break
+    return gates
+
+
 def save_circuit_diagram(gates, num_qubits, out_png, title):
     """Draw a logical/decomposed gate list as a folded-out Qiskit mpl PNG."""
     import matplotlib
@@ -480,117 +549,132 @@ def save_circuit_diagram(gates, num_qubits, out_png, title):
 
 
 # ----------------------------------------------------------------------
-# Generation pipeline
+# Molecule case runner
 # ----------------------------------------------------------------------
-# Run this file directly to turn the doubles you picked (in CASES below) into:
-#   1.  <tag>.json                              -- bare ansatz, NO init-state prep
-#   2.  <tag>_circuit.png                       -- its Qiskit diagram
-#   3.  <tag>_decomposed_simplified.json        -- cross-chip CZ -> RZX + peephole
-#   4.  <tag>_decomposed_simplified_circuit.png -- its Qiskit diagram
-# All four files are written to June_main/circuits2read/.
-if __name__ == "__main__":
-    import importlib.util
-    import sys
+class MoleculeCircuitRunner:
+    """Build, simplify and draw the UCCSD-doubles circuit for a named molecule.
 
-    _THIS_DIR = Path(__file__).resolve().parent
-    if str(_THIS_DIR) not in sys.path:
-        sys.path.insert(0, str(_THIS_DIR))
-    import uccsd_circuit_io as cio
+    The molecule -> (num_qubits, n_electrons, doubles) registry lives in
+    ``CASES`` so re-generating everything is a one-liner:
 
-    # "simplify decomposed circuit.py" has spaces in its name -> load by path.
-    _spec = importlib.util.spec_from_file_location(
-        "simplify_decomposed_circuit", str(_THIS_DIR / "simplify decomposed circuit.py")
-    )
-    simplify = importlib.util.module_from_spec(_spec)
-    _spec.loader.exec_module(simplify)
+        MoleculeCircuitRunner().run("HF")          # one molecule
+        MoleculeCircuitRunner().run_all()          # HF, Cl2, Br2
 
-    OUT_DIR = _THIS_DIR.parent / "June_main" / "circuits2read"
-    OUT_DIR.mkdir(parents=True, exist_ok=True)
+    For each molecule it writes, into June_main/circuits2read/:
+        <tag>.json / <tag>_circuit.png                 -- bare ansatz (CZ form)
+    and prints the gate count.
 
-    # ------------------------------------------------------------------
-    # INPUT: the doubles to simulate (pick them in the UCCSD_Mole notebook,
-    # then paste here).  NO initial-state prep is added, so the diagrams show
-    # the bare ansatz -- no X / Ry / CX prep layer.
-    #   tag           : output filename stem (also the diagram title)
-    #   num_qubits    : spin-up on 0..N/2-1, spin-down on N/2..N-1
-    #   doubles       : list of (k, l, i, j) for a_k^dag a_l^dag a_i a_j
-    #   pair          : True -> exact two-string-per-double (Fig.12 style)
-    #   molecule/bond_length/n_electrons : metadata only (no prep is built)
-    # ------------------------------------------------------------------
+    The doubles are the shared-creation set (N/2-1, N-1, k+N/2, k) picked by the
+    top-k MP2 ranking in the matching UCCSD_Mole notebook (HF: 3, Cl2: 5,
+    Br2: 7), listed in the notebooks' op_terms order.
+    """
+
     CASES = {
-        "F2_12q_5doubles": dict(
-            molecule="F2",
-            bond_length=1.0,
-            num_qubits=12,
-            n_electrons=10,
-            # Top-5 MP2-ranked doubles from UCCSD_Mole/F2.ipynb (active_space=(10, 6)).
-            # Same set as the notebook's op_terms, listed in the paper's nested order
-            # (a11^ a5^ a_{k+6} a_k, k=0..4) so the shared a11^a5^ subtree cancels and
-            # the circuit reaches the published 50 CZ (Fig. 14).
-            doubles=[(11, 5, k + 6, k) for k in range(5)],
+        "HF": dict(
+            molecule="HF", bond_length=1.0, num_qubits=8, n_electrons=6,
+            # UCCSD_Mole/HF.ipynb, active_space=(6, 4) -> 8 qubits, top-3 doubles.
+            doubles=[(3, 7, 4, 0), (3, 7, 5, 1), (3, 7, 6, 2)],
             pair=False,
         ),
-        # "br2_16q_3doubles": dict(
-        #     molecule="Br2",
-        #     bond_length=2.3,
-        #     num_qubits=16,
-        #     n_electrons=14,
-        #     doubles=[(7, 15, 12, 4), (7, 15, 11, 3), (7, 15, 14, 6)],
-        #     pair=False,
-        # ),
+        "Cl2": dict(
+            molecule="Cl2", bond_length=1.0, num_qubits=12, n_electrons=10,
+            # UCCSD_Mole/Cl2.ipynb, active_space=(10, 6) -> 12 qubits, top-5 doubles
+            # (the notebook table shows the top 4; the 5th completes the n_o=5 set).
+            doubles=[(5, 11, 8, 2), (5, 11, 7, 1), (5, 11, 9, 3),
+                     (5, 11, 10, 4), (5, 11, 6, 0)],
+            pair=False,
+        ),
+        "Br2": dict(
+            molecule="Br2", bond_length=1.0, num_qubits=16, n_electrons=14,
+            # UCCSD_Mole/Br2.ipynb, active_space=(14, 8) -> 16 qubits, top-7 doubles.
+            doubles=[(7, 15, 12, 4), (7, 15, 11, 3), (7, 15, 14, 6),
+                     (7, 15, 13, 5), (7, 15, 10, 2), (7, 15, 9, 1),
+                     (7, 15, 8, 0)],
+            pair=False,
+        ),
     }
 
-    for tag, cfg in CASES.items():
+    def __init__(self, out_dir=None):
+        self._dir = Path(__file__).resolve().parent
+        if out_dir is None:
+            out_dir = self._dir.parent.parent / "June_main" / "circuits2read"
+        self.out_dir = Path(out_dir)
+        self.out_dir.mkdir(parents=True, exist_ok=True)
+        import sys
+        if str(self._dir.parent) not in sys.path:
+            sys.path.insert(0, str(self._dir.parent))
+        import uccsd_circuit_io as cio
+        self._cio = cio
+
+    @staticmethod
+    def _tag(cfg):
+        return f"{cfg['molecule']}_{cfg['num_qubits']}q_{len(cfg['doubles'])}doubles"
+
+    def _verify_fusion(self, bare_gates, fused_gates, num_qubits, seed=0):
+        """Bind random angles and confirm fused == bare up to global phase
+        (statevector evolution from a random state; cheap even at 16 qubits)."""
+        from qiskit.quantum_info import random_statevector
+
+        qc_bare = qc_from_logical_gates(bare_gates, num_qubits)
+        qc_fused = qc_from_logical_gates(fused_gates, num_qubits)
+        # Each circuit rebuilds its own Parameter objects, so bind by name.
+        rng = np.random.default_rng(seed)
+        by_name = {p.name: float(rng.uniform(-np.pi, np.pi))
+                   for p in qc_bare.parameters}
+        qc_bare = qc_bare.assign_parameters(
+            {p: by_name[p.name] for p in qc_bare.parameters})
+        qc_fused = qc_fused.assign_parameters(
+            {p: by_name[p.name] for p in qc_fused.parameters})
+        sv0 = random_statevector(2 ** num_qubits, seed=seed + 1)
+        v1 = sv0.evolve(qc_bare).data
+        v2 = sv0.evolve(qc_fused).data
+        idx = int(np.argmax(np.abs(v1)))
+        phase = v1[idx] / v2[idx]
+        if not np.allclose(v1, phase * v2, atol=1e-8):
+            raise AssertionError("RZX fusion changed the unitary!")
+
+    def run(self, name):
+        """Generate JSON + PNG for one molecule (key of CASES). Returns paths."""
+        import matplotlib
+        matplotlib.use("Agg")
+        cio = self._cio
+        cfg = self.CASES[name]
+        tag = self._tag(cfg)
         num_qubits = cfg["num_qubits"]
         doubles = cfg["doubles"]
         n_spatial = num_qubits // 2
 
-        # ---- Step 2: bare ansatz (init_state=None -> no prep gates) ----
+        # ---- bare ansatz (init_state=None -> no prep gates) ----
         thetas = [Parameter(f"t{d}") for d in range(len(doubles))]
         qc, strings, signs, theta_idx = create_uccsd_circuit(
-            num_qubits,
-            doubles,
-            thetas=thetas,
-            optimize=True,
-            order="auto",
-            pair=cfg["pair"],
-            init_state=None,
+            num_qubits, doubles, thetas=thetas, optimize=True,
+            order="auto", pair=cfg["pair"], init_state=None,
         )
-        logical_gates = cio.circuit_to_logical_gates(qc, num_qubits)
-        logical_path = OUT_DIR / f"{tag}.json"
+        bare_gates = cio.circuit_to_logical_gates(qc, num_qubits)
+        bare_path = self.out_dir / f"{tag}.json"
         cio.save_circuit_json(
-            logical_path,
-            molecule=cfg["molecule"],
-            bond_length=cfg["bond_length"],
-            num_qubits=num_qubits,
-            n_spatial=n_spatial,
-            n_electrons=cfg["n_electrons"],
-            doubles=doubles,
-            signs=signs,
-            theta_idx=theta_idx,
-            logical_gates=logical_gates,
-            init_state=None,
-            beta=None,
+            bare_path, molecule=cfg["molecule"], bond_length=cfg["bond_length"],
+            num_qubits=num_qubits, n_spatial=n_spatial,
+            n_electrons=cfg["n_electrons"], doubles=doubles, signs=signs,
+            theta_idx=theta_idx, logical_gates=bare_gates,
+            init_state=None, beta=None,
         )
-        n_cz = sum(1 for g in logical_gates if g["op"] == "cz")
-        n_cross = sum(1 for g in logical_gates if g["op"] == "cz" and g["cross_chip"])
-        print(
-            f"[{tag}] logical: {logical_path.name}  "
-            f"(qubits={num_qubits}, CZ={n_cz}, cross-chip CZ={n_cross}, "
-            f"params={len(set(theta_idx))})"
-        )
-        logical_png = save_circuit_diagram(
-            logical_gates, num_qubits, OUT_DIR / f"{tag}_circuit.png", title=tag
-        )
-        print(f"[{tag}] logical diagram: {logical_png.name}")
+        save_circuit_diagram(bare_gates, num_qubits,
+                             self.out_dir / f"{tag}_circuit.png", title=tag)
 
-        # ---- Step 3: cross-chip CZ -> RZX + peephole, then diagram ----
-        decomposed_path = simplify.simplify_file(logical_path)
-        dec_data = cio.load_circuit_json(decomposed_path)
-        dec_png = save_circuit_diagram(
-            dec_data["gates"],
-            num_qubits,
-            OUT_DIR / f"{decomposed_path.stem}_circuit.png",
-            title=f"{tag} (cross-chip CZ -> RZX)",
+        n_cz = sum(1 for g in bare_gates if g["op"] == "cz")
+        print(
+            f"[{tag}] qubits={num_qubits} doubles={len(doubles)} "
+            f"params={len(set(theta_idx))}\n"
+            f"    bare : {len(bare_gates):3d} gates (CZ={n_cz})\n"
+            f"    wrote {bare_path.name} (+ {tag}_circuit.png)"
         )
-        print(f"[{tag}] decomposed diagram: {dec_png.name}")
+        return {"bare_json": bare_path}
+
+    def run_all(self):
+        return {name: self.run(name) for name in self.CASES}
+
+
+# Run this file directly to (re)generate HF / Cl2 / Br2 circuits and diagrams.
+if __name__ == "__main__":
+    MoleculeCircuitRunner().run_all()

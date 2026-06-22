@@ -1,6 +1,6 @@
 {
   "molecule": "HF",
-  "bond_length": 1.4,
+  "bond_length": 1.0,
   "num_qubits": 8,
   "n_spatial": 4,
   "n_electrons": 6,
