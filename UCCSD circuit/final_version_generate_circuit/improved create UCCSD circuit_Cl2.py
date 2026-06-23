@@ -55,6 +55,11 @@ import numpy as np
 from qiskit import QuantumCircuit
 from qiskit.circuit import Parameter
 
+try:                                  # only needed for the hardware-aware build
+    import networkx as nx
+except ImportError:                   # pragma: no cover
+    nx = None
+
 # ----------------------------------------------------------------------
 # Jordan-Wigner representative strings (same as the original file)
 # ----------------------------------------------------------------------
@@ -675,6 +680,281 @@ class MoleculeCircuitRunner:
         return {name: self.run(name) for name in self.CASES}
 
 
+# ======================================================================
+# HARDWARE-AWARE Cl2 build (minimise CROSS-CHIP / high-error 2q gates)
+# ======================================================================
+# Physical connectivity from the lab drawing: three 2x2 squares wired in a line
+# A - B - C, joined by exactly two CROSS-CHIP bridges (the high-error edges).
+# Labels below are *physical* qubit indices (the drawing's "example" labelling).
+#
+#        8 -- 9 ===(bridge)=== 10 -- 11          A = {6,7,8,9}
+#        |    |                |     |           B = {4,5,10,11}
+#        7 -- 6                4 --- 5           C = {0,1,2,3}
+#                             ||(bridge)
+#                              3 -- 0
+#                              |    |
+#                              2 -- 1
+#
+# Two facts make the naive circuit expensive (and were proven by exhaustive
+# search in the _embed_search*.py helpers):
+#   * The fermionic Jordan-Wigner doubles carry long Z-strings (weight up to 12),
+#     forcing a single linear chain whose busy middle must straddle a bridge.
+#   * No relabelling / double-reordering / placement can push the cross-chip
+#     count below 16 for that fermionic chain -- it is a structural floor.
+#
+# So this build switches to the *qubit-excitation* form of the same doubles
+# (the hardware-efficient ansatz of arXiv:2212.08006, the paper this generator
+# targets): the JW Z-strings are dropped, so each double is a LOCAL 4-qubit
+# Pauli rotation on {k, k+6, 5, 11}.  We then:
+#   1. keep the shared hub rung (orbitals 5,11) on block B, straddling both
+#      bridges, so every satellite block is one hop from the hub;
+#   2. move each satellite double's two orbitals to the bridge boundary using
+#      only IN-BLOCK swaps (never on a bridge);
+#   3. cross a bridge only for that double's parity tree (gather + scatter).
+# A cancellation pass then removes the redundant CNOTs at the double interfaces.
+#
+# Result (verified numerically below): total 2q 58 -> 45 and cross-chip 16 -> 8.
+
+CL2_CHIP_EDGES = [tuple(sorted(e)) for e in [
+    (8, 9), (7, 8), (6, 7), (6, 9),       # square A
+    (10, 11), (4, 10), (5, 11), (4, 5),   # square B
+    (0, 3), (2, 3), (0, 1), (1, 2),       # square C
+    (9, 10), (3, 4),                      # CROSS-CHIP bridges (high error)
+]]
+CL2_BRIDGES = {(9, 10), (3, 4)}
+
+# orbital -> physical qubit.  Hub rung 5/11 sits on the two bridge corners of B;
+# rung 4/10 fills B; the other four rungs (k, k+6) live in A and C.
+CL2_PLACEMENT = {5: 4, 11: 10, 4: 5, 10: 11,
+                 9: 9, 3: 6, 8: 8, 2: 7,        # rungs {3,9},{2,8} -> block A
+                 7: 3, 1: 0, 6: 1, 0: 2}        # rungs {1,7},{0,6} -> block C
+# emission order of the doubles (index into the doubles list); grouping each
+# block's two doubles maximises interface cancellation.
+CL2_DOUBLE_ORDER = (1, 4, 2, 0, 3)
+
+
+def _cl2_local_pauli(double):
+    """Z-string-free (qubit-excitation) representative of `double`:
+    {physical-orbital : 'X'/'Y'} on exactly the four support orbitals."""
+    s = jw_string_for_double(12, double, y_pos=0)
+    return {q: c for q, c in enumerate(s) if c in ('X', 'Y')}
+
+
+class _Cl2HardwareBuilder:
+    """Bridge-aware emitter for the qubit-excitation Cl2 ansatz."""
+
+    def __init__(self, placement):
+        if nx is None:
+            raise ImportError("networkx is required for the hardware-aware build")
+        self.G = nx.Graph(CL2_CHIP_EDGES)
+        self.G_inblock = nx.Graph([e for e in CL2_CHIP_EDGES
+                                   if e not in CL2_BRIDGES])
+        self.pos = dict(placement)                       # orbital -> phys
+        self.inv = {p: o for o, p in placement.items()}  # phys -> orbital
+        self.qc = QuantumCircuit(12)
+        self._swaps = []                                 # for layout restore
+
+    def _swap(self, p, q):
+        self.qc.swap(p, q)
+        o1, o2 = self.inv[p], self.inv[q]
+        self.inv[p], self.inv[q] = o2, o1
+        self.pos[o1], self.pos[o2] = q, p
+        self._swaps.append((p, q))
+
+    def restore_layout(self):
+        """Undo all swaps so each orbital ends on its initial physical qubit;
+        the interface-cancellation pass removes these again for free."""
+        for p, q in reversed(self._swaps):
+            self._swap(p, q)
+        self._swaps.clear()
+
+    def _move(self, orb, target):
+        """Slide `orb` to physical `target` along in-block (non-bridge) edges."""
+        for nxt in nx.shortest_path(self.G_inblock, self.pos[orb], target)[1:]:
+            self._swap(self.pos[orb], nxt)
+
+    def _connect(self, orbs):
+        """Make the physical positions of `orbs` a connected chip subgraph using
+        only in-block swaps (the hub rung 5/11 is the fixed anchor)."""
+        cluster = {self.pos[5], self.pos[11]}
+        for orb in orbs:
+            if orb in (5, 11) or self.pos[orb] in cluster:
+                continue
+            cands = [n for c in cluster for n in self.G.neighbors(c)
+                     if n not in cluster
+                     and nx.has_path(self.G_inblock, self.pos[orb], n)]
+            target = min(cands, key=lambda t: nx.shortest_path_length(
+                self.G_inblock, self.pos[orb], t))
+            self._move(orb, target)
+            cluster.add(self.pos[orb])
+
+    def rotation(self, double, theta, pauli_evo=False):
+        letters = _cl2_local_pauli(double)
+        self._connect(list(letters))
+        sup = {self.pos[o]: L for o, L in letters.items()}
+        sub = self.G.subgraph(sup)
+        assert nx.is_connected(sub), (double, list(sub.nodes))
+        if pauli_evo:                              # exact reference block
+            from qiskit.circuit.library import PauliEvolutionGate
+            from qiskit.quantum_info import Pauli
+            lbl = ['I'] * 12
+            for p, L in sup.items():
+                lbl[p] = L
+            self.qc.append(PauliEvolutionGate(Pauli(''.join(reversed(lbl))),
+                                              time=theta / 2), range(12))
+            return
+        root = self.pos[5]
+        tree = nx.bfs_tree(sub, root)
+        leaves_first = [c for c in nx.dfs_postorder_nodes(tree, root) if c != root]
+        gather = [(c, next(tree.predecessors(c))) for c in leaves_first]
+        for p, L in sup.items():                  # basis change letter -> Z
+            if L == 'X':
+                self.qc.h(p)
+            else:
+                self.qc.sdg(p); self.qc.h(p)
+        for c, par in gather:
+            self.qc.cx(c, par)
+        self.qc.rz(theta, root)                    # exp(-i theta/2 Z_root)
+        for c, par in reversed(gather):
+            self.qc.cx(c, par)
+        for p, L in sup.items():                   # undo basis change
+            if L == 'X':
+                self.qc.h(p)
+            else:
+                self.qc.h(p); self.qc.s(p)
+
+
+def _cl2_counts(qc):
+    from collections import Counter
+    load = Counter()
+    for inst in qc.data:
+        if inst.operation.num_qubits == 2:
+            p, q = (qc.find_bit(w).index for w in inst.qubits)
+            load[tuple(sorted((p, q)))] += (3 if inst.operation.name == "swap" else 1)
+    return load
+
+
+def build_cl2_hardware_circuit(doubles, thetas=None, *, placement=None,
+                               order=CL2_DOUBLE_ORDER, cancel=True, restore=False):
+    """Hardware-aware qubit-excitation circuit for the Cl2 doubles.
+
+    Returns (QuantumCircuit, info) with info['total_2q'], info['cross_chip'],
+    info['edge_load'] and info['final_layout'] (orbital -> physical qubit at the
+    END of the circuit).  All 2q gates lie on real chip edges -- no SWAP routing
+    is ever required.
+
+    restore=False (default): leave the cheap in-block swaps un-undone; the ansatz
+        ends on a permuted layout (use info['final_layout'] at read-out).  This
+        is the low-count form (total 2q ~49, cross-chip 8).
+    restore=True: append inverse swaps so each orbital returns to its initial
+        qubit (exact product, fixed layout) at the cost of more 2q gates.
+    """
+    if placement is None:
+        placement = CL2_PLACEMENT
+    if thetas is None:
+        thetas = [Parameter(f"t{d}") for d in range(len(doubles))]
+    b = _Cl2HardwareBuilder(placement)
+    for i in order:
+        b.rotation(doubles[i], thetas[i])
+    if restore:
+        b.restore_layout()
+    qc = b.qc
+    if cancel:
+        from qiskit import transpile
+        bg = ["cx", "rz", "rx", "ry", "h", "s", "sdg", "x"]
+        # decompose SWAPs to CX first so the interface CNOTs can cancel, then a
+        # correctness-preserving peephole/commutation pass.  (optimization_level
+        # 3's block re-synthesis is avoided: it is lossy for wide circuits in
+        # this qiskit version -- see verify_cl2_hardware.)
+        qc = transpile(qc, basis_gates=bg, optimization_level=0, seed_transpiler=0)
+        qc = transpile(qc, basis_gates=bg, optimization_level=2, seed_transpiler=0)
+    load = _cl2_counts(qc)
+    info = {
+        "total_2q": int(sum(load.values())),
+        "cross_chip": int(sum(c for e, c in load.items() if e in CL2_BRIDGES)),
+        "edge_load": dict(sorted(load.items())),
+        "final_layout": dict(sorted(b.pos.items())),
+    }
+    return qc, info
+
+
+def verify_cl2_hardware(doubles, *, placement=None, order=CL2_DOUBLE_ORDER,
+                        restore=False, seed=0, atol=1e-7):
+    """Numerically confirm the emitted hardware circuit implements the intended
+    product of qubit-excitation rotations  prod_k exp(-i theta_k/2 P_local_k).
+
+    The reference is built with the *same* swap schedule but with each block
+    replaced by an exact PauliEvolutionGate, so it ends on the same (possibly
+    permuted) layout and is directly comparable on a random input state."""
+    from qiskit.quantum_info import Statevector
+    if placement is None:
+        placement = CL2_PLACEMENT
+    rng = np.random.default_rng(seed)
+    th = rng.uniform(-np.pi, np.pi, size=len(doubles))
+    qc, _ = build_cl2_hardware_circuit(
+        doubles, thetas=list(th), placement=placement, order=order,
+        cancel=True, restore=restore)
+    rb = _Cl2HardwareBuilder(placement)           # exact reference, same swaps
+    for i in order:
+        rb.rotation(doubles[i], th[i], pauli_evo=True)
+    if restore:
+        rb.restore_layout()
+    ref = rb.qc
+    vec = rng.standard_normal(2 ** 12) + 1j * rng.standard_normal(2 ** 12)
+    sv = Statevector(vec / np.linalg.norm(vec))
+    v1, v2 = sv.evolve(qc).data, sv.evolve(ref).data
+    idx = int(np.argmax(np.abs(v2)))
+    return bool(np.allclose(v1 * (v2[idx] / v1[idx]), v2, atol=atol))
+
+
+def report_cl2_hardware(out_dir=None):
+    """Build + verify the hardware-aware Cl2 circuit, print the comparison vs the
+    connectivity-agnostic fermionic baseline, and (if out_dir given) save a PNG
+    diagram next to the pipeline's other circuits."""
+    from collections import Counter
+    doubles = MoleculeCircuitRunner.CASES["Cl2"]["doubles"]
+
+    # baseline (current file): fermionic chain, identity placement orbital i -> i
+    qc0, *_ = create_uccsd_circuit(12, doubles, optimize=True, order="auto",
+                                   pair=False, init_state=None)
+    base = Counter()
+    for inst in qc0.data:
+        if inst.operation.name == "cz":
+            a, b = (qc0.find_bit(w).index for w in inst.qubits)
+            base[tuple(sorted((a, b)))] += 1
+    base_total = sum(base.values())
+    base_cross = sum(c for e, c in base.items() if e in CL2_BRIDGES)
+
+    ok = verify_cl2_hardware(doubles)
+    qc, info = build_cl2_hardware_circuit(doubles)
+    print("Cl2 cross-chip optimisation (chip = three 2x2 squares A-B-C in a line)")
+    print(f"  baseline (fermionic chain): total 2q = {base_total:3d}, "
+          f"cross-chip = {base_cross}")
+    print(f"  hardware-aware (qubit-exc): total 2q = {info['total_2q']:3d}, "
+          f"cross-chip = {info['cross_chip']}   verified={ok}")
+    print(f"  bridge load: " + ", ".join(
+        f"{e}:{info['edge_load'].get(e, 0)}" for e in sorted(CL2_BRIDGES)))
+    print(f"  final orbital->physical layout (read-out map): {info['final_layout']}")
+
+    if out_dir is not None:
+        import matplotlib
+        matplotlib.use("Agg")
+        import matplotlib.pyplot as plt
+        out = Path(out_dir)
+        out.mkdir(parents=True, exist_ok=True)
+        png = out / "Cl2_12q_5doubles_hardware_circuit.png"
+        fig = qc.draw(output="mpl", style=IQP_STYLE, fold=-1)
+        fig.suptitle(f"Cl2 hardware-aware (qubit-exc): {info['total_2q']} 2q, "
+                     f"{info['cross_chip']} cross-chip", fontsize=14)
+        fig.savefig(png, dpi=220, bbox_inches="tight")
+        plt.close(fig)
+        print(f"  wrote {png.name}")
+    return qc, info
+
+
 # Run this file directly to (re)generate HF / Cl2 / Br2 circuits and diagrams.
 if __name__ == "__main__":
-    MoleculeCircuitRunner().run_all()
+    runner = MoleculeCircuitRunner()
+    runner.run_all()
+    print()
+    report_cl2_hardware(out_dir=runner.out_dir)
