@@ -36,11 +36,7 @@
     1,
     2
   ],
-  "param_names": [
-    "t0",
-    "t1",
-    "t2"
-  ],
+  "param_names": [],
   "gates": [
     {
       "op": "rx",
@@ -152,26 +148,13 @@
       ]
     },
     {
-      "op": "cz",
+      "op": "rzx",
       "qubits": [
-        2,
-        6
-      ]
-    },
-    {
-      "op": "rx",
-      "qubits": [
+        6,
         2
       ],
       "param": "t0",
       "coeff": 1.0
-    },
-    {
-      "op": "cz",
-      "qubits": [
-        2,
-        6
-      ]
     },
     {
       "op": "h",
@@ -266,26 +249,13 @@
       ]
     },
     {
-      "op": "cz",
+      "op": "rzx",
       "qubits": [
-        2,
-        6
-      ]
-    },
-    {
-      "op": "rx",
-      "qubits": [
+        6,
         2
       ],
       "param": "t1",
       "coeff": 1.0
-    },
-    {
-      "op": "cz",
-      "qubits": [
-        2,
-        6
-      ]
     },
     {
       "op": "h",
@@ -380,26 +350,13 @@
       ]
     },
     {
-      "op": "cz",
+      "op": "rzx",
       "qubits": [
-        2,
-        6
-      ]
-    },
-    {
-      "op": "rx",
-      "qubits": [
+        6,
         2
       ],
       "param": "t2",
       "coeff": 1.0
-    },
-    {
-      "op": "cz",
-      "qubits": [
-        2,
-        6
-      ]
     },
     {
       "op": "h",

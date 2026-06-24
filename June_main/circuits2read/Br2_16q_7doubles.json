@@ -77,8 +77,6 @@
     "t5",
     "t6"
   ],
-  "chip_size_spatial_orbitals": 2,
-  "cross_chip_tag": "cz_cross_chip",
   "gates": [
     {
       "op": "rx",
@@ -134,8 +132,7 @@
       "qubits": [
         4,
         5
-      ],
-      "cross_chip": false
+      ]
     },
     {
       "op": "h",
@@ -148,24 +145,21 @@
       "qubits": [
         5,
         6
-      ],
-      "cross_chip": true
+      ]
     },
     {
       "op": "cz",
       "qubits": [
         7,
         6
-      ],
-      "cross_chip": false
+      ]
     },
     {
       "op": "cz",
       "qubits": [
         12,
         13
-      ],
-      "cross_chip": false
+      ]
     },
     {
       "op": "h",
@@ -178,16 +172,14 @@
       "qubits": [
         13,
         14
-      ],
-      "cross_chip": true
+      ]
     },
     {
       "op": "cz",
       "qubits": [
         15,
         14
-      ],
-      "cross_chip": false
+      ]
     },
     {
       "op": "h",
@@ -200,8 +192,7 @@
       "qubits": [
         6,
         14
-      ],
-      "cross_chip": false
+      ]
     },
     {
       "op": "rx",
@@ -216,8 +207,7 @@
       "qubits": [
         6,
         14
-      ],
-      "cross_chip": false
+      ]
     },
     {
       "op": "h",
@@ -230,8 +220,7 @@
       "qubits": [
         13,
         14
-      ],
-      "cross_chip": true
+      ]
     },
     {
       "op": "h",
@@ -244,16 +233,14 @@
       "qubits": [
         12,
         13
-      ],
-      "cross_chip": false
+      ]
     },
     {
       "op": "cz",
       "qubits": [
         5,
         6
-      ],
-      "cross_chip": true
+      ]
     },
     {
       "op": "h",
@@ -266,8 +253,7 @@
       "qubits": [
         4,
         5
-      ],
-      "cross_chip": false
+      ]
     },
     {
       "op": "rx",
@@ -300,8 +286,7 @@
       "qubits": [
         3,
         4
-      ],
-      "cross_chip": true
+      ]
     },
     {
       "op": "h",
@@ -314,8 +299,7 @@
       "qubits": [
         4,
         5
-      ],
-      "cross_chip": false
+      ]
     },
     {
       "op": "h",
@@ -328,16 +312,14 @@
       "qubits": [
         5,
         6
-      ],
-      "cross_chip": true
+      ]
     },
     {
       "op": "cz",
       "qubits": [
         11,
         12
-      ],
-      "cross_chip": true
+      ]
     },
     {
       "op": "h",
@@ -350,8 +332,7 @@
       "qubits": [
         12,
         13
-      ],
-      "cross_chip": false
+      ]
     },
     {
       "op": "h",
@@ -364,8 +345,7 @@
       "qubits": [
         13,
         14
-      ],
-      "cross_chip": true
+      ]
     },
     {
       "op": "h",
@@ -378,8 +358,7 @@
       "qubits": [
         6,
         14
-      ],
-      "cross_chip": false
+      ]
     },
     {
       "op": "rx",
@@ -394,8 +373,7 @@
       "qubits": [
         6,
         14
-      ],
-      "cross_chip": false
+      ]
     },
     {
       "op": "h",
@@ -408,8 +386,7 @@
       "qubits": [
         13,
         14
-      ],
-      "cross_chip": true
+      ]
     },
     {
       "op": "h",
@@ -422,8 +399,7 @@
       "qubits": [
         12,
         13
-      ],
-      "cross_chip": false
+      ]
     },
     {
       "op": "h",
@@ -436,16 +412,14 @@
       "qubits": [
         11,
         12
-      ],
-      "cross_chip": true
+      ]
     },
     {
       "op": "cz",
       "qubits": [
         5,
         6
-      ],
-      "cross_chip": true
+      ]
     },
     {
       "op": "h",
@@ -458,8 +432,7 @@
       "qubits": [
         4,
         5
-      ],
-      "cross_chip": false
+      ]
     },
     {
       "op": "h",
@@ -472,8 +445,7 @@
       "qubits": [
         3,
         4
-      ],
-      "cross_chip": true
+      ]
     },
     {
       "op": "rx",
@@ -506,8 +478,7 @@
       "qubits": [
         2,
         3
-      ],
-      "cross_chip": false
+      ]
     },
     {
       "op": "h",
@@ -520,8 +491,7 @@
       "qubits": [
         3,
         4
-      ],
-      "cross_chip": true
+      ]
     },
     {
       "op": "h",
@@ -534,8 +504,7 @@
       "qubits": [
         4,
         5
-      ],
-      "cross_chip": false
+      ]
     },
     {
       "op": "h",
@@ -548,16 +517,14 @@
       "qubits": [
         5,
         6
-      ],
-      "cross_chip": true
+      ]
     },
     {
       "op": "cz",
       "qubits": [
         10,
         11
-      ],
-      "cross_chip": false
+      ]
     },
     {
       "op": "h",
@@ -570,8 +537,7 @@
       "qubits": [
         11,
         12
-      ],
-      "cross_chip": true
+      ]
     },
     {
       "op": "h",
@@ -584,8 +550,7 @@
       "qubits": [
         12,
         13
-      ],
-      "cross_chip": false
+      ]
     },
     {
       "op": "h",
@@ -598,8 +563,7 @@
       "qubits": [
         13,
         14
-      ],
-      "cross_chip": true
+      ]
     },
     {
       "op": "h",
@@ -612,8 +576,7 @@
       "qubits": [
         6,
         14
-      ],
-      "cross_chip": false
+      ]
     },
     {
       "op": "rx",
@@ -628,8 +591,7 @@
       "qubits": [
         6,
         14
-      ],
-      "cross_chip": false
+      ]
     },
     {
       "op": "h",
@@ -642,8 +604,7 @@
       "qubits": [
         13,
         14
-      ],
-      "cross_chip": true
+      ]
     },
     {
       "op": "h",
@@ -656,8 +617,7 @@
       "qubits": [
         12,
         13
-      ],
-      "cross_chip": false
+      ]
     },
     {
       "op": "h",
@@ -670,8 +630,7 @@
       "qubits": [
         11,
         12
-      ],
-      "cross_chip": true
+      ]
     },
     {
       "op": "h",
@@ -684,16 +643,14 @@
       "qubits": [
         10,
         11
-      ],
-      "cross_chip": false
+      ]
     },
     {
       "op": "cz",
       "qubits": [
         5,
         6
-      ],
-      "cross_chip": true
+      ]
     },
     {
       "op": "h",
@@ -706,8 +663,7 @@
       "qubits": [
         4,
         5
-      ],
-      "cross_chip": false
+      ]
     },
     {
       "op": "h",
@@ -720,8 +676,7 @@
       "qubits": [
         3,
         4
-      ],
-      "cross_chip": true
+      ]
     },
     {
       "op": "h",
@@ -734,8 +689,7 @@
       "qubits": [
         2,
         3
-      ],
-      "cross_chip": false
+      ]
     },
     {
       "op": "rx",
@@ -768,8 +722,7 @@
       "qubits": [
         1,
         2
-      ],
-      "cross_chip": true
+      ]
     },
     {
       "op": "h",
@@ -782,8 +735,7 @@
       "qubits": [
         2,
         3
-      ],
-      "cross_chip": false
+      ]
     },
     {
       "op": "h",
@@ -796,8 +748,7 @@
       "qubits": [
         3,
         4
-      ],
-      "cross_chip": true
+      ]
     },
     {
       "op": "h",
@@ -810,8 +761,7 @@
       "qubits": [
         4,
         5
-      ],
-      "cross_chip": false
+      ]
     },
     {
       "op": "h",
@@ -824,16 +774,14 @@
       "qubits": [
         5,
         6
-      ],
-      "cross_chip": true
+      ]
     },
     {
       "op": "cz",
       "qubits": [
         9,
         10
-      ],
-      "cross_chip": true
+      ]
     },
     {
       "op": "h",
@@ -846,8 +794,7 @@
       "qubits": [
         10,
         11
-      ],
-      "cross_chip": false
+      ]
     },
     {
       "op": "h",
@@ -860,8 +807,7 @@
       "qubits": [
         11,
         12
-      ],
-      "cross_chip": true
+      ]
     },
     {
       "op": "h",
@@ -874,8 +820,7 @@
       "qubits": [
         12,
         13
-      ],
-      "cross_chip": false
+      ]
     },
     {
       "op": "h",
@@ -888,8 +833,7 @@
       "qubits": [
         13,
         14
-      ],
-      "cross_chip": true
+      ]
     },
     {
       "op": "h",
@@ -902,8 +846,7 @@
       "qubits": [
         6,
         14
-      ],
-      "cross_chip": false
+      ]
     },
     {
       "op": "rx",
@@ -918,8 +861,7 @@
       "qubits": [
         6,
         14
-      ],
-      "cross_chip": false
+      ]
     },
     {
       "op": "h",
@@ -932,8 +874,7 @@
       "qubits": [
         13,
         14
-      ],
-      "cross_chip": true
+      ]
     },
     {
       "op": "h",
@@ -946,8 +887,7 @@
       "qubits": [
         12,
         13
-      ],
-      "cross_chip": false
+      ]
     },
     {
       "op": "h",
@@ -960,8 +900,7 @@
       "qubits": [
         11,
         12
-      ],
-      "cross_chip": true
+      ]
     },
     {
       "op": "h",
@@ -974,8 +913,7 @@
       "qubits": [
         10,
         11
-      ],
-      "cross_chip": false
+      ]
     },
     {
       "op": "h",
@@ -988,16 +926,14 @@
       "qubits": [
         9,
         10
-      ],
-      "cross_chip": true
+      ]
     },
     {
       "op": "cz",
       "qubits": [
         5,
         6
-      ],
-      "cross_chip": true
+      ]
     },
     {
       "op": "h",
@@ -1010,8 +946,7 @@
       "qubits": [
         4,
         5
-      ],
-      "cross_chip": false
+      ]
     },
     {
       "op": "h",
@@ -1024,8 +959,7 @@
       "qubits": [
         3,
         4
-      ],
-      "cross_chip": true
+      ]
     },
     {
       "op": "h",
@@ -1038,8 +972,7 @@
       "qubits": [
         2,
         3
-      ],
-      "cross_chip": false
+      ]
     },
     {
       "op": "h",
@@ -1052,8 +985,7 @@
       "qubits": [
         1,
         2
-      ],
-      "cross_chip": true
+      ]
     },
     {
       "op": "rx",
@@ -1086,8 +1018,7 @@
       "qubits": [
         0,
         1
-      ],
-      "cross_chip": false
+      ]
     },
     {
       "op": "h",
@@ -1100,8 +1031,7 @@
       "qubits": [
         1,
         2
-      ],
-      "cross_chip": true
+      ]
     },
     {
       "op": "h",
@@ -1114,8 +1044,7 @@
       "qubits": [
         2,
         3
-      ],
-      "cross_chip": false
+      ]
     },
     {
       "op": "h",
@@ -1128,8 +1057,7 @@
       "qubits": [
         3,
         4
-      ],
-      "cross_chip": true
+      ]
     },
     {
       "op": "h",
@@ -1142,8 +1070,7 @@
       "qubits": [
         4,
         5
-      ],
-      "cross_chip": false
+      ]
     },
     {
       "op": "h",
@@ -1156,16 +1083,14 @@
       "qubits": [
         5,
         6
-      ],
-      "cross_chip": true
+      ]
     },
     {
       "op": "cz",
       "qubits": [
         8,
         9
-      ],
-      "cross_chip": false
+      ]
     },
     {
       "op": "h",
@@ -1178,8 +1103,7 @@
       "qubits": [
         9,
         10
-      ],
-      "cross_chip": true
+      ]
     },
     {
       "op": "h",
@@ -1192,8 +1116,7 @@
       "qubits": [
         10,
         11
-      ],
-      "cross_chip": false
+      ]
     },
     {
       "op": "h",
@@ -1206,8 +1129,7 @@
       "qubits": [
         11,
         12
-      ],
-      "cross_chip": true
+      ]
     },
     {
       "op": "h",
@@ -1220,8 +1142,7 @@
       "qubits": [
         12,
         13
-      ],
-      "cross_chip": false
+      ]
     },
     {
       "op": "h",
@@ -1234,8 +1155,7 @@
       "qubits": [
         13,
         14
-      ],
-      "cross_chip": true
+      ]
     },
     {
       "op": "h",
@@ -1248,8 +1168,7 @@
       "qubits": [
         6,
         14
-      ],
-      "cross_chip": false
+      ]
     },
     {
       "op": "rx",
@@ -1264,8 +1183,7 @@
       "qubits": [
         6,
         14
-      ],
-      "cross_chip": false
+      ]
     },
     {
       "op": "h",
@@ -1278,8 +1196,7 @@
       "qubits": [
         13,
         14
-      ],
-      "cross_chip": true
+      ]
     },
     {
       "op": "h",
@@ -1292,8 +1209,7 @@
       "qubits": [
         12,
         13
-      ],
-      "cross_chip": false
+      ]
     },
     {
       "op": "h",
@@ -1306,8 +1222,7 @@
       "qubits": [
         11,
         12
-      ],
-      "cross_chip": true
+      ]
     },
     {
       "op": "h",
@@ -1320,8 +1235,7 @@
       "qubits": [
         10,
         11
-      ],
-      "cross_chip": false
+      ]
     },
     {
       "op": "h",
@@ -1334,8 +1248,7 @@
       "qubits": [
         9,
         10
-      ],
-      "cross_chip": true
+      ]
     },
     {
       "op": "h",
@@ -1348,16 +1261,14 @@
       "qubits": [
         8,
         9
-      ],
-      "cross_chip": false
+      ]
     },
     {
       "op": "cz",
       "qubits": [
         5,
         6
-      ],
-      "cross_chip": true
+      ]
     },
     {
       "op": "h",
@@ -1370,8 +1281,7 @@
       "qubits": [
         4,
         5
-      ],
-      "cross_chip": false
+      ]
     },
     {
       "op": "h",
@@ -1384,8 +1294,7 @@
       "qubits": [
         3,
         4
-      ],
-      "cross_chip": true
+      ]
     },
     {
       "op": "h",
@@ -1398,8 +1307,7 @@
       "qubits": [
         2,
         3
-      ],
-      "cross_chip": false
+      ]
     },
     {
       "op": "h",
@@ -1412,8 +1320,7 @@
       "qubits": [
         1,
         2
-      ],
-      "cross_chip": true
+      ]
     },
     {
       "op": "h",
@@ -1426,8 +1333,7 @@
       "qubits": [
         0,
         1
-      ],
-      "cross_chip": false
+      ]
     },
     {
       "op": "h",
@@ -1508,16 +1414,14 @@
       "qubits": [
         5,
         6
-      ],
-      "cross_chip": true
+      ]
     },
     {
       "op": "cz",
       "qubits": [
         13,
         14
-      ],
-      "cross_chip": true
+      ]
     },
     {
       "op": "h",
@@ -1530,8 +1434,7 @@
       "qubits": [
         6,
         14
-      ],
-      "cross_chip": false
+      ]
     },
     {
       "op": "rx",
@@ -1546,8 +1449,7 @@
       "qubits": [
         6,
         14
-      ],
-      "cross_chip": false
+      ]
     },
     {
       "op": "h",
@@ -1560,32 +1462,28 @@
       "qubits": [
         15,
         14
-      ],
-      "cross_chip": false
+      ]
     },
     {
       "op": "cz",
       "qubits": [
         13,
         14
-      ],
-      "cross_chip": true
+      ]
     },
     {
       "op": "cz",
       "qubits": [
         7,
         6
-      ],
-      "cross_chip": false
+      ]
     },
     {
       "op": "cz",
       "qubits": [
         5,
         6
-      ],
-      "cross_chip": true
+      ]
     },
     {
       "op": "h",
@@ -1630,16 +1528,14 @@
       "qubits": [
         7,
         6
-      ],
-      "cross_chip": false
+      ]
     },
     {
       "op": "cz",
       "qubits": [
         15,
         14
-      ],
-      "cross_chip": false
+      ]
     },
     {
       "op": "h",
@@ -1652,8 +1548,7 @@
       "qubits": [
         6,
         14
-      ],
-      "cross_chip": false
+      ]
     },
     {
       "op": "rx",
@@ -1668,8 +1563,7 @@
       "qubits": [
         6,
         14
-      ],
-      "cross_chip": false
+      ]
     },
     {
       "op": "h",
@@ -1682,16 +1576,14 @@
       "qubits": [
         15,
         14
-      ],
-      "cross_chip": false
+      ]
     },
     {
       "op": "cz",
       "qubits": [
         7,
         6
-      ],
-      "cross_chip": false
+      ]
     },
     {
       "op": "h",

@@ -237,8 +237,6 @@ def save_circuit_json(
         "signs": [float(s) for s in signs],
         "theta_idx": [int(i) for i in theta_idx],
         "param_names": param_names,
-        "chip_size_spatial_orbitals": 2,
-        "cross_chip_tag": CZ_CROSS_CHIP_TAG,
         "gates": logical_gates,
     }
     if extra:

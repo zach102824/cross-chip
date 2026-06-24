@@ -65,8 +65,7 @@ def _grid(start: float, stop: float, step: float) -> tuple[float, ...]:
 
 MOLECULE_PRESETS: dict[str, MoleculePreset] = {
     "HF": MoleculePreset("HF", (6, 4), _diatomic("H", "F"), _grid(1.0, 2.2, 0.2)),
-    "F2": MoleculePreset("F2", (10, 6), _diatomic("F", "F"), _grid(1.0, 3.0, 0.2)),
-    "Cl2": MoleculePreset("Cl2", (14, 8), _diatomic("Cl", "Cl"), _grid(1.0, 3.0, 0.2)),
+    "Cl2": MoleculePreset("Cl2", (10, 6), _diatomic("Cl", "Cl"), _grid(1.0, 3.0, 0.2)),
     "Br2": MoleculePreset("Br2", (14, 8), _diatomic("Br", "Br"), _grid(1.0, 3.0, 0.2)),
 }
 

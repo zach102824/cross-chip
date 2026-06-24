@@ -11,12 +11,11 @@ import sympy
 PAULI_CHAR_TO_GATE = {"I": None, "X": cirq.X, "Y": cirq.Y, "Z": cirq.Z}
 
 # Simplified gate-only noise: depolarizing strength depends on gate arity (2Q vs 1Q).
-TWO_QUBIT_GATE_DEPOL_PROB = 0.0001
-ONE_QUBIT_GATE_DEPOL_PROB = 0.005
+TWO_QUBIT_GATE_DEPOL_PROB = 0.01
+ONE_QUBIT_GATE_DEPOL_PROB = 0.0005
 
 # Cross-chip two-qubit gates (the curvy links in the chip sketch) are noisier:
-# a CZ that spans two chips gets this higher depolarizing probability.
-CROSS_CHIP_TWO_QUBIT_GATE_DEPOL_PROB = 0.12
+CROSS_CHIP_TWO_QUBIT_GATE_DEPOL_PROB = 0.1
 
 # Tag carried by cross-chip two-qubit gates so the noise model can find them.
 # (The notebook attaches this tag when loading the circuit JSON.)
@@ -24,6 +23,69 @@ CZ_CROSS_CHIP_TAG = "cz_cross_chip"
 
 # Legacy notebooks referred to a single “depol_prob”; that matched the two-qubit channel strength.
 DEFAULT_DEPOL_PROB = TWO_QUBIT_GATE_DEPOL_PROB
+
+
+@cirq.value_equality
+class RZXGate(cirq.Gate):
+    """Two-qubit RZX rotation ``exp(-i * rads/2 * Z⊗X)`` (qubit0=Z, qubit1=X).
+
+    This is the native cross-chip entangling gate. ``rads`` may be a sympy
+    expression so the gate can serve as a parameterized ansatz rotation and be
+    resolved later via ``cirq.resolve_parameters``.
+
+    It exposes an ``exponent`` (= ``rads / pi``) so the CDR Clifford machinery in
+    this module treats it like the single-qubit ``*PowGate`` rotations: an RZX is
+    Clifford iff ``2 * exponent`` is (approximately) an integer, i.e. ``rads`` is a
+    multiple of ``pi/2``. ``RZXGate`` is therefore listed in
+    ``_EXPONENT_GATE_TYPES`` and snapped via the ``th_*`` (theta) rule.
+
+    Like ``RX``, the Hermitian generator ``Z⊗X`` has eigenvalues ``±1``, so the
+    two-term parameter-shift rule (shifts ``±pi/2``, prefactor ``1/2``) is exact
+    for a single RZX driven by one parameter with coefficient 1.
+    """
+
+    def __init__(self, rads):
+        self.rads = rads
+
+    def _num_qubits_(self) -> int:
+        return 2
+
+    @property
+    def exponent(self):
+        denom = sympy.pi if isinstance(self.rads, sympy.Basic) else np.pi
+        return self.rads / denom
+
+    def _value_equality_values_(self):
+        return self.rads
+
+    def _is_parameterized_(self) -> bool:
+        return cirq.is_parameterized(self.rads)
+
+    def _parameter_names_(self):
+        return cirq.parameter_names(self.rads)
+
+    def _resolve_parameters_(self, resolver, recursive):
+        return RZXGate(cirq.resolve_parameters(self.rads, resolver, recursive))
+
+    def _has_unitary_(self) -> bool:
+        return not self._is_parameterized_()
+
+    def _unitary_(self):
+        if self._is_parameterized_():
+            return NotImplemented
+        theta = float(self.rads)
+        # (Z⊗X) is a Pauli string, so (Z⊗X)^2 = I and
+        # exp(-i*theta/2 * Z⊗X) = cos(theta/2) I - i sin(theta/2) (Z⊗X).
+        zx = np.array(
+            [[0, 1, 0, 0], [1, 0, 0, 0], [0, 0, 0, -1], [0, 0, -1, 0]], dtype=complex
+        )
+        return np.cos(theta / 2.0) * np.eye(4, dtype=complex) - 1j * np.sin(theta / 2.0) * zx
+
+    def _circuit_diagram_info_(self, args) -> cirq.CircuitDiagramInfo:
+        return cirq.CircuitDiagramInfo(wire_symbols=("Z", "X"), exponent=self.exponent)
+
+    def __repr__(self) -> str:
+        return f"RZXGate({self.rads!r})"
 
 
 class GateArityDepolarizingNoise(cirq.NoiseModel):
@@ -352,6 +414,7 @@ _EXPONENT_GATE_TYPES: tuple[type, ...] = (
     cirq.ZPowGate,
     cirq.XPowGate,
     cirq.YPowGate,
+    RZXGate,
 )
 
 
@@ -412,10 +475,15 @@ def count_non_clifford_ops(
     """Count operations in `circuit` that become non-Clifford after substituting
     `resolver` into all symbolic parameters.
 
-    Counts every `PhasedXPowGate`, `ZPowGate`, `XPowGate`, `YPowGate` whose
-    `exponent` is NOT (approximately) a multiple of 0.5 after parameter
+    Counts every `PhasedXPowGate`, `ZPowGate`, `XPowGate`, `YPowGate`, `RZXGate`
+    whose `exponent` is NOT (approximately) a multiple of 0.5 after parameter
     resolution. `H`, `CZ`, `MeasurementGate`, and identity-like exponents
     (e.g. `XPowGate(exponent=1)`) are skipped.
+
+    A two-qubit `RZXGate` counts as ONE non-Clifford gate (a single cross-chip
+    rotation), not one per qubit. So with N parameterized RZX rotations the count
+    ranges from 0 (all snapped to Clifford angles) to N. Single-qubit rotations
+    count as 1 each, as before.
     """
     resolved = cirq.resolve_parameters(circuit, resolver)
     count = 0
@@ -431,7 +499,7 @@ def count_non_clifford_ops(
             except (TypeError, ValueError):
                 continue
             if not is_clifford_exponent(exponent):
-                count += len(op.qubits)
+                count += 1 if isinstance(gate, RZXGate) else len(op.qubits)
     return count
 
 
