@@ -578,26 +578,29 @@ class MoleculeCircuitRunner:
     """
 
     CASES = {
-        "HF": dict(
-            molecule="HF", bond_length=1.0, num_qubits=8, n_electrons=6,
-            # UCCSD_Mole/HF.ipynb, active_space=(6, 4) -> 8 qubits, top-3 doubles.
-            doubles=[(3, 7, 4, 0), (3, 7, 5, 1), (3, 7, 6, 2)],
-            pair=False,
-        ),
-        "Cl2": dict(
-            molecule="Cl2", bond_length=1.0, num_qubits=12, n_electrons=10,
-            # UCCSD_Mole/Cl2.ipynb, active_space=(10, 6) -> 12 qubits, top-5 doubles
-            # (the notebook table shows the top 4; the 5th completes the n_o=5 set).
-            doubles=[(5, 11, 8, 2), (5, 11, 7, 1), (5, 11, 9, 3),
-                     (5, 11, 10, 4), (5, 11, 6, 0)],
-            pair=False,
-        ),
+        # "HF": dict(
+        #     molecule="HF", bond_length=1.0, num_qubits=8, n_electrons=6,
+        #     # UCCSD_Mole/HF.ipynb, active_space=(6, 4) -> 8 qubits, top-3 doubles.
+        #     doubles=[(3, 7, 4, 0), (3, 7, 5, 1), (3, 7, 6, 2)],
+        #     pair=False,
+        # ),
+        # "Cl2": dict(
+        #     molecule="Cl2", bond_length=1.0, num_qubits=12, n_electrons=10,
+        #     # UCCSD_Mole/Cl2.ipynb, active_space=(10, 6) -> 12 qubits, top-5 doubles
+        #     # (the notebook table shows the top 4; the 5th completes the n_o=5 set).
+        #     # doubles=[(5, 11, 8, 2), (5, 11, 7, 1), (5, 11, 9, 3),
+        #     #          (5, 11, 10, 4), (5, 11, 6, 0)],
+        #     doubles=[(5, 11, 8, 2), (5, 11, 7, 1), (5, 11, 9, 3)],
+        #     pair=False,
+        # ),
         "Br2": dict(
             molecule="Br2", bond_length=1.0, num_qubits=16, n_electrons=14,
             # UCCSD_Mole/Br2.ipynb, active_space=(14, 8) -> 16 qubits, top-7 doubles.
+            # doubles=[(7, 15, 12, 4), (7, 15, 11, 3), (7, 15, 14, 6),
+            #          (7, 15, 13, 5), (7, 15, 10, 2), (7, 15, 9, 1),
+            #          (7, 15, 8, 0)],
             doubles=[(7, 15, 12, 4), (7, 15, 11, 3), (7, 15, 14, 6),
-                     (7, 15, 13, 5), (7, 15, 10, 2), (7, 15, 9, 1),
-                     (7, 15, 8, 0)],
+                     (7, 15, 13, 5), (7, 15, 9, 1),],
             pair=False,
         ),
     }
