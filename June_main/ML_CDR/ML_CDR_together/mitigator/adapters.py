@@ -30,7 +30,6 @@ from shot_measurement import (
     _simulate_noiseless_state_for_resolver,
     _simulate_noisy_rho_for_resolver,
     estimate_energy_from_noisy_rho_shots,
-    exact_pauli_expectation_from_int_row,
     pauli_sum_to_int_observables,
 )
 
@@ -123,6 +122,8 @@ class CirqCDRAdapter:
 
     _observables: list[PauliObservable] = field(default_factory=list, init=False, repr=False)
     _offset: float = field(default=0.0, init=False, repr=False)
+    _pauli_strings: list = field(default_factory=list, init=False, repr=False)
+    _qubit_map: dict = field(default_factory=dict, init=False, repr=False)
 
     def __post_init__(self) -> None:
         obs_int, weights, offset = pauli_sum_to_int_observables(self.pauli_sum, self.qubits)
@@ -134,6 +135,18 @@ class CirqCDRAdapter:
             )
             for row, w in zip(obs_int, weights)
         ]
+        # Cache sparse cirq.PauliString per observable so simulate_ideal uses
+        # expectation_from_state_vector (O(nnz)) instead of dense 2^n matrices.
+        self._qubit_map = {q: i for i, q in enumerate(self.qubits)}
+        int_to_gate = {1: cirq.X, 2: cirq.Y, 3: cirq.Z}
+        self._pauli_strings = []
+        for obs in self._observables:
+            ps = cirq.PauliString()
+            for q, ch in zip(self.qubits, obs.label):
+                vi = _CHAR_TO_INT[ch]
+                if vi:
+                    ps *= int_to_gate[vi](q)
+            self._pauli_strings.append(ps)
 
     # --- introspection ---
 
@@ -228,10 +241,13 @@ class CirqCDRAdapter:
         state = _simulate_noiseless_state_for_resolver(
             self.circuit, resolver, self.qubits, simulator_seed=self.simulator_seed
         )
-        return {
-            obs: float(exact_pauli_expectation_from_int_row(state, obs.int_row, self.qubits))
-            for obs in self._observables
-        }
+        state = np.asarray(state, dtype=np.complex128)
+        out: dict[PauliObservable, float] = {}
+        for obs, ps in zip(self._observables, self._pauli_strings):
+            out[obs] = float(
+                np.real(ps.expectation_from_state_vector(state, qubit_map=self._qubit_map))
+            )
+        return out
 
     def run_noisy(
         self, resolver: dict, shots: int, sampling_seed: int | None = None

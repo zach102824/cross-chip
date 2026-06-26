@@ -101,6 +101,11 @@ class MitigatorConfig:
     noise_variance_init: float = 1e-3
     normalize_targets: bool = True
     gp_n_restarts: int = 2  # marginal-likelihood restarts (not in spec; small default)
+    # Cap on rows actually used to FIT the exact GP (Stage 1 still uses all rows).
+    # Exact-GP hyperparameter optimization with ARD builds an (N, N, n_hyper)
+    # gradient tensor, so N must stay bounded; rows are randomly subsampled down to
+    # this many before fitting. ~1000-2000 is plenty for an exact GP.
+    max_gp_train_points: int = 1500
 
     # --- Top-up controller ---
     uncertainty_threshold: float = 0.05
@@ -573,6 +578,14 @@ class GPResidualModel:
     def fit(self, X: np.ndarray, y_residual: np.ndarray) -> None:
         X = np.asarray(X, dtype=float)
         y = np.asarray(y_residual, dtype=float).ravel()
+        cap = int(getattr(self.config, "max_gp_train_points", 0) or 0)
+        if cap > 0 and X.shape[0] > cap:
+            # Subsample rows so the exact-GP gradient tensor stays bounded.
+            sub = np.random.default_rng(int(self.config.rng_seed)).choice(
+                X.shape[0], size=cap, replace=False
+            )
+            X = X[sub]
+            y = y[sub]
         kernel = self.build_kernel(self._index_map, self.config)
         self.gp = GaussianProcessRegressor(
             kernel=kernel,
