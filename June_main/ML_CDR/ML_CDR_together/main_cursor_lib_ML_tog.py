@@ -11,11 +11,27 @@ import sympy
 PAULI_CHAR_TO_GATE = {"I": None, "X": cirq.X, "Y": cirq.Y, "Z": cirq.Z}
 
 # Simplified gate-only noise: depolarizing strength depends on gate arity (2Q vs 1Q).
-TWO_QUBIT_GATE_DEPOL_PROB = 0.01
-ONE_QUBIT_GATE_DEPOL_PROB = 0.0005
+TWO_QUBIT_GATE_DEPOL_PROB = 0.005
+ONE_QUBIT_GATE_DEPOL_PROB = 0.0001
 
 # Cross-chip two-qubit gates (the curvy links in the chip sketch) are noisier:
 CROSS_CHIP_TWO_QUBIT_GATE_DEPOL_PROB = 0.1
+
+# --- Dephasing (T2) noise: a per-qubit phase-damping channel applied after each
+# gate, keyed by gate arity. gamma ~ t_gate / T2. Willow-class numbers: T2 ~ 68 us,
+# 1Q gate ~25 ns, 2Q gate ~42 ns  ->  gamma ~ 3e-4 (1Q), 6e-4 (2Q). Cross-chip
+# links are slower/worse, scaled up like the depolarizing channel.
+ONE_QUBIT_GATE_DEPHASING_PROB = 3e-4
+TWO_QUBIT_GATE_DEPHASING_PROB = 6e-4
+CROSS_CHIP_TWO_QUBIT_GATE_DEPHASING_PROB = 6e-3
+
+# --- Coherent over-rotation (control miscalibration): an extra rotation about
+# each gate's OWN axis, expressed as a FRACTION of its intended angle (so the
+# effective gate becomes U^(1+frac)). Small on a well-calibrated Willow-class chip
+# (~0.1-0.5%); cross-chip links are harder to calibrate.
+ONE_QUBIT_GATE_OVER_ROTATION = 2e-3
+TWO_QUBIT_GATE_OVER_ROTATION = 5e-3
+CROSS_CHIP_TWO_QUBIT_GATE_OVER_ROTATION = 2e-2
 
 # Tag carried by cross-chip two-qubit gates so the noise model can find them.
 # (The notebook attaches this tag when loading the circuit JSON.)
@@ -89,18 +105,23 @@ class RZXGate(cirq.Gate):
 
 
 class GateArityDepolarizingNoise(cirq.NoiseModel):
-    """Single-qubit depolarizing noise applied after each gate, keyed by arity.
+    """Gate-only noise applied after each gate, keyed by arity (2Q vs 1Q) and by
+    whether the operation is a cross-chip link (tag ``CZ_CROSS_CHIP_TAG``).
 
-    - Two-qubit gates: ``two_qubit_depol_prob`` on each qubit (after the gate),
-      OR ``cross_chip_two_qubit_depol_prob`` if the operation is tagged
-      ``CZ_CROSS_CHIP_TAG`` (a cross-chip link).
-    - One-qubit gates: ``one_qubit_depol_prob`` on that qubit.
+    Three error channels are layered after every (non-measurement) gate:
 
+    1. Coherent **over-rotation** (control miscalibration): an extra rotation
+       about the gate's own axis equal to ``over_rotation`` times its intended
+       angle, i.e. the effective gate becomes ``U^(1 + over_rotation)``.
+    2. **Dephasing** (T2): a per-qubit ``cirq.phase_damp`` channel.
+    3. **Depolarizing**: a per-qubit ``cirq.depolarize`` channel.
+
+    Each channel has a 1-qubit, a 2-qubit, and a cross-chip 2-qubit strength.
     Measurements are unchanged (readout error belongs in shot estimation).
 
-    ``depol_prob`` is accepted for backward compatibility but ignored; use the explicit
-    ``two_qubit_depol_prob`` / ``one_qubit_depol_prob`` kwargs or class defaults.
-    ``self.depol_prob`` mirrors ``two_qubit_depol_prob`` for legacy introspection.
+    ``depol_prob`` is accepted for backward compatibility but ignored; use the
+    explicit per-arity kwargs or the module-level defaults. ``self.depol_prob``
+    mirrors ``two_qubit_depol_prob`` for legacy introspection.
     """
 
     def __init__(
@@ -109,6 +130,12 @@ class GateArityDepolarizingNoise(cirq.NoiseModel):
         two_qubit_depol_prob: float | None = None,
         one_qubit_depol_prob: float | None = None,
         cross_chip_two_qubit_depol_prob: float | None = None,
+        two_qubit_dephasing_prob: float | None = None,
+        one_qubit_dephasing_prob: float | None = None,
+        cross_chip_two_qubit_dephasing_prob: float | None = None,
+        two_qubit_over_rotation: float | None = None,
+        one_qubit_over_rotation: float | None = None,
+        cross_chip_two_qubit_over_rotation: float | None = None,
         depol_prob: float | None = None,
     ):
         _ = depol_prob
@@ -127,11 +154,60 @@ class GateArityDepolarizingNoise(cirq.NoiseModel):
             if cross_chip_two_qubit_depol_prob is not None
             else CROSS_CHIP_TWO_QUBIT_GATE_DEPOL_PROB
         )
+        self.two_qubit_dephasing_prob = float(
+            two_qubit_dephasing_prob
+            if two_qubit_dephasing_prob is not None
+            else TWO_QUBIT_GATE_DEPHASING_PROB
+        )
+        self.one_qubit_dephasing_prob = float(
+            one_qubit_dephasing_prob
+            if one_qubit_dephasing_prob is not None
+            else ONE_QUBIT_GATE_DEPHASING_PROB
+        )
+        self.cross_chip_two_qubit_dephasing_prob = float(
+            cross_chip_two_qubit_dephasing_prob
+            if cross_chip_two_qubit_dephasing_prob is not None
+            else CROSS_CHIP_TWO_QUBIT_GATE_DEPHASING_PROB
+        )
+        self.two_qubit_over_rotation = float(
+            two_qubit_over_rotation
+            if two_qubit_over_rotation is not None
+            else TWO_QUBIT_GATE_OVER_ROTATION
+        )
+        self.one_qubit_over_rotation = float(
+            one_qubit_over_rotation
+            if one_qubit_over_rotation is not None
+            else ONE_QUBIT_GATE_OVER_ROTATION
+        )
+        self.cross_chip_two_qubit_over_rotation = float(
+            cross_chip_two_qubit_over_rotation
+            if cross_chip_two_qubit_over_rotation is not None
+            else CROSS_CHIP_TWO_QUBIT_GATE_OVER_ROTATION
+        )
         self.depol_prob = self.two_qubit_depol_prob
 
     @staticmethod
     def _is_cross_chip(operation: cirq.Operation) -> bool:
         return CZ_CROSS_CHIP_TAG in getattr(operation, "tags", ())
+
+    @staticmethod
+    def _over_rotation_op(operation: cirq.Operation, frac: float):
+        """Coherent over-rotation: the gate's own rotation scaled by ``frac``.
+
+        Returns an extra operation ``U^frac`` on the same qubits (so gate + extra
+        = ``U^(1+frac)``), or ``None`` if the gate has no well-defined power
+        (e.g. reset). Works on still-parameterized circuits: the extra op carries
+        the same symbol and is resolved alongside the original gate.
+        """
+        if frac == 0.0:
+            return None
+        gate = operation.gate
+        if isinstance(gate, RZXGate):
+            return RZXGate(gate.rads * frac).on(*operation.qubits)
+        try:
+            return operation ** frac
+        except (TypeError, ValueError):
+            return None
 
     def noisy_operation(self, operation: cirq.Operation):
         if isinstance(operation.gate, cirq.MeasurementGate):
@@ -140,20 +216,34 @@ class GateArityDepolarizingNoise(cirq.NoiseModel):
 
         n = len(operation.qubits)
         if n == 2:
+            is_cc = self._is_cross_chip(operation)
+            depol = self.cross_chip_two_qubit_depol_prob if is_cc else self.two_qubit_depol_prob
+            deph = self.cross_chip_two_qubit_dephasing_prob if is_cc else self.two_qubit_dephasing_prob
+            over = self.cross_chip_two_qubit_over_rotation if is_cc else self.two_qubit_over_rotation
             yield operation
-            prob = (
-                self.cross_chip_two_qubit_depol_prob
-                if self._is_cross_chip(operation)
-                else self.two_qubit_depol_prob
-            )
-            p2 = min(1.0, max(0.0, prob))
+            extra = self._over_rotation_op(operation, over)
+            if extra is not None:
+                yield extra
+            p_deph = min(1.0, max(0.0, deph))
+            p_depol = min(1.0, max(0.0, depol))
             for q in operation.qubits:
-                yield cirq.depolarize(p2).on(q)
+                if p_deph > 0.0:
+                    yield cirq.phase_damp(p_deph).on(q)
+                if p_depol > 0.0:
+                    yield cirq.depolarize(p_depol).on(q)
             return
         if n == 1:
             yield operation
-            p1 = min(1.0, max(0.0, self.one_qubit_depol_prob))
-            yield cirq.depolarize(p1).on(operation.qubits[0])
+            extra = self._over_rotation_op(operation, self.one_qubit_over_rotation)
+            if extra is not None:
+                yield extra
+            q = operation.qubits[0]
+            p_deph = min(1.0, max(0.0, self.one_qubit_dephasing_prob))
+            p_depol = min(1.0, max(0.0, self.one_qubit_depol_prob))
+            if p_deph > 0.0:
+                yield cirq.phase_damp(p_deph).on(q)
+            if p_depol > 0.0:
+                yield cirq.depolarize(p_depol).on(q)
             return
 
         yield operation

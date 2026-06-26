@@ -1,24 +1,33 @@
-"""Two-Stage CDR + Gaussian-Process Error Mitigator for VQE (Design 1).
+"""Combined CDR + Gaussian-Process Error Mitigator for VQE (Design 2).
 
-Stage 1 (CDR backbone): per-observable linear Clifford-Data-Regression,
-    O_ideal ~= a_i * O_noisy + b_i   (classic CDR, one (a_i, b_i) per Pauli).
-Stage 2 (GP residual): ONE shared Gaussian Process that learns the leftover
-    y = O_ideal - (a_i * O_noisy + b_i) the linear fit cannot capture.
+Unlike the two-stage design (separate per-Pauli affine CDR backbone + a GP on the
+residual), here ONE Gaussian Process maps the feature row directly to the ideal
+expectation:
 
-Final mitigated value:
-    O_mit(theta, P_i) = a_i * O_noisy + b_i  +  GP_residual(features(theta, P_i, O_noisy))
+    O_mit(theta, P_i) = GP( features(theta, P_i, O_noisy) )   ~= O_ideal
 
-The GP also returns a variance at every prediction, which drives an
-uncertainty-gated top-up loop during VQE.
+The classic CDR line ``a * O_noisy + b`` is NOT fit separately; it is absorbed
+INTO the GP kernel as a linear (DotProduct) term on the ``O_noisy`` feature
+column, with a Matern/RBF term on the angle+Pauli features capturing the coherent,
+angle-dependent residual on top:
+
+    k = c_lin * k_lin(O_noisy) [* k_obs(pauli)]      # the learned CDR slope/bias
+      + c_base * k_base(angle, pauli)                # coherent / angle residual
+      + WhiteKernel                                  # shot noise
+
+The GP returns a variance at every prediction, which drives an uncertainty-gated
+top-up loop during VQE.
 
 This module is a thin layer on top of the user's EXISTING cirq codebase
-(``main_cursor_lib`` and ``shot_measurement`` under ``June_main``). It does NOT
+(``main_cursor_lib_ML_tog`` and ``shot_measurement_ML_tog``). It does NOT
 re-implement circuit construction, simulation, or shot estimation; it binds the
-spec's adapter methods to those existing functions. Stage 1 reuses the same
-per-Pauli least-squares the repo already performs in
-``train_cf_models_per_pauli``.
+adapter methods to those existing functions. A plain per-Pauli CDR backbone is
+still fit, but ONLY as a baseline reference for validation/plots -- it is not part
+of the mitigated value.
 
-Build/verify order mirrors the design spec. See the accompanying notebook cells.
+The public API (config, adapter, Mitigator, validation, VQE loops) mirrors the
+two-stage ``gp_mitigator_ML_sep`` module so the two notebooks differ only in the
+error-mitigation core.
 """
 
 from __future__ import annotations
@@ -31,18 +40,18 @@ from typing import Callable
 
 import numpy as np
 
-# Keep this experiment folder self-contained: import the LOCAL ``*_ML_sep`` copies
+# Keep this experiment folder self-contained: import the LOCAL ``*_ML_tog`` copies
 # of the cirq pipeline that live next to this module, regardless of the caller's
-# working directory. These are the editable "separate" copies for the ML-CDR
+# working directory. These are the editable "together" copies for the ML-CDR
 # experiments; the June_main originals are left untouched.
 _THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 if _THIS_DIR not in sys.path:
     sys.path.insert(0, _THIS_DIR)
 
-from main_cursor_lib_ML_sep import (
+from main_cursor_lib_ML_tog import (
     clifford_snap_value_for_symbol,
 )
-from shot_measurement_ML_sep import (
+from shot_measurement_ML_tog import (
     _simulate_noiseless_state_for_resolver,
     _simulate_noisy_rho_for_resolver,
     estimate_energy_from_noisy_rho_shots,
@@ -51,10 +60,11 @@ from shot_measurement_ML_sep import (
     pauli_sum_to_int_observables,
 )
 
-try:  # scikit-learn is the GP backend (see plan: Stage 2 == sklearn GPR).
+try:  # scikit-learn is the GP backend (the single combined GP).
     from sklearn.gaussian_process import GaussianProcessRegressor
     from sklearn.gaussian_process.kernels import (
         ConstantKernel,
+        DotProduct,
         Hyperparameter,
         Kernel,
         Matern,
@@ -97,20 +107,25 @@ class MitigatorConfig:
     pauli_onehot: bool = True
     pauli_summaries: bool = True
 
-    # --- Stage 1: CDR linear backbone ---
+    # --- Baseline per-Pauli CDR backbone (reference only; NOT part of the
+    #     combined mitigated value, which is the single GP below). Kept so the
+    #     validation/plots can show "plain CDR" alongside the combined method. ---
     affine_regularization: float = 0.0
     refit_affine_on_topup: bool = True
 
-    # --- Stage 2: GP residual kernel ---
-    kernel_type: str = "matern"  # "matern" or "rbf"
+    # --- Combined single-GP kernel (CDR absorbed in the kernel) ---
+    kernel_type: str = "matern"  # "matern" or "rbf" for the coherent-residual term
     matern_nu: float = 2.5
     use_ard: bool = True
-    use_product_kernel: bool = True  # k_angle * k_obs (True) vs k_angle + k_obs (False)
+    # use_product_kernel here means: multiply the linear CDR term k_lin(o_noisy) by
+    # a per-observable kernel k_obs(pauli) -> a learned, observable-dependent CDR
+    # slope (True), instead of a single shared slope (False).
+    use_product_kernel: bool = True
     noise_variance_init: float = 1e-3
     normalize_targets: bool = True
     gp_n_restarts: int = 2  # marginal-likelihood restarts (not in spec; small default)
-    # Cap on rows actually used to FIT the exact GP (Stage 1 still uses all rows).
-    # Exact-GP hyperparameter optimization with ARD builds an (N, N, n_hyper)
+    # Cap on rows actually used to FIT the exact GP (the baseline backbone still
+    # uses all rows). Exact-GP hyperparameter optimization with ARD builds an (N, N, n_hyper)
     # gradient tensor, so N must stay bounded; rows are randomly subsampled down to
     # this many before fitting. ~1000-2000 is plenty for an exact GP.
     max_gp_train_points: int = 1500
@@ -471,16 +486,18 @@ def _snap_to_clifford(symbol, value: float, snap_step: float) -> float:
 
 
 # ---------------------------------------------------------------------------
-# Section 5 - Stage 1: CDR linear backbone
+# Section 5 - Baseline per-Pauli CDR backbone (reference only)
 # ---------------------------------------------------------------------------
 
 
 class CDRBackbone:
     """Per-observable affine CDR fit: ``O_ideal ~= a_i * O_noisy + b_i``.
 
-    Same per-Pauli least-squares the repo performs in ``train_cf_models_per_pauli``,
-    but operating on the row schema so Stage 2 can read residuals and we can refit
-    cheaply on top-up.
+    In this COMBINED design the CDR line is absorbed inside the single GP kernel,
+    so this standalone backbone is NOT used to form the mitigated value. It is fit
+    purely as a "plain CDR" baseline so the validation tables and the VQE plots can
+    show classic CDR next to the combined GP. Same per-Pauli least-squares the repo
+    performs in ``train_cf_models_per_pauli``.
     """
 
     def __init__(self, affine_regularization: float = 0.0) -> None:
@@ -518,7 +535,7 @@ class CDRBackbone:
 
 
 # ---------------------------------------------------------------------------
-# Section 6 - Stage 2: shared GP on the residual
+# Section 6 - Combined single GP (CDR absorbed in the kernel)
 # ---------------------------------------------------------------------------
 
 
@@ -595,14 +612,16 @@ def _make_base_kernel(n_dims: int, config: MitigatorConfig):
 
 
 # ---------------------------------------------------------------------------
-# Analytic input-gradient of the (fitted) residual-GP kernel: d k(x*, x_n)/d x*.
+# Analytic input-gradient of the (fitted) kernel: d k(x*, x_n) / d x*.
 #
-# Purely CLASSICAL: the GP residual mean is
+# This is the purely CLASSICAL half of the analytic VQE gradient. The GP mean is
 #     m(x*) = y_mean + y_std * sum_n alpha_n * k(x*, x_n),
-# so  dm/dx* = y_std * sum_n alpha_n * dk(x*, x_n)/dx*. The device is never
-# involved here; the only device-supplied quantity (d O_noisy/d theta via a
+# so  dm/dx* = y_std * sum_n alpha_n * dk(x*, x_n)/dx*.
+# The quantum device is never involved here: kernel, training points x_n, dual
+# weights alpha_n and hyperparameters all live on the classical machine after
+# the fit. The only device-supplied quantity (d O_noisy / d theta, via a
 # parameter-shift on the real measurement) is chained in later, in
-# ``Mitigator.energy_gradient`` (together with the affine backbone slope a_P).
+# ``Mitigator.energy_gradient``.
 # ---------------------------------------------------------------------------
 
 
@@ -610,11 +629,16 @@ def _leaf_kernel_value_and_input_grad(kernel, xs: np.ndarray, Xs: np.ndarray):
     """Value and d/dx* gradient of a leaf kernel restricted to its own columns.
 
     ``xs`` is the (sliced) query point, shape (k,); ``Xs`` the (sliced) training
-    points, shape (m, k). Returns ``(v, g)`` with ``v`` shape (m,) and ``g``
-    shape (m, k) (derivative w.r.t. ``xs``). Supports the leaf kernels used in
-    ``GPResidualModel.build_kernel`` (Matern / RBF / Constant / White).
+    points, shape (m, k). Returns ``(v, g)`` with ``v`` shape (m,) the kernel
+    values ``k(xs, Xs[n])`` and ``g`` shape (m, k) the derivative w.r.t. ``xs``.
+    Supports the exact leaf kernels used in ``SingleGPModel.build_kernel``.
     """
     m, k = Xs.shape
+    if isinstance(kernel, DotProduct):
+        sigma0 = float(kernel.sigma_0)
+        v = sigma0 * sigma0 + Xs @ xs
+        # d/dx*_d ( sigma0^2 + sum_d x*_d * x_n,d ) = x_n,d
+        return v, Xs.copy()
     if isinstance(kernel, (Matern, RBF)):
         ls = np.asarray(kernel.length_scale, dtype=float)
         if ls.ndim == 0:
@@ -626,8 +650,10 @@ def _leaf_kernel_value_and_input_grad(kernel, xs: np.ndarray, Xs: np.ndarray):
         if not isinstance(kernel, Matern):
             r2 = np.sum(scaled * scaled, axis=1)
             v = np.exp(-0.5 * r2)
+            # d/dx*_d exp(-1/2 sum ((x*-x_n)/l)^2) = -k * (x*_d - x_n,d)/l_d^2
             g = -v[:, None] * (diff / (ls[None, :] ** 2))
             return v, g
+        # Matern: k(r) with r = ||(x*-x_n)/l||_2.
         r = np.sqrt(np.sum(scaled * scaled, axis=1))
         nu = float(kernel.nu)
         if abs(nu - 0.5) < 1e-8:
@@ -654,8 +680,8 @@ def _leaf_kernel_value_and_input_grad(kernel, xs: np.ndarray, Xs: np.ndarray):
     if isinstance(kernel, ConstantKernel):
         return np.full(m, float(kernel.constant_value)), np.zeros((m, k))
     if isinstance(kernel, WhiteKernel):
-        # White contributes 0 to the cross-covariance for x* not exactly equal
-        # to a training point, hence 0 to the predictive mean.
+        # White contributes 0 to the cross-covariance k(x*, x_train) for x* not
+        # exactly equal to a training point, hence 0 to the predictive mean.
         return np.zeros(m), np.zeros((m, k))
     raise ValueError(
         f"Unsupported leaf kernel for analytic input gradient: {type(kernel).__name__}."
@@ -666,9 +692,9 @@ def _kernel_value_and_input_grad(kernel, x_star: np.ndarray, X_train: np.ndarray
     """Recursively compute ``(k(x*, X_train), d k/d x*)`` for a composite kernel.
 
     Handles ``Sum``/``Product`` of the kernels assembled in ``build_kernel``
-    (ConstantKernel, WhiteKernel, and ``_SubsetKernel``-wrapped Matern / RBF).
-    ``x_star`` is shape (D,), ``X_train`` shape (m, D); returns ``v`` shape (m,)
-    and ``g`` shape (m, D) (gradient w.r.t. ``x_star``).
+    (ConstantKernel, WhiteKernel, and ``_SubsetKernel``-wrapped DotProduct /
+    Matern / RBF). ``x_star`` is shape (D,), ``X_train`` shape (m, D); returns
+    ``v`` shape (m,) and ``g`` shape (m, D) (gradient w.r.t. ``x_star``).
     """
     from sklearn.gaussian_process.kernels import Product, Sum
 
@@ -693,17 +719,26 @@ def _kernel_value_and_input_grad(kernel, x_star: np.ndarray, X_train: np.ndarray
         g = np.zeros((m, D))
         g[:, idx] = g_sub
         return v, g
-    # Bare leaf kernel applied to all dimensions.
+    # Bare leaf kernel applied to all dimensions (not used by build_kernel, but
+    # handled for completeness).
     return _leaf_kernel_value_and_input_grad(kernel, np.asarray(x_star), np.asarray(X_train))
 
 
-class GPResidualModel:
-    """One shared GP over all observables; target = Stage-1 residual."""
+class SingleGPModel:
+    """One GP over all observables; target = raw ``O_ideal`` (no separate CDR).
+
+    The CDR line is built INTO the kernel: a linear ``DotProduct`` term on the
+    ``o_noisy`` feature column reproduces ``a * o_noisy + b`` (the slope/bias are
+    learned as kernel hyperparameters), optionally multiplied by a per-observable
+    kernel so the effective CDR slope can vary by Pauli. A Matern/RBF term on the
+    angle+pauli block then captures the coherent, angle-dependent residual, and a
+    WhiteKernel absorbs shot noise. ``predict`` returns ``(mean = O_mit, std)``.
+    """
 
     def __init__(self, config: MitigatorConfig) -> None:
         if not _SKLEARN_AVAILABLE:  # pragma: no cover
             raise ImportError(
-                "scikit-learn is required for GPResidualModel. Install it into the "
+                "scikit-learn is required for SingleGPModel. Install it into the "
                 f"active environment. Original import error: {_SKLEARN_IMPORT_ERROR!r}"
             )
         self.config = config
@@ -711,37 +746,47 @@ class GPResidualModel:
         self._index_map = feature_index_map(config)
 
     def build_kernel(self, feature_index_map_: dict, config: MitigatorConfig):
-        cont_idx = feature_index_map_["continuous"]
+        noisy_idx = feature_index_map_["noisy"]
+        angle_idx = feature_index_map_["angle"]
         obs_idx = feature_index_map_["pauli"]
+        base_idx = angle_idx + obs_idx
+
+        if not config.include_noisy_feature_in_gp or len(noisy_idx) == 0:
+            raise ValueError(
+                "The combined (Design 2) mitigator requires an o_noisy feature "
+                "column for the in-kernel CDR term; set "
+                "include_noisy_feature_in_gp=True."
+            )
+
         white = WhiteKernel(
             noise_level=float(config.noise_variance_init),
             noise_level_bounds=(1e-8, 1e2),
         )
-        if config.use_product_kernel and len(obs_idx) > 0 and len(cont_idx) > 0:
-            k_cont = ConstantKernel(1.0, (1e-3, 1e3)) * _SubsetKernel(
-                _make_base_kernel(len(cont_idx), config), cont_idx
-            )
-            k_obs = _SubsetKernel(_make_base_kernel(len(obs_idx), config), obs_idx)
-            return k_cont * k_obs + white
-        if len(obs_idx) > 0 and len(cont_idx) > 0:
-            # Additive structure: k_angle + k_obs.
-            k_cont = ConstantKernel(1.0, (1e-3, 1e3)) * _SubsetKernel(
-                _make_base_kernel(len(cont_idx), config), cont_idx
-            )
-            k_obs = ConstantKernel(1.0, (1e-3, 1e3)) * _SubsetKernel(
-                _make_base_kernel(len(obs_idx), config), obs_idx
-            )
-            return k_cont + k_obs + white
-        # Single block present: plain ARD kernel on all dims.
-        all_idx = cont_idx + obs_idx
-        return (
-            ConstantKernel(1.0, (1e-3, 1e3)) * _make_base_kernel(len(all_idx), config)
-            + white
-        )
 
-    def fit(self, X: np.ndarray, y_residual: np.ndarray) -> None:
+        # k_lin: DotProduct on o_noisy reproduces the CDR line a*o_noisy + b
+        # (slope via the ConstantKernel amplitude, bias via DotProduct sigma_0).
+        k_lin = ConstantKernel(1.0, (1e-3, 1e3)) * _SubsetKernel(
+            DotProduct(sigma_0=1.0, sigma_0_bounds=(1e-5, 1e2)), noisy_idx
+        )
+        # Optionally make the effective CDR slope observable-dependent.
+        if config.use_product_kernel and len(obs_idx) > 0:
+            k_obs = _SubsetKernel(_make_base_kernel(len(obs_idx), config), obs_idx)
+            k_lin = k_lin * k_obs
+
+        kernel = k_lin
+
+        # k_base: coherent / angle-dependent residual over (angles, pauli).
+        if len(base_idx) > 0:
+            k_base = ConstantKernel(1.0, (1e-3, 1e3)) * _SubsetKernel(
+                _make_base_kernel(len(base_idx), config), base_idx
+            )
+            kernel = kernel + k_base
+
+        return kernel + white
+
+    def fit(self, X: np.ndarray, y_ideal: np.ndarray) -> None:
         X = np.asarray(X, dtype=float)
-        y = np.asarray(y_residual, dtype=float).ravel()
+        y = np.asarray(y_ideal, dtype=float).ravel()
         cap = int(getattr(self.config, "max_gp_train_points", 0) or 0)
         if cap > 0 and X.shape[0] > cap:
             # Subsample rows so the exact-GP gradient tensor stays bounded.
@@ -762,19 +807,20 @@ class GPResidualModel:
 
     def predict(self, X_star: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
         if self.gp is None:
-            raise RuntimeError("GPResidualModel.fit must be called before predict.")
+            raise RuntimeError("SingleGPModel.fit must be called before predict.")
         X_star = np.asarray(X_star, dtype=float)
         mean, std = self.gp.predict(X_star, return_std=True)
         return np.asarray(mean, dtype=float), np.asarray(std, dtype=float)
 
     def predict_input_gradient(self, X_star: np.ndarray) -> np.ndarray:
-        """Analytic ``d mean / d x*`` of the residual-GP posterior mean.
+        """Analytic ``d mean / d x*`` of the GP posterior mean (per query row).
 
+        The mean is ``m(x*) = y_mean + y_std * sum_n alpha_n k(x*, x_n)``, so
         ``dm/dx* = y_std * sum_n alpha_n dk(x*, x_n)/dx*``. Returns shape
         ``(n_queries, n_features)``. Purely classical (no device access).
         """
         if self.gp is None:
-            raise RuntimeError("GPResidualModel.fit must be called before predict_input_gradient.")
+            raise RuntimeError("SingleGPModel.fit must be called before predict_input_gradient.")
         X_star = np.asarray(X_star, dtype=float)
         gp = self.gp
         kernel = gp.kernel_
@@ -802,8 +848,9 @@ class Mitigator:
         self.adapter = backend
         self.hamiltonian = hamiltonian  # kept for parity with the spec signature
         self.config = config
+        # The single GP IS the mitigator; the backbone is a plain-CDR baseline only.
+        self.gp = SingleGPModel(config)
         self.backbone = CDRBackbone(config.affine_regularization)
-        self.gp = GPResidualModel(config)
         self.rows: list[dict] = []
         self._current_theta: np.ndarray | None = None
         if config.theta_init is None:
@@ -818,9 +865,12 @@ class Mitigator:
         return np.stack([build_feature_row(r, self.config) for r in rows], axis=0)
 
     def _fit_gp_from_rows(self) -> None:
+        # Combined design: the GP maps features -> O_ideal directly (CDR is in the
+        # kernel). The baseline backbone is also (re)fit for reference only.
         X = self._feature_matrix(self.rows)
-        y = np.asarray([self.backbone.residual(r) for r in self.rows], dtype=float)
+        y = np.asarray([float(r["o_ideal"]) for r in self.rows], dtype=float)
         self.gp.fit(X, y)
+        self.backbone.fit(self.rows)
 
     # -- warm start -------------------------------------------------------
     def warmstart(self) -> None:
@@ -837,8 +887,7 @@ class Mitigator:
         self.rows = self.adapter.collect_rows(
             resolvers, shots=int(self.config.shots), seed_base=int(self.config.rng_seed) + 1
         )
-        self.backbone.fit(self.rows)
-        self._fit_gp_from_rows()
+        self._fit_gp_from_rows()  # fits the combined GP (and the baseline backbone)
 
     # -- prediction -------------------------------------------------------
     def mitigate(self, theta, o_noisy_by_pauli: dict) -> dict:
@@ -855,12 +904,11 @@ class Mitigator:
             for label in labels
         ]
         X = self._feature_matrix(rows)
-        mean, std = self.gp.predict(X)
+        mean, std = self.gp.predict(X)  # mean IS the mitigated O_ideal (CDR in-kernel)
         o_mit: dict = {}
         std_by: dict = {}
         for k, label in enumerate(labels):
-            base = self.backbone.apply(label, float(o_noisy_by_pauli[label]))
-            o_mit[label] = float(base + mean[k])
+            o_mit[label] = float(mean[k])
             std_by[label] = float(std[k])
         return o_mit, std_by
 
@@ -869,14 +917,12 @@ class Mitigator:
         if current_theta is not None:
             self._current_theta = np.asarray(current_theta, dtype=float).ravel()
         self.rows.extend(new_rows)
-        if self.config.refit_affine_on_topup:
-            self.backbone.fit(self.rows)
         if (
             self.config.drop_faraway_points
             and len(self.rows) > int(self.config.max_gp_points)
         ):
             self._prune_rows()
-        self._fit_gp_from_rows()
+        self._fit_gp_from_rows()  # refits the combined GP (and baseline backbone)
 
     def _prune_rows(self) -> None:
         cap = int(self.config.max_gp_points)
@@ -903,19 +949,17 @@ class Mitigator:
     ) -> np.ndarray:
         """Analytic ``dE_mit/dtheta`` at the CURRENT theta (in-distribution).
 
-        Two-stage mitigated value O_mit_P = a_P*O_noisy_P + b_P + GP_resid(x_P):
+        Chains the classical GP-mean input gradient with the feature Jacobian:
 
-            dE/dtheta_j = sum_P w_P * [ a_P * d O_noisy_P/dtheta_j
-                                        + d GP_resid_P/d(angle) . d(angle)/dtheta_j
-                                        + d GP_resid_P/d(o_noisy) * d O_noisy_P/dtheta_j ]
+            dE/dtheta_j = sum_P w_P * [ d mean_P/d(angle) . d(angle)/dtheta_j
+                                        + d mean_P/d(o_noisy) * d o_noisy_P/dtheta_j ]
 
-        - ``a_P`` is the (refit) affine backbone slope (classical).
         - ``d(angle)/dtheta_j`` (Fourier features) is closed form (classical).
-        - ``d O_noisy_P/dtheta_j`` is the only device-supplied term (parameter-
-          shift on the real noisy measurement); pass ``label -> np.ndarray`` of
-          length ``n_params``.
+        - ``d o_noisy_P/dtheta_j`` is the only device-supplied term and must be
+          passed in (parameter-shift on the real noisy measurement). It maps
+          ``pauli label -> np.ndarray`` of length ``n_params``.
 
-        Pauli features are constant in theta and contribute nothing.
+        Pauli features are constant in theta, so they contribute nothing.
         """
         theta = np.asarray(theta, dtype=float).ravel()
         labels = list(self.adapter.obs_labels)
@@ -924,7 +968,7 @@ class Mitigator:
             for label in labels
         ]
         X = self._feature_matrix(rows)
-        dmean = self.gp.predict_input_gradient(X)  # (P, D), classical residual GP
+        dmean = self.gp.predict_input_gradient(X)  # (P, D), classical
 
         idx = feature_index_map(self.config)
         angle_idx = idx["angle"]
@@ -943,21 +987,15 @@ class Mitigator:
                 dangle[c, i] = -kk * np.sin(kk * ti)      # d cos(k t_i)/dt_i
                 dangle[c + 1, i] = kk * np.cos(kk * ti)   # d sin(k t_i)/dt_i
 
-        # GP-residual angle contribution: (P, n_angle) @ (n_angle, n_params)
+        # angle contribution: (P, n_angle) @ (n_angle, n_params) -> (P, n_params)
         d_omit_dtheta = dmean[:, angle_idx] @ dangle
 
-        # device-supplied d O_noisy/d theta, shared by the GP noisy feature and
-        # the affine backbone slope a_P.
-        do = np.stack(
-            [np.asarray(do_noisy_dtheta[label], dtype=float).ravel() for label in labels],
-            axis=0,
-        )  # (P, n_params)
-        slope = np.asarray(
-            [float(self.backbone.coeffs.get(label, (1.0, 0.0))[0]) for label in labels],
-            dtype=float,
-        )  # (P,)
-        d_omit_dtheta = d_omit_dtheta + slope[:, None] * do
+        # device-supplied noisy-feature contribution
         if len(noisy_idx) > 0:
+            do = np.stack(
+                [np.asarray(do_noisy_dtheta[label], dtype=float).ravel() for label in labels],
+                axis=0,
+            )  # (P, n_params)
             d_omit_dtheta = d_omit_dtheta + dmean[:, noisy_idx[0]][:, None] * do
 
         weights = np.asarray(self.adapter.weights, dtype=float)  # aligned with obs_labels
@@ -1091,9 +1129,9 @@ def run_vqe_with_mitigator(
         if mode == "analytic":
             # Quantum part: parameter-shift on the REAL noisy measurement gives
             # d O_noisy_P/d theta_j (exact for single-generator gates, up to shot
-            # noise). Same device cost as parameter_shift -- the GP-residual (and
-            # affine-backbone) gradient is evaluated analytically at the current
-            # (in-distribution) theta instead of querying the surrogate at +/- pi/2.
+            # noise). Same device cost as parameter_shift -- the difference is the
+            # GP gradient is evaluated analytically at the current (in-distribution)
+            # theta instead of querying the surrogate at the far-away +/- pi/2 points.
             half = float(np.pi) / 2.0
             do_noisy = {label: np.zeros(len(theta)) for label in measured}
             for j in range(len(theta)):
@@ -1224,7 +1262,7 @@ def holdout_validation(
     adapter: CirqBackendAdapter, config: MitigatorConfig, *, seed: int | None = None
 ) -> dict:
     """Hold out a fraction of warm-start circuits; compare per-row prediction of
-    O_ideal by: unmitigated, backbone-only (plain CDR), and backbone+GP.
+    O_ideal by: unmitigated, plain CDR (baseline), and the combined single GP.
     """
     seed = int(config.rng_seed if seed is None else seed)
     theta0 = (
@@ -1250,29 +1288,28 @@ def holdout_validation(
     train_rows = adapter.collect_rows(train_res, shots=int(config.shots), seed_base=seed + 1)
     hold_rows = adapter.collect_rows(hold_res, shots=int(config.shots), seed_base=seed + 5000)
 
-    backbone = CDRBackbone(config.affine_regularization)
+    backbone = CDRBackbone(config.affine_regularization)  # plain-CDR baseline
     backbone.fit(train_rows)
-    gp = GPResidualModel(config)
+    gp = SingleGPModel(config)
     Xtr = np.stack([build_feature_row(r, config) for r in train_rows], axis=0)
-    ytr = np.asarray([backbone.residual(r) for r in train_rows], dtype=float)
+    ytr = np.asarray([r["o_ideal"] for r in train_rows], dtype=float)  # target = O_ideal
     gp.fit(Xtr, ytr)
 
     Xho = np.stack([build_feature_row(r, config) for r in hold_rows], axis=0)
-    gp_mean, _ = gp.predict(Xho)
+    gp_pred, _ = gp.predict(Xho)  # combined GP mean IS the mitigated value
     o_ideal = np.asarray([r["o_ideal"] for r in hold_rows], dtype=float)
     o_noisy = np.asarray([r["o_noisy"] for r in hold_rows], dtype=float)
     backbone_pred = np.asarray(
         [backbone.apply(r["pauli"], r["o_noisy"]) for r in hold_rows], dtype=float
     )
-    full_pred = backbone_pred + gp_mean
 
     return {
         "n_train_circuits": len(train_res),
         "n_holdout_circuits": len(hold_res),
         "n_holdout_rows": len(hold_rows),
         "rmse_unmitigated": _rmse(o_noisy, o_ideal),
-        "rmse_backbone_only": _rmse(backbone_pred, o_ideal),
-        "rmse_backbone_plus_gp": _rmse(full_pred, o_ideal),
+        "rmse_cdr_only": _rmse(backbone_pred, o_ideal),
+        "rmse_single_gp": _rmse(gp_pred, o_ideal),
     }
 
 
@@ -1313,27 +1350,26 @@ def extrapolation_validation(
     train_rows = adapter.collect_rows(train_res, shots=int(config.shots), seed_base=seed + 1)
     test_rows = adapter.collect_rows(test_res, shots=int(config.shots), seed_base=seed + 7000)
 
-    backbone = CDRBackbone(config.affine_regularization)
+    backbone = CDRBackbone(config.affine_regularization)  # plain-CDR baseline
     backbone.fit(train_rows)
-    gp = GPResidualModel(config)
+    gp = SingleGPModel(config)
     Xtr = np.stack([build_feature_row(r, config) for r in train_rows], axis=0)
-    ytr = np.asarray([backbone.residual(r) for r in train_rows], dtype=float)
+    ytr = np.asarray([r["o_ideal"] for r in train_rows], dtype=float)  # target = O_ideal
     gp.fit(Xtr, ytr)
 
     Xte = np.stack([build_feature_row(r, config) for r in test_rows], axis=0)
-    gp_mean, gp_std = gp.predict(Xte)
+    gp_pred, gp_std = gp.predict(Xte)  # combined GP mean IS the mitigated value
     o_ideal = np.asarray([r["o_ideal"] for r in test_rows], dtype=float)
     o_noisy = np.asarray([r["o_noisy"] for r in test_rows], dtype=float)
     backbone_pred = np.asarray(
         [backbone.apply(r["pauli"], r["o_noisy"]) for r in test_rows], dtype=float
     )
-    full_pred = backbone_pred + gp_mean
     return {
         "train_spread": float(train_spread),
         "test_spread": float(test_spread),
         "rmse_unmitigated": _rmse(o_noisy, o_ideal),
-        "rmse_backbone_only": _rmse(backbone_pred, o_ideal),
-        "rmse_backbone_plus_gp": _rmse(full_pred, o_ideal),
+        "rmse_cdr_only": _rmse(backbone_pred, o_ideal),
+        "rmse_single_gp": _rmse(gp_pred, o_ideal),
         "mean_gp_std": float(np.mean(gp_std)),
     }
 

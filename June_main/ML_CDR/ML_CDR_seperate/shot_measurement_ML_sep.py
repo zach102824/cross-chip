@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import sys
 from pathlib import Path
 from typing import Any, Iterable
@@ -7,7 +8,13 @@ from typing import Any, Iterable
 import cirq
 import numpy as np
 
-from main_cursor_lib import (
+# Self-contained experiment folder: import the LOCAL ``main_cursor_lib_ML_sep``
+# copy that lives next to this module, regardless of the caller's cwd.
+_THIS_DIR = os.path.dirname(os.path.abspath(__file__))
+if _THIS_DIR not in sys.path:
+    sys.path.insert(0, _THIS_DIR)
+
+from main_cursor_lib_ML_sep import (
     GateArityDepolarizingNoise,
     ONE_QUBIT_GATE_DEPOL_PROB,
     TWO_QUBIT_GATE_DEPOL_PROB,
