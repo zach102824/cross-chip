@@ -1,0 +1,356 @@
+\documentclass[11pt]{article}
+
+% ---- Overleaf-ready preamble -------------------------------------------------
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{bm}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{xcolor}
+\usepackage{tcolorbox}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,linkcolor=blue,urlcolor=blue}
+
+\newcommand{\Onoisy}{O_{\text{noisy}}}
+\newcommand{\Omit}{O_{\text{mit}}}
+\newcommand{\Oideal}{O_{\text{ideal}}}
+\newcommand{\Emit}{E_{\text{mit}}}
+\newcommand{\Eideal}{E_{\text{ideal}}}
+\newcommand{\egs}{e_{\text{gs}}}
+
+\title{\textbf{The GP-mitigated energy in \texttt{main\_HF\_ML\_tog.ipynb}:\\
+final formula, the matrices spelled out number by number,\\
+and why the mitigated curve falls below the theoretical one}}
+\author{Documentation for \texttt{gp\_mitigator\_ML\_tog.py}}
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{tcolorbox}[colback=red!5!white,colframe=red!60!black,title=\textbf{Short answer (read this first)}]
+\textbf{There is no code bug and the simulation is not wrong.} The green
+``Numerical'' and blue ``GP-mitigated'' curves are built with the \emph{same}
+weights, offset and assembly routine, evaluated at the \emph{same} $\bm\theta$
+each iteration. A single mitigated estimate dipping \emph{below} the
+ground-state energy is perfectly allowed --- it is a noisy/finite-shot estimator,
+not an exact expectation, so it can fluctuate either side of the true value.
+\textbf{What is not normal is the \emph{one-sidedness}}: blue sits below green on
+\emph{every} iteration. Pure statistical noise would scatter blue on both sides;
+a consistent sign over all $10/10$ iterations means there is a \emph{systematic
+bias}, and the optimizer is descending on the biased surrogate. So you do
+\textbf{not} need to fix a bug; you need to (i) confirm the bias with an
+independent-$\bm\theta$ evaluation and (ii) make the experiment honest.
+Section~\ref{sec:why} gives the mechanism and the exact checks.
+\end{tcolorbox}
+
+\section{What we are computing}
+
+The Hamiltonian for HF at bond $1.2$\,\AA{} is a weighted sum of $104$ Pauli
+strings on $8$ qubits, plus a constant ``offset'' (the coefficient of the
+identity term):
+\begin{equation}
+H \;=\; b_{\text{off}}\,I \;+\; \sum_{i=1}^{104} w_i\, P_i .
+\end{equation}
+Each $P_i$ is an $8$-letter word over $\{I,X,Y,Z\}$ (e.g.\ \texttt{ZZIIIIII}),
+and $w_i$ is its real coefficient.
+
+For any ansatz parameters $\bm\theta=(\theta_1,\theta_2,\theta_3)$ the energy of
+the prepared state is the weighted sum of the Pauli expectation values
+$\langle P_i\rangle$. The notebook plots three versions of this energy:
+
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+Curve & Per-term value used & Meaning \\
+\midrule
+Green (``Numerical'') & $\Oideal(\bm\theta,P_i)$ & \emph{exact} noiseless $\langle P_i\rangle$ \\
+Blue (``GP-mitigated'') & $\Omit(\bm\theta,P_i)$ & GP \emph{estimate} of $\Oideal$ \\
+Yellow/orange & $\Onoisy(\bm\theta,P_i)$ & raw / REM finite-shot measurement \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{tcolorbox}[colback=blue!4!white,colframe=blue!50!black,title=Key fact that makes ``blue below green'' suspicious]
+The Gaussian Process is \textbf{trained with target $y=\Oideal$}. Therefore
+$\Omit$ is just a regression \emph{estimate of the very same number} the green
+curve plots exactly. An unbiased estimator must scatter \emph{around} green, not
+sit \emph{below} it on every iteration.
+\end{tcolorbox}
+
+\section{The final expression for the mitigated energy}
+
+The mitigated energy is assembled term by term
+(\texttt{energy\_from\_values}):
+\begin{equation}
+\boxed{\;\Emit(\bm\theta) \;=\; b_{\text{off}} \;+\; \sum_{i=1}^{104} w_i\,
+\Omit(\bm\theta,P_i)\;}
+\label{eq:Emit}
+\end{equation}
+where each per-Pauli mitigated value is the \textbf{posterior mean of one
+Gaussian Process}:
+\begin{equation}
+\Omit(\bm\theta,P_i)\;=\; m\big(\bm x(\bm\theta,P_i)\big)
+\;=\; \bar y \;+\; \sigma_y \sum_{n=1}^{N} \alpha_n\, k\big(\bm x(\bm\theta,P_i),\,\bm x_n\big).
+\label{eq:mean}
+\end{equation}
+The green curve uses the identical Eq.~\eqref{eq:Emit} but with $\Oideal$
+instead of $\Omit$. The only difference between blue and green is
+$\Omit$ vs.\ $\Oideal$ per term --- the weights $w_i$ and offset $b_{\text{off}}$
+are identical, so a constant gap can only come from the GP, not the assembly.
+
+The symbols in Eq.~\eqref{eq:mean}:
+\begin{itemize}
+  \item $\bm x(\bm\theta,P_i)$: the $48$-number \emph{feature row} for this
+        $(\bm\theta,\text{Pauli})$ pair (Section~\ref{sec:feature}).
+  \item $\bm x_n$, $n=1\ldots N$: the $N=500$ \emph{training} feature rows.
+  \item $\bar y,\sigma_y$: mean and standard deviation of the training targets
+        $\Oideal$ (because \texttt{normalize\_y=True}).
+  \item $\alpha_n$: the ``dual weights'' $\bm\alpha=(K+\sigma_w^2 I)^{-1}
+        (\bm y-\bar y)/\sigma_y$ produced by the GP fit.
+  \item $k(\cdot,\cdot)$: the kernel function (Section~\ref{sec:kernel}).
+\end{itemize}
+
+\section{The feature row $\bm x$: 48 numbers, explained one block at a time}
+\label{sec:feature}
+
+Every row fed to the GP is a vector of $48$ real numbers
+(\texttt{build\_feature\_row}). It is the concatenation of three blocks. With the
+notebook settings ($n_{\text{params}}=3$, max harmonic $H=2$, $n_{\text{qubits}}=8$):
+
+\begin{center}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{@{}p{2.2cm} p{7.4cm} c@{}}
+\toprule
+\textbf{Block} & \textbf{What the numbers are} & \textbf{\# cols} \\
+\midrule
+angle &
+$\big[\cos\theta_j,\ \sin\theta_j,\ \cos 2\theta_j,\ \sin 2\theta_j\big]$ for
+$j=1,2,3$ (Fourier features; periodic in $\theta$) & $3\!\times\!4=12$ \\
+noisy &
+the single measured value $\Onoisy(\bm\theta,P_i)$ (input to the in-kernel CDR
+line) & $1$ \\
+pauli &
+per-qubit one-hot over $\{I,X,Y,Z\}$ for the $8$ qubits ($8\!\times\!4=32$),
+then $3$ summaries $[\,\text{weight},\,n_{XY},\,n_Z\,]$ & $32+3=35$ \\
+\midrule
+\multicolumn{2}{r}{\textbf{Total feature dimension } $D$} & $\bm{48}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection*{A fully worked example row}
+Take $\bm\theta=(0.10,\ \tfrac{\pi}{2},\ 0.0)$ and Pauli string
+$P=\texttt{ZZIIIIII}$ with a measured $\Onoisy=-0.87$. Then the $48$ numbers are:
+
+\paragraph{Angle block (12 numbers).}
+\begin{align*}
+\theta_1=0.10:&\quad \cos 0.10=0.9950,\ \sin 0.10=0.0998,\ \cos 0.20=0.9801,\ \sin 0.20=0.1987,\\
+\theta_2=\tfrac{\pi}{2}:&\quad \cos\tfrac{\pi}{2}=0.0000,\ \sin\tfrac{\pi}{2}=1.0000,\ \cos\pi=-1.0000,\ \sin\pi=0.0000,\\
+\theta_3=0.0:&\quad \cos 0=1.0000,\ \sin 0=0.0000,\ \cos 0=1.0000,\ \sin 0=0.0000.
+\end{align*}
+\paragraph{Noisy block (1 number).} $-0.87$.
+\paragraph{Pauli block (35 numbers).} The word \texttt{ZZIIIIII} = qubit$_0$:Z,
+qubit$_1$:Z, qubit$_{2\ldots7}$:I. One-hot uses the order $[I,X,Y,Z]$:
+\[
+\underbrace{[0,0,0,1]}_{q_0=Z}\;
+\underbrace{[0,0,0,1]}_{q_1=Z}\;
+\underbrace{[1,0,0,0]}_{q_2=I}\;\cdots\;
+\underbrace{[1,0,0,0]}_{q_7=I}
+\quad(32\text{ numbers}),
+\]
+then summaries $[\,\text{weight}=2,\ n_{XY}=0,\ n_Z=2\,]$ (weight $=$ number of
+non-$I$ letters). Putting it together, the full row is
+\[
+\bm x=\big[\,
+\underbrace{0.995,0.0998,0.980,0.199,\,0,1,-1,0,\,1,0,1,0}_{\text{12 angle}},\;
+\underbrace{-0.87}_{\text{noisy}},\;
+\underbrace{0,0,0,1,\,0,0,0,1,\,1,0,0,0,\ldots,1,0,0,0}_{\text{32 one-hot}},\;
+\underbrace{2,0,2}_{\text{summaries}}
+\,\big].
+\]
+
+\section{The three matrices, row-by-row and column-by-column}
+\label{sec:matrices}
+
+There are three arrays inside the fit. Here is exactly what each \emph{row} and
+each \emph{column} means, and what numbers live there.
+
+\subsection{The design (feature) matrix $X$ --- shape $500\times 48$}
+\begin{itemize}
+  \item \textbf{Each row} $=$ one training sample $=$ one
+        $(\text{near-Clifford circuit},\,\text{Pauli observable})$ pair.
+        (Warm start makes $30$ circuits $\times\,104$ observables $=3120$ rows;
+        the fit randomly keeps $N=500$ of them, \texttt{GP\_MAX\_TRAIN\_POINTS}.)
+  \item \textbf{Each column} $=$ one of the $48$ features from
+        Section~\ref{sec:feature}: columns $1\!-\!12$ are the angle Fourier
+        features, column $13$ is $\Onoisy$, columns $14\!-\!45$ are the Pauli
+        one-hot, columns $46\!-\!48$ are the Pauli summaries.
+  \item \textbf{The numbers:} angle columns are in $[-1,1]$ (sines/cosines);
+        the noisy column is a measured expectation in roughly $[-1,1]$; the
+        one-hot columns are exactly $0$ or $1$; the summary columns are small
+        non-negative integers ($0\ldots8$).
+\end{itemize}
+\[
+X=\begin{bmatrix}
+\text{--- feature row of (circuit 1, } P_1) \text{ ---} \\
+\text{--- feature row of (circuit 1, } P_2) \text{ ---} \\
+\vdots\\
+\text{--- feature row of (circuit 30, } P_{104}) \text{ ---}
+\end{bmatrix}
+\in\mathbb{R}^{500\times 48}.
+\]
+
+\subsection{The target vector $\bm y$ --- length $500$}
+\begin{itemize}
+  \item \textbf{Each entry} $y_n = \Oideal$ for the same
+        $(\text{circuit},\text{Pauli})$ pair as row $n$ of $X$ --- the
+        \emph{exact} noiseless expectation value, obtained by statevector
+        simulation. Numbers lie in $[-1,1]$.
+  \item This is the regression target. \emph{The GP is learning to map noisy
+        features to the exact value.} That is precisely why blue and green
+        estimate the same quantity.
+\end{itemize}
+
+\subsection{The kernel (Gram) matrix $K$ --- shape $500\times 500$}
+\begin{itemize}
+  \item \textbf{Entry} $K_{mn}=k(\bm x_m,\bm x_n)$ is a \emph{similarity}
+        between training rows $m$ and $n$ (Section~\ref{sec:kernel}). It is
+        symmetric ($K_{mn}=K_{nm}$), the diagonal is the largest
+        ($K_{nn}=$ self-similarity), and off-diagonals shrink toward $0$ for
+        dissimilar rows. Numbers are typically $O(1)$ and positive.
+  \item The fit solves $(K+\sigma_w^2 I)\,\bm\alpha=(\bm y-\bar y)/\sigma_y$ for
+        the dual weights $\bm\alpha\in\mathbb{R}^{500}$ used in
+        Eq.~\eqref{eq:mean}. $\sigma_w^2$ (the learned \texttt{WhiteKernel}
+        level) is added to the diagonal to absorb shot noise.
+\end{itemize}
+
+\noindent
+\textbf{Prediction in matrix form.} For one query point $\bm x_*$ form the
+cross-kernel row vector $\bm k_*=[\,k(\bm x_*,\bm x_1),\ldots,k(\bm x_*,\bm
+x_{500})\,]$. Then
+\begin{equation}
+\Omit(\bm x_*) \;=\; \bar y + \sigma_y\,\bm k_*^{\top}\bm\alpha,
+\qquad
+\text{(predict 104 Paulis at once: stack the }\bm k_*\text{ into a }104\times 500\text{ matrix).}
+\end{equation}
+
+\section{The kernel: CDR is built \emph{inside} it}
+\label{sec:kernel}
+
+\begin{equation}
+k(\bm x,\bm x')=
+\underbrace{c_{\text{lin}}\,k_{\text{lin}}(\Onoisy)\,k_{\text{obs}}(\text{pauli})}_{\text{learned per-Pauli CDR line }a\,\Onoisy+b}
++\underbrace{c_{\text{base}}\,k_{\text{base}}(\text{angle},\text{pauli})}_{\text{coherent / angle residual}}
++\underbrace{\sigma_w^2\,\delta_{\bm x,\bm x'}}_{\text{shot noise}} .
+\end{equation}
+\begin{itemize}
+  \item $k_{\text{lin}}$ is a \texttt{DotProduct} on the single $\Onoisy$
+        column; with its amplitude and bias it reproduces the classic CDR affine
+        fit $a\,\Onoisy+b$.
+  \item $k_{\text{obs}}$ is a Mat\'ern$(\nu=2.5,\text{ARD})$ on the Pauli block,
+        so the CDR slope can differ per observable.
+  \item $k_{\text{base}}$ is a Mat\'ern$(\nu=2.5,\text{ARD})$ on (angle $+$
+        Pauli), capturing the coherent, angle-dependent residual.
+\end{itemize}
+Note: there is \textbf{no underlying physical wavefunction} behind $\Omit$. Each
+Pauli value is an \emph{independent regression}, which is the root of the
+variational violation in Section~\ref{sec:why}.
+
+\section{The gradient used by the optimizer}
+
+The VQE uses \texttt{gradient\_mode="analytic"}
+(\texttt{Mitigator.energy\_gradient}):
+\begin{equation}
+\frac{\partial \Emit}{\partial \theta_j}
+=\sum_{i=1}^{104} w_i\!\left[
+\sum_{d\in\text{angle}}\frac{\partial m_i}{\partial x_d}\frac{\partial x_d}{\partial\theta_j}
++\frac{\partial m_i}{\partial \Onoisy}\frac{\partial O_{\text{noisy},i}}{\partial\theta_j}
+\right].
+\end{equation}
+Three factors:
+\begin{enumerate}
+  \item \textbf{GP-mean input gradient} (classical, analytic):
+        $\dfrac{\partial m}{\partial \bm x_*}=\sigma_y\sum_n\alpha_n
+        \dfrac{\partial k(\bm x_*,\bm x_n)}{\partial \bm x_*}$. The Pauli block is
+        constant in $\bm\theta$, so it drops out.
+  \item \textbf{Angle Jacobian} (closed form):
+        $\partial\cos(k\theta_j)/\partial\theta_j=-k\sin(k\theta_j)$,
+        $\partial\sin(k\theta_j)/\partial\theta_j=\ \ k\cos(k\theta_j)$.
+  \item \textbf{Device term} (the only quantum part), by parameter shift on the
+        \emph{real noisy} measurement:
+        $\dfrac{\partial O_{\text{noisy},i}}{\partial\theta_j}\approx
+        \tfrac12\big[O_{\text{noisy},i}(\bm\theta+\tfrac\pi2\bm e_j)-O_{\text{noisy},i}(\bm\theta-\tfrac\pi2\bm e_j)\big]$.
+\end{enumerate}
+The chaining is mathematically correct. The problem is \emph{what} it descends
+on: the surrogate $\Emit$, not the true energy.
+
+\section{Is the code wrong? Why mitigated $<$ theoretical}
+\label{sec:why}
+
+\begin{tcolorbox}[colback=red!5!white,colframe=red!60!black,title=Verdict: no bug, but a systematic bias]
+The arithmetic that builds $\Emit$ is correct and the simulation is fine. The
+numbers printed by the notebook are
+\[
+\underbrace{\Emit=-98.575060}_{\text{blue}}\;<\;
+\underbrace{\egs=-98.573878}_{\text{exact GS}}\;<\;
+\underbrace{\Eideal=-98.572335}_{\text{green}}\ \text{Eh}.
+\]
+A \emph{single} value with $\Emit<\egs$ is fine --- $\Emit$ is an estimate and may
+fluctuate below the floor. The problem is that blue is \emph{below green on every
+iteration}. If the only effect were shot/noise scatter, the sign of
+$(\Emit-\Eideal)$ would be random; getting the same sign $10/10$ times has
+probability $\sim(1/2)^{10}\approx10^{-3}$, so a \textbf{systematic downward bias}
+is present. This is a method effect (next), not a coding error.
+\end{tcolorbox}
+
+Three compounding causes:
+\begin{enumerate}
+  \item \textbf{Winner's curse (optimization bias).} The optimizer
+        \emph{minimizes the GP surrogate} $\Emit$. The GP has structured
+        regression error $\varepsilon=\Omit-\Oideal$. Gradient descent
+        preferentially walks into regions where the GP \emph{under-predicts}
+        (where $\sum_i w_i\varepsilon_i<0$). So at the visited $\bm\theta$, blue
+        is \emph{selected} to be below green --- a systematic sign, not random.
+  \item \textbf{Mean-reversion of a near-Clifford model.} With
+        \texttt{normalize\_y=True}, far from training data the mean reverts to
+        $\bar y$, the average of the \emph{near-Clifford} training targets.
+        Top-ups fire on all $10/10$ iterations, so the training set stays
+        centred on Clifford angles while the optimizer moves to
+        $\bm\theta=(0.41,0.035,0.035)$. A per-Pauli bias of only $\sim10^{-3}$,
+        times large weights $w_i$, summed over $104$ terms, becomes a several-mEh
+        energy bias.
+  \item \textbf{No variational floor.} Because $\Omit$ is a free per-Pauli
+        regression, $\Emit$ is \emph{not} a Rayleigh quotient
+        $\langle\psi|H|\psi\rangle$ of any state. Nothing enforces
+        $\Emit\ge\egs$. Green, being an exact expectation, must satisfy
+        $\Eideal\ge\egs$ --- and it does.
+\end{enumerate}
+
+\paragraph{Why it looks good but isn't.} The headline
+$|\Emit-\egs|=1.18$~mEh is misleading: the \emph{true} noiseless energy at that
+$\bm\theta$ (green) is $1.5$~mEh \emph{above} the ground state. Blue only appears
+accurate because a $\approx 2.7$~mEh downward bias drags it \emph{through} the
+true ground-state line.
+
+\section{What a correct result looks like, and how to check}
+
+A trustworthy mitigated curve should \textbf{track green from around/above} and
+\textbf{never fall below $\egs$}. Recommended checks:
+\begin{enumerate}
+  \item \textbf{Per-Pauli parity plot} on held-out data: $\Omit$ vs.\ $\Oideal$
+        for all $104$ observables; a downward energy bias shows as systematic
+        deviation off the $y=x$ line on large-$|w_i|$ terms.
+  \item \textbf{Assert the floor:} flag any iteration with $\Emit<\egs$.
+  \item \textbf{Evaluate off the optimizer path:} report blue on an
+        \emph{independent} eval set of $\bm\theta$'s (\texttt{make\_eval\_set}),
+        not at the $\bm\theta$ the optimizer chose --- this removes the winner's
+        curse (cause 1).
+  \item \textbf{Diagnose mean-reversion:} print $\bar y$; retrain the GP with
+        rows \emph{at the visited $\bm\theta$} (not only near-Clifford) and see
+        if the gap closes (tests cause 2).
+  \item \textbf{Widen training coverage:} larger \texttt{GP\_WARMSTART\_SPREAD}
+        / top-up radius, raise \texttt{GP\_MAX\_TRAIN\_POINTS} above $500$, so
+        the training distribution actually covers the optimizer's trajectory.
+\end{enumerate}
+
+\end{document}
