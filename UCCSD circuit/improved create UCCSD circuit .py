@@ -584,23 +584,20 @@ class MoleculeCircuitRunner:
         #     doubles=[(3, 7, 4, 0), (3, 7, 5, 1), (3, 7, 6, 2)],
         #     pair=False,
         # ),
-        # "Cl2": dict(
-        #     molecule="Cl2", bond_length=1.0, num_qubits=12, n_electrons=10,
-        #     # UCCSD_Mole/Cl2.ipynb, active_space=(10, 6) -> 12 qubits, top-5 doubles
-        #     # (the notebook table shows the top 4; the 5th completes the n_o=5 set).
-        #     # doubles=[(5, 11, 8, 2), (5, 11, 7, 1), (5, 11, 9, 3),
-        #     #          (5, 11, 10, 4), (5, 11, 6, 0)],
-        #     doubles=[(5, 11, 8, 2), (5, 11, 7, 1), (5, 11, 9, 3)],
-        #     pair=False,
-        # ),
+        "Cl2": dict(
+            molecule="Cl2", bond_length=1.0, num_qubits=10, n_electrons=8,
+            # UCCSD_Mole/Cl2.ipynb, active_space=(8, 5) -> 10 qubits, top-3 doubles.
+            # op_terms: a4dag a9dag a6 a1 / a4dag a9dag a5 a0 / a4dag a9dag a7 a2,
+            # i.e. the shared-creation set (N/2-1, N-1, k+N/2, k) = (4, 9, k+5, k).
+            doubles=[(4, 9, 6, 1), (4, 9, 5, 0), (4, 9, 7, 2)],
+            pair=False,
+        ),
         "Br2": dict(
-            molecule="Br2", bond_length=1.0, num_qubits=16, n_electrons=14,
-            # UCCSD_Mole/Br2.ipynb, active_space=(14, 8) -> 16 qubits, top-7 doubles.
-            # doubles=[(7, 15, 12, 4), (7, 15, 11, 3), (7, 15, 14, 6),
-            #          (7, 15, 13, 5), (7, 15, 10, 2), (7, 15, 9, 1),
-            #          (7, 15, 8, 0)],
-            doubles=[(7, 15, 12, 4), (7, 15, 11, 3), (7, 15, 14, 6),
-                     (7, 15, 13, 5), (7, 15, 9, 1),],
+            molecule="Br2", bond_length=1.0, num_qubits=12, n_electrons=10,
+            # UCCSD_Mole/Br2.ipynb, active_space=(10, 6) -> 12 qubits, top-4 doubles.
+            # op_terms: a5dag a11dag a8 a2 / a7 a1 / a10 a4 / a9 a3,
+            # i.e. the shared-creation set (N/2-1, N-1, k+N/2, k) = (5, 11, k+6, k).
+            doubles=[(5, 11, 6, 0), (5, 11, 10, 4), (5, 11, 9, 3)],
             pair=False,
         ),
     }

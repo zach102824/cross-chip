@@ -678,6 +678,9 @@ def train_cf_models_per_pauli(
             "coeffs_rem_to_exact_per_term": [],
             "r2_rem_to_exact_per_term": [],
             "training_t_remaining": [0] * len(resolvers),
+            "training_exact_per_term": np.zeros((len(resolvers), 0), dtype=float),
+            "training_unmit_per_term": np.zeros((len(resolvers), 0), dtype=float),
+            "training_rem_per_term": np.zeros((len(resolvers), 0), dtype=float),
         }
 
     n = len(resolvers)
@@ -747,6 +750,9 @@ def train_cf_models_per_pauli(
         "coeffs_rem_to_exact_per_term": coeffs_rem,
         "r2_rem_to_exact_per_term": r2_rem,
         "training_t_remaining": t_rem_list,
+        "training_exact_per_term": tex_exact,
+        "training_unmit_per_term": tunmit,
+        "training_rem_per_term": trem,
     }
 
 

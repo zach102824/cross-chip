@@ -136,6 +136,24 @@ class MitigatorConfig:
     topup_radius: "float | None" = None  # None -> tie to optimizer_step_max
     drop_faraway_points: bool = True
     max_gp_points: int = 5000
+    # (1) Trust-region trigger: top up whenever theta has moved more than
+    #     ``topup_move_fraction * effective_topup_radius`` from the center of the
+    #     last top-up, so the surrogate stays valid as the optimizer travels --
+    #     destination-agnostic, fires even when the (overconfident) uncertainty
+    #     gate stays silent off the near-Clifford cloud.
+    topup_on_move: bool = True
+    topup_move_fraction: float = 1.0
+    # (2) Mandatory periodic top-up every ``topup_every`` iterations (0 = off).
+    #     Cheap insurance against a frozen, overconfident GP trapping the optimizer.
+    topup_every: int = 0
+    # (4) Convergence validation: when |grad| < ``convergence_grad_tol`` fire one
+    #     REAL near-Clifford top-up at the current theta and re-check before
+    #     declaring convergence; only stop if the energy then moves less than
+    #     ``convergence_energy_tol`` and the gradient is still below tolerance.
+    #     ``convergence_grad_tol = 0`` disables early stopping (run the full
+    #     iteration budget -- the legacy behavior).
+    convergence_grad_tol: float = 0.0
+    convergence_energy_tol: float = 1e-3
 
     # --- Optimizer ---
     optimizer_step_max: float = 0.2
@@ -1103,19 +1121,63 @@ def run_vqe_with_mitigator(
         bundle = measure(th)
         return adapter.energy_from_values(mitigator.mitigate(th, bundle["primary"]))
 
+    def compute_grad(th: np.ndarray, measured_th: dict) -> np.ndarray:
+        if mode == "analytic":
+            # Quantum part: parameter-shift on the REAL noisy measurement gives
+            # d O_noisy_P/d theta_j (exact for single-generator gates, up to shot
+            # noise). Same device cost as parameter_shift -- the difference is the
+            # GP gradient is evaluated analytically at the current (in-distribution)
+            # theta instead of querying the surrogate at the far-away +/- pi/2 points.
+            half = float(np.pi) / 2.0
+            do_noisy = {label: np.zeros(len(th)) for label in measured_th}
+            for j in range(len(th)):
+                tp = th.copy()
+                tm = th.copy()
+                tp[j] += half
+                tm[j] -= half
+                bp = measure(tp)["primary"]
+                bm = measure(tm)["primary"]
+                for label in measured_th:
+                    do_noisy[label][j] = 0.5 * (bp[label] - bm[label])
+            return mitigator.energy_gradient(th, measured_th, do_noisy)
+        g = np.zeros_like(th)
+        for j in range(len(th)):
+            tp = th.copy()
+            tm = th.copy()
+            tp[j] += shift
+            tm[j] -= shift
+            g[j] = (mitigated_energy(tp) - mitigated_energy(tm)) * grad_scale
+        return g
+
+    def do_topup(th: np.ndarray, it_seed: int) -> tuple[dict, dict]:
+        new_rows = sample_local_rows(adapter, th, cfg, seed=int(it_seed))
+        mitigator.update_with_rows(new_rows, current_theta=th)
+        return mitigator.predict_with_uncertainty(th, measured)
+
     history: list[dict] = []
     topup_total = 0
+    # Center of the most recent top-up (trust region). Seeded at theta_init since
+    # the warm-start cloud is built around it.
+    last_topup_theta = theta.copy()
+    converged = False
     for it in range(max_iters):
         bundle = measure(theta)
         measured = bundle["primary"]
         o_mit, std = mitigator.predict_with_uncertainty(theta, measured)
+
+        # --- Decide whether to top up (uncertainty OR trust-region OR periodic) ---
+        unc_trigger = needs_topup(std, mitigator.coeff_by_pauli, cfg)
+        moved = float(np.linalg.norm(theta - last_topup_theta))
+        move_trigger = bool(cfg.topup_on_move) and moved > (
+            float(cfg.topup_move_fraction) * cfg.effective_topup_radius()
+        )
+        periodic_trigger = (
+            int(cfg.topup_every) > 0 and it > 0 and (it % int(cfg.topup_every) == 0)
+        )
         topped = 0
-        if needs_topup(std, mitigator.coeff_by_pauli, cfg):
-            new_rows = sample_local_rows(
-                adapter, theta, cfg, seed=int(cfg.rng_seed) + 10_000 + it
-            )
-            mitigator.update_with_rows(new_rows, current_theta=theta)
-            o_mit, std = mitigator.predict_with_uncertainty(theta, measured)
+        if unc_trigger or move_trigger or periodic_trigger:
+            o_mit, std = do_topup(theta, int(cfg.rng_seed) + 10_000 + it)
+            last_topup_theta = theta.copy()
             topped = 1
             topup_total += 1
 
@@ -1126,32 +1188,31 @@ def run_vqe_with_mitigator(
             for label in measured
         }
 
-        if mode == "analytic":
-            # Quantum part: parameter-shift on the REAL noisy measurement gives
-            # d O_noisy_P/d theta_j (exact for single-generator gates, up to shot
-            # noise). Same device cost as parameter_shift -- the difference is the
-            # GP gradient is evaluated analytically at the current (in-distribution)
-            # theta instead of querying the surrogate at the far-away +/- pi/2 points.
-            half = float(np.pi) / 2.0
-            do_noisy = {label: np.zeros(len(theta)) for label in measured}
-            for j in range(len(theta)):
-                tp = theta.copy()
-                tm = theta.copy()
-                tp[j] += half
-                tm[j] -= half
-                bp = measure(tp)["primary"]
-                bm = measure(tm)["primary"]
-                for label in measured:
-                    do_noisy[label][j] = 0.5 * (bp[label] - bm[label])
-            grad = mitigator.energy_gradient(theta, measured, do_noisy)
-        else:
-            grad = np.zeros_like(theta)
-            for j in range(len(theta)):
-                tp = theta.copy()
-                tm = theta.copy()
-                tp[j] += shift
-                tm[j] -= shift
-                grad[j] = (mitigated_energy(tp) - mitigated_energy(tm)) * grad_scale
+        grad = compute_grad(theta, measured)
+
+        # --- (4) Convergence validation: a small surrogate gradient is only
+        #     trustworthy if a REAL near-Clifford batch at theta doesn't move the
+        #     answer. If we haven't already refit here, top up once and re-check. ---
+        if float(cfg.convergence_grad_tol) > 0 and float(np.linalg.norm(grad)) < float(
+            cfg.convergence_grad_tol
+        ):
+            if topped == 0:
+                o_mit, std = do_topup(theta, int(cfg.rng_seed) + 20_000 + it)
+                last_topup_theta = theta.copy()
+                topped = 1
+                topup_total += 1
+                energy_new = adapter.energy_from_values(o_mit)
+                unc = weighted_uncertainty(std, mitigator.coeff_by_pauli)
+                grad = compute_grad(theta, measured)
+                energy_shift = abs(energy_new - energy)
+                energy = energy_new
+                if float(np.linalg.norm(grad)) < float(
+                    cfg.convergence_grad_tol
+                ) and energy_shift < float(cfg.convergence_energy_tol):
+                    converged = True
+            else:
+                # Surrogate was just refit with real data this iter -> trust it.
+                converged = True
 
         step = -learning_rate * grad
         if step_max is not None:
@@ -1187,12 +1248,22 @@ def run_vqe_with_mitigator(
                 f"|g|={rec['grad_norm']: .3e}  rows={rec['n_rows']}"
             )
 
+        if converged:
+            if verbose:
+                print(
+                    f"[GP-VQE] converged at iter={it:03d}: |g|={rec['grad_norm']:.3e} "
+                    f"< {float(cfg.convergence_grad_tol):.3e} and validated with a "
+                    f"real near-Clifford top-up."
+                )
+            break
+
         theta = theta + step
 
     return {
         "theta_final": theta,
         "history": history,
         "topup_total": int(topup_total),
+        "converged": bool(converged),
     }
 
 
