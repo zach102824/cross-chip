@@ -317,6 +317,29 @@ class CirqBackendAdapter:
             label: float(w) for label, w in zip(self.obs_labels, self.weights)
         }
 
+        # --- Shot accounting -------------------------------------------------
+        # EVERY quantum execution on this backend flows through ``run_noisy``
+        # (warm start, per-iteration energy, parameter-shift gradient and
+        # top-ups all call it), so counting those calls gives the exact hardware
+        # cost. Each call consumes ``shots`` shots (the OGM scheme spreads that
+        # budget across measurement groups internally). ``ideal_energy`` /
+        # ``simulate_ideal`` are noiseless statevector evaluations and cost ZERO
+        # shots, so they are deliberately not counted.
+        self.n_circuit_evals = 0
+        self.total_shots = 0
+
+    def reset_shot_counter(self) -> None:
+        """Zero the run_noisy call / shot counters (e.g. before a fresh run)."""
+        self.n_circuit_evals = 0
+        self.total_shots = 0
+
+    def shot_report(self) -> dict:
+        """Current empirical shot usage: ``run_noisy`` calls and total shots."""
+        return {
+            "circuit_evaluations": int(self.n_circuit_evals),
+            "total_shots": int(self.total_shots),
+        }
+
     # -- OGM availability (no silent per-Pauli fallback) ------------------
     def _require_ogm_available(self) -> None:
         """Raise unless the OGM measurement backend is fully available.
@@ -414,6 +437,9 @@ class CirqBackendAdapter:
 
     # -- noisy execution (shots) -----------------------------------------
     def run_noisy(self, resolver: dict, shots: int, sampling_seed: int) -> dict:
+        # Shot accounting: one physical circuit execution at ``shots`` shots.
+        self.n_circuit_evals += 1
+        self.total_shots += int(shots)
         rho = _simulate_noisy_rho_for_resolver(
             self.circuit,
             resolver,
@@ -1156,6 +1182,10 @@ def run_vqe_with_mitigator(
 
     history: list[dict] = []
     topup_total = 0
+    # Shot accounting: snapshot the backend counters so the caller gets the exact
+    # number of circuit executions (and shots) this optimization consumed.
+    evals_at_start = int(adapter.n_circuit_evals)
+    shots_at_start = int(adapter.total_shots)
     # Center of the most recent top-up (trust region). Seeded at theta_init since
     # the warm-start cloud is built around it.
     last_topup_theta = theta.copy()
@@ -1189,6 +1219,7 @@ def run_vqe_with_mitigator(
         }
 
         grad = compute_grad(theta, measured)
+        grad_evals = 1  # gradient evaluations this iter (each = 2*n_params circuits)
 
         # --- (4) Convergence validation: a small surrogate gradient is only
         #     trustworthy if a REAL near-Clifford batch at theta doesn't move the
@@ -1204,6 +1235,7 @@ def run_vqe_with_mitigator(
                 energy_new = adapter.energy_from_values(o_mit)
                 unc = weighted_uncertainty(std, mitigator.coeff_by_pauli)
                 grad = compute_grad(theta, measured)
+                grad_evals = 2  # re-evaluated the gradient after the validation top-up
                 energy_shift = abs(energy_new - energy)
                 energy = energy_new
                 if float(np.linalg.norm(grad)) < float(
@@ -1230,6 +1262,7 @@ def run_vqe_with_mitigator(
             "weighted_uncertainty": float(unc),
             "topped_up": int(topped),
             "topup_cum": int(topup_total),
+            "grad_evals": int(grad_evals),
             "grad_norm": float(np.linalg.norm(grad)),
             "n_rows": int(len(mitigator.rows)),
         }
@@ -1264,6 +1297,73 @@ def run_vqe_with_mitigator(
         "history": history,
         "topup_total": int(topup_total),
         "converged": bool(converged),
+        # Empirical (numerical) shot cost of this optimization, measured straight
+        # from the backend counters (excludes warm start, which happens before).
+        "circuit_evals": int(adapter.n_circuit_evals - evals_at_start),
+        "total_shots": int(adapter.total_shots - shots_at_start),
+    }
+
+
+def gradient_circuit_evals(config: MitigatorConfig) -> int:
+    """Circuit executions per gradient evaluation.
+
+    All gradient modes cost the same: each of the ``n_params`` angles needs a
+    ``+`` and a ``-`` shift (parameter-shift +/- pi/2, finite-difference +/- eps,
+    or the analytic mode's parameter-shift on the real device for
+    ``dO_noisy/dtheta``) -> ``2 * n_params`` physical circuit executions.
+    """
+    return 2 * int(config.n_params)
+
+
+def analytic_shot_count(
+    config: MitigatorConfig,
+    history: list[dict],
+    *,
+    include_warmstart: bool = True,
+) -> dict:
+    """Closed-form (analytic) reconstruction of the hardware shot cost.
+
+    Counts EVERYTHING that touches the device, exactly as the real run does, so
+    it can be cross-checked against the empirical backend counter
+    (``adapter.shot_report()`` / ``vqe_out['total_shots']``):
+
+      * warm start          : ``n_warmstart_circuits`` executions (once),
+      * per VQE iteration    : 1 energy measurement
+                               + ``grad_evals * 2 * n_params`` gradient circuits
+                               + ``topped_up * topup_batch_size`` top-up circuits.
+
+    ``grad_evals`` (1, or 2 on a convergence-validation iteration) and
+    ``topped_up`` (0/1) are read back from ``history`` so the data-dependent
+    top-up / early-stop behavior is reflected exactly. Every execution consumes
+    ``config.shots`` shots, so ``total_shots = circuit_evals * shots``.
+    """
+    grad_evals_cost = gradient_circuit_evals(config)
+    shots = int(config.shots)
+
+    warmstart_evals = int(config.n_warmstart_circuits) if include_warmstart else 0
+    energy_evals = 0
+    gradient_evals = 0
+    topup_evals = 0
+    for rec in history:
+        energy_evals += 1
+        gradient_evals += int(rec.get("grad_evals", 1)) * grad_evals_cost
+        topup_evals += int(rec.get("topped_up", 0)) * int(config.topup_batch_size)
+
+    breakdown = {
+        "warm_start": warmstart_evals,
+        "energy": energy_evals,
+        "gradient": gradient_evals,
+        "topup": topup_evals,
+    }
+    circuit_evals = warmstart_evals + energy_evals + gradient_evals + topup_evals
+    return {
+        "shots_per_circuit": shots,
+        "circuit_evals": int(circuit_evals),
+        "circuit_evals_breakdown": breakdown,
+        "total_shots": int(circuit_evals * shots),
+        "total_shots_breakdown": {k: int(v * shots) for k, v in breakdown.items()},
+        "n_iterations": len(history),
+        "n_params": int(config.n_params),
     }
 
 
