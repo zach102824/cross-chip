@@ -65,8 +65,16 @@ def _grid(start: float, stop: float, step: float) -> tuple[float, ...]:
 
 MOLECULE_PRESETS: dict[str, MoleculePreset] = {
     "HF": MoleculePreset("HF", (6, 4), _diatomic("H", "F"), _grid(1.0, 2.2, 0.2)),
-    "Cl2": MoleculePreset("Cl2", (10, 6), _diatomic("Cl", "Cl"), _grid(1.0, 3.0, 0.2)),
-    "Br2": MoleculePreset("Br2", (14, 8), _diatomic("Br", "Br"), _grid(1.0, 3.0, 0.2)),
+    # Canonical HF orbitals (needed for downstream UCCSD).  The 2.0 A point is
+    # skipped because the 5-orbital active space splits a sigma/pi near-degeneracy
+    # there, producing an artificially small HF-GS gap.
+    "Cl2": MoleculePreset(
+        "Cl2",
+        (8, 5),
+        _diatomic("Cl", "Cl"),
+        tuple(b for b in _grid(1.0, 3.0, 0.2) if abs(b - 2.0) > 1e-9),
+    ),
+    "Br2": MoleculePreset("Br2", (12, 6), _diatomic("Br", "Br"), _grid(1.0, 3.0, 0.2)),
 }
 
 
