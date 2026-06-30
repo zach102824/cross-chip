@@ -329,7 +329,7 @@ def initial_state_circuit(num_qubits, n_electrons=None, occupied=None,
 def create_uccsd_circuit(num_qubits, doubles, thetas=None, optimize=True,
                          order='auto', pair=False,
                          init_state=None, n_electrons=None, occupied=None,
-                         beta=None):
+                         beta=None, hub0=None):
     """Improved optimised UCCSD-doubles circuit (see module docstring).
 
     Parameters
@@ -345,6 +345,11 @@ def create_uccsd_circuit(num_qubits, doubles, thetas=None, optimize=True,
                  'multiref' (paper Eq. (6); needs beta).  The preparation
                  is prepended before the ansatz, separated by a barrier.
     n_electrons / occupied / beta : forwarded to initial_state_circuit()
+    hub0       : optional seed for the first block's alpha-row hub (= pivot
+                 carrying the RX rotation).  When it lies in every double's
+                 alpha support, hub continuity pins every RX to this qubit.
+                 None (default) -> each block picks the midpoint of its own
+                 alpha support, as before.
 
     Returns (QuantumCircuit, strings, signs, theta_idx): rotation k (in
     circuit order, possibly reordered by 'auto') implements
@@ -365,7 +370,7 @@ def create_uccsd_circuit(num_qubits, doubles, thetas=None, optimize=True,
             s2 = ''.join(jw_string_for_double(num_qubits, doubles[d], y_pos=1))
             rots.append((s2, d, -1))          # opposite angle: qubit excitation
 
-    prog, expected, hub = [], [], None
+    prog, expected, hub = [], [], hub0
     for (s, d, mult) in rots:
         prefix, pivot, ph = _compile_tworow(s, num_qubits, hub_hint=hub)
         hub = pivot                           # hub continuity
@@ -584,21 +589,24 @@ class MoleculeCircuitRunner:
         #     doubles=[(3, 7, 4, 0), (3, 7, 5, 1), (3, 7, 6, 2)],
         #     pair=False,
         # ),
-        "Cl2": dict(
-            molecule="Cl2", bond_length=1.0, num_qubits=10, n_electrons=8,
-            # UCCSD_Mole/Cl2.ipynb, active_space=(8, 5) -> 10 qubits, top-3 doubles.
-            # op_terms: a4dag a9dag a6 a1 / a4dag a9dag a5 a0 / a4dag a9dag a7 a2,
-            # i.e. the shared-creation set (N/2-1, N-1, k+N/2, k) = (4, 9, k+5, k).
-            doubles=[(4, 9, 6, 1), (4, 9, 5, 0), (4, 9, 7, 2)],
-            pair=False,
-        ),
+        # "Cl2": dict(
+        #     molecule="Cl2", bond_length=1.0, num_qubits=10, n_electrons=8,
+        #     # UCCSD_Mole/Cl2.ipynb, active_space=(8, 5) -> 10 qubits, top-3 doubles.
+        #     # op_terms: a4dag a9dag a6 a1 / a4dag a9dag a5 a0 / a4dag a9dag a7 a2,
+        #     # i.e. the shared-creation set (N/2-1, N-1, k+N/2, k) = (4, 9, k+5, k).
+        #     doubles=[(4, 9, 6, 1), (4, 9, 5, 0), (4, 9, 7, 2)],
+        #     pair=False,
+        # ),
         "Br2": dict(
             molecule="Br2", bond_length=1.0, num_qubits=12, n_electrons=10,
             # UCCSD_Mole/Br2.ipynb, active_space=(10, 6) -> 12 qubits, top-4 doubles.
             # op_terms: a5dag a11dag a8 a2 / a7 a1 / a10 a4 / a9 a3,
             # i.e. the shared-creation set (N/2-1, N-1, k+N/2, k) = (5, 11, k+6, k).
-            doubles=[(5, 11, 6, 0), (5, 11, 10, 4), (5, 11, 9, 3)],
+            doubles=[(5, 11, 6, 0), (5, 11, 10, 4), (5, 11, 9, 3), (5, 11, 8, 2)],
             pair=False,
+            # Seed the alpha-row hub on q4 (in every double's alpha support) so
+            # every RX rotation lands on the same long-range pivot qubit.
+            hub0=4,
         ),
     }
 
@@ -657,6 +665,7 @@ class MoleculeCircuitRunner:
         qc, strings, signs, theta_idx = create_uccsd_circuit(
             num_qubits, doubles, thetas=thetas, optimize=True,
             order="auto", pair=cfg["pair"], init_state=None,
+            hub0=cfg.get("hub0"),
         )
         bare_gates = cio.circuit_to_logical_gates(qc, num_qubits)
         # The JSON does not carry a "cross_chip" tag; it is re-derived from the
