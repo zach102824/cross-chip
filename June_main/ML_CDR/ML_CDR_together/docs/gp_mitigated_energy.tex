@@ -37,13 +37,18 @@
 \maketitle
 
 \begin{tcolorbox}[colback=blue!4!white,colframe=blue!50!black,title=\textbf{What this document does}]
-It explains, from scratch, (i) how the \emph{mitigated energy} $\Emit(\bm\theta)$ is
-computed and (ii) how its \emph{gradient} $\nabla\Emit$ is computed, and then shows
-both with \textbf{real numbers} from the actual pipeline at the first two VQE
-iterations. Every number here was produced by
-\texttt{docs/make\_example\_numbers.py} (settings: $60$ warm-start circuits,
-spread $0.8$, $8192$ shots, max-harmonic $2$, learning rate $0.5$, seed $1234$);
-the raw dump is in \texttt{docs/example\_numbers.json}.
+It walks through the whole pipeline \textbf{in chronological order} -- the exact
+sequence the code runs -- and explains, from scratch, how the \emph{mitigated
+energy} $\Emit(\bm\theta)$ and its \emph{gradient} $\nabla\Emit$ are produced,
+with \textbf{real numbers} from the first two VQE iterations. The order is:
+\textbf{(1)}~generate near-Clifford training data, \textbf{(2)}~encode each row as
+a feature vector, \textbf{(3)}~fit one Gaussian process, \textbf{(4)}~predict a
+mitigated value, \textbf{(5)}~assemble the energy, \textbf{(6)}~compute the
+gradient (including the $\pm\pi/2$ measurements), \textbf{(7)}~step and repeat.
+Every number here was produced by \texttt{docs/make\_example\_numbers.py}
+(settings: $60$ warm-start circuits, spread $0.8$, $8192$ shots, max-harmonic
+$2$, learning rate $0.5$, seed $1234$); the raw dump is in
+\texttt{docs/example\_numbers.json}.
 \end{tcolorbox}
 
 \section{Symbol glossary: every symbol, with a concrete example}
@@ -197,25 +202,121 @@ The reference exact ground-state energy is $\egs=-98.573878$~Eh. Because the GP
 is \emph{trained to predict} $O_{\mathrm{ideal}}$, the blue energy is an estimate
 of the green energy: they target the same quantity.
 
-\section{The pipeline at one \texorpdfstring{$\bm\theta$}{theta}}
+\section{The pipeline in chronological order (roadmap)}
+\label{sec:roadmap}
 
-\begin{enumerate}
-  \item \textbf{Measure:} run the noisy circuit at $\bm\theta$, get
-        $O_{\mathrm{noisy}}(\bm\theta,P_i)$ for all $104$ Paulis.
-  \item \textbf{Build features:} pack $\bm\theta$, the Pauli label, and
-        $O_{\mathrm{noisy}}$ into a $48$-number vector $\bm x$ (Section~\ref{sec:feature}).
-  \item \textbf{Predict:} the GP returns $O_{\mathrm{mit}}=m(\bm x)$ (Section~\ref{sec:gp}).
-  \item \textbf{Assemble energy:} $\Emit=\boff+\sum_i w_i O_{\mathrm{mit},i}$ (Section~\ref{sec:energy}).
-  \item \textbf{Gradient + step:} chain rule + a device parameter-shift give
-        $\nabla\Emit$; update $\bm\theta\leftarrow\bm\theta-0.5\,\nabla\Emit$
-        (Section~\ref{sec:grad}).
-\end{enumerate}
+Everything below happens in this exact order. Steps 1--3 are done \emph{once},
+\emph{before} the optimizer starts (``warm start''); Steps 4--7 repeat every VQE
+iteration. Each step is one section of this document.
 
-\section{The feature vector \texorpdfstring{$\bm x$}{x}: 48 numbers}
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{@{}c p{3.0cm} p{9.2cm}@{}}
+\toprule
+\# & \textbf{Step} & \textbf{What happens (and where in this doc)} \\
+\midrule
+\multicolumn{3}{@{}l@{}}{\emph{Offline, once (warm start)}}\\
+\midrule
+1 & Make training data & Build $60$ \emph{near-Clifford} circuits around the
+start angle, run each on the noisy device \emph{and} on a noiseless simulator, and
+record one row per (circuit, Pauli): $60\times104=6240$ rows of
+$(\bm\theta,P_i,O_{\mathrm{noisy}},O_{\mathrm{ideal}})$. (Section~\ref{sec:step1}) \\
+2 & Encode features & Turn each row's $(\bm\theta,P_i,O_{\mathrm{noisy}})$ into a
+$48$-number vector $\bm x$. (Section~\ref{sec:feature}) \\
+3 & Fit the GP & On the $48$-dim inputs and targets
+$y=O_{\mathrm{ideal}}$: normalize targets, build the kernel, fit $\sim\!86$ kernel
+hyperparameters by maximizing the marginal likelihood, cache the dual weights
+$\bm\alpha$. (Sections~\ref{sec:gp}--\ref{sec:fit}) \\
+\midrule
+\multicolumn{3}{@{}l@{}}{\emph{Online, every VQE iteration, at the current $\bm\theta$}}\\
+\midrule
+4 & Measure \& predict & Run the noisy circuit at $\bm\theta$ to get
+$O_{\mathrm{noisy}}(\bm\theta,P_i)$ for all $104$ Paulis; build their feature rows;
+the GP returns $O_{\mathrm{mit}}=m(\bm x_*)$. (Section~\ref{sec:worked-gp}) \\
+5 & Assemble energy & $\Emit=\boff+\sum_i w_i\,O_{\mathrm{mit},i}$.
+(Section~\ref{sec:energy}) \\
+6 & Gradient \& step & Run $2$ extra noisy circuits per angle at
+$\bm\theta\pm\tfrac\pi2\bm e_j$ to get $\partial O_{\mathrm{noisy}}/\partial\theta_j$,
+chain with the analytic GP gradient to get $\nabla\Emit$, and update
+$\bm\theta\leftarrow\bm\theta-0.5\,\nabla\Emit$. (Section~\ref{sec:grad}) \\
+7 & Top-up \& repeat & If the GP is too uncertain, add local rows and refit; then
+go back to Step 4 at the new $\bm\theta$. (Section~\ref{sec:reading}) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\section{Step 1 --- Generate the near-Clifford training data}
+\label{sec:step1}
+
+The GP can only learn the noise$\to$ideal map from \emph{examples} where we know
+both numbers. We manufacture those examples from \textbf{near-Clifford} circuits,
+because a near-Clifford circuit's ideal expectation values are cheap to compute
+exactly on a classical simulator, yet running it on the noisy device shows how the
+hardware distorts them. (\texttt{generate\_near\_clifford} +
+\texttt{collect\_rows} in the adapter.)
+
+\subsection{How one near-Clifford circuit is built}
+We start from $\bm\theta_{\text{init}}=(0,0,0)$ (the HF reference). For each of the
+$60$ circuits, the $3$ ansatz angles are set as follows
+(\texttt{n\_nonclifford\_gates}$=2$, \texttt{warmstart\_spread}$=0.8$):
+\begin{itemize}
+  \item \textbf{$2$ of the $3$ angles} are left ``non-Clifford'': jittered
+        randomly within $\pm0.8$ rad of $\bm\theta_{\text{init}}$, i.e.\
+        $\theta_j=\theta_{\text{init},j}+\mathrm{Uniform}(-0.8,0.8)$.
+  \item \textbf{the remaining angle} is \emph{snapped to the nearest Clifford
+        grid} (a multiple of $\pi/2$), which keeps the circuit close to a
+        stabilizer circuit so its ideal values are well behaved and span the
+        $\{-1,0,+1\}$ corners.
+\end{itemize}
+This ``mostly Clifford, slightly off'' design is what makes the data
+information-rich \emph{and} classically tractable.
+
+\subsection{What is measured for each circuit}
+For every circuit the adapter produces, \emph{for all $104$ Paulis at once}:
+\begin{itemize}
+  \item $O_{\mathrm{ideal}}(\bm\theta,P_i)=\langle P_i\rangle$ from a
+        \emph{noiseless} statevector simulation -- this is the regression
+        \textbf{target} $y$.
+  \item $O_{\mathrm{noisy}}(\bm\theta,P_i)$ from a \emph{noisy} density-matrix
+        simulation sampled with $8192$ shots and readout-error mitigation -- this
+        becomes a \textbf{feature}.
+\end{itemize}
+
+\subsection{The resulting training table}
+Each (circuit, Pauli) pair is one row:
+\begin{equation}
+\text{row }n:\quad \big(\underbrace{\bm\theta_n}_{\text{3 angles}},\ \underbrace{P_i}_{\text{Pauli label}},\ \underbrace{O_{\mathrm{noisy}}(\bm\theta_n,P_i)}_{\text{measured, a feature}},\ \underbrace{O_{\mathrm{ideal}}(\bm\theta_n,P_i)}_{\text{target }y_n}\big).
+\end{equation}
+With $60$ circuits and $104$ Paulis that is $\mathbf{6240}$ rows. Before the exact
+fit (Step~3) these are randomly subsampled to
+$\texttt{max\_gp\_train\_points}=\mathbf{1000}$ rows, because the GP fit factorizes
+an $N\times N$ matrix and $N=1000$ keeps that fast. A handful of example rows:
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{@{}cccrr@{}}
+\toprule
+$n$ & $\bm\theta_n$ (3 angles) & $P_i$ & $O_{\mathrm{noisy}}$ (feature) & $O_{\mathrm{ideal}}$ (target $y_n$) \\
+\midrule
+1 & $(1.57,\,0.42,\,0.00)$ & \texttt{IIIIIZII} & $-0.61$ & $-1.00$ \\
+2 & $(1.57,\,0.42,\,0.00)$ & \texttt{IIIIZIII} & $\phantom{-}0.05$ & $\phantom{-}0.00$ \\
+3 & $(0.00,\,-0.33,\,1.57)$ & \texttt{ZIIIIIII} & $-0.72$ & $-1.00$ \\
+$\vdots$ & $\vdots$ & $\vdots$ & $\vdots$ & $\vdots$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+(Values illustrative; the real rows are in the live run.) \textbf{Key point:} the
+device is only ever queried here and in Steps~4/6 -- the GP itself never touches
+the quantum computer.
+
+\section{Step 2 --- Encode each row as a 48-number feature vector \texorpdfstring{$\bm x$}{x}}
 \label{sec:feature}
 
-Each GP input is the concatenation of three blocks
-(\texttt{build\_feature\_row}). With the notebook settings ($n_{\text{params}}=3$,
+Step~3 needs fixed-length numeric inputs, so each row's
+$(\bm\theta,P_i,O_{\mathrm{noisy}})$ is turned into a vector $\bm x\in\mathbb R^{48}$
+by \texttt{build\_feature\_row}. (The target $y=O_{\mathrm{ideal}}$ is kept
+separately; it is what we predict, not an input.) The same encoding is applied to
+all $6240$ training rows now, and later to every query in Step~4. It is the
+concatenation of three blocks; with the notebook settings ($n_{\text{params}}=3$,
 max harmonic $H=2$, $n_{\text{qubits}}=8$):
 
 \begin{center}
@@ -272,12 +373,16 @@ followed by summaries $[\,\text{weight}=1,\ n_{XY}=0,\ n_Z=1\,]$. The full $48$-
 \,\big].
 \]
 
-\section{Gaussian process regression in general}
+\section{Step 3 --- Fit one Gaussian process to all rows}
 \label{sec:gp}
 
-This section is self-contained: it states everything needed to turn a set of
-training rows into the prediction function $O_{\mathrm{mit}}(\bm x_*)$, with no
-prior GP knowledge assumed.
+This is done once, after Steps 1--2. It is self-contained: it states everything
+needed to turn the $1000$ training rows into the prediction function
+$O_{\mathrm{mit}}(\bm x_*)$, with no prior GP knowledge assumed. Fitting means
+three concrete actions: \textbf{(3a)} normalize the targets, \textbf{(3b)} choose
+the kernel and optimize its hyperparameters, \textbf{(3c)} cache the dual-weight
+vector $\bm\alpha$. After that the GP is frozen and every later prediction is a
+cheap weighted sum.
 
 \subsection{Data and the modelling assumption}
 We have $N$ training rows. Row $n$ is a feature vector $\bm x_n\in\mathbb{R}^{D}$
@@ -346,7 +451,7 @@ all $k(\bm x_*,\bm x_n)\to0$ and $m(\bm x_*)\to\bar y$: the GP ``reverts to the
 mean.'' This mean-reversion is the origin of the small on-path bias discussed in
 Section~\ref{sec:reading}.
 
-\section{The exact kernel used here}
+\section{Step 3, detail --- the kernel (what ``similarity'' means)}
 \label{sec:kernel}
 
 The kernel is assembled in \texttt{SingleGPModel.build\_kernel}. It is a
@@ -442,11 +547,30 @@ So in code, \eqref{eq:kernel} reads
 \;+\;\mathrm{White}(\sigma_w^2).
 \]
 
-\subsection{Fitting the hyperparameters}
+\subsection{Step 3b --- how many hyperparameters, and how they are fit}
 \label{sec:fit}
-The free numbers $\bm\Theta=(c_1,\sigma_0,\ell^{\mathrm{obs}}_d,c_2,
-\ell^{\mathrm{base}}_d,\sigma_w^2)$ are chosen to maximize the log marginal
-likelihood of the training targets,
+
+\paragraph{Exactly how many free numbers?} With ARD (one length scale per active
+column) the kernel \eqref{eq:kernel} has the following tunable hyperparameters:
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{@{}lcl@{}}
+\toprule
+Hyperparameter & Count & Where \\
+\midrule
+$c_1$ (amplitude of $k_{\mathrm{lin}}$) & $1$ & ConstantKernel \\
+$\sigma_0$ (DotProduct offset) & $1$ & in-kernel CDR intercept \\
+$\bm\ell^{\mathrm{obs}}$ (Mat\'ern length scales on the Pauli cols) & $35$ & ARD over the $35$ pauli features \\
+$c_2$ (amplitude of $k_{\mathrm{base}}$) & $1$ & ConstantKernel \\
+$\bm\ell^{\mathrm{base}}$ (Mat\'ern length scales on angle$\oplus$pauli) & $47$ & ARD over $12+35$ features \\
+$\sigma_w^2$ (white-noise level) & $1$ & WhiteKernel \\
+\midrule
+\textbf{Total} & $\mathbf{86}$ & \\
+\bottomrule
+\end{tabular}
+\end{center}
+These $86$ numbers (collected as the vector $\bm\Theta$) are chosen to maximize
+the log marginal likelihood of the training targets,
 \begin{equation}
 \log p(\tilde{\bm y}\mid X,\bm\Theta)=
 -\tfrac12\,\tilde{\bm y}^{\!\top}\big(K_{\bm\Theta}+\sigma_w^2 I\big)^{-1}\tilde{\bm y}
@@ -458,13 +582,26 @@ the first term rewarding fit and the second penalizing model complexity
 (Occam balance). scikit-learn runs L-BFGS with
 \texttt{n\_restarts\_optimizer}$=2$ from random initializations and keeps the best
 $\bm\Theta$; bounds are $\ell\in[10^{-3},10^{3}]$,
-$\sigma_0\in[10^{-5},10^{2}]$, $\sigma_w^2\in[10^{-8},10^{2}]$. After this,
-$\bm\alpha=(K+\sigma_w^2I)^{-1}\tilde{\bm y}$ is cached and the GP is frozen.
+$\sigma_0\in[10^{-5},10^{2}]$, $\sigma_w^2\in[10^{-8},10^{2}]$.
 
-\section{A fully worked GP prediction (so you can recreate it)}
+\paragraph{Step 3c --- cache the dual weights.} With $\bm\Theta$ fixed, build the
+$1000\times1000$ matrix $K$, add $\sigma_w^2 I$, Cholesky-factorize once, and solve
+\begin{equation}
+\bm\alpha=(K+\sigma_w^2 I)^{-1}\tilde{\bm y}\quad(\text{length-}1000\text{ vector}).
+\end{equation}
+The GP is now frozen: the training inputs $\{\bm x_n\}$, the weights $\bm\alpha$,
+the constants $\bar y,\sigma_y$, and $\bm\Theta$ are all stored, and \emph{no
+further training or device calls} are needed to predict. Predicting (Step~4) is
+just Eq.~\eqref{eq:mean}.
+
+\section{Step 4 --- Predict one mitigated value (worked example)}
 \label{sec:worked-gp}
 
-We now evaluate \eqref{eq:mean} by hand. To keep the arithmetic on paper, this
+Now the loop starts. At the current $\bm\theta$ we run the noisy circuit once,
+read $O_{\mathrm{noisy}}(\bm\theta,P_i)$ for all $104$ Paulis, build each query
+feature row $\bm x_*$ (Step~2 encoding), and feed it to the frozen GP. ``Predict''
+means evaluate \eqref{eq:mean} -- a weighted sum of similarities to the stored
+training rows. To keep the arithmetic on paper, this
 example uses a \textbf{three-point training set} and \textbf{illustrative fitted
 hyperparameters}; the kernel formulas, the chaining, and every digit of the
 arithmetic are exactly what the code does for the real $N{=}1000$-row fit. The
@@ -559,8 +696,11 @@ for \texttt{IIIIIZII} to four decimals. This is the entire prediction: build the
 $48$-feature row, evaluate \eqref{eq:kernel} against each stored training row,
 dot with the cached $\bm\alpha$, and un-normalize.
 
-\section{The mitigated energy, worked out}
+\section{Step 5 --- Assemble the mitigated energy}
 \label{sec:energy}
+
+Step~4 gives one $O_{\mathrm{mit}}$ per Pauli. Summing them with the Hamiltonian
+coefficients is the energy.
 
 \subsection{Formula}
 \begin{equation}
@@ -611,31 +751,117 @@ The exact (green) energy, assembled identically with $O_{\mathrm{ideal}}$:
 So at iteration $1$: $\Emit=-98.523771$ vs.\ $\Eideal=-98.523071$ (blue is
 $0.70$~mEh below green), and $|\Emit-\egs|=50.107$~mEh.
 
-\section{The gradient, worked out}
+\section{Step 6 --- The gradient and the angle update}
 \label{sec:grad}
 
-\subsection{Formula}
-The energy depends on $\bm\theta$ both through the angle features and through the
-measured $O_{\mathrm{noisy}}$ (the Pauli block is constant in $\bm\theta$). Chain rule:
+To descend, we need $\nabla\Emit=(\partial\Emit/\partial\theta_1,\dots)$. This is
+the subtlest step, because $\Emit$ depends on $\bm\theta$ in \emph{two} different
+ways, and one of them can only be obtained by running more circuits. We explain
+the machinery first, then plug in real numbers.
+
+\subsection{Why the gradient needs the quantum device at all}
+Recall $\Emit=\boff+\sum_i w_i\,O_{\mathrm{mit},i}$ and
+$O_{\mathrm{mit},i}=m(\bm x_{*,i})$, where the query feature row
+$\bm x_{*,i}=[\,\bm a(\bm\theta)\,|\,O_{\mathrm{noisy}}(\bm\theta,P_i)\,|\,\bm p(P_i)\,]$.
+When we nudge an angle $\theta_j$, two of the three feature blocks move:
+\begin{itemize}
+  \item the \textbf{angle block} $\bm a(\bm\theta)$ changes in a way we know in
+        closed form (it is just cosines and sines of $\bm\theta$);
+  \item the \textbf{noisy block} $O_{\mathrm{noisy}}(\bm\theta,P_i)$ also changes,
+        because the physical circuit changes -- but \emph{we have no formula} for
+        how the noisy hardware responds, so its slope must be \textbf{measured};
+  \item the \textbf{Pauli block} $\bm p(P_i)$ does not depend on $\bm\theta$ at
+        all, so it contributes nothing.
+\end{itemize}
+That middle item is why the gradient touches the device.
+
+\subsection{The parameter-shift rule (where the \texorpdfstring{$\pm\pi/2$}{+-pi/2} comes from)}
+\label{sec:pshift}
+Each ansatz angle $\theta_j$ enters the circuit through a \emph{single} gate of
+the form $e^{-i\theta_j G/2}$ whose generator $G$ has eigenvalues $\pm1$ (the
+RX / RZX rotations used here). A standard fact: for any observable, the
+expectation value as a function of such a $\theta_j$ is a \emph{pure sinusoid},
+\begin{equation}
+f(\theta_j)=a+b\cos\theta_j+c\sin\theta_j,
+\end{equation}
+for some constants $a,b,c$ (set by the rest of the circuit). Its exact derivative
+can be obtained from just \emph{two} evaluations shifted by $\pm\tfrac\pi2$.
+Using $\cos(\theta\pm\tfrac\pi2)=\mp\sin\theta$ and
+$\sin(\theta\pm\tfrac\pi2)=\pm\cos\theta$,
+\begin{equation}
+\tfrac12\big[f(\theta_j+\tfrac\pi2)-f(\theta_j-\tfrac\pi2)\big]
+=\tfrac12\big[(-2b\sin\theta_j)+(2c\cos\theta_j)\big]
+=-b\sin\theta_j+c\cos\theta_j
+=f'(\theta_j).
+\label{eq:pshift}
+\end{equation}
+So the ``shift by $\pi/2$, subtract, halve'' formula is \textbf{exact} -- it is an
+algebraic identity for these gates, \emph{not} a small-step finite difference.
+The shift is exactly $\pi/2$ (not a tiny $\epsilon$) precisely because the
+function is a sinusoid; any smaller step would be \emph{less} accurate, not more.
+
+\subsection{Obtaining the noisy slope from \texorpdfstring{$\pm\pi/2$}{+-pi/2} circuits}
+\label{sec:noisy-slope}
+We apply \eqref{eq:pshift} to the \emph{real noisy measurement}. For each of the
+$3$ angles we run \textbf{two extra noisy circuits} -- one at
+$\bm\theta+\tfrac\pi2\bm e_j$ and one at $\bm\theta-\tfrac\pi2\bm e_j$ (here
+$\bm e_j$ is the unit step in coordinate $j$) -- each sampled with the \emph{same}
+$8192$ shots $+$ readout mitigation, returning all $104$ Paulis at once. Then for
+every Pauli $P_i$,
+\begin{equation}
+\boxed{\;\frac{\partial O_{\mathrm{noisy},i}}{\partial\theta_j}
+=\tfrac12\Big[O_{\mathrm{noisy},i}\big(\bm\theta+\tfrac\pi2\bm e_j\big)
+-O_{\mathrm{noisy},i}\big(\bm\theta-\tfrac\pi2\bm e_j\big)\Big].\;}
+\label{eq:noisy-slope}
+\end{equation}
+That is $2\times3=\mathbf{6}$ extra noisy circuit batches per VQE iteration (plus
+the $1$ batch already taken at $\bm\theta$ in Step~4: $7$ batches total).
+
+\paragraph{``But $\pi/2$ is far from the training set -- isn't that a problem?''}
+This is the key subtlety. The shifted angles
+$\bm\theta\pm\tfrac\pi2\bm e_j$ are indeed $\approx1.57$\,rad away from the current
+$\bm\theta$ and from the near-Clifford cluster the GP was trained on. \textbf{But
+those far-away points are sent only to the quantum device}, to evaluate
+\eqref{eq:noisy-slope} -- a property of the \emph{real measurement}, which is
+valid at any angle. They are \textbf{never fed to the GP.} The GP's own
+sensitivity, $\partial m/\partial\bm x_*$, is evaluated \emph{only at the current,
+in-distribution} $\bm\theta$ (next subsection). So the surrogate is never asked to
+extrapolate to a $\pi/2$-away point.
+
+\paragraph{Contrast with the pure ``parameter-shift'' mode.} The code also offers
+a simpler \texttt{gradient\_mode="parameter\_shift"} that shifts the
+\emph{entire mitigated energy}: it builds the surrogate energy
+$\Emit(\bm\theta\pm\tfrac\pi2\bm e_j)$ and finite-differences \emph{that}. That
+version \emph{does} query the GP at $\pi/2$-away feature rows, where the GP must
+extrapolate well outside its near-Clifford data -- exactly the regime where the
+GP reverts toward its mean and can be biased. The \texttt{analytic} mode used for
+the worked numbers here avoids that by differentiating the GP in closed form at
+$\bm\theta$ and only borrowing the \emph{device} slope from the shifted circuits.
+Same number of circuits, more trustworthy gradient.
+
+\subsection{The full chain rule}
+Combining the two moving blocks (Pauli block drops out):
 \begin{equation}
 \frac{\partial\Emit}{\partial\theta_j}
 =\sum_{i=1}^{104} w_i\!\left[
-\underbrace{\sum_{d\in\text{angle}}\frac{\partial m_i}{\partial x_d}\frac{\partial x_d}{\partial\theta_j}}_{\text{angle contribution}}
+\underbrace{\sum_{d\in\text{angle}}\frac{\partial m_i}{\partial x_d}\frac{\partial x_d}{\partial\theta_j}}_{\text{angle path (all classical)}}
 \;+\;
-\underbrace{\frac{\partial m_i}{\partial O_{\mathrm{noisy}}}\,\frac{\partial O_{\mathrm{noisy},i}}{\partial\theta_j}}_{\text{device contribution}}
+\underbrace{\frac{\partial m_i}{\partial O_{\mathrm{noisy}}}\,\frac{\partial O_{\mathrm{noisy},i}}{\partial\theta_j}}_{\text{device path ($\pm\pi/2$ circuits)}}
 \right].
 \label{eq:grad}
 \end{equation}
-The three factors:
+The three kinds of factor:
 \begin{itemize}
   \item $\dfrac{\partial m_i}{\partial \bm x_*}=\sigma_y\sum_n\alpha_n\dfrac{\partial k(\bm x_*,\bm x_n)}{\partial \bm x_*}$
-        --- analytic, purely classical (no device).
+        --- the GP mean's sensitivity to its inputs. Analytic, purely classical
+        (no device), evaluated at the current $\bm\theta$
+        (Appendix~\ref{sec:appendix-grad}).
   \item $\dfrac{\partial x_d}{\partial\theta_j}$ --- closed form for the Fourier
         features: $\partial\cos(k\theta_j)/\partial\theta_j=-k\sin(k\theta_j)$,
         $\partial\sin(k\theta_j)/\partial\theta_j=k\cos(k\theta_j)$.
   \item $\dfrac{\partial O_{\mathrm{noisy},i}}{\partial\theta_j}$ --- the only
-        quantum quantity, from a parameter shift on the real noisy measurement:
-        $\tfrac12\big[O_{\mathrm{noisy},i}(\bm\theta+\tfrac\pi2\bm e_j)-O_{\mathrm{noisy},i}(\bm\theta-\tfrac\pi2\bm e_j)\big]$.
+        quantum quantity, the $\pm\pi/2$ device slope of
+        Eq.~\eqref{eq:noisy-slope}.
 \end{itemize}
 
 \subsection{Worked chain at iteration 1 for \texorpdfstring{$\theta_1$}{theta1}, term \texorpdfstring{$P=\texttt{IIIIIZII}$}{P=IIIIIZII}}
@@ -653,9 +879,19 @@ The GP mean's sensitivity to those same four features (from
 \[
 0.035034\cdot 0 + (-0.014928)\cdot 1 + 0.0000005\cdot 0 + 0.0000012\cdot 2 = -0.014926.
 \]
-\paragraph{Device contribution.} Here
-$\partial m/\partial O_{\mathrm{noisy}}=-0.000094$ and the parameter-shift slope is
-$\partial O_{\mathrm{noisy}}/\partial\theta_1=+0.005969$, so the device piece is
+\paragraph{Device contribution.} The GP mean's sensitivity to the noisy column is
+$\partial m/\partial O_{\mathrm{noisy}}=-0.000094$ (tiny -- at the near-Clifford
+HF point the prediction barely leans on the raw measurement). The noisy slope
+comes from the two $\pm\pi/2$ circuits of Eq.~\eqref{eq:noisy-slope}: measuring
+\texttt{IIIIIZII} at $\bm\theta+\tfrac\pi2\bm e_1$ and $\bm\theta-\tfrac\pi2\bm e_1$
+gave (illustratively) $O_{\mathrm{noisy}}^{+}=-0.802331$ and
+$O_{\mathrm{noisy}}^{-}=-0.814269$, so
+\[
+\frac{\partial O_{\mathrm{noisy}}}{\partial\theta_1}
+=\tfrac12\big(O_{\mathrm{noisy}}^{+}-O_{\mathrm{noisy}}^{-}\big)
+=\tfrac12\big(-0.802331-(-0.814269)\big)=\tfrac12(0.011938)=+0.005969 .
+\]
+Hence the device piece is
 $(-0.000094)(0.005969)=-0.0000006$.
 \paragraph{Combine for this term.}
 \[
@@ -675,10 +911,12 @@ gives the full gradient:
 =[\,0.112001,\ 0.015816,\ 0.031416\,].
 \]
 
-\section{The mitigated energy at iteration 2}
+\section{Steps 4--6 again: the second iteration}
+\label{sec:iter2}
 
-Now evaluate Eq.~\eqref{eq:Emit} at $\bm\theta^{(2)}=(0.112001,0.015816,0.031416)$.
-The same six dominant terms:
+The loop now returns to Step~4 at the updated angles. We re-measure, re-predict,
+and re-assemble the energy. Evaluating Eq.~\eqref{eq:Emit} at
+$\bm\theta^{(2)}=(0.112001,0.015816,0.031416)$, the same six dominant terms:
 
 \begin{center}
 \renewcommand{\arraystretch}{1.15}
@@ -711,8 +949,28 @@ $\Eideal(\bm\theta^{(2)})=-98.546109$~Eh. Again blue is $0.77$~mEh below green,
 and $|\Emit-\egs|=26.999$~mEh -- improved from $50.107$~mEh at iteration $1$, so
 the optimizer is descending correctly.
 
-\section{Reading the two iterations}
+\section{Step 7 --- Uncertainty top-up, then iterate}
 \label{sec:reading}
+
+After predicting in Step~4, the GP also returns a \emph{predictive standard
+deviation} $\sigma(\bm x_*)$ for each Pauli. The controller forms a
+coefficient-weighted aggregate $\sum_i |w_i|\,\sigma_i$ and compares it to
+\texttt{GP\_UNCERTAINTY\_THRESHOLD}. If the GP is too unsure at the current
+$\bm\theta$ (it has wandered away from its data), the code:
+\begin{enumerate}
+  \item samples a fresh batch of $\texttt{GP\_TOPUP\_BATCH\_SIZE}$ near-Clifford
+        circuits \emph{around the current} $\bm\theta$ (Step~1 machinery, but
+        centered here, with radius \texttt{GP\_TOPUP\_RADIUS}),
+  \item measures them, appends the new rows, optionally prunes the farthest old
+        rows to stay under \texttt{GP\_MAX\_GP\_POINTS}, and \textbf{refits the GP}
+        (recomputing $\bm\Theta$ and $\bm\alpha$, Step~3),
+  \item re-predicts at $\bm\theta$ with the now better-informed GP.
+\end{enumerate}
+This keeps the surrogate trustworthy exactly where the optimizer currently is.
+Then the angle step from Step~6 is applied and control returns to Step~4. The
+whole Steps~4--7 cycle repeats for \texttt{GP\_VQE\_ITERS} iterations.
+
+\subsection{Reading the two iterations}
 
 \begin{center}
 \renewcommand{\arraystretch}{1.2}

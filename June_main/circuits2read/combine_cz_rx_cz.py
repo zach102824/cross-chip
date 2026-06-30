@@ -1,12 +1,17 @@
 """
-combine_cz_rx_cz_for_HF.py
-==========================
-Read ``HF_8q_3doubles.json`` (the bare CZ-form UCCSD-doubles ansatz for HF,
-8 qubits, 3 doubles) and fuse every  CZ(a,b) . RX(theta)@q . CZ(a,b)  sandwich
-into a single continuous-angle native RZX gate.  The HF circuit contains three
-such sandwiches -- one per double, on the alpha<->beta vertical link
-CZ(2,6) . RX(t_k)@2 . CZ(2,6) -- so three CZ pairs collapse into three RZX
-gates while every angle stays symbolic.
+combine_cz_rx_cz.py
+===================
+Read a bare CZ-form UCCSD-doubles ansatz JSON and fuse every
+CZ(a,b) . RX(theta)@q . CZ(a,b)  sandwich into a single continuous-angle
+native RZX gate.  Each double contributes one such sandwich on the
+alpha<->beta vertical link, so every CZ pair collapses into an RZX gate
+while every angle stays symbolic.
+
+Originally written for HF (``HF_8q_3doubles.json``, 8 qubits, 3 doubles); now
+generic over any input JSON in this folder.  Output names/titles are derived
+from the input file stem, e.g.
+    Br2_12q_4doubles.json -> Br2_12q_4doubles_rzx.json (+ _rzx_circuit.png)
+    Cl2_10q_3doubles.json -> Cl2_10q_3doubles_rzx.json (+ _rzx_circuit.png)
 
 Why this is exact.  CZ is symmetric and Z-diagonal, so
     CZ(a,b) . exp(-i th/2 X_q) . CZ(a,b)  ==  exp(-i th/2  X_q (x) Z_other)
@@ -14,8 +19,8 @@ which is precisely Qiskit's RZX(th) with the Z on ``other`` and the X on ``q``,
 i.e. ``rzx(th, other, q)``.
 
 Outputs (same folder, same format/style as the UCCSD generator pipeline):
-    HF_8q_3doubles_rzx.json          -- updated logical gate-list JSON
-    HF_8q_3doubles_rzx_circuit.png   -- folded-out Qiskit mpl diagram
+    <stem>_rzx.json          -- updated logical gate-list JSON
+    <stem>_rzx_circuit.png   -- folded-out Qiskit mpl diagram
 """
 from __future__ import annotations
 
@@ -74,6 +79,7 @@ def main(in_json: Path | None = None):
     gen, cio = _load_helpers()
 
     in_json = Path(in_json) if in_json is not None else _THIS_DIR / "HF_8q_3doubles.json"
+    stem = in_json.stem
     data = cio.load_circuit_json(in_json)
     num_qubits = int(data["num_qubits"])
     bare_gates = data["gates"]
@@ -86,7 +92,7 @@ def main(in_json: Path | None = None):
 
     _verify_fusion(gen, bare_gates, fused_gates, num_qubits)
 
-    out_json = _THIS_DIR / "HF_8q_3doubles_rzx.json"
+    out_json = _THIS_DIR / f"{stem}_rzx.json"
     cio.save_circuit_json(
         out_json,
         molecule=data["molecule"],
@@ -102,13 +108,13 @@ def main(in_json: Path | None = None):
         beta=data.get("beta"),
     )
 
-    out_png = _THIS_DIR / "HF_8q_3doubles_rzx_circuit.png"
+    out_png = _THIS_DIR / f"{stem}_rzx_circuit.png"
     gen.save_circuit_diagram(
-        fused_gates, num_qubits, out_png, title="HF_8q_3doubles (CZ-RX-CZ -> RZX)"
+        fused_gates, num_qubits, out_png, title=f"{stem} (CZ-RX-CZ -> RZX)"
     )
 
     print(
-        f"[HF_8q_3doubles] fused CZ-RX-CZ -> RZX\n"
+        f"[{stem}] fused CZ-RX-CZ -> RZX\n"
         f"    in  : {len(bare_gates):3d} gates (CZ={n_cz_in})\n"
         f"    out : {len(fused_gates):3d} gates (CZ={n_cz_out}, RZX={n_rzx})\n"
         f"    wrote {out_json.name} (+ {out_png.name})"
@@ -117,4 +123,18 @@ def main(in_json: Path | None = None):
 
 
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) > 1:
+        inputs = [Path(a) for a in sys.argv[1:]]
+    else:
+        inputs = [
+            _THIS_DIR / "HF_8q_3doubles.json",
+            _THIS_DIR / "Cl2_10q_3doubles.json",
+            _THIS_DIR / "Br2_12q_4doubles.json",
+        ]
+    for p in inputs:
+        if not p.is_absolute():
+            p = _THIS_DIR / p
+        if p.exists():
+            main(p)
+        else:
+            print(f"[skip] not found: {p}")
