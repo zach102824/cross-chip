@@ -493,11 +493,15 @@ amplitude ($c_1,c_2$); it scales whatever it multiplies.
 \begin{equation}
 k_{\mathrm{dot}}(o,o')=\sigma_0^2+o\,o'.
 \end{equation}
-This is the non-stationary piece that, after the linear-algebra of
-\eqref{eq:mean}, reproduces an affine map $a\cdot o+b$ from the measured value to
-the prediction -- i.e.\ the classic CDR line $O_{\mathrm{ideal}}\approx a\,
-O_{\mathrm{noisy}}+b$, with the slope $a$ set by $c_1$ and the intercept by
-$\sigma_0$. ``CDR is absorbed in the kernel'' means exactly this term.
+This is the non-stationary piece that makes the prediction an \emph{affine
+function of the live measured value}, $a\,O_{\mathrm{noisy}}+b$ -- the classic CDR
+line $O_{\mathrm{ideal}}\approx a\,O_{\mathrm{noisy}}+b$. Importantly, $a$ and $b$
+are \textbf{not} individual hyperparameters: they are \emph{assembled from the dual
+weights $\bm\alpha$ and the training measurements} after the fit ($c_1$ scales the
+resulting slope, $\sigma_0$ the intercept). Exactly how that assembly works --
+i.e.\ how ``$\bm\alpha$ times similarities'' becomes a CDR line -- is derived with
+numbers in Section~\ref{sec:cdr-emerges}. ``CDR is absorbed in the kernel'' means
+exactly this term.
 
 \paragraph{Mat\'ern} ($\nu=2.5$, the default) on a feature group with ARD
 (one length scale $\ell_d$ per active column). With the scaled distance
@@ -547,8 +551,34 @@ So in code, \eqref{eq:kernel} reads
 \;+\;\mathrm{White}(\sigma_w^2).
 \]
 
-\subsection{Step 3b --- how many hyperparameters, and how they are fit}
+\subsection{Step 3b/3c --- the fitting recipe, every step}
 \label{sec:fit}
+
+Concretely, ``fit the GP'' is this exact sequence
+(scikit-learn's \texttt{GaussianProcessRegressor.fit} on our assembled kernel):
+\begin{enumerate}
+  \item \textbf{Normalize the targets.} From the $N=1000$ training targets
+        $y_n=O_{\mathrm{ideal}}$ compute $\bar y,\sigma_y$ and form
+        $\tilde y_n=(y_n-\bar y)/\sigma_y$ (Section~\ref{sec:normalize}). The GP is
+        fit on these dimensionless numbers.
+  \item \textbf{Instantiate the kernel} \eqref{eq:kernel} with \emph{initial}
+        hyperparameters $\bm\Theta_0$: amplitudes $c_1{=}c_2{=}1$, every Mat\'ern
+        length scale $\ell{=}1$, $\sigma_0{=}1$, white level
+        $\sigma_w^2{=}10^{-3}$.
+  \item \textbf{Optimize the hyperparameters $\bm\Theta$.} For a trial $\bm\Theta$:
+        build the $N\times N$ matrix $K_{\bm\Theta}$, add $\sigma_w^2 I$,
+        Cholesky-factorize, and evaluate the log marginal likelihood
+        \eqref{eq:lml}. L-BFGS climbs this objective (with $2$ random restarts,
+        respecting the bounds below) and keeps the best $\bm\Theta$. \emph{This is
+        the only place the $86$ numbers below are chosen -- nothing about
+        $\bm\alpha$ is touched yet.}
+  \item \textbf{Cache the dual weights $\bm\alpha$.} With the winning $\bm\Theta$
+        fixed, solve $\bm\alpha=(K+\sigma_w^2 I)^{-1}\tilde{\bm y}$ once (reusing
+        the Cholesky factor) and store it.
+\end{enumerate}
+Steps 1--3 fix the \emph{shape} of the similarity function; step 4 converts the
+training targets into the frozen weight vector $\bm\alpha$ that every future
+prediction reuses. We now detail 3 (the count and objective) and 4 (the solve).
 
 \paragraph{Exactly how many free numbers?} With ARD (one length scale per active
 column) the kernel \eqref{eq:kernel} has the following tunable hyperparameters:
@@ -695,6 +725,88 @@ which matches the real iteration-2 mitigated value $O_{\mathrm{mit}}=-1.001467$
 for \texttt{IIIIIZII} to four decimals. This is the entire prediction: build the
 $48$-feature row, evaluate \eqref{eq:kernel} against each stored training row,
 dot with the cached $\bm\alpha$, and un-normalize.
+
+\subsection{How \texorpdfstring{$\bm\alpha$}{alpha} and \texorpdfstring{$k_{\mathrm{lin}}$}{k\_lin} literally give the CDR line \texorpdfstring{$a\,O_{\mathrm{noisy}}+b$}{a O\_noisy + b}}
+\label{sec:cdr-emerges}
+
+This is the step that usually feels mysterious: the prediction is ``just
+$\bm\alpha$ times similarities,'' yet we claim it \emph{contains} the classic CDR
+line $O_{\mathrm{ideal}}\approx a\,O_{\mathrm{noisy}}+b$. Here is exactly why, in
+three moves, then with the worked numbers.
+
+\paragraph{Move 1 --- the kernel is a sum, so the prediction is a sum.}
+The kernel splits as $k=k_{\mathrm{lin}}+k_{\mathrm{base}}+\text{white}$
+\eqref{eq:kernel}. Because the prediction \eqref{eq:mean} is \emph{linear} in the
+kernel, it splits the same way (the white term is $0$ for a fresh query):
+\begin{equation}
+m(\bm x_*)=\bar y
++\sigma_y\underbrace{\sum_n\alpha_n k_{\mathrm{lin}}(\bm x_*,\bm x_n)}_{\text{(I) the CDR part}}
++\sigma_y\underbrace{\sum_n\alpha_n k_{\mathrm{base}}(\bm x_*,\bm x_n)}_{\text{(II) the residual part}} .
+\label{eq:mean-split}
+\end{equation}
+
+\paragraph{Move 2 --- part (I) is exactly affine in $O_{\mathrm{noisy}}$.}
+Write $o_*=O_{\mathrm{noisy}}$ of the query and $o_n$ of training row $n$, and
+$k_{\mathrm{obs},n}=k_{\mathrm{obs}}(\bm p_*,\bm p_n)$. Since
+$k_{\mathrm{lin}}(\bm x_*,\bm x_n)=c_1(\sigma_0^2+o_* o_n)\,k_{\mathrm{obs},n}$,
+\begin{align}
+\sum_n\alpha_n k_{\mathrm{lin}}
+&=c_1\sum_n\alpha_n(\sigma_0^2+o_* o_n)\,k_{\mathrm{obs},n}\notag\\
+&=\underbrace{\Big(c_1\sigma_0^2\!\sum_n\alpha_n k_{\mathrm{obs},n}\Big)}_{\textstyle B}
++\underbrace{\Big(c_1\!\sum_n\alpha_n o_n\,k_{\mathrm{obs},n}\Big)}_{\textstyle A}\;o_*
+=B+A\,o_* .
+\label{eq:AB}
+\end{align}
+The bracketed quantities $A$ and $B$ are \textbf{constants} -- built once from the
+frozen $\bm\alpha$, the fixed training measurements $o_n$, and the fixed
+hyperparameters. So part (I), as a function of the \emph{live} measurement $o_*$,
+is a straight line $A\,o_*+B$. Because $k_{\mathrm{obs},n}$ weights the sum by
+Pauli similarity, \emph{each Pauli gets its own $A,B$} -- the observable-dependent
+CDR slope the product kernel was built for.
+
+\paragraph{Move 3 --- fold in the constants.}
+Part (II) does not depend on $o_*$ at all (it uses only angle/Pauli columns); call
+its value $R$ (the ``coherent residual''). Substituting into
+\eqref{eq:mean-split},
+\begin{equation}
+\boxed{\;O_{\mathrm{mit}}
+=\underbrace{\big(\bar y+\sigma_y B+\sigma_y R\big)}_{\textstyle b\ (\text{intercept})}
++\underbrace{\sigma_y A}_{\textstyle a\ (\text{slope})}\;O_{\mathrm{noisy}}\;}
+\end{equation}
+which is \emph{exactly} a CDR line $a\,O_{\mathrm{noisy}}+b$ -- but with a slope and
+intercept manufactured by the fit, and an intercept that \emph{shifts with the
+angle} through $R$ (something a plain per-Pauli CDR line cannot do). That extra
+angle dependence is the whole point of adding $k_{\mathrm{base}}$.
+
+\paragraph{The same, with the worked numbers.} Reuse the $3$-point example
+($c_1=0.5$, $\sigma_0^2=0.09$, $\bar y=-0.42$, $\sigma_y=0.55$,
+$\bm\alpha=(-0.7431,-0.2000,-0.2000)$, $o_n=(-0.78,-0.62,-0.85)$,
+$k_{\mathrm{obs},n}=(1,1,0.32289)$, and the $k_{\mathrm{base},n}=(0.74481,0.44258,0.33258)$
+from Step~4):
+\[
+\begin{aligned}
+A&=c_1\!\sum_n\alpha_n o_n k_{\mathrm{obs},n}
+=0.5\big[(-0.7431)(-0.78)+(-0.2)(-0.62)+(-0.2)(-0.85)(0.32289)\big]=0.37925,\\
+B&=c_1\sigma_0^2\!\sum_n\alpha_n k_{\mathrm{obs},n}
+=0.5(0.09)\big[-0.7431-0.2-0.2(0.32289)\big]=-0.04535,\\
+R&=\sum_n\alpha_n k_{\mathrm{base},n}
+=(-0.7431)(0.74481)+(-0.2)(0.44258)+(-0.2)(0.33258)=-0.70850.
+\end{aligned}
+\]
+So the effective CDR line for this Pauli at this angle is
+\[
+a=\sigma_y A=0.55(0.37925)=0.20859,\qquad
+b=\bar y+\sigma_y B+\sigma_y R=-0.42+0.55(-0.04535)+0.55(-0.70850)=-0.83462,
+\]
+and evaluating at the live $O_{\mathrm{noisy}}=-0.80$,
+\[
+O_{\mathrm{mit}}=a\,O_{\mathrm{noisy}}+b=0.20859(-0.80)-0.83462=-1.00149,
+\]
+identical to the Step-4 result. So ``$\bm\alpha$ times similarities'' and ``a CDR
+line $a\,O_{\mathrm{noisy}}+b$'' are the \emph{same computation} seen two ways:
+$\bm\alpha$ together with the DotProduct term \emph{produce} the slope
+$a=\sigma_y A$ and intercept-part $\sigma_y B$, while the Mat\'ern term supplies
+the angle-dependent residual $R$ that a plain CDR line lacks.
 
 \section{Step 5 --- Assemble the mitigated energy}
 \label{sec:energy}
@@ -910,6 +1022,68 @@ gives the full gradient:
 =[\,0,0,0\,]-0.5\,[\,-0.224003,-0.031632,-0.062832\,]
 =[\,0.112001,\ 0.015816,\ 0.031416\,].
 \]
+
+\subsection{Why the gradient is accurate even though the device part uses only REM-mitigated data}
+\label{sec:grad-accuracy}
+
+A natural worry: the device slope $\partial O_{\mathrm{noisy},i}/\partial\theta_j$
+comes from \emph{noisy, only REM-mitigated} measurements whose absolute error is
+large, so surely the gradient is badly wrong? It is not, for four independent
+reasons.
+
+\paragraph{1. The quantum-measured part of the gradient is negligible.}
+In Eq.~\eqref{eq:grad} the device path enters multiplied by
+$\partial m_i/\partial O_{\mathrm{noisy}}$. For the dominant term \texttt{IIIIIZII}
+at iteration~1 the captured numbers are
+\[
+\underbrace{\text{angle path}}_{\text{classical}}=-0.0149258,
+\qquad
+\underbrace{\text{device path}}_{\pm\pi/2\ \text{circuits}}=-5.61\times10^{-7},
+\]
+so the quantum-measured contribution is $\approx0.004\%$ of the term. The gradient
+is, in practice, \emph{almost entirely} the analytic, noise-free derivative of the
+GP mean with respect to the \textbf{angle} features -- a purely classical quantity.
+
+\paragraph{2. Why that multiplier is tiny.}
+Here $\partial m_i/\partial O_{\mathrm{noisy}}=-9.4\times10^{-5}$: the GP, trained
+on near-Clifford data, predicts $O_{\mathrm{ideal}}$ mostly from the
+angle$\oplus$Pauli base kernel (which interpolates the near-Clifford manifold) and
+only weakly from the live noisy value (the in-kernel CDR/DotProduct term). So even
+a genuine noisy slope ($\partial O_{\mathrm{noisy}}/\partial\theta_1=+0.005969$)
+is scaled by $\sim\!10^{-4}$ before it reaches the gradient. Effectively, the
+gradient is the classical derivative of the GP's model of the \emph{noiseless}
+landscape.
+
+\paragraph{3. Even the device slope is far more accurate than $O_{\mathrm{noisy}}$.}
+Model the noise as $O_{\mathrm{noisy}}(\bm\theta)\approx\lambda\,O_{\mathrm{ideal}}(\bm\theta)+b$
+with slowly-varying damping $\lambda$ and offset $b$. Because the parameter-shift
+slope is a \emph{difference} (Eq.~\eqref{eq:noisy-slope}),
+\[
+\frac{\partial O_{\mathrm{noisy}}}{\partial\theta_j}
+\approx\lambda\,\frac{\partial O_{\mathrm{ideal}}}{\partial\theta_j}:
+\]
+the offset $b$ cancels exactly ($b-b=0$, removing the largest systematic error),
+and the damping $\lambda$ only \emph{rescales} the slope -- same sign, same zeros.
+A uniformly rescaled gradient merely changes the effective learning rate; it does
+not change the descent direction or the location of the minimum.
+
+\paragraph{4. The gradient only steers; the reported accuracy is the forward GP.}
+The plotted error $|\,E-\egs\,|$ uses the GP-mitigated \emph{forward} value at each
+$\bm\theta$; its accuracy is set by how well the GP predicts $O_{\mathrm{ideal}}$,
+not by the gradient. The gradient's only job is to move $\bm\theta$ into a good
+region -- and gradient descent is famously robust to noisy/biased gradients (the
+reason SGD works). ``Good final energy'' and ``accurate gradient'' are therefore
+largely decoupled.
+
+\begin{tcolorbox}[colback=orange!5!white,colframe=orange!60!black,title=\textbf{Caveat}]
+The flip side of point~2 -- the GP nearly ignoring the live measurement and
+leaning on its near-Clifford interpolation -- is the same mechanism behind the
+on-path bias (blue sitting just below green). So a dramatic dip to $\sim\!10^{-4}$
+Eh should be read as a property of the GP forward model (plus possible on-path
+optimism), \emph{not} as evidence that the gradients are precise to that level.
+The honest check remains evaluating the mitigated energy on an \textbf{independent}
+set of $\bm\theta$, not only along the optimizer path.
+\end{tcolorbox}
 
 \section{Steps 4--6 again: the second iteration}
 \label{sec:iter2}

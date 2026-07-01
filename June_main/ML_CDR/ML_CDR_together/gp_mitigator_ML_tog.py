@@ -146,6 +146,12 @@ class MitigatorConfig:
     # (2) Mandatory periodic top-up every ``topup_every`` iterations (0 = off).
     #     Cheap insurance against a frozen, overconfident GP trapping the optimizer.
     topup_every: int = 0
+    # (3) Top-up-until-satisfied: after a top-up fires, keep adding local batches
+    #     while the |c|-weighted predicted std stays above ``uncertainty_threshold``,
+    #     up to ``max_topup_retries`` extra batches (0 = off -> a single top-up).
+    #     Bounds the shot cost while forcing the surrogate to be trustworthy at
+    #     the current theta before the gradient/step are computed.
+    max_topup_retries: int = 0
     # (4) Convergence validation: when |grad| < ``convergence_grad_tol`` fire one
     #     REAL near-Clifford top-up at the current theta and re-check before
     #     declaring convergence; only stop if the energy then moves less than
@@ -1205,11 +1211,30 @@ def run_vqe_with_mitigator(
             int(cfg.topup_every) > 0 and it > 0 and (it % int(cfg.topup_every) == 0)
         )
         topped = 0
+        iter_topups = 0  # number of top-up batches this iter (for shot accounting)
         if unc_trigger or move_trigger or periodic_trigger:
             o_mit, std = do_topup(theta, int(cfg.rng_seed) + 10_000 + it)
             last_topup_theta = theta.copy()
             topped = 1
+            iter_topups += 1
             topup_total += 1
+            # (3) Top-up-until-satisfied: keep adding local batches while the GP is
+            #     still too uncertain at theta, bounded by ``max_topup_retries`` so
+            #     the shot cost stays capped. Forces a trustworthy surrogate before
+            #     the gradient/step are taken (the fix for runaway extrapolation).
+            retries = 0
+            while (
+                int(cfg.max_topup_retries) > 0
+                and weighted_uncertainty(std, mitigator.coeff_by_pauli)
+                > float(cfg.uncertainty_threshold)
+                and retries < int(cfg.max_topup_retries)
+            ):
+                o_mit, std = do_topup(
+                    theta, int(cfg.rng_seed) + 30_000 + it * 1000 + retries
+                )
+                iter_topups += 1
+                topup_total += 1
+                retries += 1
 
         energy = adapter.energy_from_values(o_mit)
         unc = weighted_uncertainty(std, mitigator.coeff_by_pauli)
@@ -1231,6 +1256,7 @@ def run_vqe_with_mitigator(
                 o_mit, std = do_topup(theta, int(cfg.rng_seed) + 20_000 + it)
                 last_topup_theta = theta.copy()
                 topped = 1
+                iter_topups += 1
                 topup_total += 1
                 energy_new = adapter.energy_from_values(o_mit)
                 unc = weighted_uncertainty(std, mitigator.coeff_by_pauli)
@@ -1261,6 +1287,7 @@ def run_vqe_with_mitigator(
             "energy_backbone": float(adapter.energy_from_values(backbone_by_pauli)),
             "weighted_uncertainty": float(unc),
             "topped_up": int(topped),
+            "n_topups": int(iter_topups),
             "topup_cum": int(topup_total),
             "grad_evals": int(grad_evals),
             "grad_norm": float(np.linalg.norm(grad)),
@@ -1277,7 +1304,7 @@ def run_vqe_with_mitigator(
             )
             print(
                 f"[GP-VQE] iter={it:03d}  E_mit={energy: .6f}{extra}  "
-                f"unc={unc: .4e}  topup={topped} (cum={topup_total})  "
+                f"unc={unc: .4e}  topup={iter_topups} (cum={topup_total})  "
                 f"|g|={rec['grad_norm']: .3e}  rows={rec['n_rows']}"
             )
 
@@ -1330,7 +1357,7 @@ def analytic_shot_count(
       * warm start          : ``n_warmstart_circuits`` executions (once),
       * per VQE iteration    : 1 energy measurement
                                + ``grad_evals * 2 * n_params`` gradient circuits
-                               + ``topped_up * topup_batch_size`` top-up circuits.
+                               + ``n_topups * topup_batch_size`` top-up circuits.
 
     ``grad_evals`` (1, or 2 on a convergence-validation iteration) and
     ``topped_up`` (0/1) are read back from ``history`` so the data-dependent
@@ -1347,7 +1374,10 @@ def analytic_shot_count(
     for rec in history:
         energy_evals += 1
         gradient_evals += int(rec.get("grad_evals", 1)) * grad_evals_cost
-        topup_evals += int(rec.get("topped_up", 0)) * int(config.topup_batch_size)
+        # ``n_topups`` counts every batch this iter (top-up-until-satisfied can fire
+        # several); fall back to the 0/1 ``topped_up`` flag for legacy histories.
+        n_topups = int(rec.get("n_topups", rec.get("topped_up", 0)))
+        topup_evals += n_topups * int(config.topup_batch_size)
 
     breakdown = {
         "warm_start": warmstart_evals,

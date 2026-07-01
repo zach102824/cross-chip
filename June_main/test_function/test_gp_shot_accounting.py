@@ -8,7 +8,7 @@ hardware cost is therefore::
     total_shots = shots * (warm_start
                            + sum_iter[ 1 (energy)
                                        + grad_evals * 2 * n_params (gradient)
-                                       + topped_up * topup_batch_size (top-up) ])
+                                       + n_topups * topup_batch_size (top-up) ])
 
 Two independent counts must agree:
 
@@ -170,8 +170,17 @@ def _run(cfg, *, std_value=0.0, grad_fn=None, max_iters, learning_rate=0.5,
     return adapter, vqe_out
 
 
-def _check(adapter, vqe_out, cfg, *, expected_topup_iters, expected_iters):
-    """Assert NUMERICAL == ANALYTICAL == hand formula (VQE only, no warm start)."""
+def _check(adapter, vqe_out, cfg, *, expected_topup_iters, expected_iters,
+           expected_topup_batches=None):
+    """Assert NUMERICAL == ANALYTICAL == hand formula (VQE only, no warm start).
+
+    ``expected_topup_iters`` counts iterations that top up at all (the 0/1
+    ``topped_up`` flag); ``expected_topup_batches`` counts the TOTAL number of
+    top-up batches (``n_topups``), which can exceed the iteration count once
+    top-up-until-satisfied fires several batches per iter. Defaults to equal.
+    """
+    if expected_topup_batches is None:
+        expected_topup_batches = expected_topup_iters
     history = vqe_out["history"]
     n_params = cfg.n_params
     grad_cost = gpm.gradient_circuit_evals(cfg)
@@ -180,9 +189,9 @@ def _check(adapter, vqe_out, cfg, *, expected_topup_iters, expected_iters):
     # grad_evals is 2 only on a convergence-validation iteration, else 1.
     grad_eval_units = sum(int(h["grad_evals"]) for h in history)
     hand_evals = (
-        len(history)                                # energy
-        + grad_eval_units * grad_cost               # gradient
-        + expected_topup_iters * cfg.topup_batch_size  # top-ups
+        len(history)                                   # energy
+        + grad_eval_units * grad_cost                  # gradient
+        + expected_topup_batches * cfg.topup_batch_size  # top-ups (all batches)
     )
     hand_shots = hand_evals * cfg.shots
 
@@ -197,6 +206,7 @@ def _check(adapter, vqe_out, cfg, *, expected_topup_iters, expected_iters):
 
     assert len(history) == expected_iters, (len(history), expected_iters)
     assert sum(int(h["topped_up"]) for h in history) == expected_topup_iters
+    assert sum(int(h["n_topups"]) for h in history) == expected_topup_batches
     assert num_evals == hand_evals, (num_evals, hand_evals)
     assert num_shots == hand_shots, (num_shots, hand_shots)
     assert ana["circuit_evals"] == num_evals, (ana["circuit_evals"], num_evals)
@@ -280,6 +290,22 @@ def test_convergence_validation_early_stop():
     _check(adapter, vqe_out, cfg, expected_topup_iters=1, expected_iters=len(history))
 
 
+def test_topup_until_uncertainty_satisfied():
+    """top-up-until-satisfied: with std stuck above the threshold every triggered
+    iteration fires 1 initial + max_topup_retries extra batches (bounded cap)."""
+    retries = 3
+    cfg = _base_config(uncertainty_threshold=0.1, max_topup_retries=retries)
+    n = 4
+    # weighted unc = 2 * 0.5 = 1.0 > 0.1 on every iter (incl. iter 0 via the
+    # uncertainty gate); the fake std never drops so the retry loop hits the cap.
+    adapter, vqe_out = _run(cfg, std_value=0.5, max_iters=n)
+    per_iter = 1 + retries  # initial top-up + capped retries
+    _check(adapter, vqe_out, cfg, expected_topup_iters=n, expected_iters=n,
+           expected_topup_batches=n * per_iter)
+    # Every iteration recorded the full batch count.
+    assert all(int(h["n_topups"]) == per_iter for h in vqe_out["history"])
+
+
 def test_parameter_shift_matches_analytic_mode_cost():
     """Gradient cost is mode-independent: parameter-shift costs the same 2*n_params
     circuits per gradient as the analytic mode."""
@@ -298,6 +324,7 @@ SCENARIOS = [
     ("periodic top-ups", test_periodic_topups),
     ("trust-region top-ups", test_trust_region_move_topups),
     ("convergence early stop", test_convergence_validation_early_stop),
+    ("top-up until uncertainty satisfied", test_topup_until_uncertainty_satisfied),
     ("parameter-shift == analytic cost", test_parameter_shift_matches_analytic_mode_cost),
 ]
 
