@@ -1,0 +1,274 @@
+\documentclass[11pt]{article}
+
+% ---- Minimal, Overleaf-ready preamble (plain headings; no hyperref needed) ----
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{xcolor}
+\usepackage{tcolorbox}
+
+\title{\textbf{A fully numeric toy: from 4 training rows to $E_{\mathrm{mit}}$\\
+(every matrix and every intermediate number shown)}}
+\author{Companion to \texttt{gp\_mitigated\_energy.tex}}
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{tcolorbox}[colback=blue!4!white,colframe=blue!50!black,title=\textbf{Goal of this note}]
+Show the \emph{entire} GP-mitigation calculation on a deliberately tiny example:
+\textbf{4 training rows} and \textbf{1 query row}. We write down every number --
+the normalization, the kernel matrix $K$, the noisy matrix $K+\sigma_w^2 I$, the
+dual-weight solve for $\bm\alpha$, the query vector $\bm k_*$, the prediction
+$O_{\mathrm{mit}}$, and the final energy $E_{\mathrm{mit}}$ -- with nothing hidden.
+Everything is machine-checked, so you can reproduce each step by hand.
+\end{tcolorbox}
+
+\section{The toy problem}
+
+\paragraph{What we are doing.} A Gaussian process (GP) is trained to turn a
+\emph{noisy} measured expectation value $O_{\mathrm{noisy}}$ into an estimate of
+the \emph{ideal} (noiseless) value $O_{\mathrm{ideal}}$. Then the mitigated energy
+is $E_{\mathrm{mit}}=\text{offset}+w\,O_{\mathrm{mit}}$.
+
+\paragraph{Simplifications (vs.\ the real pipeline).} To keep every number on the
+page: (i)~each row is described by just \textbf{two features}, an angle feature
+$a$ and the measured value $o=O_{\mathrm{noisy}}$ (the real code uses $12$ Fourier
+angle features $+$ a Pauli block); (ii)~the smoothness kernel is a plain Gaussian
+(RBF) instead of Mat\'ern-$\tfrac52$ -- used identically; (iii)~there is a single
+observable $P$, so the energy is one term $E_{\mathrm{mit}}=\text{offset}+w\,
+O_{\mathrm{mit}}$ (with many Paulis you repeat the prediction per Pauli and sum);
+(iv)~we use $N=4$ training rows instead of $\sim\!1000$.
+
+\paragraph{The toy Hamiltonian.}
+\begin{equation}
+H=\text{offset}\cdot I+w\,P,\qquad \text{offset}=-0.5,\quad w=0.8 .
+\end{equation}
+
+\section{Step 0 --- the data}
+
+Each training row is a triple $(a_n,\,o_n,\,y_n)$ where $a_n$ is the angle
+feature, $o_n=O_{\mathrm{noisy}}$ is the measured value (a \emph{feature}), and
+$y_n=O_{\mathrm{ideal}}$ is the noiseless value (the \emph{target}). We also have
+one query point $(a_*,o_*)$ whose ideal value we want to predict.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{@{}ccccc@{}}
+\toprule
+row $n$ & $a_n$ (angle) & $o_n=O_{\mathrm{noisy}}$ & $y_n=O_{\mathrm{ideal}}$ (target) \\
+\midrule
+1 & $0.0$ & $-0.70$ & $-1.0$ \\
+2 & $0.5$ & $-0.40$ & $-0.6$ \\
+3 & $1.0$ & $\phantom{-}0.10$ & $\phantom{-}0.2$ \\
+4 & $1.5$ & $\phantom{-}0.55$ & $\phantom{-}0.9$ \\
+\midrule
+\textbf{query} $*$ & $0.30$ & $-0.55$ & \textbf{unknown (we predict it)} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+(Notice the noisy $o_n$ tracks the ideal $y_n$ but is ``damped'' toward $0$ --
+that is exactly the distortion the GP will learn to undo.)
+
+\section{Step 1 --- fix the kernel and its numbers}
+
+The kernel measures similarity between two rows $x=(a,o)$ and $x'=(a',o')$. As in
+the real code it is the sum of a \emph{linear} (CDR) piece on the noisy value and
+a \emph{smoothness} piece on the angle:
+\begin{equation}
+k(x,x')=\underbrace{c_1\big(\sigma_0^2+o\,o'\big)}_{\textstyle k_{\mathrm{lin}}\ (\text{CDR line})}
+\;+\;\underbrace{c_2\,\exp\!\Big(-\tfrac{(a-a')^2}{2\ell^2}\Big)}_{\textstyle k_{\mathrm{base}}\ (\text{coherent residual})} .
+\label{eq:k}
+\end{equation}
+On the \emph{diagonal only} we also add a white-noise variance $\sigma_w^2$
+(shot noise). The fixed hyperparameters for this toy are
+\begin{equation}
+c_1=0.5,\quad \sigma_0^2=0.2,\quad c_2=1.0,\quad \ell=1.0,\quad \sigma_w^2=0.01 .
+\end{equation}
+(In the real code these $\sim\!86$ numbers are \emph{learned}; here we just fix
+them so we can compute.)
+
+\section{Step 2 --- normalize the targets}
+
+The GP is fit on standardized targets. With the four $y_n$:
+\begin{align}
+\bar y&=\tfrac14(-1.0-0.6+0.2+0.9)=-0.125,\\
+\sigma_y&=\sqrt{\tfrac14\!\sum_n (y_n-\bar y)^2}=0.732718,\\
+\tilde y_n&=\frac{y_n-\bar y}{\sigma_y}
+=(\,-1.194185,\ -0.648272,\ 0.443554,\ 1.398902\,).
+\end{align}
+We will predict in standardized units and un-normalize at the very end with
+$y=\bar y+\sigma_y\,\tilde y$.
+
+\section{Step 3 --- build the kernel matrix \texorpdfstring{$K$}{K}}
+
+$K$ is $4\times4$ with $K_{mn}=k(x_m,x_n)$. Take one entry in full detail,
+$K_{12}$ (rows $1$ and $2$: $o_1=-0.70,\,o_2=-0.40,\,a_1=0,\,a_2=0.5$):
+\begin{align}
+k_{\mathrm{lin}}&=0.5\,(0.2+(-0.70)(-0.40))=0.5\,(0.2+0.28)=0.240000,\\
+k_{\mathrm{base}}&=1.0\cdot\exp\!\Big(-\tfrac{(0-0.5)^2}{2}\Big)=e^{-0.125}=0.882497,\\
+K_{12}&=0.240000+0.882497=1.122497 .
+\end{align}
+Doing this for all $16$ pairs gives the two parts and their sum:
+\begin{equation}
+K_{\mathrm{lin}}=
+\begin{bmatrix}
+0.345000 & 0.240000 & 0.065000 & -0.092500\\
+0.240000 & 0.180000 & 0.080000 & -0.010000\\
+0.065000 & 0.080000 & 0.105000 & 0.127500\\
+-0.092500 & -0.010000 & 0.127500 & 0.251250
+\end{bmatrix},
+\end{equation}
+\begin{equation}
+K_{\mathrm{base}}=
+\begin{bmatrix}
+1.000000 & 0.882497 & 0.606531 & 0.324652\\
+0.882497 & 1.000000 & 0.882497 & 0.606531\\
+0.606531 & 0.882497 & 1.000000 & 0.882497\\
+0.324652 & 0.606531 & 0.882497 & 1.000000
+\end{bmatrix},
+\end{equation}
+\begin{equation}
+K=K_{\mathrm{lin}}+K_{\mathrm{base}}=
+\begin{bmatrix}
+1.345000 & 1.122497 & 0.671531 & 0.232152\\
+1.122497 & 1.180000 & 0.962497 & 0.596531\\
+0.671531 & 0.962497 & 1.105000 & 1.009997\\
+0.232152 & 0.596531 & 1.009997 & 1.251250
+\end{bmatrix}.
+\end{equation}
+
+\section{Step 4 --- add the shot-noise term}
+
+Add $\sigma_w^2=0.01$ on the diagonal only:
+\begin{equation}
+A\equiv K+\sigma_w^2 I=
+\begin{bmatrix}
+1.355000 & 1.122497 & 0.671531 & 0.232152\\
+1.122497 & 1.190000 & 0.962497 & 0.596531\\
+0.671531 & 0.962497 & 1.115000 & 1.009997\\
+0.232152 & 0.596531 & 1.009997 & 1.261250
+\end{bmatrix}.
+\end{equation}
+
+\section{Step 5 --- solve for the dual weights \texorpdfstring{$\bm\alpha$}{alpha}}
+
+The dual weights solve the $4\times4$ linear system $A\,\bm\alpha=\tilde{\bm y}$:
+\begin{equation}
+\begin{bmatrix}
+1.355000 & 1.122497 & 0.671531 & 0.232152\\
+1.122497 & 1.190000 & 0.962497 & 0.596531\\
+0.671531 & 0.962497 & 1.115000 & 1.009997\\
+0.232152 & 0.596531 & 1.009997 & 1.261250
+\end{bmatrix}
+\begin{bmatrix}\alpha_1\\\alpha_2\\\alpha_3\\\alpha_4\end{bmatrix}
+=
+\begin{bmatrix}-1.194185\\-0.648272\\0.443554\\1.398902\end{bmatrix}.
+\end{equation}
+Solving (Cholesky, or any linear solver) gives
+\begin{equation}
+\boxed{\;\bm\alpha=(\,0.305071,\ -2.230610,\ 0.837933,\ 1.436984\,)\;}
+\end{equation}
+\paragraph{Sanity check.} Multiply $A\,\bm\alpha$ back: e.g.\ row 1,
+\[
+1.355000(0.305071)+1.122497(-2.230610)+0.671531(0.837933)+0.232152(1.436984)=-1.194185,
+\]
+which equals $\tilde y_1$. (All four rows reproduce $\tilde{\bm y}$ exactly.) These
+$\bm\alpha$ are computed \emph{once} and then reused for every prediction.
+
+\section{Step 6 --- build the query similarity vector \texorpdfstring{$\bm k_*$}{k*}}
+
+$\bm k_*$ holds the similarity of the query $(a_*,o_*)=(0.30,-0.55)$ to each
+training row, using the same kernel \eqref{eq:k}. One entry in full, $[\bm k_*]_1$
+(vs.\ row 1, $o_1=-0.70,a_1=0$):
+\begin{align}
+k_{\mathrm{lin}}&=0.5\,(0.2+(-0.55)(-0.70))=0.5\,(0.2+0.385)=0.292500,\\
+k_{\mathrm{base}}&=\exp\!\Big(-\tfrac{(0.30-0)^2}{2}\Big)=e^{-0.045}=0.955997,\\
+[\bm k_*]_1&=0.292500+0.955997=1.248497 .
+\end{align}
+All four entries:
+\begin{equation}
+\bm k_*=(\,1.248497,\ 1.190199,\ 0.855205,\ 0.435502\,).
+\end{equation}
+\emph{(The white $\sigma_w^2$ term does \textbf{not} appear here: the query is a
+new point, not identical to any training row.)}
+
+\section{Step 7 --- predict the mitigated value}
+
+The GP posterior mean is $O_{\mathrm{mit}}=\bar y+\sigma_y\,(\bm k_*\!\cdot\bm\alpha)$.
+First the dot product:
+\begin{align}
+\bm k_*\!\cdot\bm\alpha
+&=1.248497(0.305071)+1.190199(-2.230610)\notag\\
+&\quad+0.855205(0.837933)+0.435502(1.436984)\notag\\
+&=0.380902-2.654900+0.716600+0.625809=-0.931575 .
+\end{align}
+Un-normalize:
+\begin{equation}
+\boxed{\;O_{\mathrm{mit}}=\bar y+\sigma_y\,(\bm k_*\!\cdot\bm\alpha)
+=-0.125+0.732718\,(-0.931575)=-0.807581\;}
+\end{equation}
+So the raw measurement $O_{\mathrm{noisy}}=-0.55$ was corrected to
+$O_{\mathrm{mit}}=-0.8076$ (pushed back toward the ideal $-1$, undoing the damping).
+
+\section{Step 8 --- assemble the energy}
+
+With one Hamiltonian term,
+\begin{equation}
+\boxed{\;E_{\mathrm{mit}}=\text{offset}+w\,O_{\mathrm{mit}}
+=-0.5+0.8\,(-0.807581)=-1.146065\;}
+\end{equation}
+For a real Hamiltonian $H=\text{offset}+\sum_i w_i P_i$ you repeat Steps 6--7 for
+each Pauli $P_i$ (same $K$, same $\bm\alpha$, a new $\bm k_*$ per Pauli) and sum:
+$E_{\mathrm{mit}}=\text{offset}+\sum_i w_i\,O_{\mathrm{mit},i}$.
+
+\section{Bonus --- the same prediction is a CDR line \texorpdfstring{$a\,O_{\mathrm{noisy}}+b$}{a O + b}}
+
+Because the kernel is a sum, $\bm k_*\!\cdot\bm\alpha$ splits into the linear
+(CDR) part and the base part. The linear part is \emph{exactly affine} in the live
+$o_*$:
+\begin{align}
+\sum_n\alpha_n k_{\mathrm{lin}}(x_*,x_n)
+&=\underbrace{c_1\sigma_0^2\!\sum_n\alpha_n}_{\textstyle B}
++\underbrace{c_1\!\sum_n\alpha_n o_n}_{\textstyle A}\;o_* ,\\
+A&=0.5\big[0.305071(-0.70)+(-2.230610)(-0.40)+0.837933(0.10)+1.436984(0.55)\big]=0.776415,\\
+B&=0.5(0.2)\big[0.305071-2.230610+0.837933+1.436984\big]=0.034938,
+\end{align}
+and the base part (independent of $o_*$) is
+$R=\sum_n\alpha_n k_{\mathrm{base}}(x_*,x_n)=-0.539485$. Folding in the
+normalization gives an effective CDR line
+\begin{equation}
+O_{\mathrm{mit}}=a\,O_{\mathrm{noisy}}+b,\qquad
+a=\sigma_y A=0.568893,\qquad
+b=\bar y+\sigma_y B+\sigma_y R=-0.494690 .
+\end{equation}
+Check at $O_{\mathrm{noisy}}=-0.55$:
+\[
+a\,O_{\mathrm{noisy}}+b=0.568893(-0.55)-0.494690=-0.807581,
+\]
+identical to Step 7. So ``$\bm\alpha$ times similarities'' and ``a CDR line
+$a\,O_{\mathrm{noisy}}+b$'' are literally the same computation: the DotProduct
+piece together with $\bm\alpha$ supply the slope $a$ and part of the intercept,
+and the smoothness kernel supplies the angle-dependent correction $R$.
+
+\section*{Summary of the pipeline (all numbers)}
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{@{}ll@{}}
+\toprule
+Quantity & Value \\
+\midrule
+$\bar y,\ \sigma_y$ & $-0.125,\ 0.732718$ \\
+$\bm\alpha$ & $(0.305071,\,-2.230610,\,0.837933,\,1.436984)$ \\
+$\bm k_*$ & $(1.248497,\,1.190199,\,0.855205,\,0.435502)$ \\
+$\bm k_*\!\cdot\bm\alpha$ & $-0.931575$ \\
+$O_{\mathrm{mit}}$ & $-0.807581$ \\
+$E_{\mathrm{mit}}=\text{offset}+w\,O_{\mathrm{mit}}$ & $-0.5+0.8(-0.807581)=\mathbf{-1.146065}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\end{document}
