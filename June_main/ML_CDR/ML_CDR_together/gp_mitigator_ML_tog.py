@@ -92,11 +92,25 @@ class MitigatorConfig:
 
     # --- Near-Clifford data generation ---
     n_warmstart_circuits: int = 30
-    n_nonclifford_gates: int = 2
+    # int, or a tuple/list of ints sampled uniformly per circuit (mixed designs,
+    # e.g. (1, 2): mostly-1-non-Clifford budget with some 2-D face coverage).
+    n_nonclifford_gates: "int | tuple[int, ...]" = 2
     warmstart_spread: float = 0.3  # angle spread (radians) around theta_init
     clifford_snap_step: float = float(np.pi) / 2.0
     shots: int = 10000
     rng_seed: int = 0
+    # Grid-diverse snapping: snapped coordinates land on a RANDOM Clifford node
+    # within +/- clifford_node_hops grid steps of theta (0 = always the nearest
+    # node, the legacy behavior). Same cost per circuit, but the training set
+    # then covers axis lines through MANY grid nodes, which pins the
+    # cross-parameter interaction structure at grid resolution -- the missing
+    # information when only 1 gate per circuit is non-Clifford.
+    clifford_node_hops: int = 1
+    # Fully-Clifford anchor circuits sampled over a wider grid (anchor_node_hops
+    # steps). Their rows are tagged "anchor" and are never pruned, so the GP
+    # stays pinned globally even after large theta moves. 0 = off.
+    n_clifford_anchor_circuits: int = 8
+    anchor_node_hops: int = 2
 
     # --- Observables (real list comes from the Hamiltonian) ---
     n_observables: int = 100  # informational only
@@ -106,6 +120,18 @@ class MitigatorConfig:
     include_noisy_feature_in_gp: bool = True
     pauli_onehot: bool = True
     pauli_summaries: bool = True
+    # Theta-location interaction features. Static per-parameter descriptors
+    # (gate depth, downstream noise) are invisible to the kernel for a fixed
+    # circuit (constant columns), so they are encoded as ROW-VARYING
+    # interactions: sin(theta_j) * depth_frac_j, sin(theta_j) * downstream_2q_frac_j,
+    # and sin(theta_j) * lightcone_overlap(j, P). The last one couples the angle
+    # block to the observable block so information pools across Paulis.
+    include_location_features: bool = True
+    # Filled automatically from the adapter (see CirqBackendAdapter
+    # .param_location_descriptors); shape (n_params, 2) = [depth_frac, down_frac].
+    param_locations: "np.ndarray | None" = None
+    # (n_params, n_qubits) 0/1 forward-lightcone masks per parameter.
+    param_lightcones: "np.ndarray | None" = None
 
     # --- Baseline per-Pauli CDR backbone (reference only; NOT part of the
     #     combined mitigated value, which is the single GP below). Kept so the
@@ -117,6 +143,10 @@ class MitigatorConfig:
     kernel_type: str = "matern"  # "matern" or "rbf" for the coherent-residual term
     matern_nu: float = 2.5
     use_ard: bool = True
+    # ARD on the (4 * n_qubits) Pauli one-hot dims is a lot of hyperparameters
+    # for a few hundred rows; False = one shared length scale for the one-hot
+    # block (summaries keep their own scales when use_ard=True).
+    pauli_ard: bool = False
     # use_product_kernel here means: multiply the linear CDR term k_lin(o_noisy) by
     # a per-observable kernel k_obs(pauli) -> a learned, observable-dependent CDR
     # slope (True), instead of a single shared slope (False).
@@ -124,6 +154,33 @@ class MitigatorConfig:
     noise_variance_init: float = 1e-3
     normalize_targets: bool = True
     gp_n_restarts: int = 2  # marginal-likelihood restarts (not in spec; small default)
+    # --- Measurement-reliance controls -----------------------------------
+    # prior_mean_mode:
+    #   "backbone" -> the GP is trained on RESIDUALS y = o_ideal - (a_P*o_noisy + b_P)
+    #                 around the per-Pauli affine CDR backbone, and the backbone is
+    #                 added back at prediction. The mitigated value then ALWAYS
+    #                 carries a_P * O_noisy, so the device signal contributes to
+    #                 both the value and the analytic gradient, and an off-cloud GP
+    #                 can only be wrong at the (small) residual scale.
+    #   "zero"     -> legacy combined design: GP maps features -> O_ideal directly.
+    prior_mean_mode: str = "backbone"
+    # Upper ConstantKernel bound on the PURE-ANGLE additive term. Bounding it
+    # (e.g. 0.1 in normalized-target units) stops the angle-only path from
+    # absorbing the whole signal and bypassing the measurement, which is the
+    # classical-model degeneracy seen with 1 non-Clifford gate per circuit.
+    angle_term_amplitude_bound: float = 0.1
+    # Upper bound on DotProduct sigma_0 (the CDR bias channel). Keeping it small
+    # stops the o_noisy-independent offset from soaking up angle structure.
+    dotproduct_sigma0_bound: float = 1.0
+    # Heteroscedastic per-row noise: alpha_row = o_noisy_var estimated from the
+    # binomial shot noise of each Pauli (~ (1 - o^2)/shots) instead of relying on
+    # one shared WhiteKernel level. The WhiteKernel stays as a learned floor.
+    heteroscedastic_alpha: bool = True
+    # Report EPISTEMIC predictive std only: subtract the learned WhiteKernel
+    # (aleatoric shot-noise) level from the predictive variance. Without this the
+    # std has a shot-noise floor that no amount of training data can push below,
+    # so an uncertainty gate can become permanently unreachable.
+    epistemic_std: bool = True
     # Cap on rows actually used to FIT the exact GP (the baseline backbone still
     # uses all rows). Exact-GP hyperparameter optimization with ARD builds an (N, N, n_hyper)
     # gradient tensor, so N must stay bounded; rows are randomly subsampled down to
@@ -147,11 +204,25 @@ class MitigatorConfig:
     #     Cheap insurance against a frozen, overconfident GP trapping the optimizer.
     topup_every: int = 0
     # (3) Top-up-until-satisfied: after a top-up fires, keep adding local batches
-    #     while the |c|-weighted predicted std stays above ``uncertainty_threshold``,
+    #     while the quadrature energy-scale std stays above ``uncertainty_threshold``,
     #     up to ``max_topup_retries`` extra batches (0 = off -> a single top-up).
     #     Bounds the shot cost while forcing the surrogate to be trustworthy at
     #     the current theta before the gradient/step are computed.
     max_topup_retries: int = 0
+    # Prequential validation: every top-up batch has EXACT o_ideal values, so
+    # BEFORE its rows are added the current GP is evaluated on them and the
+    # mean absolute per-circuit ENERGY error is recorded. That is a real,
+    # unbiased local error estimate immune to GP overconfidence; the retry loop
+    # is driven by max(prequential_error, weighted_std) > uncertainty_threshold.
+    prequential_topup_check: bool = True
+    # If the prequential error is STILL above threshold after all retries, use
+    # the backbone-only (plain per-Pauli CDR) prediction for this iteration
+    # instead of trusting a locally-invalid GP mean.
+    fallback_to_backbone_on_mistrust: bool = True
+    # Move-scaled top-ups: when the trust-region (move) trigger fires, take
+    # ceil(moved / effective_topup_radius) batches (capped by this value) so a
+    # large theta jump is re-covered before the next gradient step. 1 = legacy.
+    max_move_topup_batches: int = 3
     # (4) Convergence validation: when |grad| < ``convergence_grad_tol`` fire one
     #     REAL near-Clifford top-up at the current theta and re-check before
     #     declaring convergence; only stop if the energy then moves less than
@@ -230,34 +301,94 @@ def encode_pauli(
     return np.asarray(feats, dtype=float)
 
 
+def _location_features_enabled(config: MitigatorConfig) -> bool:
+    return bool(
+        config.include_location_features
+        and config.param_locations is not None
+        and config.param_lightcones is not None
+    )
+
+
+# Number of location-interaction features per parameter:
+#   sin(theta_j) * depth_frac_j, sin(theta_j) * downstream_2q_frac_j,
+#   sin(theta_j) * lightcone_overlap(j, P).
+_N_LOC_PER_PARAM = 3
+
+
+def _pauli_support_mask(pauli: str) -> np.ndarray:
+    return np.asarray([1.0 if ch != "I" else 0.0 for ch in str(pauli)], dtype=float)
+
+
+def lightcone_overlap(config: MitigatorConfig, pauli: str) -> np.ndarray:
+    """Per-parameter fraction of the Pauli's non-identity support that lies in
+    the forward lightcone of the gate driven by that parameter. Shape (n_params,).
+    """
+    lc = np.asarray(config.param_lightcones, dtype=float)  # (n_params, n_qubits)
+    support = _pauli_support_mask(pauli)
+    w = float(support.sum())
+    if w <= 0.0:
+        return np.zeros(lc.shape[0], dtype=float)
+    return (lc @ support) / w
+
+
+def encode_location(theta: np.ndarray, pauli: str, config: MitigatorConfig) -> np.ndarray:
+    """Row-varying theta-location interaction features.
+
+    Static per-parameter descriptors (depth, downstream noise) are constant
+    columns for a fixed circuit and therefore invisible to the kernel, so they
+    are encoded as interactions with ``sin(theta_j)`` -- and with the Pauli's
+    lightcone overlap, which couples the angle block to the observable block.
+    Length = ``_N_LOC_PER_PARAM * n_params``.
+    """
+    theta = np.asarray(theta, dtype=float).ravel()
+    locs = np.asarray(config.param_locations, dtype=float)  # (n_params, 2)
+    ov = lightcone_overlap(config, pauli)  # (n_params,)
+    feats: list[float] = []
+    for j, t in enumerate(theta):
+        s = float(np.sin(t))
+        feats.extend([s * float(locs[j, 0]), s * float(locs[j, 1]), s * float(ov[j])])
+    return np.asarray(feats, dtype=float)
+
+
 def feature_index_map(config: MitigatorConfig) -> dict[str, list[int]]:
     """Record which feature indices belong to which block.
 
-    Blocks: ``angle`` (Fourier), ``noisy`` (optional O_noisy scalar), ``pauli``.
-    The product kernel groups (angle + noisy) as the continuous block and pauli
-    as the observable block.
+    Blocks: ``angle`` (Fourier), ``noisy`` (optional O_noisy scalar),
+    ``location`` (theta-location interactions), ``pauli``. The pauli block is
+    further split into one-hot and summary indices so the kernel can share a
+    single length scale over the one-hot dims (``pauli_ard=False``).
     """
     n_angle = int(config.n_params) * 2 * int(config.max_harmonic)
     n_noisy = 1 if config.include_noisy_feature_in_gp else 0
-    n_pauli = (4 * int(config.n_qubits) if config.pauli_onehot else 0) + (
-        3 if config.pauli_summaries else 0
-    )
+    n_loc = _N_LOC_PER_PARAM * int(config.n_params) if _location_features_enabled(config) else 0
+    n_onehot = 4 * int(config.n_qubits) if config.pauli_onehot else 0
+    n_summary = 3 if config.pauli_summaries else 0
     angle_idx = list(range(0, n_angle))
     noisy_idx = list(range(n_angle, n_angle + n_noisy))
-    pauli_idx = list(range(n_angle + n_noisy, n_angle + n_noisy + n_pauli))
+    loc_start = n_angle + n_noisy
+    loc_idx = list(range(loc_start, loc_start + n_loc))
+    pauli_start = loc_start + n_loc
+    onehot_idx = list(range(pauli_start, pauli_start + n_onehot))
+    summary_idx = list(range(pauli_start + n_onehot, pauli_start + n_onehot + n_summary))
     return {
         "angle": angle_idx,
         "noisy": noisy_idx,
-        "pauli": pauli_idx,
+        "location": loc_idx,
+        "pauli": onehot_idx + summary_idx,
+        "pauli_onehot": onehot_idx,
+        "pauli_summaries": summary_idx,
         "continuous": angle_idx + noisy_idx,  # angle + noisy for the product kernel
     }
 
 
 def build_feature_row(row: dict, config: MitigatorConfig) -> np.ndarray:
-    """Build the GP input vector for one row: ``[angle | (o_noisy) | pauli]``."""
+    """Build the GP input vector for one row:
+    ``[angle | (o_noisy) | (location) | pauli]``."""
     parts = [encode_angles(row["theta"], config.max_harmonic)]
     if config.include_noisy_feature_in_gp:
         parts.append(np.asarray([float(row["o_noisy"])], dtype=float))
+    if _location_features_enabled(config):
+        parts.append(encode_location(row["theta"], row["pauli"], config))
     parts.append(
         encode_pauli(
             row["pauli"],
@@ -323,6 +454,11 @@ class CirqBackendAdapter:
             label: float(w) for label, w in zip(self.obs_labels, self.weights)
         }
 
+        # Per-parameter location descriptors (depth fraction, downstream noisy-2q
+        # fraction) and forward-lightcone qubit masks, computed once from the
+        # symbolic circuit. Used by the theta-location interaction features.
+        self.param_locations, self.param_lightcones = self._compute_param_locations()
+
         # --- Shot accounting -------------------------------------------------
         # EVERY quantum execution on this backend flows through ``run_noisy``
         # (warm start, per-iteration energy, parameter-shift gradient and
@@ -345,6 +481,56 @@ class CirqBackendAdapter:
             "circuit_evaluations": int(self.n_circuit_evals),
             "total_shots": int(self.total_shots),
         }
+
+    # -- theta-location descriptors (classical, computed once) ------------
+    def _compute_param_locations(self) -> tuple[np.ndarray, np.ndarray]:
+        """Per-parameter gate-location descriptors from the symbolic circuit.
+
+        Returns ``(locations, lightcones)``:
+          * ``locations``  shape (n_params, 2): ``[depth_frac, downstream_2q_frac]``
+            of the (first) gate driven by each symbol -- depth position in the
+            circuit and the fraction of noisy 2-qubit gates that come AFTER it
+            (later rotations are less decohered).
+          * ``lightcones`` shape (n_params, n_qubits): 0/1 forward-lightcone
+            masks (qubits reachable from the driven gate through subsequent ops).
+        """
+        import cirq
+
+        ops = list(self.circuit.all_operations())
+        n_ops = max(1, len(ops))
+        two_q_positions = [i for i, op in enumerate(ops) if len(op.qubits) == 2]
+        n_two_q = max(1, len(two_q_positions))
+        qubit_index = {q: i for i, q in enumerate(self.qubits)}
+        n_qubits = len(self.qubits)
+
+        locations = np.zeros((len(self.symbols), 2), dtype=float)
+        lightcones = np.zeros((len(self.symbols), n_qubits), dtype=float)
+        for j, sym in enumerate(self.symbols):
+            name = str(sym)
+            driven = [
+                i for i, op in enumerate(ops) if name in cirq.parameter_names(op)
+            ]
+            if not driven:
+                continue
+            first = driven[0]
+            depth_frac = float(first) / float(n_ops)
+            down_frac = float(sum(1 for p in two_q_positions if p > first)) / float(
+                n_two_q
+            )
+            locations[j] = (depth_frac, down_frac)
+            # Forward lightcone: start from the union of qubits of ALL gates the
+            # symbol drives, then sweep subsequent ops that touch the set.
+            cone: set = set()
+            for i in driven:
+                cone.update(ops[i].qubits)
+            start = min(driven)
+            for op in ops[start:]:
+                if cone.intersection(op.qubits):
+                    cone.update(op.qubits)
+            for q in cone:
+                if q in qubit_index:
+                    lightcones[j, qubit_index[q]] = 1.0
+        return locations, lightcones
 
     # -- OGM availability (no silent per-Pauli fallback) ------------------
     def _require_ogm_available(self) -> None:
@@ -390,28 +576,51 @@ class CirqBackendAdapter:
         return self.resolver_from_theta(theta)
 
     # -- near-Clifford generation (LOCAL around theta) -------------------
+    def _snap_step_for_symbol(self, sym, snap_step: float) -> float:
+        """Clifford grid step for this symbol (pi for ph_*, snap_step otherwise)."""
+        return float(np.pi) if str(sym).startswith("ph_") else float(snap_step)
+
     def generate_near_clifford(
         self,
         theta: np.ndarray,
         n_circuits: int,
-        n_nonclifford: int,
+        n_nonclifford: "int | tuple[int, ...] | list[int]",
         snap_step: float,
         spread: float,
         seed: int,
+        node_hops: int = 0,
     ) -> list[dict]:
         """Local near-Clifford resolvers around ``theta``.
 
-        Most parameters are snapped to the nearest Clifford grid; a random subset
-        of size ``n_nonclifford`` is left non-Clifford by jittering within
-        ``spread`` radians of ``theta``. Locality matters because the GP uses the
-        angles as features (warm-start spread and top-up radius both flow here).
+        Most parameters are snapped to the Clifford grid; a random subset of size
+        ``n_nonclifford`` is left non-Clifford by jittering within ``spread``
+        radians of ``theta``. Locality matters because the GP uses the angles as
+        features (warm-start spread and top-up radius both flow here).
+
+        * ``n_nonclifford`` may be an int, or a tuple/list of ints cycled
+          round-robin over the circuits (balanced mixed designs, e.g. ``(1, 2)``
+          gives exactly half the circuits 1 and half 2 non-Clifford gates; which
+          parameters are non-Clifford stays random).
+        * ``node_hops > 0``: each snapped coordinate lands on a RANDOM Clifford
+          node within ``+/- node_hops`` grid steps of the nearest one, instead of
+          always the nearest. Cost per circuit is unchanged, but the training set
+          then covers axis lines through many grid nodes, which supplies the
+          cross-parameter interaction information a single-node axis design
+          fundamentally lacks.
         """
         theta = np.asarray(theta, dtype=float).ravel()
         n_params = len(self.symbols)
-        n_nc = int(max(0, min(int(n_nonclifford), n_params)))
+        if isinstance(n_nonclifford, (tuple, list)):
+            nnc_choices = [int(max(0, min(int(v), n_params))) for v in n_nonclifford]
+            if not nnc_choices:
+                nnc_choices = [0]
+        else:
+            nnc_choices = [int(max(0, min(int(n_nonclifford), n_params)))]
+        hops = int(max(0, node_hops))
         rng = np.random.default_rng(int(seed))
         resolvers: list[dict] = []
-        for _ in range(int(n_circuits)):
+        for i_circ in range(int(n_circuits)):
+            n_nc = int(nnc_choices[i_circ % len(nnc_choices)])
             if n_nc > 0:
                 nc_idx = set(
                     int(j)
@@ -425,7 +634,37 @@ class CirqBackendAdapter:
                 if j in nc_idx:
                     resolver[sym] = tj + float(rng.uniform(-spread, spread))
                 else:
-                    resolver[sym] = _snap_to_clifford(sym, tj, snap_step)
+                    base = _snap_to_clifford(sym, tj, snap_step)
+                    if hops > 0:
+                        step = self._snap_step_for_symbol(sym, snap_step)
+                        base += float(rng.integers(-hops, hops + 1)) * step
+                    resolver[sym] = base
+            resolvers.append(resolver)
+        return resolvers
+
+    def generate_clifford_anchors(
+        self,
+        theta: np.ndarray,
+        n_circuits: int,
+        snap_step: float,
+        seed: int,
+        node_hops: int = 2,
+    ) -> list[dict]:
+        """Fully-Clifford resolvers on random grid nodes within ``node_hops``
+        steps of ``theta``. These are the cheapest possible training circuits and
+        act as never-pruned global anchors that keep the GP pinned after large
+        theta moves.
+        """
+        theta = np.asarray(theta, dtype=float).ravel()
+        hops = int(max(1, node_hops))
+        rng = np.random.default_rng(int(seed))
+        resolvers: list[dict] = []
+        for _ in range(int(n_circuits)):
+            resolver: dict = {}
+            for j, sym in enumerate(self.symbols):
+                base = _snap_to_clifford(sym, float(theta[j]), snap_step)
+                step = self._snap_step_for_symbol(sym, snap_step)
+                resolver[sym] = base + float(rng.integers(-hops, hops + 1)) * step
             resolvers.append(resolver)
         return resolvers
 
@@ -471,6 +710,10 @@ class CirqBackendAdapter:
         )
         per_term_unmit = np.asarray(est["per_term_unmitigated"], dtype=float).ravel()
         per_term_rem = np.asarray(est["per_term_rem"], dtype=float).ravel()
+        per_term_n = np.asarray(
+            est.get("per_term_n_samples", np.full(len(self.obs_labels), int(shots))),
+            dtype=int,
+        ).ravel()
         key = "per_term_rem" if self.use_rem_branch else "per_term_unmitigated"
         per_term = per_term_rem if key == "per_term_rem" else per_term_unmit
         primary = {label: float(per_term[k]) for k, label in enumerate(self.obs_labels)}
@@ -480,17 +723,21 @@ class CirqBackendAdapter:
         rem_by_pauli = {
             label: float(per_term_rem[k]) for k, label in enumerate(self.obs_labels)
         }
+        n_samples_by_pauli = {
+            label: int(per_term_n[k]) for k, label in enumerate(self.obs_labels)
+        }
         return {
             "primary": primary,
             "unmit_by_pauli": unmit_by_pauli,
             "rem_by_pauli": rem_by_pauli,
+            "n_samples_by_pauli": n_samples_by_pauli,
             "energy_unmitigated": float(est["energy_unmitigated"]),
             "energy_rem": float(est["energy_rem"]),
         }
 
     # -- row collection (one row per (circuit, observable)) ---------------
     def collect_rows(
-        self, resolvers: list[dict], *, shots: int, seed_base: int
+        self, resolvers: list[dict], *, shots: int, seed_base: int, anchor: bool = False
     ) -> list[dict]:
         rows: list[dict] = []
         for i, resolver in enumerate(resolvers):
@@ -498,6 +745,7 @@ class CirqBackendAdapter:
             ideal = self.simulate_ideal(resolver)
             noisy = self.run_noisy(resolver, shots=shots, sampling_seed=seed_base + i)
             measured = noisy["primary"]
+            n_samples = noisy.get("n_samples_by_pauli", {})
             for label in self.obs_labels:
                 rows.append(
                     {
@@ -505,6 +753,8 @@ class CirqBackendAdapter:
                         "pauli": label,
                         "o_noisy": float(measured[label]),
                         "o_ideal": float(ideal[label]),
+                        "n_samples": int(n_samples.get(label, shots)),
+                        "anchor": bool(anchor),
                     }
                 )
         return rows
@@ -650,8 +900,9 @@ if _SKLEARN_AVAILABLE:
             return self.kernel.is_stationary()
 
 
-def _make_base_kernel(n_dims: int, config: MitigatorConfig):
-    length_scale = np.ones(n_dims) if config.use_ard else 1.0
+def _make_base_kernel(n_dims: int, config: MitigatorConfig, *, force_scalar: bool = False):
+    use_ard = bool(config.use_ard) and not force_scalar
+    length_scale = np.ones(n_dims) if use_ard else 1.0
     if config.kernel_type.lower() == "rbf":
         return RBF(length_scale=length_scale, length_scale_bounds=(1e-3, 1e3))
     return Matern(
@@ -659,6 +910,47 @@ def _make_base_kernel(n_dims: int, config: MitigatorConfig):
         length_scale_bounds=(1e-3, 1e3),
         nu=float(config.matern_nu),
     )
+
+
+def _sum_white_noise_level(kernel) -> float:
+    """Total WhiteKernel noise level of a fitted composite kernel.
+
+    White terms only appear as top-level summands in ``build_kernel``, so a
+    recursive walk over ``Sum`` nodes suffices (a White inside a ``Product``
+    would not contribute a clean diagonal anyway).
+    """
+    from sklearn.gaussian_process.kernels import Sum
+
+    if isinstance(kernel, Sum):
+        return _sum_white_noise_level(kernel.k1) + _sum_white_noise_level(kernel.k2)
+    if isinstance(kernel, WhiteKernel):
+        return float(kernel.noise_level)
+    return 0.0
+
+
+def _make_pauli_kernel(feature_index_map_: dict, config: MitigatorConfig):
+    """Kernel over the Pauli block.
+
+    ``pauli_ard=True``  -> per-dimension length scales over all Pauli dims (legacy).
+    ``pauli_ard=False`` -> ONE shared length scale over the (4 * n_qubits)
+    one-hot dims (a few hundred rows cannot support 30+ length scales), with the
+    3 summary dims keeping their own ARD scales.
+    """
+    if not _SKLEARN_AVAILABLE:  # pragma: no cover
+        raise ImportError(f"scikit-learn unavailable: {_SKLEARN_IMPORT_ERROR!r}")
+    obs_idx = feature_index_map_["pauli"]
+    onehot_idx = feature_index_map_.get("pauli_onehot", [])
+    summary_idx = feature_index_map_.get("pauli_summaries", [])
+    if len(obs_idx) == 0:
+        return None
+    if bool(config.pauli_ard) or len(onehot_idx) == 0:
+        return _SubsetKernel(_make_base_kernel(len(obs_idx), config), obs_idx)
+    k = _SubsetKernel(
+        _make_base_kernel(len(onehot_idx), config, force_scalar=True), onehot_idx
+    )
+    if len(summary_idx) > 0:
+        k = k * _SubsetKernel(_make_base_kernel(len(summary_idx), config), summary_idx)
+    return k
 
 
 # ---------------------------------------------------------------------------
@@ -798,8 +1090,10 @@ class SingleGPModel:
     def build_kernel(self, feature_index_map_: dict, config: MitigatorConfig):
         noisy_idx = feature_index_map_["noisy"]
         angle_idx = feature_index_map_["angle"]
+        loc_idx = feature_index_map_.get("location", [])
         obs_idx = feature_index_map_["pauli"]
-        base_idx = angle_idx + obs_idx
+        cont_idx = angle_idx + loc_idx  # theta-dependent (angle + location) block
+        base_idx = cont_idx + obs_idx
 
         if not config.include_noisy_feature_in_gp or len(noisy_idx) == 0:
             raise ValueError(
@@ -815,28 +1109,67 @@ class SingleGPModel:
 
         # k_lin: DotProduct on o_noisy reproduces the CDR line a*o_noisy + b
         # (slope via the ConstantKernel amplitude, bias via DotProduct sigma_0).
+        # sigma_0 (the o_noisy-independent bias channel) is bounded so it cannot
+        # soak up angle structure and bypass the measurement.
+        sigma0_hi = max(float(config.dotproduct_sigma0_bound), 1e-4)
         k_lin = ConstantKernel(1.0, (1e-3, 1e3)) * _SubsetKernel(
-            DotProduct(sigma_0=1.0, sigma_0_bounds=(1e-5, 1e2)), noisy_idx
+            DotProduct(
+                sigma_0=min(1.0, sigma0_hi), sigma_0_bounds=(1e-5, sigma0_hi)
+            ),
+            noisy_idx,
         )
         # Optionally make the effective CDR slope observable-dependent.
         if config.use_product_kernel and len(obs_idx) > 0:
-            k_obs = _SubsetKernel(_make_base_kernel(len(obs_idx), config), obs_idx)
+            k_obs = _make_pauli_kernel(feature_index_map_, config)
             k_lin = k_lin * k_obs
 
         kernel = k_lin
 
-        # k_base: coherent / angle-dependent residual over (angles, pauli).
+        # k_base: coherent / angle-dependent residual over (angles, location,
+        # pauli). In the legacy "zero" prior-mean mode this pure-angle path can
+        # absorb the whole O_ideal(theta) signal and turn the model into a
+        # classical surrogate that ignores the measurement; its amplitude is
+        # therefore bounded by ``angle_term_amplitude_bound`` (in normalized-
+        # target units). In "backbone" mode the target is already the small
+        # CDR residual, so the legacy wide bounds are kept.
         if len(base_idx) > 0:
-            k_base = ConstantKernel(1.0, (1e-3, 1e3)) * _SubsetKernel(
-                _make_base_kernel(len(base_idx), config), base_idx
+            if str(config.prior_mean_mode).lower() == "zero":
+                amp_hi = max(float(config.angle_term_amplitude_bound), 2e-3)
+            else:
+                amp_hi = 1e3
+            c_base = ConstantKernel(
+                min(1.0, 0.5 * amp_hi), (1e-3, amp_hi)
             )
+            if bool(config.pauli_ard) or len(obs_idx) == 0:
+                k_base = c_base * _SubsetKernel(
+                    _make_base_kernel(len(base_idx), config), base_idx
+                )
+            else:
+                # Separable form so the one-hot block can share one length scale.
+                k_base = c_base * _SubsetKernel(
+                    _make_base_kernel(len(cont_idx), config), cont_idx
+                ) * _make_pauli_kernel(feature_index_map_, config)
             kernel = kernel + k_base
 
         return kernel + white
 
-    def fit(self, X: np.ndarray, y_ideal: np.ndarray) -> None:
+    def fit(
+        self,
+        X: np.ndarray,
+        y_target: np.ndarray,
+        sample_alpha: "np.ndarray | None" = None,
+    ) -> None:
+        """Fit the GP. ``y_target`` is O_ideal ("zero" mode) or the CDR-backbone
+        residual ("backbone" mode). ``sample_alpha`` is an optional per-row noise
+        variance (heteroscedastic shot noise), in the units of ``y_target``.
+        """
         X = np.asarray(X, dtype=float)
-        y = np.asarray(y_ideal, dtype=float).ravel()
+        y = np.asarray(y_target, dtype=float).ravel()
+        alpha_rows = (
+            None
+            if sample_alpha is None
+            else np.asarray(sample_alpha, dtype=float).ravel()
+        )
         cap = int(getattr(self.config, "max_gp_train_points", 0) or 0)
         if cap > 0 and X.shape[0] > cap:
             # Subsample rows so the exact-GP gradient tensor stays bounded.
@@ -845,10 +1178,19 @@ class SingleGPModel:
             )
             X = X[sub]
             y = y[sub]
+            if alpha_rows is not None:
+                alpha_rows = alpha_rows[sub]
         kernel = self.build_kernel(self._index_map, self.config)
+        if alpha_rows is None:
+            alpha = 1e-10  # WhiteKernel carries the (learned) shot noise.
+        else:
+            # sklearn adds ``alpha`` to K in NORMALIZED-target space when
+            # normalize_y=True, so rescale the physical variances by var(y).
+            scale = float(np.var(y)) if bool(self.config.normalize_targets) else 1.0
+            alpha = alpha_rows / max(scale, 1e-12) + 1e-10
         self.gp = GaussianProcessRegressor(
             kernel=kernel,
-            alpha=1e-10,  # WhiteKernel carries the (learned) shot noise.
+            alpha=alpha,
             normalize_y=bool(self.config.normalize_targets),
             n_restarts_optimizer=int(self.config.gp_n_restarts),
             random_state=int(self.config.rng_seed),
@@ -860,7 +1202,21 @@ class SingleGPModel:
             raise RuntimeError("SingleGPModel.fit must be called before predict.")
         X_star = np.asarray(X_star, dtype=float)
         mean, std = self.gp.predict(X_star, return_std=True)
-        return np.asarray(mean, dtype=float), np.asarray(std, dtype=float)
+        std = np.asarray(std, dtype=float)
+        if bool(getattr(self.config, "epistemic_std", False)):
+            # sklearn's predictive variance includes the WhiteKernel diagonal
+            # (aleatoric shot noise). Subtract it so the reported std measures
+            # EPISTEMIC uncertainty -- the part more data can actually reduce.
+            # With normalize_y the kernel lives in normalized-target units, so
+            # the noise level is rescaled by y_train_std^2 back to output units.
+            white = _sum_white_noise_level(self.gp.kernel_)
+            y_std_arr = np.asarray(
+                getattr(self.gp, "_y_train_std", 1.0), dtype=float
+            ).ravel()
+            y_std_f = float(y_std_arr[0]) if y_std_arr.size else 1.0
+            var = np.maximum(std**2 - white * y_std_f**2, 0.0)
+            std = np.sqrt(var)
+        return np.asarray(mean, dtype=float), std
 
     def predict_input_gradient(self, X_star: np.ndarray) -> np.ndarray:
         """Analytic ``d mean / d x*`` of the GP posterior mean (per query row).
@@ -887,6 +1243,76 @@ class SingleGPModel:
 
 
 # ---------------------------------------------------------------------------
+# Shared fit / predict helpers (used by the Mitigator AND the validation
+# functions so the backbone prior mean and heteroscedastic noise are applied
+# identically everywhere).
+# ---------------------------------------------------------------------------
+
+
+def _use_backbone_prior(config: MitigatorConfig) -> bool:
+    return str(config.prior_mean_mode).lower() == "backbone"
+
+
+def _row_alphas(rows: list[dict], config: MitigatorConfig) -> "np.ndarray | None":
+    """Per-row shot-noise variance ``~ (1 - o^2) / n_samples`` (binomial), using
+    the effective per-term sample counts returned by the OGM estimator. ``None``
+    when ``heteroscedastic_alpha`` is off (the shared WhiteKernel then carries
+    all the noise).
+    """
+    if not bool(config.heteroscedastic_alpha):
+        return None
+    out = np.empty(len(rows), dtype=float)
+    for i, r in enumerate(rows):
+        o = float(r["o_noisy"])
+        n = max(1, int(r.get("n_samples", config.shots)))
+        out[i] = max(1.0 - min(o * o, 1.0), 0.05) / n
+    return out
+
+
+def _backbone_values(
+    backbone: "CDRBackbone", rows: list[dict]
+) -> np.ndarray:
+    return np.asarray(
+        [backbone.apply(r["pauli"], r["o_noisy"]) for r in rows], dtype=float
+    )
+
+
+def _fit_backbone_and_gp(
+    rows: list[dict], config: MitigatorConfig
+) -> "tuple[CDRBackbone, SingleGPModel]":
+    """Fit the per-Pauli CDR backbone, then the single GP.
+
+    In ``prior_mean_mode="backbone"`` the GP is trained on the RESIDUALS
+    ``o_ideal - (a_P * o_noisy + b_P)`` so the mitigated value always carries
+    the measured signal through the backbone; in ``"zero"`` mode the GP maps
+    features directly to ``o_ideal`` (legacy combined design).
+    """
+    backbone = CDRBackbone(config.affine_regularization)
+    backbone.fit(rows)
+    gp = SingleGPModel(config)
+    X = np.stack([build_feature_row(r, config) for r in rows], axis=0)
+    y = np.asarray([float(r["o_ideal"]) for r in rows], dtype=float)
+    if _use_backbone_prior(config):
+        y = y - _backbone_values(backbone, rows)
+    gp.fit(X, y, sample_alpha=_row_alphas(rows, config))
+    return backbone, gp
+
+
+def _predict_rows(
+    gp: "SingleGPModel",
+    backbone: "CDRBackbone",
+    rows: list[dict],
+    config: MitigatorConfig,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Mitigated per-row prediction ``(mean, std)`` honoring the prior mean."""
+    X = np.stack([build_feature_row(r, config) for r in rows], axis=0)
+    mean, std = gp.predict(X)
+    if _use_backbone_prior(config):
+        mean = mean + _backbone_values(backbone, rows)
+    return np.asarray(mean, dtype=float), np.asarray(std, dtype=float)
+
+
+# ---------------------------------------------------------------------------
 # Section 7 - Combined mitigator (public API)
 # ---------------------------------------------------------------------------
 
@@ -898,7 +1324,14 @@ class Mitigator:
         self.adapter = backend
         self.hamiltonian = hamiltonian  # kept for parity with the spec signature
         self.config = config
-        # The single GP IS the mitigator; the backbone is a plain-CDR baseline only.
+        # Auto-fill the theta-location descriptors from the adapter's circuit so
+        # the location interaction features work without extra notebook wiring.
+        if config.include_location_features and config.param_locations is None:
+            config.param_locations = np.asarray(backend.param_locations, dtype=float)
+            config.param_lightcones = np.asarray(backend.param_lightcones, dtype=float)
+        # The single GP maps features to the target (O_ideal or the backbone
+        # residual, depending on ``prior_mean_mode``); the backbone doubles as
+        # the plain-CDR baseline for validation/plots.
         self.gp = SingleGPModel(config)
         self.backbone = CDRBackbone(config.affine_regularization)
         self.rows: list[dict] = []
@@ -915,12 +1348,10 @@ class Mitigator:
         return np.stack([build_feature_row(r, self.config) for r in rows], axis=0)
 
     def _fit_gp_from_rows(self) -> None:
-        # Combined design: the GP maps features -> O_ideal directly (CDR is in the
-        # kernel). The baseline backbone is also (re)fit for reference only.
-        X = self._feature_matrix(self.rows)
-        y = np.asarray([float(r["o_ideal"]) for r in self.rows], dtype=float)
-        self.gp.fit(X, y)
-        self.backbone.fit(self.rows)
+        # Fit the backbone first (its line defines the residual target in
+        # "backbone" mode), then the single GP -- via the shared helper so the
+        # validation paths use the exact same recipe.
+        self.backbone, self.gp = _fit_backbone_and_gp(self.rows, self.config)
 
     # -- warm start -------------------------------------------------------
     def warmstart(self) -> None:
@@ -929,14 +1360,34 @@ class Mitigator:
         resolvers = self.adapter.generate_near_clifford(
             theta0,
             n_circuits=int(self.config.n_warmstart_circuits),
-            n_nonclifford=int(self.config.n_nonclifford_gates),
+            n_nonclifford=self.config.n_nonclifford_gates,
             snap_step=float(self.config.clifford_snap_step),
             spread=float(self.config.warmstart_spread),
             seed=int(self.config.rng_seed),
+            node_hops=int(self.config.clifford_node_hops),
         )
         self.rows = self.adapter.collect_rows(
             resolvers, shots=int(self.config.shots), seed_base=int(self.config.rng_seed) + 1
         )
+        # Fully-Clifford anchor circuits over a wider grid: never pruned, keep
+        # the GP pinned globally even after large theta moves.
+        n_anchor = int(getattr(self.config, "n_clifford_anchor_circuits", 0) or 0)
+        if n_anchor > 0:
+            anchor_res = self.adapter.generate_clifford_anchors(
+                theta0,
+                n_circuits=n_anchor,
+                snap_step=float(self.config.clifford_snap_step),
+                seed=int(self.config.rng_seed) + 91,
+                node_hops=int(self.config.anchor_node_hops),
+            )
+            self.rows.extend(
+                self.adapter.collect_rows(
+                    anchor_res,
+                    shots=int(self.config.shots),
+                    seed_base=int(self.config.rng_seed) + 2001,
+                    anchor=True,
+                )
+            )
         self._fit_gp_from_rows()  # fits the combined GP (and the baseline backbone)
 
     # -- prediction -------------------------------------------------------
@@ -953,8 +1404,10 @@ class Mitigator:
             {"theta": theta, "pauli": label, "o_noisy": float(o_noisy_by_pauli[label])}
             for label in labels
         ]
-        X = self._feature_matrix(rows)
-        mean, std = self.gp.predict(X)  # mean IS the mitigated O_ideal (CDR in-kernel)
+        # Honors prior_mean_mode: in "backbone" mode the mean is
+        # (a_P * o_noisy + b_P) + GP residual, so the measurement always flows
+        # through the prediction.
+        mean, std = _predict_rows(self.gp, self.backbone, rows, self.config)
         o_mit: dict = {}
         std_by: dict = {}
         for k, label in enumerate(labels):
@@ -976,18 +1429,24 @@ class Mitigator:
 
     def _prune_rows(self) -> None:
         cap = int(self.config.max_gp_points)
+        # Anchor rows (fully-Clifford global pins) are NEVER pruned; the
+        # distance-based cap applies to the remaining rows.
+        anchors = [r for r in self.rows if r.get("anchor")]
+        others = [r for r in self.rows if not r.get("anchor")]
+        cap_others = max(0, cap - len(anchors))
         if self._current_theta is not None:
             dist = np.asarray(
                 [
                     float(np.linalg.norm(np.asarray(r["theta"]) - self._current_theta))
-                    for r in self.rows
+                    for r in others
                 ],
                 dtype=float,
             )
-            keep = np.argsort(dist)[:cap]
-            self.rows = [self.rows[i] for i in sorted(keep.tolist())]
+            keep = np.argsort(dist)[:cap_others]
+            others = [others[i] for i in sorted(keep.tolist())]
         else:
-            self.rows = self.rows[-cap:]
+            others = others[-cap_others:] if cap_others > 0 else []
+        self.rows = anchors + others
 
     def mitigated_energy(self, theta, o_noisy_by_pauli: dict) -> float:
         o_mit = self.mitigate(theta, o_noisy_by_pauli)
@@ -1005,9 +1464,13 @@ class Mitigator:
                                         + d mean_P/d(o_noisy) * d o_noisy_P/dtheta_j ]
 
         - ``d(angle)/dtheta_j`` (Fourier features) is closed form (classical).
+        - the location interaction features also depend on theta and their
+          Jacobian (``cos(theta_j) * descriptor``) is included per Pauli row.
         - ``d o_noisy_P/dtheta_j`` is the only device-supplied term and must be
           passed in (parameter-shift on the real noisy measurement). It maps
           ``pauli label -> np.ndarray`` of length ``n_params``.
+        - in ``prior_mean_mode="backbone"`` the backbone term contributes
+          ``a_P * d o_noisy_P/dtheta_j`` on top of the GP-residual gradient.
 
         Pauli features are constant in theta, so they contribute nothing.
         """
@@ -1023,6 +1486,7 @@ class Mitigator:
         idx = feature_index_map(self.config)
         angle_idx = idx["angle"]
         noisy_idx = idx["noisy"]
+        loc_idx = idx.get("location", [])
         n_params = int(self.config.n_params)
         n_harm = int(self.config.max_harmonic)
 
@@ -1040,13 +1504,41 @@ class Mitigator:
         # angle contribution: (P, n_angle) @ (n_angle, n_params) -> (P, n_params)
         d_omit_dtheta = dmean[:, angle_idx] @ dangle
 
-        # device-supplied noisy-feature contribution
+        # location-interaction contribution (features = sin(theta_j) * c_jk with
+        # c_jk = [depth_frac, down_frac, lightcone_overlap(j, P)]):
+        # d/dtheta_j = cos(theta_j) * c_jk. The overlap depends on the Pauli, so
+        # the Jacobian varies per row.
+        if len(loc_idx) > 0:
+            locs = np.asarray(self.config.param_locations, dtype=float)
+            cos_t = np.cos(theta)
+            for i, label in enumerate(labels):
+                ov = lightcone_overlap(self.config, label)  # (n_params,)
+                for j in range(n_params):
+                    cols = loc_idx[
+                        _N_LOC_PER_PARAM * j : _N_LOC_PER_PARAM * (j + 1)
+                    ]
+                    c_vec = np.asarray(
+                        [locs[j, 0], locs[j, 1], float(ov[j])], dtype=float
+                    )
+                    d_omit_dtheta[i, j] += float(
+                        np.dot(dmean[i, cols], c_vec)
+                    ) * float(cos_t[j])
+
+        # device-supplied noisy-measurement contribution: through the GP's
+        # o_noisy feature column AND, in backbone mode, through the backbone
+        # slope a_P (the always-on measurement channel).
+        do = np.stack(
+            [np.asarray(do_noisy_dtheta[label], dtype=float).ravel() for label in labels],
+            axis=0,
+        )  # (P, n_params)
         if len(noisy_idx) > 0:
-            do = np.stack(
-                [np.asarray(do_noisy_dtheta[label], dtype=float).ravel() for label in labels],
-                axis=0,
-            )  # (P, n_params)
             d_omit_dtheta = d_omit_dtheta + dmean[:, noisy_idx[0]][:, None] * do
+        if _use_backbone_prior(self.config):
+            slopes = np.asarray(
+                [self.backbone.coeffs.get(label, (1.0, 0.0))[0] for label in labels],
+                dtype=float,
+            )
+            d_omit_dtheta = d_omit_dtheta + slopes[:, None] * do
 
         weights = np.asarray(self.adapter.weights, dtype=float)  # aligned with obs_labels
         grad = weights @ d_omit_dtheta  # (n_params,)
@@ -1065,11 +1557,19 @@ def needs_topup(std_by_pauli: dict, coeff_by_pauli: dict, config: MitigatorConfi
 
 
 def weighted_uncertainty(std_by_pauli: dict, coeff_by_pauli: dict) -> float:
-    """|c_i|-weighted aggregate of predicted std (an energy-scale uncertainty)."""
+    """Energy-scale predictive uncertainty: ``sqrt(sum_i c_i^2 sigma_i^2)``.
+
+    Quadrature aggregation (independent per-Pauli errors) instead of the old L1
+    sum ``sum_i |c_i| sigma_i``: with ~100 Hamiltonian terms the L1 form is a
+    perfectly-correlated worst case ~10x larger than the realistic energy error,
+    which made any Eh-scale threshold permanently unreachable and forced the
+    top-up gate / backbone fallback to fire on every iteration.
+    """
     total = 0.0
     for label, std in std_by_pauli.items():
-        total += abs(float(coeff_by_pauli.get(label, 0.0))) * float(std)
-    return float(total)
+        c = float(coeff_by_pauli.get(label, 0.0))
+        total += (c * float(std)) ** 2
+    return float(np.sqrt(total))
 
 
 def sample_local_rows(
@@ -1079,12 +1579,40 @@ def sample_local_rows(
     resolvers = adapter.generate_near_clifford(
         theta,
         n_circuits=int(config.topup_batch_size),
-        n_nonclifford=int(config.n_nonclifford_gates),
+        n_nonclifford=config.n_nonclifford_gates,
         snap_step=float(config.clifford_snap_step),
         spread=float(config.effective_topup_radius()),
         seed=int(seed),
+        node_hops=int(config.clifford_node_hops),
     )
     return adapter.collect_rows(resolvers, shots=int(config.shots), seed_base=int(seed) + 1)
+
+
+def prequential_topup_error(mitigator: "Mitigator", new_rows: list[dict]) -> float:
+    """Mean absolute per-circuit ENERGY error of the CURRENT model on a fresh
+    near-Clifford batch, evaluated BEFORE the batch is added.
+
+    Every top-up row carries an exact ``o_ideal``, so this is a real, unbiased
+    local error estimate -- immune to the GP's own (possibly overconfident)
+    predictive std. The metric is the SIGNED energy error per circuit,
+    ``|sum_P c_P * (pred_P - ideal_P)|`` averaged over the batch circuits: the
+    quantity the VQE actually consumes, in which per-Pauli errors cancel (the
+    old L1 form ``sum_P |c_P| |err_P|`` overstated it ~10x and locked the
+    controller into permanent backbone fallback).
+    """
+    if not new_rows:
+        return 0.0
+    mean, _ = _predict_rows(mitigator.gp, mitigator.backbone, new_rows, mitigator.config)
+    coeff = mitigator.coeff_by_pauli
+    # Group rows by circuit via their theta vector (top-up thetas carry
+    # continuous jitter, so collisions are not a concern in practice).
+    err_by_circuit: dict[tuple, float] = {}
+    for r, m in zip(new_rows, mean):
+        key = tuple(np.round(np.asarray(r["theta"], dtype=float), 12).tolist())
+        err_by_circuit[key] = err_by_circuit.get(key, 0.0) + float(
+            coeff.get(r["pauli"], 0.0)
+        ) * (float(m) - float(r["o_ideal"]))
+    return float(np.mean([abs(v) for v in err_by_circuit.values()]))
 
 
 # ---------------------------------------------------------------------------
@@ -1181,10 +1709,23 @@ def run_vqe_with_mitigator(
             g[j] = (mitigated_energy(tp) - mitigated_energy(tm)) * grad_scale
         return g
 
-    def do_topup(th: np.ndarray, it_seed: int) -> tuple[dict, dict]:
-        new_rows = sample_local_rows(adapter, th, cfg, seed=int(it_seed))
-        mitigator.update_with_rows(new_rows, current_theta=th)
-        return mitigator.predict_with_uncertainty(th, measured)
+    def do_topup(
+        th: np.ndarray, it_seed: int, n_batches: int = 1
+    ) -> tuple[dict, dict, "float | None"]:
+        """Add ``n_batches`` local near-Clifford batches; return the refreshed
+        prediction and the PREQUENTIAL error of the last batch (the current
+        model's per-circuit energy error on the fresh rows, measured BEFORE they were
+        added -- a real local accuracy estimate, not the GP's own std)."""
+        preq_err: "float | None" = None
+        for b in range(int(max(1, n_batches))):
+            new_rows = sample_local_rows(
+                adapter, th, cfg, seed=int(it_seed) + 101 * b
+            )
+            if bool(cfg.prequential_topup_check):
+                preq_err = prequential_topup_error(mitigator, new_rows)
+            mitigator.update_with_rows(new_rows, current_theta=th)
+        o_mit_, std_ = mitigator.predict_with_uncertainty(th, measured)
+        return o_mit_, std_, preq_err
 
     history: list[dict] = []
     topup_total = 0
@@ -1212,29 +1753,63 @@ def run_vqe_with_mitigator(
         )
         topped = 0
         iter_topups = 0  # number of top-up batches this iter (for shot accounting)
+        preq_err: "float | None" = None
+        used_backbone_fallback = False
         if unc_trigger or move_trigger or periodic_trigger:
-            o_mit, std = do_topup(theta, int(cfg.rng_seed) + 10_000 + it)
+            # Move-scaled: a large theta jump gets proportionally more batches
+            # (capped) so the new region is re-covered before the gradient/step.
+            n_batches = 1
+            if move_trigger:
+                n_batches = int(
+                    min(
+                        max(1, int(np.ceil(moved / max(cfg.effective_topup_radius(), 1e-9)))),
+                        int(max(1, cfg.max_move_topup_batches)),
+                    )
+                )
+            o_mit, std, preq_err = do_topup(
+                theta, int(cfg.rng_seed) + 10_000 + it, n_batches=n_batches
+            )
             last_topup_theta = theta.copy()
             topped = 1
-            iter_topups += 1
-            topup_total += 1
-            # (3) Top-up-until-satisfied: keep adding local batches while the GP is
-            #     still too uncertain at theta, bounded by ``max_topup_retries`` so
-            #     the shot cost stays capped. Forces a trustworthy surrogate before
-            #     the gradient/step are taken (the fix for runaway extrapolation).
+            iter_topups += n_batches
+            topup_total += n_batches
+
+            def _trust_metric() -> float:
+                m = weighted_uncertainty(std, mitigator.coeff_by_pauli)
+                if preq_err is not None:
+                    m = max(m, float(preq_err))
+                return float(m)
+
+            # (3) Top-up-until-satisfied: keep adding local batches while the GP
+            #     is still untrustworthy at theta -- by its own std OR by the
+            #     (overconfidence-immune) prequential error -- bounded by
+            #     ``max_topup_retries`` so the shot cost stays capped.
             retries = 0
             while (
                 int(cfg.max_topup_retries) > 0
-                and weighted_uncertainty(std, mitigator.coeff_by_pauli)
-                > float(cfg.uncertainty_threshold)
+                and _trust_metric() > float(cfg.uncertainty_threshold)
                 and retries < int(cfg.max_topup_retries)
             ):
-                o_mit, std = do_topup(
+                o_mit, std, preq_err = do_topup(
                     theta, int(cfg.rng_seed) + 30_000 + it * 1000 + retries
                 )
                 iter_topups += 1
                 topup_total += 1
                 retries += 1
+
+            # If the model is STILL locally invalid by real (prequential) error,
+            # do not trust its mean for this iteration: use the plain per-Pauli
+            # CDR backbone, which is guaranteed to track the measurement.
+            if (
+                bool(cfg.fallback_to_backbone_on_mistrust)
+                and preq_err is not None
+                and float(preq_err) > float(cfg.uncertainty_threshold)
+            ):
+                o_mit = {
+                    label: mitigator.backbone.apply(label, measured[label])
+                    for label in measured
+                }
+                used_backbone_fallback = True
 
         energy = adapter.energy_from_values(o_mit)
         unc = weighted_uncertainty(std, mitigator.coeff_by_pauli)
@@ -1253,7 +1828,7 @@ def run_vqe_with_mitigator(
             cfg.convergence_grad_tol
         ):
             if topped == 0:
-                o_mit, std = do_topup(theta, int(cfg.rng_seed) + 20_000 + it)
+                o_mit, std, preq_err = do_topup(theta, int(cfg.rng_seed) + 20_000 + it)
                 last_topup_theta = theta.copy()
                 topped = 1
                 iter_topups += 1
@@ -1286,6 +1861,8 @@ def run_vqe_with_mitigator(
             "energy_rem": float(bundle["energy_rem"]),
             "energy_backbone": float(adapter.energy_from_values(backbone_by_pauli)),
             "weighted_uncertainty": float(unc),
+            "prequential_error": float(preq_err) if preq_err is not None else float("nan"),
+            "used_backbone_fallback": bool(used_backbone_fallback),
             "topped_up": int(topped),
             "n_topups": int(iter_topups),
             "topup_cum": int(topup_total),
@@ -1302,10 +1879,14 @@ def run_vqe_with_mitigator(
                 if "energy_ideal" in rec
                 else ""
             )
+            preq_str = (
+                f"  preq={preq_err: .4e}" if preq_err is not None else ""
+            )
+            fb_str = "  [backbone fallback]" if used_backbone_fallback else ""
             print(
                 f"[GP-VQE] iter={it:03d}  E_mit={energy: .6f}{extra}  "
-                f"unc={unc: .4e}  topup={iter_topups} (cum={topup_total})  "
-                f"|g|={rec['grad_norm']: .3e}  rows={rec['n_rows']}"
+                f"unc={unc: .4e}{preq_str}  topup={iter_topups} (cum={topup_total})  "
+                f"|g|={rec['grad_norm']: .3e}  rows={rec['n_rows']}{fb_str}"
             )
 
         if converged:
@@ -1354,20 +1935,25 @@ def analytic_shot_count(
     it can be cross-checked against the empirical backend counter
     (``adapter.shot_report()`` / ``vqe_out['total_shots']``):
 
-      * warm start          : ``n_warmstart_circuits`` executions (once),
+      * warm start          : ``n_warmstart_circuits + n_clifford_anchor_circuits``
+                               executions (once),
       * per VQE iteration    : 1 energy measurement
                                + ``grad_evals * 2 * n_params`` gradient circuits
                                + ``n_topups * topup_batch_size`` top-up circuits.
 
     ``grad_evals`` (1, or 2 on a convergence-validation iteration) and
-    ``topped_up`` (0/1) are read back from ``history`` so the data-dependent
-    top-up / early-stop behavior is reflected exactly. Every execution consumes
+    ``n_topups`` (the number of top-up BATCHES, including move-scaled and retry
+    batches) are read back from ``history`` so the data-dependent top-up /
+    early-stop behavior is reflected exactly. Every execution consumes
     ``config.shots`` shots, so ``total_shots = circuit_evals * shots``.
     """
     grad_evals_cost = gradient_circuit_evals(config)
     shots = int(config.shots)
 
-    warmstart_evals = int(config.n_warmstart_circuits) if include_warmstart else 0
+    n_anchor = int(getattr(config, "n_clifford_anchor_circuits", 0) or 0)
+    warmstart_evals = (
+        int(config.n_warmstart_circuits) + n_anchor if include_warmstart else 0
+    )
     energy_evals = 0
     gradient_evals = 0
     topup_evals = 0
@@ -1474,10 +2060,11 @@ def holdout_validation(
     resolvers = adapter.generate_near_clifford(
         theta0,
         n_circuits=int(config.n_warmstart_circuits),
-        n_nonclifford=int(config.n_nonclifford_gates),
+        n_nonclifford=config.n_nonclifford_gates,
         snap_step=float(config.clifford_snap_step),
         spread=float(config.warmstart_spread),
         seed=seed,
+        node_hops=int(config.clifford_node_hops),
     )
     rng = np.random.default_rng(seed)
     order = rng.permutation(len(resolvers))
@@ -1489,20 +2076,11 @@ def holdout_validation(
     train_rows = adapter.collect_rows(train_res, shots=int(config.shots), seed_base=seed + 1)
     hold_rows = adapter.collect_rows(hold_res, shots=int(config.shots), seed_base=seed + 5000)
 
-    backbone = CDRBackbone(config.affine_regularization)  # plain-CDR baseline
-    backbone.fit(train_rows)
-    gp = SingleGPModel(config)
-    Xtr = np.stack([build_feature_row(r, config) for r in train_rows], axis=0)
-    ytr = np.asarray([r["o_ideal"] for r in train_rows], dtype=float)  # target = O_ideal
-    gp.fit(Xtr, ytr)
-
-    Xho = np.stack([build_feature_row(r, config) for r in hold_rows], axis=0)
-    gp_pred, _ = gp.predict(Xho)  # combined GP mean IS the mitigated value
+    backbone, gp = _fit_backbone_and_gp(train_rows, config)
+    gp_pred, _ = _predict_rows(gp, backbone, hold_rows, config)
     o_ideal = np.asarray([r["o_ideal"] for r in hold_rows], dtype=float)
     o_noisy = np.asarray([r["o_noisy"] for r in hold_rows], dtype=float)
-    backbone_pred = np.asarray(
-        [backbone.apply(r["pauli"], r["o_noisy"]) for r in hold_rows], dtype=float
-    )
+    backbone_pred = _backbone_values(backbone, hold_rows)
 
     return {
         "n_train_circuits": len(train_res),
@@ -1535,36 +2113,29 @@ def extrapolation_validation(
     train_res = adapter.generate_near_clifford(
         theta0,
         n_circuits=int(config.n_warmstart_circuits),
-        n_nonclifford=int(config.n_nonclifford_gates),
+        n_nonclifford=config.n_nonclifford_gates,
         snap_step=float(config.clifford_snap_step),
         spread=float(train_spread),
         seed=seed,
+        node_hops=int(config.clifford_node_hops),
     )
     test_res = adapter.generate_near_clifford(
         theta0,
         n_circuits=max(8, int(config.topup_batch_size)),
-        n_nonclifford=int(config.n_nonclifford_gates),
+        n_nonclifford=config.n_nonclifford_gates,
         snap_step=float(config.clifford_snap_step),
         spread=float(test_spread),
         seed=seed + 999,
+        node_hops=int(config.clifford_node_hops),
     )
     train_rows = adapter.collect_rows(train_res, shots=int(config.shots), seed_base=seed + 1)
     test_rows = adapter.collect_rows(test_res, shots=int(config.shots), seed_base=seed + 7000)
 
-    backbone = CDRBackbone(config.affine_regularization)  # plain-CDR baseline
-    backbone.fit(train_rows)
-    gp = SingleGPModel(config)
-    Xtr = np.stack([build_feature_row(r, config) for r in train_rows], axis=0)
-    ytr = np.asarray([r["o_ideal"] for r in train_rows], dtype=float)  # target = O_ideal
-    gp.fit(Xtr, ytr)
-
-    Xte = np.stack([build_feature_row(r, config) for r in test_rows], axis=0)
-    gp_pred, gp_std = gp.predict(Xte)  # combined GP mean IS the mitigated value
+    backbone, gp = _fit_backbone_and_gp(train_rows, config)
+    gp_pred, gp_std = _predict_rows(gp, backbone, test_rows, config)
     o_ideal = np.asarray([r["o_ideal"] for r in test_rows], dtype=float)
     o_noisy = np.asarray([r["o_noisy"] for r in test_rows], dtype=float)
-    backbone_pred = np.asarray(
-        [backbone.apply(r["pauli"], r["o_noisy"]) for r in test_rows], dtype=float
-    )
+    backbone_pred = _backbone_values(backbone, test_rows)
     return {
         "train_spread": float(train_spread),
         "test_spread": float(test_spread),
@@ -1573,6 +2144,169 @@ def extrapolation_validation(
         "rmse_single_gp": _rmse(gp_pred, o_ideal),
         "mean_gp_std": float(np.mean(gp_std)),
     }
+
+
+def nnc_generalization_validation(
+    adapter: CirqBackendAdapter,
+    config: MitigatorConfig,
+    *,
+    nnc_train: "int | tuple[int, ...] | None" = None,
+    nnc_test: "int | None" = None,
+    n_test_circuits: int | None = None,
+    seed: int | None = None,
+) -> dict:
+    """Train with few non-Clifford gates per circuit, test on FULLY non-Clifford
+    thetas -- exactly the regime the live VQE operates in.
+
+    ``nnc_train`` defaults to ``config.n_nonclifford_gates``; ``nnc_test``
+    defaults to ``n_params`` (all parameters jittered, no snapping), which is
+    what a real VQE theta looks like. This measures the classical-model
+    degeneracy directly: a model that only interpolates ``O_ideal(theta)`` from
+    axis-aligned slices fails here, while one that leans on ``O_noisy``
+    (backbone prior / in-kernel CDR) degrades gracefully.
+    """
+    seed = int(config.rng_seed if seed is None else seed)
+    theta0 = (
+        np.zeros(int(config.n_params))
+        if config.theta_init is None
+        else np.asarray(config.theta_init, dtype=float)
+    )
+    nnc_train = config.n_nonclifford_gates if nnc_train is None else nnc_train
+    nnc_test = int(config.n_params) if nnc_test is None else int(nnc_test)
+    n_test = int(
+        max(8, config.topup_batch_size) if n_test_circuits is None else n_test_circuits
+    )
+
+    train_res = adapter.generate_near_clifford(
+        theta0,
+        n_circuits=int(config.n_warmstart_circuits),
+        n_nonclifford=nnc_train,
+        snap_step=float(config.clifford_snap_step),
+        spread=float(config.warmstart_spread),
+        seed=seed,
+        node_hops=int(config.clifford_node_hops),
+    )
+    test_res = adapter.generate_near_clifford(
+        theta0,
+        n_circuits=n_test,
+        n_nonclifford=nnc_test,
+        snap_step=float(config.clifford_snap_step),
+        spread=float(config.warmstart_spread),
+        seed=seed + 4242,
+        node_hops=0,
+    )
+    train_rows = adapter.collect_rows(train_res, shots=int(config.shots), seed_base=seed + 1)
+    test_rows = adapter.collect_rows(test_res, shots=int(config.shots), seed_base=seed + 9000)
+
+    backbone, gp = _fit_backbone_and_gp(train_rows, config)
+    gp_pred, gp_std = _predict_rows(gp, backbone, test_rows, config)
+    o_ideal = np.asarray([r["o_ideal"] for r in test_rows], dtype=float)
+    o_noisy = np.asarray([r["o_noisy"] for r in test_rows], dtype=float)
+    backbone_pred = _backbone_values(backbone, test_rows)
+    return {
+        "nnc_train": nnc_train,
+        "nnc_test": nnc_test,
+        "n_test_circuits": n_test,
+        "rmse_unmitigated": _rmse(o_noisy, o_ideal),
+        "rmse_cdr_only": _rmse(backbone_pred, o_ideal),
+        "rmse_single_gp": _rmse(gp_pred, o_ideal),
+        "mean_gp_std": float(np.mean(gp_std)),
+    }
+
+
+def measurement_reliance_report(
+    mitigator: Mitigator,
+    rows: "list[dict] | None" = None,
+    *,
+    max_rows: int = 200,
+    seed: int = 0,
+    verbose: bool = True,
+) -> dict:
+    """How much does the mitigated prediction actually USE the noisy measurement?
+
+    Two complementary probes on (a sample of) the training rows:
+
+      1. gradient probe -- mean ``|d mean / d o_noisy|`` from the analytic GP
+         input gradient, plus the backbone slope ``|a_P|`` when the backbone
+         prior mean is active (the always-on measurement channel).
+      2. permutation probe -- re-predict the same rows with ``o_noisy`` SHUFFLED
+         within each Pauli group. If the predictions barely move, the model is
+         ignoring the measurement: it has degenerated into a classical surrogate
+         of O_ideal(theta) (the nnc=1 failure mode).
+
+    ``degenerate`` is True when the permutation-induced RMS prediction change is
+    < 5% of the target scale.
+    """
+    config = mitigator.config
+    rows = list(mitigator.rows if rows is None else rows)
+    if not rows:
+        raise ValueError("No rows available; run warmstart() first.")
+    rng = np.random.default_rng(int(seed))
+    if len(rows) > int(max_rows):
+        pick = rng.choice(len(rows), size=int(max_rows), replace=False)
+        rows = [rows[i] for i in sorted(pick.tolist())]
+
+    # (1) gradient probe.
+    idx = feature_index_map(config)
+    noisy_col = idx["noisy"][0] if idx["noisy"] else None
+    gp_grad_reliance = 0.0
+    if noisy_col is not None:
+        X = np.stack([build_feature_row(r, config) for r in rows], axis=0)
+        dmean = mitigator.gp.predict_input_gradient(X)
+        gp_grad_reliance = float(np.mean(np.abs(dmean[:, noisy_col])))
+    backbone_slope = 0.0
+    if _use_backbone_prior(config):
+        slopes = [
+            abs(float(mitigator.backbone.coeffs.get(r["pauli"], (1.0, 0.0))[0]))
+            for r in rows
+        ]
+        backbone_slope = float(np.mean(slopes))
+    total_reliance = gp_grad_reliance + backbone_slope
+
+    # (2) permutation probe: shuffle o_noisy within each Pauli group.
+    mean_orig, _ = _predict_rows(mitigator.gp, mitigator.backbone, rows, config)
+    by_pauli: dict[str, list[int]] = {}
+    for i, r in enumerate(rows):
+        by_pauli.setdefault(r["pauli"], []).append(i)
+    rows_perm = [dict(r) for r in rows]
+    for label, idxs in by_pauli.items():
+        if len(idxs) < 2:
+            continue
+        perm = rng.permutation(idxs)
+        for i_dst, i_src in zip(idxs, perm.tolist()):
+            rows_perm[i_dst]["o_noisy"] = float(rows[i_src]["o_noisy"])
+    mean_perm, _ = _predict_rows(mitigator.gp, mitigator.backbone, rows_perm, config)
+    perm_delta_rms = float(np.sqrt(np.mean((mean_perm - mean_orig) ** 2)))
+    target_scale = float(np.std([r["o_ideal"] for r in rows]) + 1e-12)
+    perm_ratio = perm_delta_rms / target_scale
+    degenerate = bool(perm_ratio < 0.05)
+
+    out = {
+        "gp_grad_reliance": gp_grad_reliance,
+        "backbone_slope_mean": backbone_slope,
+        "total_reliance": total_reliance,
+        "perm_delta_rms": perm_delta_rms,
+        "target_scale": target_scale,
+        "perm_ratio": perm_ratio,
+        "degenerate": degenerate,
+        "n_rows_probed": len(rows),
+    }
+    if verbose:
+        print(
+            f"[reliance] mean |d mean/d o_noisy| (GP)   : {gp_grad_reliance:.4f}\n"
+            f"[reliance] mean backbone slope |a_P|      : {backbone_slope:.4f}\n"
+            f"[reliance] total measurement reliance     : {total_reliance:.4f}\n"
+            f"[reliance] permutation RMS shift / scale  : {perm_delta_rms:.4e} / "
+            f"{target_scale:.4e} = {perm_ratio:.2%}"
+        )
+        if degenerate:
+            print(
+                "[reliance] WARNING: predictions barely respond to o_noisy -- the "
+                "model has degenerated into a CLASSICAL surrogate of O_ideal(theta). "
+                "Use prior_mean_mode='backbone', lower angle_term_amplitude_bound, "
+                "or add grid-diverse training data (clifford_node_hops > 0)."
+            )
+    return out
 
 
 def make_eval_set(

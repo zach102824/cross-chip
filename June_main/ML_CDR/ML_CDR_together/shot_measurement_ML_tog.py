@@ -289,6 +289,7 @@ def estimate_energy_from_noisy_rho_shots(
         if return_per_term:
             out["per_term_unmitigated"] = np.zeros((0,), dtype=float)
             out["per_term_rem"] = np.zeros((0,), dtype=float)
+            out["per_term_n_samples"] = np.zeros((0,), dtype=int)
         return out
 
     rem_vectors = rem_z_vectors(p0, p1) if (apply_readout_noise and apply_rem) else None
@@ -313,6 +314,7 @@ def estimate_energy_from_noisy_rho_shots(
             z = np.zeros(len(weights), dtype=float)
             out["per_term_unmitigated"] = z.copy()
             out["per_term_rem"] = z.copy()
+            out["per_term_n_samples"] = np.zeros(len(weights), dtype=int)
         return out
 
     unique_settings, unique_counts = _unique_settings_with_counts(sampled_settings)
@@ -330,6 +332,7 @@ def estimate_energy_from_noisy_rho_shots(
     energy_rem = offset
     per_term_unmit: list[float] | None = [] if return_per_term else None
     per_term_rem: list[float] | None = [] if return_per_term else None
+    per_term_n: list[int] | None = [] if return_per_term else None
 
     for obs_row, coeff in zip(observables_int, weights):
         compatible_keys = [
@@ -358,8 +361,10 @@ def estimate_energy_from_noisy_rho_shots(
         energy_rem += coeff * term_r
         if return_per_term:
             assert per_term_unmit is not None and per_term_rem is not None
+            assert per_term_n is not None
             per_term_unmit.append(float(term_u))
             per_term_rem.append(float(term_r))
+            per_term_n.append(int(total))
 
     result: dict[str, Any] = {
         "energy_unmitigated": float(energy_unmit),
@@ -369,6 +374,10 @@ def estimate_energy_from_noisy_rho_shots(
     if return_per_term:
         result["per_term_unmitigated"] = np.asarray(per_term_unmit, dtype=float)
         result["per_term_rem"] = np.asarray(per_term_rem, dtype=float)
+        # Effective sample count behind each per-term estimate (how many of the
+        # grouped-measurement shots were compatible with this Pauli) -- used by
+        # the GP's heteroscedastic per-row noise model.
+        result["per_term_n_samples"] = np.asarray(per_term_n, dtype=int)
     return result
 
 

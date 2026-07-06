@@ -1,0 +1,10 @@
+cirq
+numpy
+scipy
+matplotlib
+sympy
+qiskit
+openfermion
+openfermionpyscf
+ipykernel
+jupyter
