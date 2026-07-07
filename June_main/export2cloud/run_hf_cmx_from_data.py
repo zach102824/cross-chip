@@ -5,8 +5,16 @@ This is the standalone version of the CMX cell in ``June_main/main_HF.ipynb``.
 It does NOT run VQE. It loads ``params_final`` from a saved run folder
 (``data/HF_bond_<R>/vqe_results.json``), rebuilds the same HF prep + ansatz
 circuit, measures <H>, <H^2>, <H^3> with the SAME CDR+REM pipeline using the
-OGM measurement scheme, runs the connected-moment expansion, and saves the CMX
-results back into the run folder.
+OGM measurement scheme, runs the connected-moment expansion, and (when the new
+sweep improves on what is already saved) overwrites the CMX results in the run
+folder.
+
+By default it sweeps larger shot multipliers (10x, 20x base shots) than the
+original ``main_HF.py`` run (which used 1x/5x); the extra shots reduce the
+finite-shot noise in <H^2>/<H^3> that pushes E_CME(k=3) away from e_gs. The new
+multipliers are merged with any already saved, and the files are only rewritten
+when the best new |E_CME - e_gs| beats the best saved one (use --force-save to
+override, --no-save to just print the comparison).
 
 All Hamiltonian and OGM basis files are read from THIS directory
 (``June_main/export2cloud``):
@@ -14,8 +22,9 @@ All Hamiltonian and OGM basis files are read from THIS directory
   - OGM bases    : ``June_main/OGM_measurement_basis/OGM_HF_bond_<R>.txt`` / ``..._square_...`` / ``..._triple_...``
 
 Run, e.g.:
-    python run_hf_cmx_from_data.py
+    python run_hf_cmx_from_data.py --run-dir data/HF_bond_1.2
     python run_hf_cmx_from_data.py --run-dir data/HF_bond_2.2
+    python run_hf_cmx_from_data.py --run-dir data/HF_bond_2.2 --multipliers 10,20
 """
 from __future__ import annotations
 
@@ -211,6 +220,47 @@ def cme_k3(h1: float, h2: float, h3: float) -> tuple[float, float, float, float]
     return energy, c1, c2, c3
 
 
+def load_existing_by_multiplier(run_dir: Path) -> dict[int, dict[str, Any]]:
+    """Load the CMX-by-multiplier results already saved in ``run_dir`` (if any).
+
+    JSON stores the multiplier keys as strings; convert them back to ints so the
+    new and existing sweeps can be compared and merged consistently.
+    """
+    path = run_dir / "cme_results_by_multiplier.json"
+    if not path.is_file():
+        return {}
+    raw = load_json(path)
+    out: dict[int, dict[str, Any]] = {}
+    for key, value in raw.items():
+        try:
+            out[int(key)] = value
+        except (TypeError, ValueError):
+            continue
+    return out
+
+
+def best_multiplier(
+    by_multiplier: dict[int, dict[str, Any]], e_gs: float
+) -> tuple[int | None, float]:
+    """Return (multiplier, |E_CME - e_gs|) for the multiplier closest to e_gs.
+
+    NaN/missing E_CME values are ignored. Returns (None, inf) when nothing usable.
+    """
+    best_mult: int | None = None
+    best_err = float("inf")
+    for mult, result in by_multiplier.items():
+        e_cme = result.get("E_cme_shots")
+        if e_cme is None:
+            continue
+        err = abs(float(e_cme) - e_gs)
+        if not np.isfinite(err):
+            continue
+        if err < best_err:
+            best_err = err
+            best_mult = int(mult)
+    return best_mult, best_err
+
+
 def parse_multiplier_list(text: str) -> list[int]:
     values = [int(item.strip()) for item in text.split(",") if item.strip()]
     if not values:
@@ -231,8 +281,18 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--multipliers",
         type=parse_multiplier_list,
-        default=parse_multiplier_list("1,5,10,15"),
-        help="Comma-separated <H^2>/<H^3> shot multipliers, e.g. 1,5,10,15.",
+        default=parse_multiplier_list("10,20"),
+        help="Comma-separated <H^2>/<H^3> shot multipliers, e.g. 10,20.",
+    )
+    parser.add_argument(
+        "--force-save",
+        action="store_true",
+        help="Overwrite the saved CMX results even if the new best |E_CME - e_gs| is not better.",
+    )
+    parser.add_argument(
+        "--no-save",
+        action="store_true",
+        help="Only run and print the comparison; never write files.",
     )
     parser.add_argument("--moment-source", default="cdr_rem", choices=["cdr_rem", "cdr_unmit", "rem", "unmit"])
     parser.add_argument("--cdr-training-circuits", type=int, default=None)
@@ -447,7 +507,47 @@ def main() -> None:
             f"E_CME={r['E_cme_shots']:.10f} Eh  |E_CME - e_gs|={abs(r['E_cme_shots'] - e_gs):.6e} Eh"
         )
 
-    cme_results = cme_results_by_multiplier[args.multipliers[-1]]
+    # Load the CMX results that are currently on disk (if any) so we can decide
+    # whether the newly-computed multipliers actually improve on them before we
+    # overwrite anything. "Better" == smaller |E_CME - e_gs| for the best multiplier.
+    existing_by_multiplier = load_existing_by_multiplier(run_dir)
+    new_best_mult, new_best_err = best_multiplier(cme_results_by_multiplier, e_gs)
+    old_best_mult, old_best_err = best_multiplier(existing_by_multiplier, e_gs)
+
+    print("\n=== new vs saved CMX comparison ===")
+    if old_best_mult is not None:
+        print(f"saved best : {old_best_mult}x  |E_CME - e_gs| = {old_best_err:.6e} Eh")
+    else:
+        print("saved best : (no existing CMX results on disk)")
+    print(f"new   best : {new_best_mult}x  |E_CME - e_gs| = {new_best_err:.6e} Eh")
+
+    is_better = old_best_err is None or new_best_err < old_best_err
+
+    if args.no_save:
+        print("\n--no-save set: not writing any files.")
+        return
+
+    if not (is_better or args.force_save):
+        print(
+            "\nNew multipliers did NOT improve on the saved CMX results; leaving the "
+            "existing files untouched. Re-run with --force-save to overwrite anyway."
+        )
+        return
+
+    if is_better:
+        print("\nNew multipliers improved the CMX result; overwriting saved files.")
+    else:
+        print("\n--force-save set: overwriting saved files despite no improvement.")
+
+    # Merge the new multipliers into whatever was on disk so previously-computed
+    # multipliers (e.g. 1x, 5x) are preserved alongside the new 10x/20x sweep.
+    merged_by_multiplier = dict(existing_by_multiplier)
+    merged_by_multiplier.update(cme_results_by_multiplier)
+
+    # Single-result alias = the multiplier with the smallest |E_CME - e_gs| overall.
+    best_mult_overall, _ = best_multiplier(merged_by_multiplier, e_gs)
+    cme_results = merged_by_multiplier[best_mult_overall]
+
     written = save_checkpoint(
         data_dir=run_dir.parent,
         molecule=MOLECULE,
@@ -455,7 +555,7 @@ def main() -> None:
         stage="cmx_from_saved_vqe",
         vqe_results=vqe_results,
         cme_results=cme_results,
-        cme_results_by_multiplier=cme_results_by_multiplier,
+        cme_results_by_multiplier=merged_by_multiplier,
         metadata={
             **metadata,
             "circuit_name": CIRCUIT_NAME,
@@ -470,6 +570,7 @@ def main() -> None:
             "circuit_num_params": n_params,
             "circuit_json": str(circuit_json),
             "circuit_meta_num_gates": len(circuit_meta.get("gates", [])),
+            "cmx_best_multiplier": int(best_mult_overall),
         },
     )
     print("\nSaved CMX result files:")

@@ -144,21 +144,76 @@ computational-basis determinant $\ket{\rm HF}$,
 \end{equation}
 because the $X/Y$ factors flip exactly the four occupations
 $i,j,k,l$ (producing the doubly-excited determinant $\ket{D}$) and the
-single $Y$ contributes one factor $\pm i$. Hence
+single $Y$ contributes one factor $\pm i$. Moreover, since $P^2=\mathbb{1}$,
+the relation $P\ket{\rm HF}=\pm i\ket{D}$ implies $P\ket{D}=\mp i\ket{\rm HF}$:
+each such string maps the two-dimensional subspace
+$\mathcal{V}=\mathrm{span}\{\ket{\rm HF},\ket{D}\}$ \emph{into itself}. Hence
 \begin{equation}
   e^{-i\frac{\alpha}{2}P}\ket{\rm HF}
   = \cos\tfrac{\alpha}{2}\ket{\rm HF} \pm \sin\tfrac{\alpha}{2}\ket{D}
 \end{equation}
-is \emph{exactly the same real Givens rotation} that the full eight-string
-fermionic exponential produces --- only the rotation angle is rescaled
-($\theta \to \alpha/2$ instead of $\theta$), which the variational optimiser
-absorbs. The companion script verifies this numerically. Therefore, as long
-as each double acts on the reference in its own two-dimensional subspace,
-\textbf{one Pauli rotation per double gives the identical variational
-manifold at $1/8$ of the cost}. (The Z-chains in $P$ contribute only a
-$\pm1$ sign on a determinant, again absorbed by the parameter; with the
-multi-reference initial state the resulting ansatz is simply \emph{defined}
-as these Pauli rotations, Eqs.~(22)--(24) of the paper.)
+is \emph{exactly the same real Givens rotation on $\mathcal{V}$} that the
+full eight-string fermionic exponential produces --- only the rotation angle
+is rescaled ($\theta \to \alpha/2$ instead of $\theta$), which the
+variational optimiser absorbs. The companion script verifies this
+numerically. (The Z-chains in $P$ contribute only a $\pm1$ sign on a
+determinant, again absorbed by the parameter.)
+
+\paragraph{Scope of the argument --- where it is exact and where it is a
+redefinition.} It is important to be precise about what the above does and
+does \emph{not} prove.
+\begin{itemize}
+\item \textbf{Exact within each double's subspace.} Every one of the eight
+  strings of a given double preserves $\mathcal{V}$ and acts there as the
+  same Givens rotation. In particular, a product of \emph{several strings of
+  the same double} (they all commute) is still exact on $\mathcal{V}$: the
+  rotations simply compose. This is why the H$_2$ circuit below, which keeps
+  a $\pm$ pair of strings of the single double $\ad3\ad1\an2\an0$, equals
+  the exact fermionic exponential on
+  $\mathrm{span}\{\ket{1010},\ket{0101}\}$ with composed angle $2\theta$ ---
+  even though the state after the first factor is no longer $\ket{\rm HF}$,
+  it is still inside the invariant subspace $\mathcal{V}$.
+\item \textbf{Not exact across different doubles.} For LiH and F$_2$ the
+  product mixes strings of \emph{different} doubles, each with its own
+  subspace $\mathcal{V}_k=\mathrm{span}\{\ket{\rm HF},\ket{D_k}\}$. The
+  one-term equivalence only holds on $\mathcal{V}_k$; after the first
+  rotation the state acquires components (on $\ket{D_1}$, say) that lie
+  \emph{outside} the subspaces of the later strings, and there the two
+  operators genuinely differ: the fermionic
+  $e^{\theta(\hat T_k-\hat T_k^\dagger)}$ acts as the \emph{identity} on a
+  determinant with the wrong occupations (the ladder operators annihilate
+  it), whereas the Pauli rotation \emph{flips bits unconditionally}. Exact
+  statevector simulation makes this concrete for two of the LiH strings,
+  $P_1=Y_0X_1X_3Z_4X_5$ and $P_3=Y_0Z_1X_2X_3Z_4X_5$ (defined below), acting
+  on $\ket{\rm HF}=\ket{100100}$ with $\theta_1=\theta_3=\pi/10$:
+  \begin{equation}
+    e^{-i\theta_3 P_3}\,e^{-i\theta_1 P_1}\ket{100100}
+    = 0.9045\ket{100100} - 0.2939\ket{010001} - 0.2939\ket{001001}
+      \;+\; \underbrace{0.0955\ket{111100}}_{N=4\ \text{leakage}},
+  \end{equation}
+  i.e.\ a cross term of order $\sin\theta_1\sin\theta_3$ that even leaves
+  the particle-number sector --- something the fermionic product can never
+  do.
+\item \textbf{Why the paper is nevertheless correct.} The rigorous one-term
+  statement is used only where it is rigorous: in the \emph{screening} step
+  (each candidate double evaluated alone on $\ket{\rm HF}$, Step~1) and for
+  the first factor acting on the reference. The full product of one-term
+  rotations, Eqs.~(22)--(24), is then simply \emph{defined} as the
+  variational ansatz --- a ``qubit-excitation'' ansatz in the sense of
+  Yordanov \emph{et al.}\ rather than a trotterized fermionic-excitation
+  ansatz. It agrees with the fermionic product to first order in each angle
+  around the reference; the discrepancies are the
+  $\mathcal{O}(\sin\theta_i\sin\theta_j)$ cross terms above. VQE
+  re-optimises the angles of \emph{this} ansatz directly, so the energy
+  remains variational; the paper's phrase ``the contribution of each term is
+  the same'' is a statement about the reference state, quietly promoted to a
+  definition of the ansatz.
+\end{itemize}
+So the accurate summary of Step 2 is: \textbf{one Pauli rotation per double
+reproduces the double's Givens rotation on the reference exactly, and the
+product of such rotations is adopted as the ansatz at $1/8$ of the cost} ---
+identical variational manifold per single double, a slightly different (in
+practice comparably expressive) manifold for products of several doubles.
 
 The chosen representatives are [Eqs.~(22)--(24)]:
 \begin{align}
@@ -169,10 +224,16 @@ U_{\mathrm{LiH}}  &= e^{-i\theta_3 Y_0Z_1X_2X_3Z_4X_5}\,
 U_{\mathrm{F}_2}  &= e^{-i\theta_5 X_4X_5Y_{10}X_{11}}\cdots
                      e^{-i\theta_1 Y_0Z_1Z_2Z_3Z_4X_5\,X_6Z_7Z_8Z_9Z_{10}X_{11}} .
 \end{align}
-H$_2$ is special: it keeps a $\pm$ \emph{pair} of strings. The two factors
-commute and their product equals the \emph{exact} fermionic double on the
-two-determinant subspace with angle $2\theta$ --- with a single parameter and
-such a tiny circuit the authors could afford the exact pair.
+H$_2$ is special: it keeps a $\pm$ \emph{pair} of strings \emph{of the same
+double}. The two factors commute and each preserves the invariant subspace
+$\mathrm{span}\{\ket{1010},\ket{0101}\}$, so their product equals the
+\emph{exact} fermionic double there with composed angle $2\theta$ (verified
+numerically: the final state is
+$\cos2\theta\ket{1010}-\sin2\theta\ket{0101}$ with no leakage) --- with a
+single parameter and such a tiny circuit the authors could afford the exact
+pair. For LiH and F$_2$ the factors belong to \emph{different} doubles, so,
+per the discussion above, the products are the \emph{defined} ansatz rather
+than the fermionic product.
 
 % =====================================================================
 \section{Step 3: CZ-native compilation --- the Pauli-frame picture}
@@ -365,8 +426,9 @@ $22+18+14+10+6=70$ CZs without sharing and $2920$ for textbook UCCSD.
   determinant reference).
 \item \textbf{JW-map} each double; \textbf{keep one odd-$Y$ Pauli string}
   per double (it generates the same Givens rotation on the reference;
-  rescaled angle absorbed by VQE). $\Rightarrow$ $8\times$ fewer
-  exponentials.
+  rescaled angle absorbed by VQE; the \emph{product} over several doubles is
+  a redefined qubit-excitation ansatz, exact only to first order in the
+  angles). $\Rightarrow$ $8\times$ fewer exponentials.
 \item \textbf{Order} the strings so consecutive ones share maximal tensor
   factors (guaranteed by shared $\ad{}/\an{}$ indices, e.g.\
   $\ad{11}\ad{5}$ in every F$_2$ double).

@@ -1,16 +1,25 @@
 {
   "bond_length": 1.2,
-  "created_utc": "2026-07-06T15:57:20.850054+00:00",
+  "created_utc": "2026-07-07T10:44:14.078349+00:00",
   "has_cme_results": true,
   "has_cme_results_by_multiplier": true,
   "has_vqe_results": true,
   "metadata": {
+    "cdr_t_max": 2,
     "cdr_training_circuits": 30,
+    "circuit_json": "/Users/zacharyhe/cross_chips_sim/June_main/export2cloud/June_main/circuits2read/HF_8q_3doubles_rzx.json",
+    "circuit_meta_num_gates": 55,
     "circuit_name": "HF_8q_3doubles_rzx",
+    "circuit_num_params": 3,
+    "circuit_num_qubits": 8,
+    "cmx_best_multiplier": 20,
     "measurement_scheme": "ogm",
-    "num_shots": 8192,
+    "num_shots": 81920,
+    "script": "run_hf_cmx_from_data.py",
+    "source_run_dir": "/Users/zacharyhe/cross_chips_sim/June_main/export2cloud/data/HF_bond_1.2",
+    "source_vqe_results": "/Users/zacharyhe/cross_chips_sim/June_main/export2cloud/data/HF_bond_1.2/vqe_results.json",
     "vqe_iters": 15
   },
   "molecule": "HF",
-  "stage": "final"
+  "stage": "cmx_from_saved_vqe"
 }
