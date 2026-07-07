@@ -1,7 +1,7 @@
 {
   "bond_length": 2.2,
-  "created_utc": "2026-07-06T06:11:33.689798+00:00",
-  "has_cme_results": false,
+  "created_utc": "2026-07-06T16:58:26.869729+00:00",
+  "has_cme_results": true,
   "has_cme_results_by_multiplier": true,
   "has_vqe_results": true,
   "metadata": {

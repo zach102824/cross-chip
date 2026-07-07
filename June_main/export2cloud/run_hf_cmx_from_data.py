@@ -397,18 +397,18 @@ def main() -> None:
 
     print(f"Loaded saved HF VQE data : {vqe_path}")
     print(f"bond_length={bond_length:.1f}  params_final={params_final.tolist()}")
-    print(f"measurement_scheme=ogm  <H> shots={h_num_shots}  multipliers={args.multipliers}")
+    print(f"measurement_scheme=ogm  base shots={h_num_shots}  multipliers={args.multipliers}")
     print(f"true ground-state energy e_gs = {e_gs:.10f} Eh")
-
-    # Measure <H> ONCE (its shot budget is fixed across the multiplier sweep).
-    moments = {"H": measure_moment("H", h_num_shots)}
 
     cme_results_by_multiplier: dict[int, dict[str, Any]] = {}
     for mult in args.multipliers:
-        h2_h3_shots = int(mult * h_num_shots)
-        print(f"\n--- <H^2>, <H^3> shots = {mult}x <H> shots = {h2_h3_shots} ---")
-        moments["H2"] = measure_moment("H2", h2_h3_shots)
-        moments["H3"] = measure_moment("H3", h2_h3_shots)
+        moment_shots = int(mult * h_num_shots)
+        print(f"\n--- <H>, <H^2>, <H^3> shots = {mult}x base shots = {moment_shots} ---")
+        moments = {
+            "H": measure_moment("H", moment_shots),
+            "H2": measure_moment("H2", moment_shots),
+            "H3": measure_moment("H3", moment_shots),
+        }
 
         src = {key: moments[key][args.moment_source] for key in ("H", "H2", "H3")}
         e_cme, c1, c2, c3 = cme_k3(src["H"], src["H2"], src["H3"])
@@ -417,7 +417,7 @@ def main() -> None:
             moments["H"]["noiseless"], moments["H2"]["noiseless"], moments["H3"]["noiseless"]
         )
 
-        print(f"=== Connected Moment Expansion (k=3), <H^2>/<H^3> shot multiplier = {mult}x ===")
+        print(f"=== Connected Moment Expansion (k=3), shot multiplier = {mult}x ===")
         print(f"moment source for formula : {args.moment_source}")
         print(f"<H>={src['H']:+.8f}  <H^2>={src['H2']:+.8f}  <H^3>={src['H3']:+.8f}")
         print(f"connected moments         : c1={c1:+.6e}  c2={c2:+.6e}  c3={c3:+.6e}")
@@ -428,7 +428,7 @@ def main() -> None:
 
         cme_results_by_multiplier[mult] = {
             "params_final": params_final.copy(),
-            "shots": {"H": h_num_shots, "H2": h2_h3_shots, "H3": h2_h3_shots},
+            "shots": {"H": moment_shots, "H2": moment_shots, "H3": moment_shots},
             "moments": {key: dict(value) for key, value in moments.items()},
             "connected_moments": {"c1": float(c1), "c2": float(c2), "c3": float(c3)},
             "E_cme_shots": float(e_cme),
@@ -439,11 +439,11 @@ def main() -> None:
             "h2_h3_shot_multiplier": int(mult),
         }
 
-    print("\n=== CME(k=3) summary across <H^2>/<H^3> shot multipliers ===")
+    print("\n=== CME(k=3) summary across shot multipliers ===")
     for mult in args.multipliers:
         r = cme_results_by_multiplier[mult]
         print(
-            f"{mult:>3d}x (shots={r['shots']['H2']:>8d})  "
+            f"{mult:>3d}x (shots={r['shots']['H']:>8d})  "
             f"E_CME={r['E_cme_shots']:.10f} Eh  |E_CME - e_gs|={abs(r['E_cme_shots'] - e_gs):.6e} Eh"
         )
 

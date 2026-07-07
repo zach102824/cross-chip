@@ -47,7 +47,7 @@ from pathlib import Path
 # Which molecule / bond length to load. The circuit JSON is produced by the
 # molecule notebook (e.g. UCCSD_Mole/HF.ipynb) via uccsd_circuit_io.build_and_save.
 MOLECULE = "HF"
-BOND_LENGTH = 1.2
+BOND_LENGTH = float(os.environ.get("HF_BOND_LENGTH", "1.2"))
 bond_length = BOND_LENGTH  # alias used by later cells (OGM / Hamiltonian paths)
 
 # Active space for the loaded molecule. These MUST match the molecule notebook
@@ -1162,10 +1162,9 @@ try:
     # bigger shot counts here instead of the single GLOBAL_NUM_SHOTS knob (cell :18).
     # Tune these freely.
     # ----------------------------------------------------------------------------
-    CME_H_NUM_SHOTS = int(globals().get("GLOBAL_NUM_SHOTS", 8192))   # shots for <H>
-    # <H^2> and <H^3> are swept over several multiples of CME_H_NUM_SHOTS (instead of
-    # a single fixed shot count) so we can see how their shot budget affects the
-    # CME(k=3) accuracy. Edit this list freely.
+    CME_H_NUM_SHOTS = int(globals().get("GLOBAL_NUM_SHOTS", 8192))   # base shots for <H>, <H^2>, <H^3>
+    # All three moments are swept over several multiples of CME_H_NUM_SHOTS so we can
+    # see how the shot budget affects the CME(k=3) accuracy. Edit this list freely.
     CME_SHOT_MULTIPLIERS = [1, 5, 10, 15]
 
     # Which measured value feeds the CME formula, one of:
@@ -1314,12 +1313,7 @@ try:
         return result
 
 
-    # 4) Measure <H> ONCE with the CDR+REM pipeline (its shot budget is fixed and does
-    #    not depend on the <H^2>/<H^3> shot-multiplier sweep below).
-    moments = {"H": _measure_moment("H", CME_H_NUM_SHOTS)}
-
-
-    # 5) Connected moment expansion (k=3).
+    # 4) Connected moment expansion (k=3).
     def _cme_k3(h1: float, h2: float, h3: float):
         c1 = h1
         c2 = h2 - h1 ** 2
@@ -1330,16 +1324,18 @@ try:
 
     e_ref = float(globals().get("e_gs", np.linalg.eigvalsh(pauli_sum.matrix(qubits=qubits))[0].real))
 
-    # 6) Sweep the <H^2>/<H^3> shot budget over CME_SHOT_MULTIPLIERS x CME_H_NUM_SHOTS,
-    #    remeasuring <H^2> and <H^3> and rerunning the CME(k=3) formula at each
-    #    multiplier (the <H> moment measured above is reused unchanged throughout).
+    # 5) Sweep the <H>/<H^2>/<H^3> shot budget over CME_SHOT_MULTIPLIERS x CME_H_NUM_SHOTS,
+    #    remeasuring all three moments and rerunning the CME(k=3) formula at each multiplier.
     cme_results_by_multiplier = {}
     for mult in CME_SHOT_MULTIPLIERS:
-        h2_h3_shots = int(mult * CME_H_NUM_SHOTS)
-        print(f"\n--- <H^2>, <H^3> shots = {mult}x CME_H_NUM_SHOTS = {h2_h3_shots} ---")
-        moments["H2"] = _measure_moment("H2", h2_h3_shots)
-        moments["H3"] = _measure_moment("H3", h2_h3_shots)
-        shots = {"H": CME_H_NUM_SHOTS, "H2": h2_h3_shots, "H3": h2_h3_shots}
+        moment_shots = int(mult * CME_H_NUM_SHOTS)
+        print(f"\n--- <H>, <H^2>, <H^3> shots = {mult}x CME_H_NUM_SHOTS = {moment_shots} ---")
+        moments = {
+            "H": _measure_moment("H", moment_shots),
+            "H2": _measure_moment("H2", moment_shots),
+            "H3": _measure_moment("H3", moment_shots),
+        }
+        shots = {"H": moment_shots, "H2": moment_shots, "H3": moment_shots}
 
         src = {k: moments[k][CME_MOMENT_SOURCE] for k in ("H", "H2", "H3")}
         E_cme, C1, C2, C3 = _cme_k3(src["H"], src["H2"], src["H3"])
@@ -1348,7 +1344,7 @@ try:
             moments["H"]["noiseless"], moments["H2"]["noiseless"], moments["H3"]["noiseless"]
         )
 
-        print(f"=== Connected Moment Expansion (k=3), <H^2>/<H^3> shot multiplier = {mult}x ===")
+        print(f"=== Connected Moment Expansion (k=3), shot multiplier = {mult}x ===")
         print(f"moment source for formula : {CME_MOMENT_SOURCE}")
         print(f"<H>={src['H']:+.8f}  <H^2>={src['H2']:+.8f}  <H^3>={src['H3']:+.8f}")
         print(f"connected moments         : c1={C1:+.6e}  c2={C2:+.6e}  c3={C3:+.6e}")
@@ -1383,11 +1379,11 @@ try:
             "h2_h3_shot_multiplier": mult,
         }
 
-    print("\n=== CME(k=3) summary across <H^2>/<H^3> shot multipliers ===")
+    print("\n=== CME(k=3) summary across shot multipliers ===")
     for mult in CME_SHOT_MULTIPLIERS:
         r = cme_results_by_multiplier[mult]
         print(
-            f"{mult:>3d}x (shots={r['shots']['H2']:>8d})  "
+            f"{mult:>3d}x (shots={r['shots']['H']:>8d})  "
             f"E_CME={r['E_cme_shots']:.10f} Eh  |E_CME - e_gs|={abs(r['E_cme_shots'] - e_ref):.6e} Eh"
         )
 
