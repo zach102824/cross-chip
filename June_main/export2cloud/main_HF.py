@@ -28,7 +28,7 @@ import sympy
 
 
 # Shared sampling/CDR settings used across later notebook cells.
-GLOBAL_NUM_SHOTS = int(os.environ.get("GLOBAL_NUM_SHOTS", "81920"))
+GLOBAL_NUM_SHOTS = int(os.environ.get("GLOBAL_NUM_SHOTS", "8192"))
 CDR_NUM_TRAINING_CIRCUITS = int(os.environ.get("CDR_NUM_TRAINING_CIRCUITS", "30"))
 CDR_T_MAX_GRADIENT = int(os.environ.get("CDR_T_MAX_GRADIENT", "2"))
 CDR_T_MAX_VQE = int(os.environ.get("CDR_T_MAX_VQE", str(CDR_T_MAX_GRADIENT)))

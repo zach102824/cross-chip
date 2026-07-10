@@ -95,7 +95,7 @@ CZ_CROSS_CHIP_TAG = "cz_cross_chip"
 # matter: (3, 4) and (4, 3) are the same link. Edit this to match the chip layout.
 # In HF_8q_3doubles_rzx.json the native RZX entanglers act on qubits 2 and 6, so
 # that is the cross-chip link here.
-CROSS_CHIP_QUBIT_PAIRS = {(3, 8)}
+CROSS_CHIP_QUBIT_PAIRS = {(3, 8), (0, 1), (5, 6)}
 _CROSS_CHIP_PAIR_SET = {frozenset(pair) for pair in CROSS_CHIP_QUBIT_PAIRS}
 
 
