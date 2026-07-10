@@ -2,7 +2,8 @@
 """Cloud-runnable export generated from June_main/main_HF.ipynb.
 
 Run from this directory, for example: python main_Cl2.py
-Results are written under data/Cl2_bond_2.2/.
+Results are written under data/Cl2_bond_<R>/. Override bond length with
+CL2_BOND_LENGTH (e.g. CL2_BOND_LENGTH=1.2 python main_Cl2.py).
 """
 from __future__ import annotations
 
@@ -47,7 +48,7 @@ from pathlib import Path
 # Which molecule / bond length to load. The circuit JSON is produced by the
 # molecule notebook (e.g. UCCSD_Mole/HF.ipynb) via uccsd_circuit_io.build_and_save.
 MOLECULE = "Cl2"
-BOND_LENGTH = 2.2
+BOND_LENGTH = float(os.environ.get("CL2_BOND_LENGTH", "2.2"))
 bond_length = BOND_LENGTH  # alias used by later cells (OGM / Hamiltonian paths)
 
 # Active space for the loaded molecule. These MUST match the molecule notebook
@@ -969,8 +970,8 @@ noiseless_ref_curve, noiseless_ref_thetas = _build_noiseless_reference_curve(_pa
 theta = _params0.copy()
 
 trace = []
-best_E = float("inf")
-best_theta = theta.copy()
+best_E = float(E0)
+best_theta = _params0.copy()
 prev_E = float(E0)
 
 for it in range(1, int(VQE_ITERS) + 1):
@@ -1127,18 +1128,18 @@ def _run_cmx_disabled():
         # --- Connected Moment Expansion (CME), order k=3 ---
         # E_ground = <H> - (<H^2> - <H>^2)^2 / (<H^3> - 3<H><H^2> + 2<H>^3)
         #
-        # Quantum state: the FINAL noisy state after the 15-step VQE (gate noise + the
-        # optimized final parameters). <H>, <H^2> and <H^3> are each measured with the
+        # Quantum state: the BEST noisy state found during VQE (gate noise + the
+        # parameters with the lowest measured CDR+REM energy). <H>, <H^2> and <H^3> are each measured with the
         # SAME CDR+REM pipeline used for the VQE energy objective (run_mitigation("cdr"))
         # -- one call per observable, each with its own Hamiltonian file, OGM basis file
         # and shot budget. CDR rebuilds the noisy state internally from `circuit` + the
-        # final-parameter resolver + the same noise model and simulator seed, i.e. the
-        # identical final noisy state as `rho_final` (kept here only for the exact
+        # best-parameter resolver + the same noise model and simulator seed, i.e. the
+        # identical selected noisy state as `rho_cmx` (kept here only for the exact
         # Tr[H^k rho] reference).
         #
         # Accuracy is judged against the EXACT NOISELESS expectation <psi|H^k|psi> at the
-        # final params (mirrors the VQE loop's |REM+CF - noiseless| diagnostic), because
-        # CDR+REM recovers the noiseless value -- not the noisy-state Tr[H^k rho_final].
+        # best params (mirrors the VQE loop's |REM+CF - noiseless| diagnostic), because
+        # CDR+REM recovers the noiseless value -- not the noisy-state Tr[H^k rho_cmx].
         import sys
         from pathlib import Path
 
@@ -1183,10 +1184,11 @@ def _run_cmx_disabled():
         if "vqe_results" not in globals():
             raise RuntimeError("Run the VQE loop cell first (defines vqe_results).")
 
-        # 1) Rebuild the FINAL noisy density matrix from the optimized VQE parameters
+        # 1) Rebuild the noisy density matrix from the lowest-energy VQE parameters
         #    (same noisy-ansatz + density-matrix recipe as cell ``21b206da``).
         random_seed = int(globals().get("random_seed", globals()["GLOBAL_RANDOM_SEED"]))
-        params_final = np.asarray(vqe_results["params_final"], dtype=float).reshape(n_params)
+        params_cmx = np.asarray(vqe_results["params_best"], dtype=float).reshape(n_params)
+        print(f"[CMX] using VQE best params (E_best={float(vqe_results['E_best']):.10f} Eh)")
 
         gate_noise = GateArityDepolarizingNoise(
             two_qubit_depol_prob=TWO_QUBIT_GATE_DEPOL_PROB,
@@ -1194,25 +1196,25 @@ def _run_cmx_disabled():
             cross_chip_two_qubit_depol_prob=CROSS_CHIP_TWO_QUBIT_GATE_DEPOL_PROB,
         )
         _noisy_ansatz = circuit.with_noise(gate_noise)
-        _resolved_final = cirq.resolve_parameters(
-            _noisy_ansatz, cirq.ParamResolver(resolver_from_params(params_final))
+        _resolved_cmx = cirq.resolve_parameters(
+            _noisy_ansatz, cirq.ParamResolver(resolver_from_params(params_cmx))
         )
-        rho_final = np.asarray(
+        rho_cmx = np.asarray(
             cirq.DensityMatrixSimulator(seed=random_seed)
-            .simulate(_resolved_final, qubit_order=qubits)
+            .simulate(_resolved_cmx, qubit_order=qubits)
             .final_density_matrix,
             dtype=np.complex128,
         )
-        rho_final = sanitize_density_matrix(rho_final)
+        rho_cmx = sanitize_density_matrix(rho_cmx)
 
-        # 1b) Exact NOISELESS statevector at the SAME final params. This is the reference
+        # 1b) Exact NOISELESS statevector at the SAME best params. This is the reference
         #     the VQE loop compares CDR+REM against (|REM+CF - noiseless|): CDR is built to
         #     recover the noiseless expectation, so each moment's cdr+rem should be compared
-        #     to <psi|H^k|psi> here -- NOT to the noisy-state Tr[H^k rho_final] below.
+        #     to <psi|H^k|psi> here -- NOT to the noisy-state Tr[H^k rho_cmx] below.
         _psi_noiseless = np.asarray(
             cirq.Simulator(dtype=np.complex128)
             .simulate(
-                cirq.resolve_parameters(circuit, cirq.ParamResolver(resolver_from_params(params_final))),
+                cirq.resolve_parameters(circuit, cirq.ParamResolver(resolver_from_params(params_cmx))),
                 qubit_order=qubits,
             )
             .final_state_vector,
@@ -1247,7 +1249,7 @@ def _run_cmx_disabled():
         # 3) Mitigation config (CDR + REM), reused from the VQE objective so the moments
         #    are measured exactly like the 15th VQE energy. Falls back to GLOBAL_* knobs
         #    if the CDR-setup cell's globals are not present.
-        final_resolver = cirq.ParamResolver(resolver_from_params(params_final))
+        cmx_resolver = cirq.ParamResolver(resolver_from_params(params_cmx))
         symbols_cme = globals().get("symbols_li_h", globals()["symbols"])
 
         base_noise_cme = dict(
@@ -1290,8 +1292,8 @@ def _run_cmx_disabled():
                 ansatz_circuit=circuit,
                 observable_h=pauli_sums[key],
                 qubits=qubits,
-                target_resolver=final_resolver,
-                target_params=final_resolver,
+                target_resolver=cmx_resolver,
+                target_params=cmx_resolver,
                 symbols=symbols_cme,
                 base_noise_cfg=base_noise_cme,
                 shot_cfg=shot_cfg_key,
@@ -1304,7 +1306,7 @@ def _run_cmx_disabled():
                 "rem": float(mit["rem_target"]),
                 "cdr_unmit": float(mit["cdr_unmit_corrected"]),
                 "cdr_rem": float(mit["cdr_rem_corrected"]),
-                "exact": float(trace_energy(pauli_sums[key].matrix(qubits=qubits), rho_final)),
+                "exact": float(trace_energy(pauli_sums[key].matrix(qubits=qubits), rho_cmx)),
                 "noiseless": float(
                     np.real(pauli_sums[key].expectation_from_state_vector(_psi_noiseless, qubit_map=_qubit_map))
                 ),
@@ -1376,7 +1378,7 @@ def _run_cmx_disabled():
             print(f"|E_CME(shots) - E_CME(noiseless)| = {abs(E_cme - E_cme_noiseless):.6e} Eh")
 
             cme_results_by_multiplier[mult] = {
-                "params_final": params_final.copy(),
+                "params_best": params_cmx.copy(),
                 "shots": dict(shots),
                 "moments": {k: dict(v) for k, v in moments.items()},
                 "connected_moments": {"c1": float(C1), "c2": float(C2), "c3": float(C3)},
