@@ -2,7 +2,8 @@
 """Cloud-runnable export generated from June_main/main_HF.ipynb.
 
 Run from this directory, for example: python main_Br2.py
-Results are written under data/Br2_bond_2.2/.
+Results are written under data/Br2_bond_<R>/. Override bond length with
+BR2_BOND_LENGTH (e.g. BR2_BOND_LENGTH=3.8 python main_Br2.py).
 """
 from __future__ import annotations
 
@@ -47,7 +48,7 @@ from pathlib import Path
 # Which molecule / bond length to load. The circuit JSON is produced by the
 # molecule notebook (e.g. UCCSD_Mole/HF.ipynb) via uccsd_circuit_io.build_and_save.
 MOLECULE = "Br2"
-BOND_LENGTH = 2.2
+BOND_LENGTH = float(os.environ.get("BR2_BOND_LENGTH", "2.2"))
 bond_length = BOND_LENGTH  # alias used by later cells (OGM / Hamiltonian paths)
 
 # Active space for the loaded molecule. These MUST match the molecule notebook

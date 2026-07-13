@@ -1,0 +1,540 @@
+{
+  "molecule": "HF",
+  "bond_length": 1.4,
+  "num_qubits": 8,
+  "n_spatial": 4,
+  "n_electrons": 6,
+  "init_state": "multiref",
+  "beta": 0.03755427394302326,
+  "doubles": [
+    [
+      7,
+      3,
+      4,
+      0
+    ],
+    [
+      7,
+      3,
+      5,
+      1
+    ],
+    [
+      7,
+      3,
+      6,
+      2
+    ]
+  ],
+  "signs": [
+    1.0,
+    1.0,
+    1.0
+  ],
+  "theta_idx": [
+    0,
+    1,
+    2
+  ],
+  "param_names": [
+    "t0",
+    "t1",
+    "t2"
+  ],
+  "gates": [
+    {
+      "op": "ry",
+      "qubits": [
+        2
+      ],
+      "value": -0.07507326861785078
+    },
+    {
+      "op": "cx",
+      "qubits": [
+        2,
+        3
+      ]
+    },
+    {
+      "op": "cx",
+      "qubits": [
+        3,
+        6
+      ]
+    },
+    {
+      "op": "cx",
+      "qubits": [
+        6,
+        7
+      ]
+    },
+    {
+      "op": "x",
+      "qubits": [
+        0
+      ]
+    },
+    {
+      "op": "x",
+      "qubits": [
+        1
+      ]
+    },
+    {
+      "op": "x",
+      "qubits": [
+        2
+      ]
+    },
+    {
+      "op": "x",
+      "qubits": [
+        4
+      ]
+    },
+    {
+      "op": "x",
+      "qubits": [
+        5
+      ]
+    },
+    {
+      "op": "x",
+      "qubits": [
+        6
+      ]
+    },
+    {
+      "op": "rx",
+      "qubits": [
+        0
+      ],
+      "value": 1.5707963267948966
+    },
+    {
+      "op": "h",
+      "qubits": [
+        1
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        2
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        3
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        4
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        5
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        6
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        7
+      ]
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        0,
+        1
+      ],
+      "cross_chip": false
+    },
+    {
+      "op": "h",
+      "qubits": [
+        1
+      ]
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        1,
+        2
+      ],
+      "cross_chip": true
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        3,
+        2
+      ],
+      "cross_chip": false
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        4,
+        5
+      ],
+      "cross_chip": false
+    },
+    {
+      "op": "h",
+      "qubits": [
+        5
+      ]
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        5,
+        6
+      ],
+      "cross_chip": true
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        7,
+        6
+      ],
+      "cross_chip": false
+    },
+    {
+      "op": "h",
+      "qubits": [
+        6
+      ]
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        2,
+        6
+      ],
+      "cross_chip": false
+    },
+    {
+      "op": "rx",
+      "qubits": [
+        2
+      ],
+      "param": "t0",
+      "coeff": 1.0
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        2,
+        6
+      ],
+      "cross_chip": false
+    },
+    {
+      "op": "h",
+      "qubits": [
+        6
+      ]
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        5,
+        6
+      ],
+      "cross_chip": true
+    },
+    {
+      "op": "h",
+      "qubits": [
+        5
+      ]
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        4,
+        5
+      ],
+      "cross_chip": false
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        1,
+        2
+      ],
+      "cross_chip": true
+    },
+    {
+      "op": "h",
+      "qubits": [
+        1
+      ]
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        0,
+        1
+      ],
+      "cross_chip": false
+    },
+    {
+      "op": "h",
+      "qubits": [
+        4
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        1
+      ]
+    },
+    {
+      "op": "rx",
+      "qubits": [
+        0
+      ],
+      "value": -1.5707963267948966
+    },
+    {
+      "op": "rx",
+      "qubits": [
+        1
+      ],
+      "value": 1.5707963267948966
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        1,
+        2
+      ],
+      "cross_chip": true
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        5,
+        6
+      ],
+      "cross_chip": true
+    },
+    {
+      "op": "h",
+      "qubits": [
+        6
+      ]
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        2,
+        6
+      ],
+      "cross_chip": false
+    },
+    {
+      "op": "rx",
+      "qubits": [
+        2
+      ],
+      "param": "t1",
+      "coeff": 1.0
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        2,
+        6
+      ],
+      "cross_chip": false
+    },
+    {
+      "op": "h",
+      "qubits": [
+        6
+      ]
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        7,
+        6
+      ],
+      "cross_chip": false
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        5,
+        6
+      ],
+      "cross_chip": true
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        3,
+        2
+      ],
+      "cross_chip": false
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        1,
+        2
+      ],
+      "cross_chip": true
+    },
+    {
+      "op": "h",
+      "qubits": [
+        6
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        5
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        2
+      ]
+    },
+    {
+      "op": "rx",
+      "qubits": [
+        1
+      ],
+      "value": -1.5707963267948966
+    },
+    {
+      "op": "rx",
+      "qubits": [
+        2
+      ],
+      "value": 1.5707963267948966
+    },
+    {
+      "op": "h",
+      "qubits": [
+        2
+      ]
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        3,
+        2
+      ],
+      "cross_chip": false
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        7,
+        6
+      ],
+      "cross_chip": false
+    },
+    {
+      "op": "h",
+      "qubits": [
+        6
+      ]
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        2,
+        6
+      ],
+      "cross_chip": false
+    },
+    {
+      "op": "rx",
+      "qubits": [
+        2
+      ],
+      "param": "t2",
+      "coeff": 1.0
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        2,
+        6
+      ],
+      "cross_chip": false
+    },
+    {
+      "op": "h",
+      "qubits": [
+        6
+      ]
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        7,
+        6
+      ],
+      "cross_chip": false
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        3,
+        2
+      ],
+      "cross_chip": false
+    },
+    {
+      "op": "h",
+      "qubits": [
+        7
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        3
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        2
+      ]
+    },
+    {
+      "op": "rx",
+      "qubits": [
+        2
+      ],
+      "value": -1.5707963267948966
+    }
+  ]
+}

@@ -1,0 +1,431 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath, amssymb}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage[colorlinks=true, linkcolor=blue, citecolor=blue, urlcolor=blue]{hyperref}
+
+\newcommand{\ket}[1]{\left|#1\right\rangle}
+\newcommand{\bra}[1]{\left\langle#1\right|}
+\newcommand{\Phip}{\ket{\Phi^{+}}}
+\newcommand{\RZZ}{R_{ZZ}}
+\newcommand{\RZX}{R_{ZX}}
+
+\title{LOCC and the EJPP Protocol, From Scratch:\\
+ebits, classical bits, and how to run a two-qubit gate\\ between two chips
+that never talk quantumly at gate time}
+\author{Tutorial companion to \texttt{mbvqe\_locc\_cross\_chip.tex}}
+\date{July 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+This is a self-contained tutorial. It defines every term used in the
+cross-chip discussion---\emph{local operations}, \emph{classical
+communication}, \emph{LOCC}, \emph{ebit}, \emph{cbit}, \emph{Bell pair},
+\emph{by-product Pauli}---and then walks through the
+Eisert--Jacobs--Papadopoulos--Plenio (EJPP) protocol~\cite{eisert2000}
+line by line, tracking the full quantum state after every step. A worked toy
+example (a nonlocal CNOT acting on
+$\ket{+}\ket{0}$) shows explicitly how one shared ebit is
+\emph{consumed} to create one ebit of entanglement between the data qubits,
+which is why the protocol's resource count is provably optimal.
+\end{abstract}
+
+\section{The setting: two labs, one phone line}
+
+Picture two labs (for us: two chips).
+\textbf{Alice} owns chip A with qubits $\{a, e_1, \dots\}$;
+\textbf{Bob} owns chip B with qubits $\{b, e_2, \dots\}$.
+They are connected by an ordinary \emph{classical} channel (a phone line, or
+on hardware: the classical control electronics). There is \emph{no} quantum
+channel available at computation time---no way to apply a gate that touches
+one qubit in each lab.
+
+The question LOCC theory answers: \emph{what can Alice and Bob accomplish
+jointly using only their local quantum hardware plus the phone line, possibly
+assisted by entanglement they shared beforehand?}
+
+\section{Vocabulary}
+
+\subsection{Local operations (LO)}
+
+Anything Alice can do inside her own lab: unitary gates on her own qubits,
+adding ancilla qubits, and \emph{measuring} her own qubits. Same for Bob.
+Crucially, a two-qubit gate between $a$ and $e_1$ is local (both are
+Alice's); a two-qubit gate between $a$ and $b$ is \emph{not} local---that is
+exactly the operation we are not allowed to do directly.
+
+\subsection{Classical communication (CC) and the cbit}
+
+Alice may phone Bob and tell him her measurement outcomes; Bob can then
+choose his next gate \emph{conditioned} on what she says. One transmitted
+classical bit is called a \textbf{cbit}. In circuit language, CC is
+\emph{mid-circuit measurement followed by classically-controlled gates}
+(feedforward). This is the ``measurement + feedforward'' machinery that also
+powers measurement-based quantum computing.
+
+\subsection{LOCC}
+
+\textbf{LOCC = Local Operations and Classical Communication}: any protocol
+built from arbitrarily many rounds of (local gates, local measurements,
+phone calls, conditioning on the calls). Two facts anchor everything:
+
+\begin{itemize}[leftmargin=2em]
+  \item \textbf{LOCC cannot create entanglement.} If Alice's and Bob's qubits
+        start in a product (unentangled) state, they remain unentangled no
+        matter how clever the protocol. Measurements and phone calls can
+        create classical \emph{correlation} (``we both know the coin came up
+        heads'') but never quantum entanglement. Entanglement is a genuinely
+        quantum resource that must be established by a quantum interaction.
+  \item \textbf{LOCC cannot increase entanglement.} If they already share
+        some entanglement, LOCC can spend it, convert it, or throw it away,
+        but never grow it. Entanglement behaves like a currency that only a
+        quantum channel can mint.
+\end{itemize}
+
+These two facts are what make the resource counting in
+Section~\ref{sec:optimal} a \emph{theorem} rather than an engineering
+accident.
+
+\subsection{The Bell pair and the ebit}
+\label{sec:ebit}
+
+The \textbf{Bell pair} (also: EPR pair) is the two-qubit state
+\[
+\Phip_{e_1 e_2}
+   \;=\; \frac{\ket{0}_{e_1}\ket{0}_{e_2} + \ket{1}_{e_1}\ket{1}_{e_2}}{\sqrt{2}},
+\]
+with qubit $e_1$ held by Alice and $e_2$ by Bob. It is \emph{maximally}
+entangled: if Alice measures $e_1$ and gets $0$ (probability $1/2$), Bob's
+$e_2$ collapses to $\ket{0}$, and likewise for $1$---and the same perfect
+correlation holds in \emph{every} measurement basis, which no classical
+correlation can reproduce.
+
+An \textbf{ebit} (``entanglement bit'') is the \emph{unit of entanglement}:
+by definition, one ebit is the amount of entanglement contained in one
+maximally entangled Bell pair. It is a resource unit, exactly like
+``one liter'' or ``one joule'':
+
+\begin{itemize}[leftmargin=2em]
+  \item Saying a protocol ``consumes one ebit'' means: it uses up one shared
+        Bell pair (the pair ends in a product state or is measured away, so
+        its entanglement is gone afterwards).
+  \item A partially entangled state contains \emph{less} than one ebit; $n$
+        Bell pairs contain $n$ ebits. (Formally, the entanglement entropy
+        $E = -\mathrm{tr}(\rho_A \log_2 \rho_A)$ of a Bell pair is exactly
+        $1$.)
+  \item Classic exchange rates:
+        \textbf{teleportation} sends one unknown qubit at the price of
+        $1\ \text{ebit} + 2\ \text{cbits}$;
+        \textbf{superdense coding} sends $2$ cbits at the price of
+        $1\ \text{ebit} + 1$ transmitted qubit. Ebits and cbits are genuinely
+        different currencies---neither alone can substitute for the other.
+\end{itemize}
+
+For our two-chip setting: producing one Bell pair requires \emph{one} use of
+the noisy cross-chip interaction, but crucially it acts only on \emph{ancilla}
+qubits $e_1, e_2$ and can be done \emph{ahead of time}, checked, retried, or
+distilled---before any fragile data is involved.
+
+\subsection{By-product Paulis}
+
+Whenever a measurement is used inside a protocol, the outcome is random. The
+protocol stays deterministic because each outcome dictates a known
+\emph{Pauli correction} ($X$, $Z$, or nothing) on some other qubit; these are
+called \textbf{by-product operators}. Since Paulis are cheap---and often can
+be tracked purely in software (``Pauli frame'') instead of physically
+applied---this randomness costs almost nothing.
+
+\section{Warm-up toy examples}
+
+\subsection{What LOCC \emph{cannot} do: try to build a Bell pair by phone}
+
+Alice prepares $\ket{+}_a = (\ket{0}+\ket{1})/\sqrt{2}$, measures it, gets a
+random bit $m$, and phones Bob, who prepares $\ket{m}_b$. The joint state is
+now
+\[
+\tfrac{1}{2}\big(\ket{00}\bra{00} + \ket{11}\bra{11}\big)_{ab},
+\]
+a \emph{classically correlated mixture}---if both measure in the $Z$ basis
+they always agree, just like the Bell pair. But measure both in the $X$
+basis: the Bell pair gives perfectly correlated outcomes, while this state
+gives completely random ones. No LOCC protocol can close that gap. This is
+the operational meaning of ``LOCC cannot create entanglement.''
+
+\subsection{What one ebit buys: teleportation in three lines}
+
+Alice holds an unknown qubit $\ket{\psi} = \alpha\ket{0}+\beta\ket{1}$ and
+one half of $\Phip_{e_1 e_2}$. She measures the pair $(\psi, e_1)$ in the
+Bell basis (a local operation!), obtaining two random classical bits
+$(m_1, m_2)$, and phones them to Bob. Bob applies $X^{m_2} Z^{m_1}$ to
+$e_2$---and $e_2$ is now exactly $\ket{\psi}$. Cost:
+$1$ ebit $+$ $2$ cbits; the Bell pair is destroyed. Note the by-product
+Paulis in action.
+
+\section{The EJPP protocol: a nonlocal gate for half the price of
+teleportation}
+\label{sec:ejpp}
+
+Teleporting $a$ to Bob's lab, applying the gate locally, and teleporting back
+costs $2$ ebits $+$ $4$ cbits. Eisert, Jacobs, Papadopoulos, and Plenio
+(EJPP, 2000)~\cite{eisert2000} showed that for CNOT/CZ---and by the same
+construction for any gate \emph{diagonal in a product basis}, such as
+$\RZZ(\theta) = e^{-i(\theta/2)\,Z\otimes Z}$---you only need
+\[
+\boxed{\,1\ \text{ebit} \;+\; 1\ \text{cbit } (A\!\to\!B)
+\;+\; 1\ \text{cbit } (B\!\to\!A)\,}
+\]
+and that this is \emph{optimal} (Sec.~\ref{sec:optimal}).
+
+The intuition: a gate diagonal in $Z\otimes Z$ only needs to know the
+\emph{$Z$-basis information} of Alice's qubit, not the whole qubit. So
+instead of teleporting the full state, Alice ``fans out'' just her qubit's
+$Z$-information onto Bob's ancilla (sometimes called a \emph{cat-entangler}),
+Bob runs the gate locally against that ancilla, and the ancilla is then
+coherently erased (\emph{cat-disentangler}). Fan-out of one basis is allowed;
+cloning of the full state would not be.
+
+\subsection{The protocol, with the full state after every step}
+
+Qubits: data $a$ (Alice), data $b$ (Bob), ancillas $e_1$ (Alice), $e_2$
+(Bob). Target: enact $\RZZ(\theta)_{ab}$, which acts as
+$\RZZ(\theta)\ket{i}_a\ket{j}_b
+ = e^{-i\frac{\theta}{2}(-1)^{i\oplus j}}\ket{i}_a\ket{j}_b$.
+Start from an \emph{arbitrary} (possibly entangled with the rest of the
+computer; we suppress spectator qubits) data state
+\[
+\ket{\psi}_{ab} \;=\; \sum_{i,j\in\{0,1\}} c_{ij}\,\ket{i}_a \ket{j}_b .
+\]
+
+\begin{enumerate}[leftmargin=2em, itemsep=0.6em]
+
+\item \textbf{Share entanglement (offline).} Establish
+$\Phip_{e_1 e_2}$. Full state:
+\[
+\sum_{ij} c_{ij} \ket{i}_a \ket{j}_b \otimes
+\frac{\ket{0}_{e_1}\ket{0}_{e_2} + \ket{1}_{e_1}\ket{1}_{e_2}}{\sqrt{2}} .
+\]
+This is the only step needing the cross-chip interaction, and it involves no
+data.
+
+\item \textbf{Attach (Alice, local).} CNOT with control $a$, target $e_1$:
+\[
+\sum_{ij} c_{ij} \ket{i}_a \ket{j}_b \otimes
+\frac{\ket{i}_{e_1}\ket{0}_{e_2} + \ket{i\oplus 1}_{e_1}\ket{1}_{e_2}}{\sqrt{2}} .
+\]
+
+\item \textbf{Measure and phone $\rightarrow$ (Alice).} Measure $e_1$ in the
+$Z$ basis; call the outcome $m_1 \in \{0,1\}$ (each with probability $1/2$).
+Keeping only the terms consistent with $m_1$ and renormalizing:
+\[
+\sum_{ij} c_{ij} \ket{i}_a \ket{j}_b \,\ket{i \oplus m_1}_{e_2} .
+\]
+Alice phones $m_1$ to Bob (1 cbit). Bob applies the by-product correction
+$X^{m_1}$ on $e_2$:
+\[
+\sum_{ij} c_{ij} \ket{i}_a \ket{j}_b \,\ket{i}_{e_2} .
+\]
+Read this carefully: $e_2$, sitting in \emph{Bob's} lab, is now perfectly
+correlated with the logical value $i$ of Alice's data qubit, \emph{in
+superposition}, without $a$ ever having left Alice's lab. The Bell pair's
+entanglement has been spent to build this three-qubit
+GHZ-like correlation (hence ``cat''-entangler). This is not cloning: only the
+$Z$-basis information is fanned out.
+
+\item \textbf{Do the gate locally (Bob).} Bob applies the \emph{local}
+two-qubit gate $\RZZ(\theta)$ on $(e_2, b)$. Because $e_2$ carries the value
+$i$, the phase it imprints is exactly the one $\RZZ(\theta)_{ab}$ would have
+imprinted:
+\[
+\sum_{ij} c_{ij}\, e^{-i\frac{\theta}{2}(-1)^{i\oplus j}}
+\ket{i}_a \ket{j}_b \,\ket{i}_{e_2} .
+\]
+Note $\theta$ is \emph{arbitrary}---nothing here requires a Clifford angle.
+Bob could even apply several controlled/diagonal gates against $e_2$ in a row
+before moving on (this is the ``entanglement reuse'' trick used in
+distributed-circuit compilers).
+
+\item \textbf{Detach: measure and phone $\leftarrow$ (Bob).} The ancilla must
+be removed \emph{coherently}---measuring it in the $Z$ basis would collapse
+$a$! Instead Bob measures $e_2$ in the $X$ basis. Writing
+$\ket{i}_{e_2} = \frac{1}{\sqrt 2}\big(\ket{+} + (-1)^i \ket{-}\big)_{e_2}$,
+the outcome $m_2 \in \{+,-\} \equiv \{0,1\}$ leaves
+\[
+\sum_{ij} c_{ij}\, e^{-i\frac{\theta}{2}(-1)^{i\oplus j}}\,
+(-1)^{i \cdot m_2} \ket{i}_a \ket{j}_b .
+\]
+Bob phones $m_2$ to Alice (1 cbit); she applies the by-product $Z^{m_2}$ on
+$a$, killing the stray $(-1)^{i\cdot m_2}$:
+\[
+\sum_{ij} c_{ij}\, e^{-i\frac{\theta}{2}(-1)^{i\oplus j}}
+\ket{i}_a \ket{j}_b
+\;=\; \RZZ(\theta)_{ab}\,\ket{\psi}_{ab}. \qquad \blacksquare
+\]
+\end{enumerate}
+
+The gate is \emph{exact} (no approximation, works on arbitrary input,
+linearity handles entanglement with spectators), deterministic (every random
+outcome has its Pauli fix), and the Bell pair is gone: one ebit consumed.
+
+As a circuit (time flows left to right; double lines are classical wires):
+
+\begin{center}
+\begin{tabular}{lllll}
+$a$:\;   & --------$\bullet$-------- & ------------------ & ------$Z^{m_2}$-- & (Alice) \\
+$e_1$:\; & --------$\oplus$--$\big[Z\text{-meas} \Rightarrow m_1\big]$ & & & (Alice) \\
+$e_2$:\; & --$X^{m_1}$-- & --$\RZZ(\theta)$-- & $\big[X\text{-meas} \Rightarrow m_2\big]$ & (Bob) \\
+$b$:\;   & ------------- & --$\RZZ(\theta)$-- & ------------------ & (Bob) \\
+\end{tabular}
+
+\smallskip
+{\small ($e_1 e_2$ start in $\Phip$; $m_1$ travels A$\to$B, $m_2$ travels B$\to$A.)}
+\end{center}
+
+\subsection{Worked toy example: a nonlocal CNOT on
+$\ket{+}_a\ket{0}_b$, every amplitude spelled out}
+\label{sec:toy}
+
+CNOT is the special case: it equals $\RZZ$-type construction with the target
+conjugated by Hadamards (equivalently, use CZ, which is diagonal:
+$\mathrm{CZ} = e^{i\frac{\pi}{4}} \RZZ(-\tfrac{\pi}{2})
+\cdot e^{-i\frac{\pi}{4}Z_a} e^{-i\frac{\pi}{4}Z_b}$ up to local $Z$
+rotations; here we just run the EJPP steps with a local CNOT in step 4).
+Take the input
+\[
+\ket{\psi_{\text{in}}}
+ = \ket{+}_a \ket{0}_b
+ = \tfrac{1}{\sqrt 2}\big(\ket{0}_a + \ket{1}_a\big)\ket{0}_b ,
+\]
+i.e.\ $c_{00} = c_{10} = \tfrac{1}{\sqrt2}$, $c_{01} = c_{11} = 0$.
+The target output is the maximally entangled state
+$\mathrm{CNOT}_{ab}\ket{\psi_{\text{in}}}
+ = \tfrac{1}{\sqrt2}(\ket{00}+\ket{11})_{ab} = \Phip_{ab}$.
+We deliberately chose this input because it makes the ebit bookkeeping
+visible: \emph{the protocol must end with $a,b$ sharing 1 ebit, and LOCC
+cannot create ebits, so the 1 ebit in $(e_1,e_2)$ has to be spent.}
+
+\begin{enumerate}[leftmargin=2em, itemsep=0.5em]
+\item After sharing the Bell pair (ordering qubits $a, e_1, e_2, b$):
+\[
+\tfrac{1}{2}\Big(
+ \ket{0\,0\,0\,0} + \ket{0\,1\,1\,0} + \ket{1\,0\,0\,0} + \ket{1\,1\,1\,0}
+\Big).
+\]
+\item Alice's CNOT $a \to e_1$ flips $e_1$ on the $\ket{1}_a$ branches:
+\[
+\tfrac{1}{2}\Big(
+ \ket{0\,0\,0\,0} + \ket{0\,1\,1\,0} + \ket{1\,1\,0\,0} + \ket{1\,0\,1\,0}
+\Big).
+\]
+\item Alice measures $e_1$. Say she gets $m_1 = 0$ (the $m_1 = 1$ case is
+symmetric). Surviving terms, renormalized:
+\[
+\tfrac{1}{\sqrt2}\Big(\ket{0}_a \ket{0}_{e_2} + \ket{1}_a \ket{1}_{e_2}\Big)\ket{0}_b .
+\]
+She phones ``0''; Bob's correction $X^{0} = \mathbb{1}$ does nothing.
+Observe: $a$ and $e_2$ now form a Bell pair---the entanglement that used to
+live in $(e_1, e_2)$ has been \emph{swapped} onto $(a, e_2)$. Nothing was
+created; it moved.
+\item Bob applies the local CNOT with control $e_2$, target $b$:
+\[
+\tfrac{1}{\sqrt2}\Big(\ket{0}_a \ket{0}_{e_2}\ket{0}_b
+ + \ket{1}_a \ket{1}_{e_2}\ket{1}_b\Big),
+\]
+a three-qubit GHZ state: the correct correlation is already in $(a,b)$, but
+$e_2$ is still riding along and must be detached without looking at the
+$Z$-value.
+\item Bob measures $e_2$ in the $X$ basis. Rewrite
+$\ket{0}_{e_2} = \tfrac{\ket{+}+\ket{-}}{\sqrt2}$,
+$\ket{1}_{e_2} = \tfrac{\ket{+}-\ket{-}}{\sqrt2}$:
+\[
+\tfrac{1}{2}\Big[\ket{+}_{e_2}\big(\ket{00}+\ket{11}\big)_{ab}
+ + \ket{-}_{e_2}\big(\ket{00}-\ket{11}\big)_{ab}\Big].
+\]
+  \begin{itemize}
+  \item Outcome $m_2 = +$: state is $\tfrac{1}{\sqrt2}(\ket{00}+\ket{11})_{ab}
+        = \Phip_{ab}$. Done, no correction.
+  \item Outcome $m_2 = -$: state is $\tfrac{1}{\sqrt2}(\ket{00}-\ket{11})_{ab}$.
+        Bob phones ``$-$''; Alice applies $Z_a$, flipping the sign of the
+        $\ket{11}$ term: $\Phip_{ab}$. Done.
+  \end{itemize}
+\end{enumerate}
+
+Final tally for either outcome sequence: the data qubits end in exactly
+$\mathrm{CNOT}_{ab}\ket{\psi_{\text{in}}}$; the ancillas end measured-out and
+unentangled; one ebit was consumed, one cbit traveled each way; the only
+conditional operations were single-qubit Paulis.
+
+\subsection{Why $1$ ebit $+$ $2$ cbits is optimal}
+\label{sec:optimal}
+
+\begin{itemize}[leftmargin=2em]
+  \item \textbf{$\geq 1$ ebit:} as the toy example shows, a CNOT acting on
+        $\ket{+}\ket{0}$ \emph{outputs} one ebit between the labs. LOCC
+        cannot create entanglement, so at least one ebit must be supplied.
+  \item \textbf{$\geq 1$ cbit each way:} a nonlocal CNOT can be used to send
+        a classical bit in either direction (control value shows up at the
+        target, and in the Hadamard basis phase kicks back from target to
+        control). A protocol using no communication in some direction would
+        therefore allow faster-than-classical signalling---impossible. EJPP
+        meets both lower bounds, hence \emph{optimal}. A generic two-qubit
+        gate (e.g.\ SWAP) genuinely needs $2$ ebits $+$ $4$ cbits; diagonal
+        and controlled-$U$ gates are the cheap family.
+\end{itemize}
+
+\section{Back to our circuit}
+
+In \texttt{HF\_8q\_3doubles\_rzx.json} the only cross-chip gates are three
+$\RZX(t_k)$ on qubits $(6,2)$, and
+$\RZX(t) = (I \otimes H)\,\RZZ(t)\,(I \otimes H)$ with the Hadamards already
+present in the circuit---so each one is exactly an EJPP-implementable
+diagonal gate:
+
+\begin{itemize}[leftmargin=2em]
+  \item One \emph{pre-shared, verifiable, distillable} Bell pair per
+        $\RZX(t_k)$, consumed at gate time; the data qubits never experience
+        the noisy cross-chip interaction directly.
+  \item The by-product corrections are the Paulis $X^{m_1}_{e_2}$ and
+        $Z^{m_2}_{q_6}$. Since everything downstream in our ansatz is
+        Clifford or another $\RZX$, these need not be applied physically:
+        pushing a Pauli through $\RZX(t)$ at worst flips $t \to -t$
+        ($X_{q_6}$ and $Z_{q_2}$ anticommute with $Z_6 X_2$; $Z_{q_6}$ and
+        $X_{q_2}$ commute), so the whole correction layer reduces to
+        shot-by-shot sign bookkeeping on later angles and on the final
+        readout bits---a pure software ``Pauli frame,'' with zero added gate
+        noise and zero feedforward latency.
+  \item Where the profit comes from (quantified in the companion note): not
+        from teleportation per se, but from moving the seam noise onto
+        ancillas \emph{before} the computation, where heralding and one round
+        of entanglement distillation can upgrade the Bell fidelity---something
+        fundamentally impossible for a direct data-data gate, which gets
+        exactly one unrepeatable try.
+\end{itemize}
+
+\begin{thebibliography}{9}
+
+\bibitem{eisert2000}
+J.~Eisert, K.~Jacobs, P.~Papadopoulos, and M.~B. Plenio,
+\emph{Optimal local implementation of nonlocal quantum gates},
+Phys. Rev. A \textbf{62}, 052317 (2000);
+\href{https://arxiv.org/abs/quant-ph/0005101}{arXiv:quant-ph/0005101}.
+
+\bibitem{teleport}
+C.~H. Bennett, G.~Brassard, C.~Cr\'epeau, R.~Jozsa, A.~Peres, and
+W.~K. Wootters,
+\emph{Teleporting an unknown quantum state via dual classical and
+Einstein--Podolsky--Rosen channels},
+Phys. Rev. Lett. \textbf{70}, 1895 (1993).
+
+\bibitem{horodecki}
+R.~Horodecki, P.~Horodecki, M.~Horodecki, and K.~Horodecki,
+\emph{Quantum entanglement},
+Rev. Mod. Phys. \textbf{81}, 865 (2009)
+(comprehensive review of LOCC and entanglement as a resource).
+
+\end{thebibliography}
+
+\end{document}

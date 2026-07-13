@@ -1,0 +1,405 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath, amssymb}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage[colorlinks=true, linkcolor=blue, citecolor=blue, urlcolor=blue]{hyperref}
+
+\newcommand{\ket}[1]{\left|#1\right\rangle}
+\newcommand{\bra}[1]{\left\langle#1\right|}
+\newcommand{\ebit}{\mathrm{ebit}}
+\newcommand{\RZX}{R_{ZX}}
+\newcommand{\RZZ}{R_{ZZ}}
+
+\title{Measurement-Based VQE and LOCC Gate Teleportation:\\
+Can They Replace the Long-Range $\RZX$ in Our Cross-Chip HF Circuit?}
+\author{Notes on arXiv:2010.13940 (MB-VQE) and quant-ph/0005101 (LOCC nonlocal gates)\\
+applied to \texttt{HF\_8q\_3doubles\_rzx.json}}
+\date{July 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We summarize two papers---the measurement-based variational quantum eigensolver
+(MB-VQE) of Ferguson \emph{et al.}~\cite{ferguson2021} and the optimal LOCC
+implementation of nonlocal gates by Eisert \emph{et al.}~\cite{eisert2000}---and
+ask whether their ideas (mid-circuit measurement, classical feedforward, and
+entanglement-assisted local operations) can be used to avoid the noisy
+long-range $\RZX$ gates in our cross-chip HF UCCSD ansatz. The short answer:
+\emph{yes, in principle}. Our circuit has a special structure (all gates are
+Clifford except the three parameterized $\RZX$ ``knobs''), which is exactly the
+regime where both papers are most powerful. A na\"ive gate teleportation of the
+cross-chip $\RZX$ does \emph{not} beat the direct gate under our current noise
+model, but combining teleportation with (i) offline, heralded/distilled Bell-pair
+generation and (ii) software Pauli-frame feedforward gives a realistic path to a
+$2$--$3\times$ reduction of the effective cross-chip error. As a zero-ebit
+alternative, quasi-probability circuit cutting of the three $\RZX$ gates has a
+modest sampling overhead because the converged UCCSD angles are small.
+\end{abstract}
+
+\section{Our setting: the cross-chip HF circuit}
+\label{sec:setting}
+
+The ansatz \texttt{HF\_8q\_3doubles\_rzx.json} is an 8-qubit UCCSD-style
+circuit for HF (6 electrons in 4 spatial orbitals) with three double
+excitations $(3,7,4,0)$, $(3,7,5,1)$, $(3,7,6,2)$ and three variational
+parameters $t_0, t_1, t_2$. The two chips host qubits $\{0,1,2,3\}$ and
+$\{4,5,6,7\}$, and the \emph{only} gates that cross the seam are three
+parameterized entanglers
+\[
+\RZX(t_k)_{6,2} \;=\; \exp\!\Big(-i\,\tfrac{t_k}{2}\, Z_6 \otimes X_2\Big),
+\qquad k = 0,1,2 .
+\]
+In the simulation (\texttt{main\_cursor\_lib.py}) the noise model is
+gate-level depolarizing plus readout error:
+
+\begin{center}
+\begin{tabular}{lcc}
+\toprule
+Operation & Depolarizing prob. & Comment \\
+\midrule
+Single-qubit gate            & $5\times 10^{-4}$ & \\
+On-chip two-qubit gate (CZ)  & $1\times 10^{-2}$ & 20 CZ gates in the circuit \\
+\textbf{Cross-chip two-qubit gate ($\RZX$)} & $\mathbf{1\times 10^{-1}}$ & 3 gates, pair $(2,6)$ \\
+Readout ($P(0\!\to\!0)$ / $P(1\!\to\!1)$) & $0.92$--$0.97$ / $0.85$--$0.90$ & per-qubit asymmetric \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+So each cross-chip $\RZX$ is $10\times$ noisier than a local CZ, and the three
+of them dominate the error budget: they alone contribute a circuit-fidelity
+factor of roughly $(1-\tfrac{4}{5}\,0.1)^3 \approx 0.78$ (for two-qubit
+depolarizing, a fraction $12/15 = 4/5$ of the Pauli errors damage a generic
+state), while the twenty local CZs contribute
+$(1-\tfrac{4}{5}\,0.01)^{20}\approx 0.85$.
+
+\paragraph{A structural observation that makes everything below work.}
+Every gate in the circuit other than the three $\RZX(t_k)$ is Clifford:
+H, CZ, and $R_X(\pm\pi/2)$ are all Clifford operations. The circuit is
+therefore ``Clifford scaffolding $+$ 3 non-Clifford knobs.'' This is precisely
+the structure that (a) MB-VQE absorbs into an offline resource state, and
+(b) lets us replace active quantum feedforward by classical sign-tracking
+(Sec.~\ref{sec:pauliframe}).
+
+\section{Paper I: Measurement-based VQE (arXiv:2010.13940)}
+\label{sec:mbvqe}
+
+\subsection{What the paper does}
+
+Ferguson, Dellantonio, Jansen, Al Balushi, D\"ur, and
+Muschik~\cite{ferguson2021} replace the \emph{circuit model} of VQE with the
+\emph{measurement-based} model (MBQC). Instead of applying a sequence of
+parameterized gates to $\ket{0}^{\otimes n}$, one prepares a fixed entangled
+\emph{custom state} (a decorated graph state) and then performs only
+\emph{single-qubit measurements} on its auxiliary qubits. Measurements in
+rotated bases $R(\theta) = \{(\ket{0} \pm e^{i\theta}\ket{1})/\sqrt{2}\}$ carry
+the variational parameters~$\theta$; the classical optimizer updates the
+$\theta$'s exactly as in an ordinary VQE. Randomness of measurement outcomes
+is compensated by \emph{by-product Pauli operators} and \emph{adaptive
+measurements} (later bases conditioned on earlier outcomes)---i.e.\ mid-circuit
+measurement plus classical feedforward is the computational engine, not gates.
+
+\subsection{Procedure, scheme A: variational families by ``edge decoration''}
+
+\begin{itemize}[leftmargin=2em]
+  \item Start from an ansatz state $\ket{\psi_a}$ that is a stabilizer/graph
+        state approximating the unperturbed ground state (their example: the
+        toric code with a local $\hat{Z}$-field perturbation).
+  \item \emph{Decorate} the graph: for each connected pair of output qubits
+        $(m,n)$, insert a small pattern of four auxiliary qubits on the edge.
+  \item Measure each auxiliary qubit in a rotated basis $R(\theta_i)$. The
+        angles interpolate continuously between ``keep the edge''
+        ($\theta = 0$: original entanglement) and ``cut the edge''
+        ($\theta = \pi/2$: entanglement removed), plus an extra rotation.
+  \item Feed the measured energy to the classical optimizer; update the
+        $\theta_i$; repeat. By-product Paulis from random outcomes are tracked
+        classically.
+  \item Key selling point: one auxiliary qubit connected to $k$ output qubits
+        implements $e^{i(\theta/2)\, \hat Z_1 \otimes \cdots \otimes \hat Z_k}$
+        in a \emph{single} measurement---a many-body rotation that would need
+        $O(k)$ two-qubit gates in the circuit model.
+\end{itemize}
+
+\subsection{Procedure, scheme B: translating a gate circuit into MB-VQE}
+
+\begin{itemize}[leftmargin=2em]
+  \item Write the VQE circuit as Clifford gates $+$ parameterized single-qubit
+        rotations (``knobs''). Any circuit can be cast this way; ours already is.
+  \item Replace each gate by its standard MBQC measurement pattern on a graph
+        state; join the patterns.
+  \item \textbf{Perform all non-adaptive (Pauli-basis) measurements first.}
+        These correspond exactly to the Clifford part of the circuit,
+        \emph{regardless of where those gates sit in the circuit}. By the
+        Gottesman--Knill theorem this step can even be done on a classical
+        computer: one directly computes the smaller ``custom state'' that
+        remains, and prepares \emph{that} state in hardware.
+  \item What is left at runtime: prepare the custom state, perform one adaptive
+        rotated-basis measurement per knob (in dependency order), apply/track
+        by-product Paulis, read out the output qubits.
+  \item Resource comparison (their Schwinger-model example): a $K$-layer,
+        $S$-qubit circuit VQE with $K(S-1)$ entangling gates becomes a custom
+        state of $S(2K{+}1)$ qubits manipulated \emph{only} by single-qubit
+        measurements. The translation pays off when the circuit is mostly
+        Clifford with few knobs.
+\end{itemize}
+
+\section{Paper II: Optimal LOCC implementation of nonlocal gates
+(quant-ph/0005101)}
+\label{sec:locc}
+
+\subsection{What the paper does}
+
+Eisert, Jacobs, Papadopoulos, and Plenio~\cite{eisert2000} ask: in a
+\emph{distributed} quantum computer, what are the minimal resources---shared
+entanglement (ebits) and classical communication (cbits)---needed to enact a
+two-qubit gate between qubits sitting on \emph{different} nodes, using only
+local operations and classical communication (LOCC)? Their central results:
+
+\begin{itemize}[leftmargin=2em]
+  \item \textbf{Theorem (CNOT/CZ):} one shared ebit plus one classical bit in
+        each direction is \emph{necessary and sufficient} to implement a
+        nonlocal CNOT. (Necessity: a CNOT can create one ebit, and LOCC cannot
+        increase entanglement.)
+  \item A \emph{generic} two-qubit gate needs two ebits and two cbits each way
+        (equivalent to teleporting the qubit there and back), so
+        controlled-unitary/commuting gates are ``half price.''
+  \item The construction extends to controlled-$U$ gates, Toffoli-type
+        multiparty gates, and---most relevant for us---\emph{any gate diagonal
+        in a product basis}, such as
+        $\RZZ(\theta) = e^{-i(\theta/2) Z\otimes Z}$.
+\end{itemize}
+
+\subsection{Procedure: the EJPP gate-teleportation protocol for a nonlocal
+$\RZZ(\theta)$ between chip A (qubit $a$) and chip B (qubit $b$)}
+\label{sec:ejpp}
+
+Ancillas: $e_1$ on chip A, $e_2$ on chip B, prepared in
+$\ket{\Phi^+} = (\ket{00}+\ket{11})/\sqrt{2}$.
+
+\begin{enumerate}[leftmargin=2em]
+  \item \textbf{(Entangle, offline)} Create the Bell pair $\ket{\Phi^+}_{e_1 e_2}$
+        across the seam. This is the \emph{only} step that uses the noisy
+        cross-chip interaction, and it does not touch the data qubits.
+  \item \textbf{(Attach)} On chip A: CNOT with data qubit $a$ as control,
+        $e_1$ as target.
+  \item \textbf{(Measure + send $\rightarrow$)} Measure $e_1$ in the $Z$ basis,
+        outcome $m_1$; send $m_1$ to chip B; apply $X^{m_1}$ on $e_2$. Now
+        $e_2$ coherently carries the $Z$-parity of $a$.
+  \item \textbf{(Local gate)} On chip B: apply the \emph{local} two-qubit gate
+        $\RZZ(\theta)$ between $e_2$ and $b$. (Because the target gate is
+        diagonal in $Z\otimes Z$, this works for arbitrary $\theta$, not just
+        Clifford angles.)
+  \item \textbf{(Detach: measure + send $\leftarrow$)} Measure $e_2$ in the $X$
+        basis, outcome $m_2$; send $m_2$ back to chip A; apply $Z^{m_2}$ on $a$.
+\end{enumerate}
+
+Net effect: $\RZZ(\theta)_{a,b}$ enacted exactly, consuming one ebit, two
+mid-circuit measurements, and two classical bits. All corrections are Pauli
+gates, which matters below.
+
+\section{Application to our circuit: three concrete routes}
+\label{sec:application}
+
+Our cross-chip gate is $\RZX(t)_{6,2}$, which is locally equivalent to
+$\RZZ(t)$:
+\[
+\RZX(t)_{6,2} = \big(I_6 \otimes H_2\big)\,
+\RZZ(t)_{6,2}\,\big(I_6 \otimes H_2\big),
+\]
+and the JSON already surrounds each $\RZX$ with Hadamards, so the EJPP
+protocol of Sec.~\ref{sec:ejpp} applies \emph{directly} with $a = q_6$,
+$b = q_2$ (single-qubit basis changes are essentially free at
+$p_1 = 5\times10^{-4}$).
+
+\subsection{Route 1: LOCC gate teleportation of the three $\RZX$ gates}
+
+\paragraph{Feedforward can be purely classical (Pauli frame).}
+\label{sec:pauliframe}
+The corrections $X^{m_1}$ on $e_2$ and $Z^{m_2}$ on $q_6$ are Pauli gates.
+Everything downstream of each $\RZX$ is either Clifford (H, CZ,
+$R_X(\pm\pi/2)$) or another $\RZX(t_k)$. Pauli operators propagate through
+Clifford gates by relabeling, and through
+$\RZX(t) = e^{-i(t/2)Z\otimes X}$ by at most a \emph{sign flip of the angle}:
+$X_{q_6}$ or $Z_{q_2}$ anticommute with $Z_6 X_2$, so pushing them through
+flips $t \to -t$; $Z_{q_6}$ and $X_{q_2}$ commute. Therefore \emph{no
+conditional quantum gates are needed at all}: we track the Pauli frame in
+software, conditionally flip the signs of the later angles $t_{k'}$
+($k' > k$) shot by shot, and reinterpret the final readout bits. This
+eliminates the latency/error cost of active feedforward---the same trick that
+makes MB-VQE by-product operators cheap.
+
+\paragraph{Error budget (per cross-chip $\RZX$).}
+Let $p_x = 0.1$ (cross-chip), $p_2 = 0.01$ (local 2q), and let
+$\epsilon_M$ be the mid-circuit measurement error of an ancilla.
+
+\begin{itemize}[leftmargin=2em]
+  \item \textbf{Direct gate (status quo):} one depolarizing hit of $p_x = 0.1$
+        on data qubits $q_2, q_6$. Bell-pair-equivalent infidelity of the
+        operation $\approx \tfrac{4}{5}p_x = 8\%$.
+  \item \textbf{Na\"ive teleportation (no distillation):} one $p_x$ hit on
+        the \emph{ancillas} during Bell creation
+        (Bell fidelity $F = 1 - \tfrac{4}{5}p_x = 0.92$), which teleports onto
+        the data as an $8\%$ Pauli error, \emph{plus} one local CNOT
+        ($0.8\%$), one local $\RZZ$ ($0.8\%$), and two ancilla measurements.
+        With our readout numbers ($P(1\!\to\!1)$ as low as $0.85$!) this is
+        strictly \emph{worse} than the direct gate. Verdict: do not do this
+        na\"ively.
+  \item \textbf{Teleportation + offline heralding/distillation (the real
+        proposal):} because step 1 involves only ancillas, Bell pairs can be
+        (i) generated \emph{before} the data circuit reaches the seam,
+        (ii) \emph{verified} (repeat-until-success stabilizer checks), and
+        (iii) \emph{distilled}: one DEJMPS/BBPSSW round consumes two raw
+        $F = 0.92$ pairs and outputs one pair with
+        $F' \approx 0.98$--$0.99$ (ideal local ops), degraded to roughly
+        $F' \approx 0.96$--$0.97$ by our local gate and measurement errors.
+        The teleported $\RZX$ then carries $\sim 3$--$4\%$ error instead of
+        $8\%$: a $\mathbf{2\text{--}3\times}$ \textbf{reduction per cross-chip
+        gate}, at the cost of 2 extra qubits per chip, $2$--$3$ Bell attempts
+        per gate, and mid-circuit ancilla readout.
+\end{itemize}
+
+\noindent Two caveats specific to our simulator: (1) the readout error model
+is harsh ($\epsilon_M$ up to $15\%$); teleportation only wins if ancilla
+mid-circuit readout is modeled with better fidelity than final data readout
+(physically reasonable---these can be dedicated measure qubits---but it is a
+modeling choice we must make explicitly). (2) Depolarized Bell pairs can be
+Pauli-twirled, so all injected errors become \emph{stochastic Pauli} errors,
+which is friendlier to our CDR/vnCDR pipelines than coherent errors.
+
+\subsection{Route 2: MB-VQE translation of the whole ansatz}
+
+Our circuit is the ideal target for the paper's scheme B
+(Sec.~\ref{sec:mbvqe}): 20 CZ $+$ all H/$R_X(\pm\pi/2)$ are Clifford, and
+there are only \emph{three} knobs $t_0, t_1, t_2$.
+
+\begin{itemize}[leftmargin=2em]
+  \item Absorb the entire Clifford scaffolding (including the HF reference
+        prep) into a \emph{custom state} computed classically via
+        Gottesman--Knill; at runtime only three adaptive rotated-basis
+        measurements $R(\pm t_k)$ remain, plus output readout.
+  \item The custom state is entangled \emph{across the seam}: since the
+        circuit generates at most 3 ebits across the $(2,6)$ cut (one per
+        $\RZX$), the custom state needs at most $\sim$3 cross-chip graph
+        edges. Each edge is one cross-chip CZ---or, better, one
+        \emph{distilled Bell pair merged into the graph by LOCC} (a local CZ
+        plus one ancilla measurement per side), which is exactly Route 1's
+        resource reused for state preparation.
+  \item The advantage over Route 1: all cross-chip operations move into
+        \emph{state preparation}, fully offline, verifiable, and
+        repeat-until-success---the data-carrying computation never touches the
+        seam. Adaptive-measurement ordering for 3 knobs is trivial
+        ($t_0 \to t_1 \to t_2$, matching circuit order), and by-product
+        Paulis are handled by the same sign-flip bookkeeping as in
+        Sec.~\ref{sec:pauliframe}.
+  \item Cost: auxiliary qubits for the custom state (order of the knob count,
+        i.e.\ few, after classical simplification---not the na\"ive
+        one-per-gate), and the assumption that we can prepare a
+        specific $\sim$8--14 qubit graph state with good fidelity. In our
+        depolarizing simulator this becomes: (local Cliffords at
+        $p_2 = 0.01$) $+$ (3 distilled cross edges), so the seam cost is
+        identical to Route 1 while the on-chip depth at runtime shrinks
+        substantially.
+\end{itemize}
+
+\subsection{Route 3 (no ebits at all): quasi-probability cutting of the
+$\RZX$ gates}
+
+If we refuse to spend \emph{any} quantum resource on the seam, LO plus
+classical post-processing (``virtual gates'') can simulate each
+$\RZX(\theta)$ by sampling local operations and measurements on $q_6$/$q_2$
+independently. The cost is a sampling overhead
+\[
+\gamma^2 \;=\; \big(1 + 2\,|\sin\theta|\big)^2 \quad \text{per cut gate},
+\qquad
+\Gamma^2 = \prod_{k=0}^{2}\big(1 + 2|\sin t_k|\big)^2 \ \text{overall}.
+\]
+Since converged UCCSD doubles amplitudes are small (for HF near equilibrium,
+$|t_k| \sim 0.05$--$0.25$), the total shot-count multiplier is modest, e.g.\
+$|t_k| = 0.2$ for all three gives $\Gamma^2 \approx (1.4)^3 \approx 2.7$.
+This route removes the $10\%$ cross-chip error \emph{entirely} (replaced by
+local operations at $\le 1\%$) and needs no new hardware model---only more
+shots and the standard cutting post-processing. During early optimization
+iterations, when the $t_k$ are near zero, the overhead is almost negligible.
+
+\section{Assessment and recommendation}
+
+\begin{center}
+\begin{tabular}{p{3.4cm} p{3.5cm} p{3.5cm} p{3.6cm}}
+\toprule
+ & \textbf{Route 1: EJPP teleported $\RZX$} & \textbf{Route 2: MB-VQE custom state} & \textbf{Route 3: circuit cutting} \\
+\midrule
+Cross-chip quantum cost & 1 Bell pair per gate (distill: 2--3 raw) & $\sim$3 graph edges from distilled pairs & none \\
+Extra qubits & 2 ancillas & few auxiliary qubits & none \\
+Mid-circuit meas.\ + feedforward & yes (classical frame only) & yes (adaptive bases) & no \\
+Expected seam error & $\sim$3--4\% per gate (vs.\ 10\%) & same, but fully offline & $\lesssim 1\%$ (local only) \\
+Shot overhead & $\sim\!1\times$ & $\sim\!1\times$ & $\Gamma^2 \approx 1.5$--$3\times$ \\
+Simulator changes needed & Bell prep, ancilla meas., angle-sign frame, distillation & graph-state compiler, adaptive meas. & LO decomposition + post-processing \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{itemize}[leftmargin=2em]
+  \item \textbf{Yes, the ideas apply---and unusually well}, because the ansatz
+        is ``Clifford $+$ 3 knobs'' and only one qubit pair crosses the seam.
+        The MB-VQE paper tells us the whole Clifford part can be pushed into
+        an offline resource state; the Eisert LOCC paper tells us each
+        cross-chip $\RZX$ costs exactly one ebit and purely-Pauli
+        (i.e.\ software-trackable) corrections.
+  \item \textbf{Na\"ive teleportation does not help} under our noise model:
+        it relocates the same $10\%$ error and adds measurement error. The
+        gain comes only from \emph{offline heralded/distilled} entanglement,
+        which is possible precisely because teleportation decouples seam
+        noise from the data qubits.
+  \item \textbf{Recommended first experiment (cheapest, biggest win):}
+        Route 3. Implement the quasi-probability cut of the three
+        $\RZX(t_k)$ in the simulator and compare energy error and CDR
+        performance against the direct cross-chip gate at matched total
+        shots. Expected: cross-chip depolarizing contribution removed at
+        $\le 3\times$ shot cost.
+  \item \textbf{Recommended second experiment:} Route 1 with one round of
+        DEJMPS distillation and Pauli-frame sign tracking (no conditional
+        gates), sweeping ancilla measurement fidelity to find the break-even
+        point against the direct $p_x = 0.1$ gate.
+  \item Route 2 is the most elegant end point (all seam operations offline)
+        but requires the most new infrastructure; it reuses Route 1's
+        distilled-Bell machinery, so it is a natural follow-up rather than a
+        starting point.
+\end{itemize}
+
+\begin{thebibliography}{9}
+
+\bibitem{ferguson2021}
+R.~R. Ferguson, L.~Dellantonio, A.~Al Balushi, K.~Jansen, W.~D\"ur, and
+C.~A. Muschik,
+\emph{Measurement-Based Variational Quantum Eigensolver},
+Phys. Rev. Lett. \textbf{126}, 220501 (2021);
+\href{https://arxiv.org/abs/2010.13940}{arXiv:2010.13940}.
+
+\bibitem{eisert2000}
+J.~Eisert, K.~Jacobs, P.~Papadopoulos, and M.~B. Plenio,
+\emph{Optimal local implementation of nonlocal quantum gates},
+Phys. Rev. A \textbf{62}, 052317 (2000);
+\href{https://arxiv.org/abs/quant-ph/0005101}{arXiv:quant-ph/0005101}.
+
+\bibitem{mitarai2021}
+K.~Mitarai and K.~Fujii,
+\emph{Constructing a virtual two-qubit gate by sampling single-qubit
+operations},
+New J. Phys. \textbf{23}, 023021 (2021);
+\href{https://arxiv.org/abs/1909.07534}{arXiv:1909.07534}
+(sampling-overhead formula used in Route 3).
+
+\bibitem{dejmps}
+D.~Deutsch, A.~Ekert, R.~Jozsa, C.~Macchiavello, S.~Popescu, and
+A.~Sanpera,
+\emph{Quantum Privacy Amplification and the Security of Quantum Cryptography
+over Noisy Channels},
+Phys. Rev. Lett. \textbf{77}, 2818 (1996)
+(the DEJMPS distillation round cited in Route 1).
+
+\end{thebibliography}
+
+\end{document}

@@ -1,0 +1,30 @@
+NOTATION: three quantum slots, always in this order (subscripts make it explicit):
+    |x>_A = sender qubit Q_A
+    |y>_R = cable mode R  (the bus; transiently occupied, must end in 0)
+    |z>_B = receiver qubit Q_B
+Couplers G_A, G_B are classical on/off switches -- they are NOT quantum slots
+and never appear inside kets.
+
+-----------------------------------------------------------------------
+QST -- full state transfer (both couplers on TOGETHER, tau ~ 66 ns)
+
+  (a|0> + b|1>)_A |0>_R |0>_B   -->   |0>_A |0>_R (a|0> + b|1>)_B
+
+  Requirement: R and Q_B start in |0> (total excitations <= 1).
+
+-----------------------------------------------------------------------
+QST/2 -- Bell-pair generation (couplers on ONE AFTER THE OTHER)
+
+  Start:   |1>_A |0>_R |0>_B        (pi pulse on sender; one photon total)
+
+  Step 1:  G_A on for 25 ns  (= half of a full A<->R swap):
+           ( |1>_A |0>_R + |0>_A |1>_R )/sqrt2  (x) |0>_B
+           --> photon half-emitted into the cable.
+               Entanglement here is A <-> CABLE MODE. Not a Bell pair yet.
+               (Qubits alone read |10> and |00> in the two branches.)
+
+  Step 2:  G_A off, G_B on, full swap R -> B (~50 ns):
+           |1>_R branch: photon moves into Q_B.  |0>_R branch: nothing to swap.
+           ( |1>_A |0>_B + |0>_A |1>_B )/sqrt2  (x) |0>_R
+           --> NOW it is a Bell pair:  (|10> + |01>)/sqrt2 = |Psi+> on A,B,
+               with the cable back in vacuum.

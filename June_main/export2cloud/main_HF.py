@@ -1165,7 +1165,7 @@ try:
     CME_H_NUM_SHOTS = int(globals().get("GLOBAL_NUM_SHOTS", 8192))   # base shots for <H>, <H^2>, <H^3>
     # All three moments are swept over several multiples of CME_H_NUM_SHOTS so we can
     # see how the shot budget affects the CME(k=3) accuracy. Edit this list freely.
-    CME_SHOT_MULTIPLIERS = [1, 5]
+    CME_SHOT_MULTIPLIERS = [5, 10, 20]
 
     # Which measured value feeds the CME formula, one of:
     #   "cdr_rem"   -> CDR + REM corrected (matches the VQE energy objective)

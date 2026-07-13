@@ -1116,12 +1116,13 @@ _saved_vqe_paths = save_checkpoint(
 )
 
 
-# %% Notebook cell 19 (CME/CMX) — temporarily disabled; VQE-only save below.
+# %% Notebook cell 19 (CME/CMX)
 
 cme_results = None
 cme_results_by_multiplier = None
 
-def _run_cmx_disabled():
+def _run_cmx():
+    global cme_results, cme_results_by_multiplier
 
     try:
 
@@ -1413,16 +1414,18 @@ def _run_cmx_disabled():
 
 
 
-# _run_cmx_disabled()  # uncomment to re-enable CME/CMX
+_run_cmx()
 
 
-# Save final VQE payloads (CMX disabled).
+# Save final VQE + CME payloads for local plot recreation.
 _saved_final_paths = save_checkpoint(
     data_dir=Path("data"),
     molecule=MOLECULE,
     bond_length=float(bond_length),
     stage="final",
     vqe_results=globals().get("vqe_results"),
+    cme_results=globals().get("cme_results"),
+    cme_results_by_multiplier=globals().get("cme_results_by_multiplier"),
     metadata={
         "circuit_name": CIRCUIT_NAME,
         "measurement_scheme": GLOBAL_MEASUREMENT_SCHEME,
