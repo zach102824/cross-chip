@@ -74,28 +74,30 @@ CASES = {
         order="given",
         hub0=None,  # auto-detected shared pivot (== 2 for HF)
     ),
-    # "Cl2": dict(
-    #     molecule="Cl2",
-    #     bond_length=1.0,
-    #     n_qubits_full=10,
-    #     n_electrons=8,
-    #     # UCCSD_Mole/Cl2.ipynb, active_space=(8, 5) -> 10 qubits, top-3 doubles.
-    #     doubles=[(4, 9, 6, 1), (4, 9, 5, 0), (4, 9, 7, 2)],
-    #     pair=False,
-    #     order="given",
-    #     hub0=None,
-    # ),
-    # "Br2": dict(
-    #     molecule="Br2",
-    #     bond_length=1.0,
-    #     n_qubits_full=12,
-    #     n_electrons=10,
-    #     # UCCSD_Mole/Br2.ipynb, active_space=(10, 6) -> 12 qubits, top-4 doubles.
-    #     doubles=[(5, 11, 6, 0), (5, 11, 10, 4), (5, 11, 9, 3), (5, 11, 8, 2)],
-    #     pair=False,
-    #     order="given",
-    #     hub0=None,
-    # ),
+    "Cl2": dict(
+        molecule="Cl2",
+        # Matches June_main/export2cloud/main_Cl2.py (CL2_BOND_LENGTH default).
+        bond_length=2.2,
+        n_qubits_full=10,
+        n_electrons=8,
+        # UCCSD_Mole/Cl2.ipynb, active_space=(8, 5) -> 10 qubits, top-3 doubles.
+        doubles=[(4, 9, 6, 1), (4, 9, 5, 0), (4, 9, 7, 2)],
+        pair=False,
+        order="given",
+        hub0=None,
+    ),
+    "Br2": dict(
+        molecule="Br2",
+        # Matches June_main/export2cloud/main_Br2.py (BR2_BOND_LENGTH default).
+        bond_length=2.2,
+        n_qubits_full=12,
+        n_electrons=10,
+        # UCCSD_Mole/Br2.ipynb, active_space=(10, 6) -> 12 qubits, top-4 doubles.
+        doubles=[(5, 11, 6, 0), (5, 11, 10, 4), (5, 11, 9, 3), (5, 11, 8, 2)],
+        pair=False,
+        order="given",
+        hub0=None,
+    ),
 }
 
 

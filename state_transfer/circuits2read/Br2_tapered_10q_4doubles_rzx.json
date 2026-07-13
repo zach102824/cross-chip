@@ -1,0 +1,688 @@
+{
+  "molecule": "Br2",
+  "bond_length": 2.2,
+  "num_qubits": 10,
+  "n_spatial": 5,
+  "n_electrons": 10,
+  "init_state": null,
+  "beta": null,
+  "doubles": [
+    [
+      5,
+      11,
+      6,
+      0
+    ],
+    [
+      5,
+      11,
+      10,
+      4
+    ],
+    [
+      5,
+      11,
+      9,
+      3
+    ],
+    [
+      5,
+      11,
+      8,
+      2
+    ]
+  ],
+  "signs": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+  ],
+  "theta_idx": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "param_names": [],
+  "gates": [
+    {
+      "op": "rx",
+      "qubits": [
+        0
+      ],
+      "value": 1.5707963267948966
+    },
+    {
+      "op": "h",
+      "qubits": [
+        1
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        2
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        3
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        4
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        5
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        6
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        7
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        8
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        9
+      ]
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        0,
+        1
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        1
+      ]
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        1,
+        2
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        2
+      ]
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        2,
+        3
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        3
+      ]
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        3,
+        4
+      ]
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        5,
+        6
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        6
+      ]
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        6,
+        7
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        7
+      ]
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        7,
+        8
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        8
+      ]
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        8,
+        9
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        9
+      ]
+    },
+    {
+      "op": "rzx",
+      "qubits": [
+        9,
+        4
+      ],
+      "param": "t0",
+      "coeff": 1.0
+    },
+    {
+      "op": "h",
+      "qubits": [
+        9
+      ]
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        8,
+        9
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        8
+      ]
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        7,
+        8
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        7
+      ]
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        6,
+        7
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        6
+      ]
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        5,
+        6
+      ]
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        3,
+        4
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        3
+      ]
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        2,
+        3
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        2
+      ]
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        1,
+        2
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        1
+      ]
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        0,
+        1
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        8
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        7
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        6
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        5
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        4
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        3
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        2
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        1
+      ]
+    },
+    {
+      "op": "rx",
+      "qubits": [
+        0
+      ],
+      "value": -1.5707963267948966
+    },
+    {
+      "op": "rx",
+      "qubits": [
+        4
+      ],
+      "value": 1.5707963267948966
+    },
+    {
+      "op": "h",
+      "qubits": [
+        4
+      ]
+    },
+    {
+      "op": "rzx",
+      "qubits": [
+        9,
+        4
+      ],
+      "param": "t1",
+      "coeff": 1.0
+    },
+    {
+      "op": "h",
+      "qubits": [
+        4
+      ]
+    },
+    {
+      "op": "rx",
+      "qubits": [
+        4
+      ],
+      "value": -1.5707963267948966
+    },
+    {
+      "op": "rx",
+      "qubits": [
+        3
+      ],
+      "value": 1.5707963267948966
+    },
+    {
+      "op": "h",
+      "qubits": [
+        4
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        8
+      ]
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        3,
+        4
+      ]
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        8,
+        9
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        9
+      ]
+    },
+    {
+      "op": "rzx",
+      "qubits": [
+        9,
+        4
+      ],
+      "param": "t2",
+      "coeff": 1.0
+    },
+    {
+      "op": "h",
+      "qubits": [
+        9
+      ]
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        8,
+        9
+      ]
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        3,
+        4
+      ]
+    },
+    {
+      "op": "rx",
+      "qubits": [
+        3
+      ],
+      "value": -1.5707963267948966
+    },
+    {
+      "op": "rx",
+      "qubits": [
+        2
+      ],
+      "value": 1.5707963267948966
+    },
+    {
+      "op": "h",
+      "qubits": [
+        3
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        7
+      ]
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        2,
+        3
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        3
+      ]
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        3,
+        4
+      ]
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        7,
+        8
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        8
+      ]
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        8,
+        9
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        9
+      ]
+    },
+    {
+      "op": "rzx",
+      "qubits": [
+        9,
+        4
+      ],
+      "param": "t3",
+      "coeff": 1.0
+    },
+    {
+      "op": "h",
+      "qubits": [
+        9
+      ]
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        8,
+        9
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        8
+      ]
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        7,
+        8
+      ]
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        3,
+        4
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        3
+      ]
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        2,
+        3
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        9
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        8
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        7
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        4
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        3
+      ]
+    },
+    {
+      "op": "rx",
+      "qubits": [
+        2
+      ],
+      "value": -1.5707963267948966
+    }
+  ],
+  "tapered": true,
+  "n_qubits_full": 12,
+  "n_electrons_full": 10,
+  "removed_qubits": [
+    5,
+    11
+  ],
+  "tapering_values": [
+    -1,
+    -1
+  ],
+  "kept_qubits": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    6,
+    7,
+    8,
+    9,
+    10
+  ],
+  "symmetry_generators": [
+    "ZZZZZZIIIIII",
+    "IIIIIIZZZZZZ"
+  ],
+  "hf_bitstring_tapered": "1111111111",
+  "hf_occupied_qubits": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+  ],
+  "tapered_strings": [
+    "YZZZZXZZZZ",
+    "IIIIYIIIIX",
+    "IIIYZIIIXZ",
+    "IIYZZIIXZZ"
+  ],
+  "bridge_pair": [
+    4,
+    9
+  ]
+}
