@@ -37,6 +37,10 @@ GLOBAL_RANDOM_SEED = int(os.environ.get("GLOBAL_RANDOM_SEED", "1234"))
 GLOBAL_SAMPLING_SEED = int(os.environ.get("GLOBAL_SAMPLING_SEED", "1234"))
 GLOBAL_MEASUREMENT_SCHEME = os.environ.get("MEASUREMENT_SCHEME", "ogm")
 GLOBAL_APPLY_READOUT_NOISE = True
+# Depolarizing probability applied to EACH QST cable transfer (the tagged SWAP
+# on the (2, 6) pair). Patched into main_cursor_lib's cross-chip constant below
+# so every downstream noise config (trace energy, shots, CDR, VQE, CMX) uses it.
+QST_DEPOL_PROB = float(os.environ.get("QST_DEPOL_PROB", "0.01"))
 GLOBAL_READOUT_P0_SUCCESS = np.array([0.97, 0.96, 0.93, 0.96, 0.92, 0.93, 0.94, 0.92])
 GLOBAL_READOUT_P1_SUCCESS = np.array([0.85, 0.90, 0.88, 0.90, 0.86, 0.89, 0.87, 0.85])
 
@@ -44,31 +48,41 @@ GLOBAL_READOUT_P1_SUCCESS = np.array([0.85, 0.90, 0.88, 0.90, 0.86, 0.89, 0.87, 
 import json
 from pathlib import Path
 
-# Which molecule / bond length to load. The circuit JSON is produced by the
-# molecule notebook (e.g. UCCSD_Mole/HF.ipynb) via uccsd_circuit_io.build_and_save.
+# Which molecule / bond length to load. The circuit JSON is produced by
+# state_transfer/rewrite_hf_tapered_with_qst.py (tapered 6q ansatz + QST ancilla).
 MOLECULE = "HF"
-BOND_LENGTH = float(os.environ.get("HF_BOND_LENGTH", "1.2"))
+BOND_LENGTH = float(os.environ.get("HF_BOND_LENGTH", "2.2"))
 bond_length = BOND_LENGTH  # alias used by later cells (OGM / Hamiltonian paths)
 
-# Active space for the loaded molecule. These MUST match the molecule notebook
-# that produced the circuit / Hamiltonian (e.g. UCCSD_Mole/HF.ipynb uses 6
-# electrons in 4 spatial orbitals for HF). They drive the HF-determinant
-# reference and the qubit-count sanity checks below.
-N_ACTIVE_ELECTRONS = 6              # active electrons
-N_SPATIAL_ORBITALS = 4             # active spatial orbitals
-N_QUBITS = 2 * N_SPATIAL_ORBITALS  # spin-orbitals == qubits
+# Token used in tapered Hamiltonian / OGM filenames (same rule as
+# generate_molecular_hamiltonians.bond_token: 1.0 -> "1", 1.2 -> "1.2").
+BOND_TOKEN = f"{bond_length:.10g}".rstrip("0").rstrip(".")
+
+# Active space of the TAPERED register. Tapering removed one qubit per spin
+# block (8 -> 6 qubits) and the tapered HF bitstring is "111111", so all 6
+# data qubits are occupied (see Pauli_Ham/HF_tapered_bond_*_meta.json).
+N_ACTIVE_ELECTRONS = 6             # active electrons (tapered register)
+N_SPATIAL_ORBITALS = 3             # tapered spatial slots per spin block
+N_QUBITS = 2 * N_SPATIAL_ORBITALS  # DATA qubits (Hamiltonian acts on these)
 ETA = N_ACTIVE_ELECTRONS // 2      # occupied spatial orbitals per spin sector
+# The QST circuit adds one communication ancilla (q6) beyond the data register.
+# It starts and ends in |0>, is never measured for energy, and the Hamiltonian
+# is identity on it.
+N_TOTAL_QUBITS = N_QUBITS + 1
 
 _READOUT_P0_TEMPLATE = np.array([0.97, 0.96, 0.93, 0.96, 0.92, 0.93, 0.94, 0.92], dtype=float)
 _READOUT_P1_TEMPLATE = np.array([0.85, 0.90, 0.88, 0.90, 0.86, 0.89, 0.87, 0.85], dtype=float)
-GLOBAL_READOUT_P0_SUCCESS = np.resize(_READOUT_P0_TEMPLATE, N_QUBITS).astype(float)
-GLOBAL_READOUT_P1_SUCCESS = np.resize(_READOUT_P1_TEMPLATE, N_QUBITS).astype(float)
+GLOBAL_READOUT_P0_SUCCESS = np.resize(_READOUT_P0_TEMPLATE, N_TOTAL_QUBITS).astype(float)
+GLOBAL_READOUT_P1_SUCCESS = np.resize(_READOUT_P1_TEMPLATE, N_TOTAL_QUBITS).astype(float)
 print(f"Cloud measurement scheme: {GLOBAL_MEASUREMENT_SCHEME}")
 
 _repo = Path.cwd().resolve()
 while not (_repo / "June_main").is_dir() and _repo != _repo.parent:
     _repo = _repo.parent
-CIRCUITS_DIR = _repo / "June_main" / "circuits2read"
+STATE_TRANSFER_DIR = _repo / "state_transfer"
+CIRCUITS_DIR = STATE_TRANSFER_DIR / "circuits2read"
+OGM_BASIS_DIR = STATE_TRANSFER_DIR / "OGM_basis"
+PAULI_HAM_DIR = STATE_TRANSFER_DIR / "Pauli_Ham"
 
 # Make the shared library importable from this first cell (later cells repeat this).
 import sys as _sys
@@ -78,23 +92,69 @@ for _p in (str(_repo / "June_main"), str(_repo)):
 # Parameterized native cross-chip RZX gate (supports sympy angles + resolution and
 # is recognized by the CDR Clifford-snapping in main_cursor_lib).
 from main_cursor_lib import RZXGate
-# Bare ansatz (NO initial-state prep), with cross-chip CZ already decomposed to
-# the native RZX form. The reference state (HF / multireference) is prepended in
-# the next cell, so this cell just reads + draws the ansatz to confirm it loaded.
-CIRCUIT_NAME = "HF_8q_3doubles_rzx"
+# Patch the library's cross-chip constant so EVERY later
+# `from main_cursor_lib import CROSS_CHIP_TWO_QUBIT_GATE_DEPOL_PROB` (trace
+# energy, shots, CDR, VQE, CMX cells) picks up the QST depol probability
+# instead of the old 0.1 cross-chip RZX value. In this circuit the tag is
+# carried by the QST swaps, so this constant IS the per-QST depol strength.
+import main_cursor_lib as _mcl
+_mcl.CROSS_CHIP_TWO_QUBIT_GATE_DEPOL_PROB = QST_DEPOL_PROB
+
+# Pin the LOCAL state_transfer/shot_measurement.py (the self-contained copy
+# with the vendored OGM sampler -- no external shadowgrouping folder needed).
+# Later cells insert June_main at the front of sys.path, which also contains a
+# shot_measurement.py; importing eagerly here caches the local copy in
+# sys.modules so every later `from shot_measurement import ...` resolves to it.
+_sys.path.insert(0, str(STATE_TRANSFER_DIR))
+import shot_measurement as _shot_measurement_local
+
+assert Path(_shot_measurement_local.__file__).resolve().parent == STATE_TRANSFER_DIR.resolve(), (
+    f"Wrong shot_measurement imported: {_shot_measurement_local.__file__}"
+)
+
+
+def ogm_file_with_ancilla(base_ogm_path: Path) -> Path:
+    """Return a 7-qubit padded copy of a 6-qubit OGM basis file.
+
+    The OGM files in state_transfer/OGM_basis are (6 qubit rows + 1
+    distribution row) x N settings. The QST circuit has one extra ancilla
+    wire (q6) that always ends in |0> and never enters the Hamiltonian, so we
+    measure it in Z: insert one row of 3.0 just before the distribution row.
+    The padded copy is cached under OGM_basis/with_ancilla/ and reused.
+    """
+    base_ogm_path = Path(base_ogm_path)
+    padded_dir = base_ogm_path.parent / "with_ancilla"
+    padded_path = padded_dir / base_ogm_path.name
+    if padded_path.is_file() and padded_path.stat().st_mtime >= base_ogm_path.stat().st_mtime:
+        return padded_path
+    data = np.loadtxt(base_ogm_path)
+    if data.ndim != 2 or data.shape[0] != N_QUBITS + 1:
+        raise ValueError(
+            f"{base_ogm_path} has shape {data.shape}; expected ({N_QUBITS + 1}, n_settings)."
+        )
+    z_row = np.full((1, data.shape[1]), 3.0)
+    padded = np.vstack([data[:-1], z_row, data[-1:]])
+    padded_dir.mkdir(parents=True, exist_ok=True)
+    np.savetxt(padded_path, padded, fmt="%16.7e")
+    return padded_path
+
+
+# Bare ansatz (NO initial-state prep): the tapered 6-qubit RZX circuit rewritten
+# with QST state transfer -- every long-range RZX(5,2) became
+# QST(2->6) . local RZX(5,6) . QST(6->2) on 7 wires (ancilla q6).
+# The reference state (HF / multireference) is prepended in the next cell.
+CIRCUIT_NAME = "HF_tapered_6q_3doubles_rzx_qst"
 CIRCUIT_JSON = CIRCUITS_DIR / f"{CIRCUIT_NAME}.json"
 
-# Cross-chip two-qubit gates carry this tag so the noise model can apply a higher
-# (cross-chip) depolarizing probability.
+# QST cable transfers carry this tag so the noise model can apply the QST
+# depolarizing probability (QST_DEPOL_PROB) to them.
 CZ_CROSS_CHIP_TAG = "cz_cross_chip"
 
-# Which qubit pairs physically span two chips. The circuit JSON no longer carries
-# a per-gate "cross_chip" flag; instead, ANY two-qubit gate acting on one of these
-# (qubit_i, qubit_j) line-qubit index pairs is treated as a cross-chip link and
-# gets the higher CROSS_CHIP_TWO_QUBIT_GATE_DEPOL_PROB noise. Order does not
-# matter: (3, 4) and (4, 3) are the same link. Edit this to match the chip layout.
-# In HF_8q_3doubles_rzx.json the native RZX entanglers act on qubits 2 and 6, so
-# that is the cross-chip link here.
+# Which qubit pairs are QST cable links. In the QST circuit the only 2-qubit
+# ops on (2, 6) are the QST swaps (data q2 <-> ancilla q6); the local RZX acts
+# on (5, 6) and gets the regular TWO_QUBIT_GATE_DEPOL_PROB. Any two-qubit gate
+# on one of these pairs is tagged and receives QST_DEPOL_PROB. Order does not
+# matter: (2, 6) and (6, 2) are the same link.
 CROSS_CHIP_QUBIT_PAIRS = {(2, 6)}
 _CROSS_CHIP_PAIR_SET = {frozenset(pair) for pair in CROSS_CHIP_QUBIT_PAIRS}
 
@@ -142,6 +202,11 @@ def load_circuit_from_json(path):
             new_op = cirq.CNOT(qs[0], qs[1])
         elif op == "cz":
             new_op = cirq.CZ(qs[0], qs[1])
+        elif op == "qst":
+            # QST cable transfer (exact SWAP on the receiver-in-|0> subspace).
+            # SWAP is Clifford, so CDR training circuits keep it unchanged. The
+            # pair-based tagging below applies QST_DEPOL_PROB to it.
+            new_op = cirq.SWAP(qs[0], qs[1])
         elif op == "rzx":
             # Native cross-chip gate kept as ONE 2-qubit op. The angle can be a
             # sympy symbol (parameterized ansatz) and is resolved later for VQE,
@@ -176,10 +241,11 @@ num_qubits = len(qubits)
 n_params = len(symbols)
 qubit_map = {qq: i for i, qq in enumerate(qubits)}
 
-# Sanity-check the loaded circuit against the declared active space.
-assert num_qubits == N_QUBITS, (
-    f"Circuit has {num_qubits} qubits but active space implies "
-    f"N_QUBITS={N_QUBITS} (= 2 * N_SPATIAL_ORBITALS={N_SPATIAL_ORBITALS})."
+# Sanity-check the loaded circuit against the declared active space:
+# 6 data qubits + 1 QST ancilla.
+assert num_qubits == N_TOTAL_QUBITS, (
+    f"Circuit has {num_qubits} qubits but expected N_TOTAL_QUBITS={N_TOTAL_QUBITS} "
+    f"(= {N_QUBITS} data qubits + 1 QST ancilla)."
 )
 _meta_ne = circuit_meta.get("n_electrons")
 if _meta_ne is not None:
@@ -209,9 +275,11 @@ _n_cross = sum(
     if len(g["qubits"]) == 2 and _is_cross_chip_pair(g["qubits"])
 )
 _n_rzx = sum(1 for g in circuit_meta["gates"] if g["op"] == "rzx")
+_n_qst = sum(1 for g in circuit_meta["gates"] if g["op"] == "qst")
 print(
-    f"Loaded bare ansatz: {num_qubits} qubits, {n_params} params, "
-    f"{_n_rzx} RZX, {_n_cross} cross-chip 2Q gates  ({CIRCUIT_JSON.name})"
+    f"Loaded bare ansatz: {num_qubits} qubits ({N_QUBITS} data + 1 ancilla), "
+    f"{n_params} params, {_n_rzx} local RZX, {_n_qst} QST swaps "
+    f"({_n_cross} tagged with QST depol {QST_DEPOL_PROB})  ({CIRCUIT_JSON.name})"
 )
 
 # %% Notebook cell 1
@@ -219,16 +287,17 @@ print(
 import sys
 from pathlib import Path
 
-# Repo root resolution for local file loading (root holds Pauli_Ham/ and June_main/).
+# Repo root resolution for local file loading (root holds June_main/; the
+# tapered Hamiltonians live in state_transfer/Pauli_Ham).
 _repo = Path.cwd().resolve()
-while not (_repo / "Pauli_Ham").is_dir() and _repo != _repo.parent:
+while not (_repo / "June_main").is_dir() and _repo != _repo.parent:
     _repo = _repo.parent
 for _p in (str(_repo / "June_main"), str(_repo)):
     if _p not in sys.path:
         sys.path.insert(0, _p)
 
 
-# Read numbered-Pauli Hamiltonian from Pauli_Ham/<MOLECULE>_bond_<bond>.txt.
+# Read numbered-Pauli Hamiltonian from state_transfer/Pauli_Ham/<MOLECULE>_tapered_bond_<token>.txt.
 def load_pauli_sum_from_numbered_file(path: Path, qubits: list[cirq.Qid]) -> cirq.PauliSum:
     idx_to_pauli = {1: cirq.X, 2: cirq.Y, 3: cirq.Z}
     out = cirq.PauliSum()
@@ -261,14 +330,16 @@ def load_pauli_sum_from_numbered_file(path: Path, qubits: list[cirq.Qid]) -> cir
     return out
 
 
-ham_path = _repo / "Pauli_Ham" / f"{MOLECULE}_bond_{bond_length:.1f}.txt"
+ham_path = PAULI_HAM_DIR / f"{MOLECULE}_tapered_bond_{BOND_TOKEN}.txt"
 
-# Hamiltonian + exact ground-state energy. The bare ansatz (no prep) is not a
+# Hamiltonian + exact ground-state energy. The tapered Hamiltonian acts on the
+# 6 DATA qubits only (identity on the QST ancilla q6), so the numbered file is
+# loaded against qubits[:N_QUBITS]. The bare ansatz (no prep) is not a
 # meaningful state by itself, so the reference energy of the FULL circuit is
 # reported in the "Initial state preparation" cell once the prep is prepended.
-pauli_sum = load_pauli_sum_from_numbered_file(ham_path, list(qubits))
+pauli_sum = load_pauli_sum_from_numbered_file(ham_path, list(qubits[:N_QUBITS]))
 qubit_map = {q: i for i, q in enumerate(qubits)}
-e_gs = float(np.linalg.eigvalsh(pauli_sum.matrix(qubits=qubits))[0].real)
+e_gs = float(np.linalg.eigvalsh(pauli_sum.matrix(qubits=qubits[:N_QUBITS]))[0].real)
 
 # HF determinant reference (X on the occupied spin-orbitals of this active
 # space). Occupation comes from the explicit active-space inputs above
@@ -442,7 +513,7 @@ print(f"Tr[H ρ_noisy] (gate noise only): {trace_noisy_energy:.10f} Eh")
 
 # Finite-shot energy from the same ``rho_noisy`` as above: OGM measurement layout + asymmetric
 # readout (``p_0_success`` / ``p_1_success`` on LineQubit 0…5) and optional REM in post-processing.
-# the OGM basis file is read from the local OGM_measurement_basis folder, not from shadowgrouping.
+# the OGM basis file is read from state_transfer/OGM_basis (ancilla-padded copy), not from shadowgrouping.
 import sys
 from pathlib import Path
 
@@ -466,16 +537,17 @@ p_1_success = np.array(globals()["GLOBAL_READOUT_P1_SUCCESS"], dtype=float)
 apply_readout_noise = bool(globals()["GLOBAL_APPLY_READOUT_NOISE"])
 apply_rem = True
 
+_ogm_base = OGM_BASIS_DIR / f"OGM_{MOLECULE}_tapered_bond_{BOND_TOKEN}.txt"
 ogm_file = globals().get(
     "ogm_file",
-    _repo / "June_main" / "OGM_measurement_basis" / f"OGM_{MOLECULE}_bond_{bond_length:.1f}.txt",
+    ogm_file_with_ancilla(_ogm_base) if _ogm_base.is_file() else _ogm_base,
 )
 
 print(f"OGM file: {ogm_file}  exists={ogm_file.is_file()}")
 
 if not ogm_file.is_file():
     print(
-        "Skip OGM shot estimate: OGM basis file missing in June_main/OGM_measurement_basis."
+        "Skip OGM shot estimate: OGM basis file missing in state_transfer/OGM_basis."
     )
 else:
     try:
@@ -545,7 +617,7 @@ shot_cfg = {
     "sampling_seed": int(globals().get("sampling_seed", globals()["GLOBAL_SAMPLING_SEED"])),
     "ogm_file": globals().get(
         "ogm_file",
-        _repo / "June_main" / "OGM_measurement_basis" / f"OGM_{MOLECULE}_bond_{bond_length:.1f}.txt",
+        ogm_file_with_ancilla(OGM_BASIS_DIR / f"OGM_{MOLECULE}_tapered_bond_{BOND_TOKEN}.txt"),
     ),
 }
 readout_cal = {
@@ -560,7 +632,7 @@ cdr_cfg_base = dict(
 )
 
 if not Path(shot_cfg["ogm_file"]).is_file():
-    print("Skip CDR demo: OGM basis file missing in June_main/OGM_measurement_basis.")
+    print("Skip CDR demo: OGM basis file missing in state_transfer/OGM_basis.")
 else:
     mit_pp = run_cdr_with_per_pauli_coeff_print(
         ansatz_circuit=circuit,
@@ -1166,6 +1238,12 @@ try:
     # All three moments are swept over several multiples of CME_H_NUM_SHOTS so we can
     # see how the shot budget affects the CME(k=3) accuracy. Edit this list freely.
     CME_SHOT_MULTIPLIERS = [5, 10, 20]
+    # Independent repeats used to estimate Var[<H>], Var[<H^2>] and Var[<H^3>].
+    # The reported moments are averages over these repeats, so the variance passed
+    # to Eq. (73) is the sample variance divided by the number of repeats.
+    CME_VARIANCE_REPEATS = int(os.environ.get("CME_VARIANCE_REPEATS", "10"))
+    if CME_VARIANCE_REPEATS < 2:
+        raise ValueError("CME_VARIANCE_REPEATS must be at least 2 to estimate a variance.")
 
     # Which measured value feeds the CME formula, one of:
     #   "cdr_rem"   -> CDR + REM corrected (matches the VQE energy objective)
@@ -1215,28 +1293,34 @@ try:
     )
     _qubit_map = {q: i for i, q in enumerate(qubits)}
 
-    # 2) Hamiltonian (H / H^2 / H^3) + matching OGM measurement-basis files.
+    # 2) Tapered Hamiltonian (H / H^2 / H^3) + matching tapered OGM basis files
+    #    (all under state_transfer/; OGM files padded with the Z-measured ancilla).
     ham_paths = {
-        "H": _repo / "Pauli_Ham" / f"{MOLECULE}_bond_{bond_length:.1f}.txt",
-        "H2": _repo / "Pauli_Ham" / f"{MOLECULE}_square_bond_{bond_length:.1f}.txt",
-        "H3": _repo / "Pauli_Ham" / f"{MOLECULE}_triple_bond_{bond_length:.1f}.txt",
+        "H": PAULI_HAM_DIR / f"{MOLECULE}_tapered_bond_{BOND_TOKEN}.txt",
+        "H2": PAULI_HAM_DIR / f"{MOLECULE}_tapered_square_bond_{BOND_TOKEN}.txt",
+        "H3": PAULI_HAM_DIR / f"{MOLECULE}_tapered_triple_bond_{BOND_TOKEN}.txt",
     }
-    ogm_paths = {
-        "H": _repo / "June_main" / "OGM_measurement_basis" / f"OGM_{MOLECULE}_bond_{bond_length:.1f}.txt",
-        "H2": _repo / "June_main" / "OGM_measurement_basis" / f"OGM_{MOLECULE}_square_bond_{bond_length:.1f}.txt",
-        "H3": _repo / "June_main" / "OGM_measurement_basis" / f"OGM_{MOLECULE}_triple_bond_{bond_length:.1f}.txt",
+    _ogm_bases = {
+        "H": OGM_BASIS_DIR / f"OGM_{MOLECULE}_tapered_bond_{BOND_TOKEN}.txt",
+        "H2": OGM_BASIS_DIR / f"OGM_{MOLECULE}_tapered_square_bond_{BOND_TOKEN}.txt",
+        "H3": OGM_BASIS_DIR / f"OGM_{MOLECULE}_tapered_triple_bond_{BOND_TOKEN}.txt",
     }
     for key in ("H", "H2", "H3"):
         if not ham_paths[key].is_file():
             raise FileNotFoundError(f"Missing Hamiltonian file for {key}: {ham_paths[key]}")
-        if str(globals().get("GLOBAL_MEASUREMENT_SCHEME", "")).lower() != "direct_pauli" and not ogm_paths[key].is_file():
-            raise FileNotFoundError(f"Missing OGM basis file for {key}: {ogm_paths[key]}")
+        if str(globals().get("GLOBAL_MEASUREMENT_SCHEME", "")).lower() != "direct_pauli" and not _ogm_bases[key].is_file():
+            raise FileNotFoundError(f"Missing OGM basis file for {key}: {_ogm_bases[key]}")
+    ogm_paths = {
+        key: (ogm_file_with_ancilla(path) if path.is_file() else path)
+        for key, path in _ogm_bases.items()
+    }
 
-    # Reuse the already-loaded H PauliSum; load H^2 and H^3 from their numbered files.
+    # Reuse the already-loaded H PauliSum; load H^2 and H^3 from their numbered
+    # files (6 data qubits; identity on the QST ancilla).
     pauli_sums = {
         "H": pauli_sum,
-        "H2": load_pauli_sum_from_numbered_file(ham_paths["H2"], list(qubits)),
-        "H3": load_pauli_sum_from_numbered_file(ham_paths["H3"], list(qubits)),
+        "H2": load_pauli_sum_from_numbered_file(ham_paths["H2"], list(qubits[:N_QUBITS])),
+        "H3": load_pauli_sum_from_numbered_file(ham_paths["H3"], list(qubits[:N_QUBITS])),
     }
 
     # 3) Mitigation config (CDR + REM), reused from the VQE objective so the moments
@@ -1272,14 +1356,28 @@ try:
     _base_shot_cfg.setdefault("measurement_scheme", str(globals()["GLOBAL_MEASUREMENT_SCHEME"]))
     _base_shot_cfg.setdefault("apply_readout_noise", bool(globals()["GLOBAL_APPLY_READOUT_NOISE"]))
     _base_shot_cfg.setdefault("sampling_seed", int(globals()["GLOBAL_SAMPLING_SEED"]))
-    _sim_seed = int(globals().get("random_seed", globals()["GLOBAL_RANDOM_SEED"]))
+
+    def _fresh_cmx_seed() -> int:
+        """Return a fresh non-deterministic seed from OS entropy."""
+        return int.from_bytes(os.urandom(8), byteorder="big") % (2**31 - 1) or 1
+
 
     def _measure_moment(key: str, num_shots: int) -> dict:
         """Measure <H^k> (key in {"H","H2","H3"}) with the CDR+REM pipeline at the
-        given shot budget, returning unmit/rem/cdr_unmit/cdr_rem/exact/noiseless."""
+        given shot budget, returning unmit/rem/cdr_unmit/cdr_rem/exact/noiseless.
+
+        Every call uses independent OS-entropy seeds for shot sampling, CDR
+        training-circuit generation and any stochastic simulator path.
+        """
+        sampling_seed_key = _fresh_cmx_seed()
+        cdr_seed_key = _fresh_cmx_seed()
+        simulator_seed_key = _fresh_cmx_seed()
         shot_cfg_key = dict(_base_shot_cfg)
         shot_cfg_key["num_shots"] = int(num_shots)
         shot_cfg_key["ogm_file"] = ogm_paths[key]
+        shot_cfg_key["sampling_seed"] = sampling_seed_key
+        cdr_cfg_key = dict(cdr_cfg_cme)
+        cdr_cfg_key["seed"] = cdr_seed_key
         mit = run_mitigation(
             "cdr",
             ansatz_circuit=circuit,
@@ -1291,8 +1389,8 @@ try:
             base_noise_cfg=base_noise_cme,
             shot_cfg=shot_cfg_key,
             readout_cal=readout_cal_cme,
-            cdr_cfg=cdr_cfg_cme,
-            simulator_seed=_sim_seed,
+            cdr_cfg=cdr_cfg_key,
+            simulator_seed=simulator_seed_key,
         )
         result = {
             "unmit": float(mit["unmit_target"]),
@@ -1303,6 +1401,9 @@ try:
             "noiseless": float(
                 np.real(pauli_sums[key].expectation_from_state_vector(_psi_noiseless, qubit_map=_qubit_map))
             ),
+            "sampling_seed": int(sampling_seed_key),
+            "cdr_seed": int(cdr_seed_key),
+            "simulator_seed": int(simulator_seed_key),
         }
         print(
             f"<{key:<2}>  shots={int(num_shots):>8d}  "
@@ -1323,23 +1424,145 @@ try:
         return e, c1, c2, c3
 
 
+    def _cme_k3_gradient(a: float, b: float, c: float) -> np.ndarray:
+        """Analytic gradient of E=a-(b-a^2)^2/(c-3ab+2a^3).
+
+        The final term in dE/da has a plus sign. This follows by direct
+        differentiation; the minus sign printed in paper Eq. (73) is a typo.
+        """
+        s21 = b - a ** 2
+        s31 = c - 3.0 * a * b + 2.0 * a ** 3
+        if abs(s31) < 1e-12:
+            return np.full(3, np.nan, dtype=float)
+        return np.array(
+            [
+                1.0
+                + 4.0 * a * s21 / s31
+                + s21 ** 2 * (-3.0 * b + 6.0 * a ** 2) / s31 ** 2,
+                -2.0 * s21 / s31 - 3.0 * a * s21 ** 2 / s31 ** 2,
+                s21 ** 2 / s31 ** 2,
+            ],
+            dtype=float,
+        )
+
+
+    def _validate_cme_k3_gradient_numerically() -> None:
+        """Central-difference check at a stable, non-singular test point."""
+        x = np.array([0.4, 1.2, 2.0], dtype=float)
+        analytic = _cme_k3_gradient(*x)
+        numeric = np.empty(3, dtype=float)
+        for i in range(3):
+            step = 1e-6 * max(1.0, abs(float(x[i])))
+            xp = x.copy()
+            xm = x.copy()
+            xp[i] += step
+            xm[i] -= step
+            numeric[i] = (_cme_k3(*xp)[0] - _cme_k3(*xm)[0]) / (2.0 * step)
+        if not np.allclose(analytic, numeric, rtol=2e-6, atol=2e-7):
+            raise RuntimeError(
+                f"CMX gradient check failed: analytic={analytic}, finite_difference={numeric}"
+            )
+        print(
+            "[CMX] analytic variance-propagation derivatives passed the "
+            f"finite-difference check (max |delta|={np.max(np.abs(analytic - numeric)):.3e})."
+        )
+
+
+    def _cme_k3_with_variance(
+        a: float,
+        b: float,
+        c: float,
+        var_a: float,
+        var_b: float,
+        var_c: float,
+    ):
+        """CMX energy and diagonal Eq. (73) propagated uncertainty."""
+        energy, c1, c2, c3 = _cme_k3(a, b, c)
+        gradient = _cme_k3_gradient(a, b, c)
+        variances = np.array([var_a, var_b, var_c], dtype=float)
+        variance = float(np.sum((gradient ** 2) * variances))
+        # Guard only against tiny negative roundoff; every summand is nonnegative.
+        variance = max(variance, 0.0)
+        sigma = float(np.sqrt(variance))
+        return energy, c1, c2, c3, variance, sigma, gradient
+
+
+    _validate_cme_k3_gradient_numerically()
     e_ref = float(globals().get("e_gs", np.linalg.eigvalsh(pauli_sum.matrix(qubits=qubits))[0].real))
 
     # 5) Sweep the <H>/<H^2>/<H^3> shot budget over CME_SHOT_MULTIPLIERS x CME_H_NUM_SHOTS,
-    #    remeasuring all three moments and rerunning the CME(k=3) formula at each multiplier.
+    #    independently remeasuring all three moments CME_VARIANCE_REPEATS times
+    #    and rerunning the CME(k=3) formula at each multiplier.
     cme_results_by_multiplier = {}
     for mult in CME_SHOT_MULTIPLIERS:
         moment_shots = int(mult * CME_H_NUM_SHOTS)
-        print(f"\n--- <H>, <H^2>, <H^3> shots = {mult}x CME_H_NUM_SHOTS = {moment_shots} ---")
-        moments = {
-            "H": _measure_moment("H", moment_shots),
-            "H2": _measure_moment("H2", moment_shots),
-            "H3": _measure_moment("H3", moment_shots),
+        print(
+            f"\n--- <H>, <H^2>, <H^3> shots/repeat = {mult}x CME_H_NUM_SHOTS "
+            f"= {moment_shots}; independent repeats = {CME_VARIANCE_REPEATS} ---"
+        )
+        moment_replicates = {key: [] for key in ("H", "H2", "H3")}
+        for rep in range(CME_VARIANCE_REPEATS):
+            print(f"[CMX] variance repeat {rep + 1}/{CME_VARIANCE_REPEATS}")
+            for key in ("H", "H2", "H3"):
+                moment_replicates[key].append(_measure_moment(key, moment_shots))
+
+        moment_arrays = {
+            key: np.asarray(
+                [result[CME_MOMENT_SOURCE] for result in moment_replicates[key]],
+                dtype=float,
+            )
+            for key in ("H", "H2", "H3")
         }
+        moments = {
+            key: {
+                value_key: float(np.mean([result[value_key] for result in moment_replicates[key]]))
+                for value_key in ("unmit", "rem", "cdr_unmit", "cdr_rem", "exact", "noiseless")
+            }
+            for key in ("H", "H2", "H3")
+        }
+        for key in ("H", "H2", "H3"):
+            moments[key]["replicates"] = [dict(result) for result in moment_replicates[key]]
+            moments[key]["sample_variance"] = float(np.var(moment_arrays[key], ddof=1))
+            moments[key]["mean_variance"] = float(
+                moments[key]["sample_variance"] / CME_VARIANCE_REPEATS
+            )
         shots = {"H": moment_shots, "H2": moment_shots, "H3": moment_shots}
 
         src = {k: moments[k][CME_MOMENT_SOURCE] for k in ("H", "H2", "H3")}
-        E_cme, C1, C2, C3 = _cme_k3(src["H"], src["H2"], src["H3"])
+        E_cme, C1, C2, C3, E_cme_variance, E_cme_sigma, E_cme_gradient = _cme_k3_with_variance(
+            src["H"],
+            src["H2"],
+            src["H3"],
+            moments["H"]["mean_variance"],
+            moments["H2"]["mean_variance"],
+            moments["H3"]["mean_variance"],
+        )
+        E_cme_minus_1sigma = float(E_cme - E_cme_sigma)
+        E_cme_minus_2sigma = float(E_cme - 2.0 * E_cme_sigma)
+
+        # Direct replicate-level check of the linearized Eq. (73) uncertainty.
+        # This need not agree exactly because CMX is nonlinear and Eq. (73)
+        # deliberately neglects covariance between independently measured moments.
+        E_cme_replicates = np.asarray(
+            [
+                _cme_k3(
+                    moment_arrays["H"][rep],
+                    moment_arrays["H2"][rep],
+                    moment_arrays["H3"][rep],
+                )[0]
+                for rep in range(CME_VARIANCE_REPEATS)
+            ],
+            dtype=float,
+        )
+        finite_cme_replicates = E_cme_replicates[np.isfinite(E_cme_replicates)]
+        if finite_cme_replicates.size >= 2:
+            E_cme_empirical_variance = float(
+                np.var(finite_cme_replicates, ddof=1) / finite_cme_replicates.size
+            )
+            E_cme_empirical_sigma = float(np.sqrt(E_cme_empirical_variance))
+        else:
+            E_cme_empirical_variance = float("nan")
+            E_cme_empirical_sigma = float("nan")
         E_cme_exact, _, _, _ = _cme_k3(moments["H"]["exact"], moments["H2"]["exact"], moments["H3"]["exact"])
         E_cme_noiseless, _, _, _ = _cme_k3(
             moments["H"]["noiseless"], moments["H2"]["noiseless"], moments["H3"]["noiseless"]
@@ -1359,6 +1582,14 @@ try:
             )
         )
         print(f"E_CME(k=3) [shots/{CME_MOMENT_SOURCE}]      = {E_cme:.10f} Eh")
+        print(f"Var[E_CME] (Eq. 73 propagation)             = {E_cme_variance:.6e} Eh^2")
+        print(f"sigma[E_CME]                                = {E_cme_sigma:.6e} Eh")
+        print(f"E_CME - 1 sigma                             = {E_cme_minus_1sigma:.10f} Eh")
+        print(f"E_CME - 2 sigma                             = {E_cme_minus_2sigma:.10f} Eh")
+        print(
+            f"empirical sigma of replicated CMX mean      = {E_cme_empirical_sigma:.6e} Eh "
+            "(nonlinear cross-check)"
+        )
         print(f"E_CME(k=3) [noiseless moments] = {E_cme_noiseless:.10f} Eh")
         print(f"E_CME(k=3) [exact Tr moments]  = {E_cme_exact:.10f} Eh")
         print(f"true ground-state energy e_gs  = {e_ref:.10f} Eh")
@@ -1373,11 +1604,20 @@ try:
             "moments": {k: dict(v) for k, v in moments.items()},
             "connected_moments": {"c1": float(C1), "c2": float(C2), "c3": float(C3)},
             "E_cme_shots": float(E_cme),
+            "E_cme_variance": float(E_cme_variance),
+            "E_cme_sigma": float(E_cme_sigma),
+            "E_cme_minus_1sigma": float(E_cme_minus_1sigma),
+            "E_cme_minus_2sigma": float(E_cme_minus_2sigma),
+            "E_cme_gradient": np.asarray(E_cme_gradient, dtype=float),
+            "E_cme_replicates": E_cme_replicates,
+            "E_cme_empirical_variance": float(E_cme_empirical_variance),
+            "E_cme_empirical_sigma": float(E_cme_empirical_sigma),
             "E_cme_noiseless": float(E_cme_noiseless),
             "E_cme_exact": float(E_cme_exact),
             "e_gs": float(e_ref),
             "moment_source": CME_MOMENT_SOURCE,
             "h2_h3_shot_multiplier": mult,
+            "variance_repeats": int(CME_VARIANCE_REPEATS),
         }
 
     print("\n=== CME(k=3) summary across shot multipliers ===")
@@ -1385,7 +1625,10 @@ try:
         r = cme_results_by_multiplier[mult]
         print(
             f"{mult:>3d}x (shots={r['shots']['H']:>8d})  "
-            f"E_CME={r['E_cme_shots']:.10f} Eh  |E_CME - e_gs|={abs(r['E_cme_shots'] - e_ref):.6e} Eh"
+            f"E_CME={r['E_cme_shots']:.10f} +/- {r['E_cme_sigma']:.3e} Eh  "
+            f"E-1sigma={r['E_cme_minus_1sigma']:.10f}  "
+            f"E-2sigma={r['E_cme_minus_2sigma']:.10f}  "
+            f"|E_CME - e_gs|={abs(r['E_cme_shots'] - e_ref):.6e} Eh"
         )
 
     # Backward-compatible alias for cells expecting a single ``cme_results`` dict:

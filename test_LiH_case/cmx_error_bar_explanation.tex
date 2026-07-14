@@ -1,0 +1,118 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{microtype}
+\usepackage[hidelinks]{hyperref}
+\usepackage{xcolor}
+
+\definecolor{cmxred}{RGB}{210,25,20}
+
+\title{Where the Error Bars on the Red CMX Curve Come From}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section*{Short answer}
+
+In the LiH absolute-energy-error plot, the \textcolor{cmxred}{red circles and
+dashed curve} are energies obtained after connected moments expansion (CMX)
+error mitigation.  Their vertical error bars represent uncertainty caused by
+finite statistical sampling of the quantum measurements.  They are not the
+difference between the red point and the exact ground-state energy.
+
+\section*{Quantities measured for CMX}
+
+CMX estimates the ground-state energy from three Hamiltonian moments:
+\begin{equation}
+  a=\langle \hat H\rangle,\qquad
+  b=\langle \hat H^2\rangle,\qquad
+  c=\langle \hat H^3\rangle .
+\end{equation}
+Each expectation value is estimated from a finite number of measurement shots.
+Consequently, $a$, $b$, and $c$ have statistical variances
+$\operatorname{Var}(a)$, $\operatorname{Var}(b)$, and
+$\operatorname{Var}(c)$.
+
+\section*{Propagation into the CMX energy}
+
+The CMX energy is a nonlinear function
+\begin{equation}
+  E_{\mathrm{CMX}}=f(a,b,c).
+\end{equation}
+The paper propagates the variances of the measured moments through this
+function:
+\begin{equation}
+\label{eq:propagation}
+  \operatorname{Var}(E_{\mathrm{CMX}})
+  =
+  \left(\frac{\partial E_{\mathrm{CMX}}}{\partial a}\right)^2
+       \operatorname{Var}(a)
+  +
+  \left(\frac{\partial E_{\mathrm{CMX}}}{\partial b}\right)^2
+       \operatorname{Var}(b)
+  +
+  \left(\frac{\partial E_{\mathrm{CMX}}}{\partial c}\right)^2
+       \operatorname{Var}(c).
+\end{equation}
+The plotted error-bar magnitude is therefore the propagated standard
+uncertainty
+\begin{equation}
+  \boxed{\sigma_{E_{\mathrm{CMX}}}
+  =\sqrt{\operatorname{Var}(E_{\mathrm{CMX}})}}.
+\end{equation}
+Thus, a red point at energy $E_{\mathrm{CMX}}$ is displayed with a vertical
+range conventionally interpreted as
+$E_{\mathrm{CMX}}\pm\sigma_{E_{\mathrm{CMX}}}$.
+
+Equation~\eqref{eq:propagation} is Eq.~(72) in the paper's Supplementary
+Information.  Its expression specialized to the second-order CMX estimator is
+given in Supplementary Eq.~(73).  The authors state that the CMX error bar is
+calculated using Eq.~(73).  Because this propagation omits covariance terms,
+they also note that the actual variance could be smaller.
+
+\section*{Values for the LiH red curve}
+
+The paper's \emph{Source Data Fig.~3} spreadsheet labels these numbers
+``REM+CF+CMX error bar.''  For the LiH panel, their magnitudes are:
+
+\begin{center}
+\begin{tabular}{cc}
+\toprule
+Bond distance (\AA) & Error-bar magnitude (mHa) \\
+\midrule
+0.5 & 1.747 \\
+0.7 & 4.135 \\
+0.9 & 1.496 \\
+1.2 & 5.452 \\
+1.5 & 1.525 \\
+1.8 & 1.711 \\
+2.2 & 1.615 \\
+2.6 & 2.280 \\
+3.0 & 1.843 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Here $1~\mathrm{mHa}=10^{-3}$ Hartree.  These values quantify statistical
+precision.  By contrast, the vertical coordinate in the absolute-error panel
+is
+\begin{equation}
+  \left|E_{\mathrm{CMX}}-E_{\mathrm{exact}}\right|,
+\end{equation}
+which quantifies agreement with exact diagonalization.  These are two
+different notions of error.
+
+\section*{Source}
+
+S.~Guo \emph{et al.}, ``Experimental quantum computational chemistry with
+optimised unitary coupled cluster ansatz,'' \emph{Nature Physics} \textbf{20},
+1240--1246 (2024),
+\href{https://doi.org/10.1038/s41567-024-02530-z}
+{doi:10.1038/s41567-024-02530-z}.  See Supplementary Eqs.~(72)--(73) and
+Source Data Fig.~3.
+
+\end{document}

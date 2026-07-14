@@ -1174,6 +1174,9 @@ def _run_cmx():
         # a single fixed shot count) so we can see how their shot budget affects the
         # CME(k=3) accuracy. Edit this list freely.
         CME_SHOT_MULTIPLIERS = [1, 5, 10, 15]
+        CME_VARIANCE_REPEATS = int(os.environ.get("CME_VARIANCE_REPEATS", "10"))
+        if CME_VARIANCE_REPEATS < 2:
+            raise ValueError("CME_VARIANCE_REPEATS must be at least 2 to estimate a variance.")
 
         # Which measured value feeds the CME formula, one of:
         #   "cdr_rem"   -> CDR + REM corrected (matches the VQE energy objective)
@@ -1280,14 +1283,23 @@ def _run_cmx():
         _base_shot_cfg.setdefault("measurement_scheme", str(globals()["GLOBAL_MEASUREMENT_SCHEME"]))
         _base_shot_cfg.setdefault("apply_readout_noise", bool(globals()["GLOBAL_APPLY_READOUT_NOISE"]))
         _base_shot_cfg.setdefault("sampling_seed", int(globals()["GLOBAL_SAMPLING_SEED"]))
-        _sim_seed = int(globals().get("random_seed", globals()["GLOBAL_RANDOM_SEED"]))
+
+        def _fresh_cmx_seed() -> int:
+            """Return a fresh non-deterministic seed from OS entropy."""
+            return int.from_bytes(os.urandom(8), byteorder="big") % (2**31 - 1) or 1
 
         def _measure_moment(key: str, num_shots: int) -> dict:
             """Measure <H^k> (key in {"H","H2","H3"}) with the CDR+REM pipeline at the
-            given shot budget, returning unmit/rem/cdr_unmit/cdr_rem/exact/noiseless."""
+            given shot budget using independent sampling, CDR and simulator seeds."""
+            sampling_seed_key = _fresh_cmx_seed()
+            cdr_seed_key = _fresh_cmx_seed()
+            simulator_seed_key = _fresh_cmx_seed()
             shot_cfg_key = dict(_base_shot_cfg)
             shot_cfg_key["num_shots"] = int(num_shots)
             shot_cfg_key["ogm_file"] = ogm_paths[key]
+            shot_cfg_key["sampling_seed"] = sampling_seed_key
+            cdr_cfg_key = dict(cdr_cfg_cme)
+            cdr_cfg_key["seed"] = cdr_seed_key
             mit = run_mitigation(
                 "cdr",
                 ansatz_circuit=circuit,
@@ -1299,8 +1311,8 @@ def _run_cmx():
                 base_noise_cfg=base_noise_cme,
                 shot_cfg=shot_cfg_key,
                 readout_cal=readout_cal_cme,
-                cdr_cfg=cdr_cfg_cme,
-                simulator_seed=_sim_seed,
+                cdr_cfg=cdr_cfg_key,
+                simulator_seed=simulator_seed_key,
             )
             result = {
                 "unmit": float(mit["unmit_target"]),
@@ -1311,6 +1323,9 @@ def _run_cmx():
                 "noiseless": float(
                     np.real(pauli_sums[key].expectation_from_state_vector(_psi_noiseless, qubit_map=_qubit_map))
                 ),
+                "sampling_seed": int(sampling_seed_key),
+                "cdr_seed": int(cdr_seed_key),
+                "simulator_seed": int(simulator_seed_key),
             }
             print(
                 f"<{key:<2}>  shots={int(num_shots):>8d}  "
@@ -1322,11 +1337,6 @@ def _run_cmx():
             return result
 
 
-        # 4) Measure <H> ONCE with the CDR+REM pipeline (its shot budget is fixed and does
-        #    not depend on the <H^2>/<H^3> shot-multiplier sweep below).
-        moments = {"H": _measure_moment("H", CME_H_NUM_SHOTS)}
-
-
         # 5) Connected moment expansion (k=3).
         def _cme_k3(h1: float, h2: float, h3: float):
             c1 = h1
@@ -1336,21 +1346,115 @@ def _run_cmx():
             return e, c1, c2, c3
 
 
+        def _cme_k3_gradient(a: float, b: float, c: float) -> np.ndarray:
+            """Analytic gradient of E=a-(b-a^2)^2/(c-3ab+2a^3)."""
+            s21 = b - a ** 2
+            s31 = c - 3.0 * a * b + 2.0 * a ** 3
+            if abs(s31) < 1e-12:
+                return np.full(3, np.nan, dtype=float)
+            return np.array(
+                [
+                    1.0 + 4.0 * a * s21 / s31
+                    + s21 ** 2 * (-3.0 * b + 6.0 * a ** 2) / s31 ** 2,
+                    -2.0 * s21 / s31 - 3.0 * a * s21 ** 2 / s31 ** 2,
+                    s21 ** 2 / s31 ** 2,
+                ],
+                dtype=float,
+            )
+
+
+        def _validate_cme_k3_gradient_numerically() -> None:
+            x = np.array([0.4, 1.2, 2.0], dtype=float)
+            analytic = _cme_k3_gradient(*x)
+            numeric = np.empty(3, dtype=float)
+            for i in range(3):
+                step = 1e-6 * max(1.0, abs(float(x[i])))
+                xp, xm = x.copy(), x.copy()
+                xp[i] += step
+                xm[i] -= step
+                numeric[i] = (_cme_k3(*xp)[0] - _cme_k3(*xm)[0]) / (2.0 * step)
+            if not np.allclose(analytic, numeric, rtol=2e-6, atol=2e-7):
+                raise RuntimeError(
+                    f"CMX gradient check failed: analytic={analytic}, finite_difference={numeric}"
+                )
+            print(
+                "[CMX] analytic derivatives passed the finite-difference check "
+                f"(max |delta|={np.max(np.abs(analytic - numeric)):.3e})."
+            )
+
+
+        def _cme_k3_with_variance(a, b, c, var_a, var_b, var_c):
+            energy, c1, c2, c3 = _cme_k3(a, b, c)
+            gradient = _cme_k3_gradient(a, b, c)
+            variance = max(
+                float(np.sum(gradient ** 2 * np.array([var_a, var_b, var_c], dtype=float))),
+                0.0,
+            )
+            return energy, c1, c2, c3, variance, float(np.sqrt(variance)), gradient
+
+
+        _validate_cme_k3_gradient_numerically()
         e_ref = float(globals().get("e_gs", np.linalg.eigvalsh(pauli_sum.matrix(qubits=qubits))[0].real))
 
         # 6) Sweep the <H^2>/<H^3> shot budget over CME_SHOT_MULTIPLIERS x CME_H_NUM_SHOTS,
-        #    remeasuring <H^2> and <H^3> and rerunning the CME(k=3) formula at each
-        #    multiplier (the <H> moment measured above is reused unchanged throughout).
+        #    independently remeasuring all moments and rerunning CME(k=3). <H>
+        #    keeps its fixed base shot budget while <H^2>/<H^3> use the multiplier.
         cme_results_by_multiplier = {}
         for mult in CME_SHOT_MULTIPLIERS:
             h2_h3_shots = int(mult * CME_H_NUM_SHOTS)
-            print(f"\n--- <H^2>, <H^3> shots = {mult}x CME_H_NUM_SHOTS = {h2_h3_shots} ---")
-            moments["H2"] = _measure_moment("H2", h2_h3_shots)
-            moments["H3"] = _measure_moment("H3", h2_h3_shots)
+            print(
+                f"\n--- H shots/repeat={CME_H_NUM_SHOTS}, H2/H3 shots/repeat={h2_h3_shots}; "
+                f"independent repeats={CME_VARIANCE_REPEATS} ---"
+            )
+            moment_replicates = {key: [] for key in ("H", "H2", "H3")}
+            for rep in range(CME_VARIANCE_REPEATS):
+                print(f"[CMX] variance repeat {rep + 1}/{CME_VARIANCE_REPEATS}")
+                moment_replicates["H"].append(_measure_moment("H", CME_H_NUM_SHOTS))
+                moment_replicates["H2"].append(_measure_moment("H2", h2_h3_shots))
+                moment_replicates["H3"].append(_measure_moment("H3", h2_h3_shots))
+            moment_arrays = {
+                key: np.asarray(
+                    [result[CME_MOMENT_SOURCE] for result in moment_replicates[key]], dtype=float
+                )
+                for key in ("H", "H2", "H3")
+            }
+            moments = {
+                key: {
+                    value_key: float(np.mean([r[value_key] for r in moment_replicates[key]]))
+                    for value_key in ("unmit", "rem", "cdr_unmit", "cdr_rem", "exact", "noiseless")
+                }
+                for key in ("H", "H2", "H3")
+            }
+            for key in ("H", "H2", "H3"):
+                moments[key]["replicates"] = [dict(r) for r in moment_replicates[key]]
+                moments[key]["sample_variance"] = float(np.var(moment_arrays[key], ddof=1))
+                moments[key]["mean_variance"] = float(
+                    moments[key]["sample_variance"] / CME_VARIANCE_REPEATS
+                )
             shots = {"H": CME_H_NUM_SHOTS, "H2": h2_h3_shots, "H3": h2_h3_shots}
 
             src = {k: moments[k][CME_MOMENT_SOURCE] for k in ("H", "H2", "H3")}
-            E_cme, C1, C2, C3 = _cme_k3(src["H"], src["H2"], src["H3"])
+            E_cme, C1, C2, C3, E_cme_variance, E_cme_sigma, E_cme_gradient = _cme_k3_with_variance(
+                src["H"], src["H2"], src["H3"],
+                moments["H"]["mean_variance"],
+                moments["H2"]["mean_variance"],
+                moments["H3"]["mean_variance"],
+            )
+            E_cme_minus_1sigma = float(E_cme - E_cme_sigma)
+            E_cme_minus_2sigma = float(E_cme - 2.0 * E_cme_sigma)
+            E_cme_replicates = np.asarray(
+                [
+                    _cme_k3(moment_arrays["H"][i], moment_arrays["H2"][i], moment_arrays["H3"][i])[0]
+                    for i in range(CME_VARIANCE_REPEATS)
+                ],
+                dtype=float,
+            )
+            finite_replicates = E_cme_replicates[np.isfinite(E_cme_replicates)]
+            E_cme_empirical_variance = (
+                float(np.var(finite_replicates, ddof=1) / finite_replicates.size)
+                if finite_replicates.size >= 2 else float("nan")
+            )
+            E_cme_empirical_sigma = float(np.sqrt(E_cme_empirical_variance))
             E_cme_exact, _, _, _ = _cme_k3(moments["H"]["exact"], moments["H2"]["exact"], moments["H3"]["exact"])
             E_cme_noiseless, _, _, _ = _cme_k3(
                 moments["H"]["noiseless"], moments["H2"]["noiseless"], moments["H3"]["noiseless"]
@@ -1370,6 +1474,11 @@ def _run_cmx():
                 )
             )
             print(f"E_CME(k=3) [shots/{CME_MOMENT_SOURCE}]      = {E_cme:.10f} Eh")
+            print(f"Var[E_CME] (Eq. 73 propagation)             = {E_cme_variance:.6e} Eh^2")
+            print(f"sigma[E_CME]                                = {E_cme_sigma:.6e} Eh")
+            print(f"E_CME - 1 sigma                             = {E_cme_minus_1sigma:.10f} Eh")
+            print(f"E_CME - 2 sigma                             = {E_cme_minus_2sigma:.10f} Eh")
+            print(f"empirical sigma of replicated CMX mean      = {E_cme_empirical_sigma:.6e} Eh")
             print(f"E_CME(k=3) [noiseless moments] = {E_cme_noiseless:.10f} Eh")
             print(f"E_CME(k=3) [exact Tr moments]  = {E_cme_exact:.10f} Eh")
             print(f"true ground-state energy e_gs  = {e_ref:.10f} Eh")
@@ -1384,11 +1493,20 @@ def _run_cmx():
                 "moments": {k: dict(v) for k, v in moments.items()},
                 "connected_moments": {"c1": float(C1), "c2": float(C2), "c3": float(C3)},
                 "E_cme_shots": float(E_cme),
+                "E_cme_variance": float(E_cme_variance),
+                "E_cme_sigma": float(E_cme_sigma),
+                "E_cme_minus_1sigma": float(E_cme_minus_1sigma),
+                "E_cme_minus_2sigma": float(E_cme_minus_2sigma),
+                "E_cme_gradient": np.asarray(E_cme_gradient, dtype=float),
+                "E_cme_replicates": E_cme_replicates,
+                "E_cme_empirical_variance": float(E_cme_empirical_variance),
+                "E_cme_empirical_sigma": float(E_cme_empirical_sigma),
                 "E_cme_noiseless": float(E_cme_noiseless),
                 "E_cme_exact": float(E_cme_exact),
                 "e_gs": float(e_ref),
                 "moment_source": CME_MOMENT_SOURCE,
                 "h2_h3_shot_multiplier": mult,
+                "variance_repeats": int(CME_VARIANCE_REPEATS),
             }
 
         print("\n=== CME(k=3) summary across <H^2>/<H^3> shot multipliers ===")
@@ -1396,7 +1514,10 @@ def _run_cmx():
             r = cme_results_by_multiplier[mult]
             print(
                 f"{mult:>3d}x (shots={r['shots']['H2']:>8d})  "
-                f"E_CME={r['E_cme_shots']:.10f} Eh  |E_CME - e_gs|={abs(r['E_cme_shots'] - e_ref):.6e} Eh"
+                f"E_CME={r['E_cme_shots']:.10f} +/- {r['E_cme_sigma']:.3e} Eh  "
+                f"E-1sigma={r['E_cme_minus_1sigma']:.10f}  "
+                f"E-2sigma={r['E_cme_minus_2sigma']:.10f}  "
+                f"|E_CME - e_gs|={abs(r['E_cme_shots'] - e_ref):.6e} Eh"
             )
 
         # Backward-compatible alias for cells expecting a single ``cme_results`` dict:
