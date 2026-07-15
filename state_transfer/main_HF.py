@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Cloud-runnable export generated from June_main/main_HF.ipynb.
 
-Run from this directory, for example: python main_HF.py
-Results are written under data/HF_bond_2.0/.
+Run from this directory, for example:
+  HF_BOND_LENGTH=1.2 GLOBAL_NUM_SHOTS=81920 python main_HF.py
+Results are written under data/HF_bond_<bond>_shots_<shots>/.
 """
 from __future__ import annotations
 
@@ -1175,6 +1176,7 @@ _saved_vqe_paths = save_checkpoint(
     data_dir=Path("data"),
     molecule=MOLECULE,
     bond_length=float(bond_length),
+    num_shots=int(GLOBAL_NUM_SHOTS),
     stage="vqe",
     vqe_results=vqe_results,
     metadata={
@@ -1650,6 +1652,7 @@ _saved_final_paths = save_checkpoint(
     data_dir=Path("data"),
     molecule=MOLECULE,
     bond_length=float(bond_length),
+    num_shots=int(GLOBAL_NUM_SHOTS),
     stage="final",
     vqe_results=globals().get("vqe_results"),
     cme_results=globals().get("cme_results"),

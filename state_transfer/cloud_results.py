@@ -46,22 +46,35 @@ def save_checkpoint(
     cme_results: Any | None = None,
     cme_results_by_multiplier: Any | None = None,
     metadata: dict[str, Any] | None = None,
+    num_shots: int | None = None,
 ) -> dict[str, str]:
     """Save cloud-run artifacts in JSON plus pickle form.
 
     JSON is convenient for plotting and quick inspection; pickle preserves numpy
     arrays and any nested objects that JSON conversion simplifies.
+
+    Output directory: ``{molecule}_bond_{bond}_shots_{shots}`` when ``num_shots``
+    is provided (or present in ``metadata``); otherwise ``{molecule}_bond_{bond}``.
     """
+    meta = metadata or {}
+    if num_shots is None and "num_shots" in meta:
+        num_shots = int(meta["num_shots"])
+
     root = Path(data_dir)
-    run_dir = root / f"{molecule}_bond_{float(bond_length):.1f}"
+    bond_token = f"{float(bond_length):.1f}"
+    if num_shots is not None:
+        run_dir = root / f"{molecule}_bond_{bond_token}_shots_{int(num_shots)}"
+    else:
+        run_dir = root / f"{molecule}_bond_{bond_token}"
     run_dir.mkdir(parents=True, exist_ok=True)
 
     summary = {
         "created_utc": datetime.now(timezone.utc).isoformat(),
         "molecule": molecule,
         "bond_length": float(bond_length),
+        "num_shots": int(num_shots) if num_shots is not None else None,
         "stage": stage,
-        "metadata": metadata or {},
+        "metadata": meta,
         "has_vqe_results": vqe_results is not None,
         "has_cme_results": cme_results is not None,
         "has_cme_results_by_multiplier": cme_results_by_multiplier is not None,

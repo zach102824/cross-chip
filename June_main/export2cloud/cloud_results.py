@@ -46,20 +46,32 @@ def save_checkpoint(
     cme_results: Any | None = None,
     cme_results_by_multiplier: Any | None = None,
     metadata: dict[str, Any] | None = None,
+    num_shots: int | None = None,
 ) -> dict[str, str]:
     """Save cloud-run artifacts in JSON plus pickle form.
 
     JSON is convenient for plotting and quick inspection; pickle preserves numpy
     arrays and any nested objects that JSON conversion simplifies.
+
+    Layout when ``num_shots`` is set (preferred for new runs)::
+
+        data/shots_<N>/<molecule>_bond_<R>/
+
+    Without ``num_shots``, keeps the legacy layout ``data/<molecule>_bond_<R>/``.
     """
     root = Path(data_dir)
-    run_dir = root / f"{molecule}_bond_{float(bond_length):.1f}"
+    bond_dir = f"{molecule}_bond_{float(bond_length):.1f}"
+    if num_shots is not None:
+        run_dir = root / f"shots_{int(num_shots)}" / bond_dir
+    else:
+        run_dir = root / bond_dir
     run_dir.mkdir(parents=True, exist_ok=True)
 
     summary = {
         "created_utc": datetime.now(timezone.utc).isoformat(),
         "molecule": molecule,
         "bond_length": float(bond_length),
+        "num_shots": int(num_shots) if num_shots is not None else None,
         "stage": stage,
         "metadata": metadata or {},
         "has_vqe_results": vqe_results is not None,
