@@ -1,12 +1,102 @@
 from __future__ import annotations
 
 import json
+import os
 import pickle
+import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
 import numpy as np
+
+
+def _run_dir(
+    data_dir: str | Path,
+    molecule: str,
+    bond_length: float,
+    num_shots: int | None = None,
+) -> Path:
+    root = Path(data_dir)
+    bond_dir = f"{molecule}_bond_{float(bond_length):.1f}"
+    if num_shots is not None:
+        return root / f"shots_{int(num_shots)}" / bond_dir
+    return root / bond_dir
+
+
+def _atomic_pickle(path: Path, payload: Any) -> None:
+    """Write pickle via a same-directory temp file, then replace."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fd, tmp_name = tempfile.mkstemp(prefix=f".{path.name}.", suffix=".tmp", dir=path.parent)
+    try:
+        with os.fdopen(fd, "wb") as handle:
+            pickle.dump(payload, handle, protocol=pickle.HIGHEST_PROTOCOL)
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(tmp_name, path)
+    except Exception:
+        try:
+            os.unlink(tmp_name)
+        except OSError:
+            pass
+        raise
+
+
+def save_vqe_progress(
+    *,
+    data_dir: str | Path,
+    molecule: str,
+    bond_length: float,
+    payload: dict[str, Any],
+    num_shots: int | None = None,
+) -> Path:
+    """Persist mid-VQE state so a stopped run can resume from the next iteration."""
+    run_dir = _run_dir(data_dir, molecule, bond_length, num_shots=num_shots)
+    path = run_dir / "vqe_progress.pkl"
+    body = dict(payload)
+    body["saved_utc"] = datetime.now(timezone.utc).isoformat()
+    body["molecule"] = molecule
+    body["bond_length"] = float(bond_length)
+    if num_shots is not None:
+        body["num_shots"] = int(num_shots)
+    _atomic_pickle(path, body)
+    # Small JSON sidecar for quick inspection (thetas / timings only).
+    sidecar = {
+        "saved_utc": body["saved_utc"],
+        "molecule": molecule,
+        "bond_length": float(bond_length),
+        "completed_iters": int(body.get("completed_iters", 0)),
+        "max_iters": int(body.get("max_iters", 0)),
+        "theta": _jsonable(body.get("theta")),
+        "best_theta": _jsonable(body.get("best_theta")),
+        "best_E": _jsonable(body.get("best_E")),
+        "prev_E": _jsonable(body.get("prev_E")),
+        "iteration_timings": _jsonable(body.get("iteration_timings", [])),
+    }
+    _dump_json(run_dir / "vqe_progress.json", sidecar)
+    print(
+        f"[cloud-results] saved VQE progress "
+        f"(completed_iters={sidecar['completed_iters']}/{sidecar['max_iters']}) under {run_dir}"
+    )
+    return path
+
+
+def load_vqe_progress(
+    *,
+    data_dir: str | Path,
+    molecule: str,
+    bond_length: float,
+    num_shots: int | None = None,
+) -> dict[str, Any] | None:
+    """Load mid-VQE checkpoint if present; otherwise return None."""
+    path = _run_dir(data_dir, molecule, bond_length, num_shots=num_shots) / "vqe_progress.pkl"
+    if not path.is_file():
+        return None
+    with path.open("rb") as handle:
+        payload = pickle.load(handle)
+    if not isinstance(payload, dict):
+        return None
+    return payload
 
 
 def _jsonable(value: Any) -> Any:
