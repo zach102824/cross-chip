@@ -10,6 +10,12 @@ and saves one numbered Pauli Hamiltonian per bond under ``Pauli_Ham``:
 with ``I=0, X=1, Y=2, Z=3``.  Qubits are exported in spin-block order:
 
     [alpha spatial orbitals..., beta spatial orbitals...]
+
+For Cl2 and Br2 the active orbitals are symmetry-pinned (same method as
+``UCCSD_Mole/Cl2.ipynb`` / ``Br2.ipynb``): the occupied MO columns are reordered
+so each active-space slot holds the same physical orbital (fixed irrep, fixed
+slot order) at every bond length, instead of whatever the canonical energy
+ordering happens to put there.
 """
 
 from __future__ import annotations
@@ -25,6 +31,7 @@ from openfermion.chem import MolecularData
 from openfermion.linalg import get_sparse_operator
 from openfermion.transforms import get_fermion_operator, jordan_wigner
 from openfermionpyscf import run_pyscf
+from pyscf import ao2mo, gto, scf, symm
 from scipy.sparse.linalg import eigsh
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -42,6 +49,9 @@ class MoleculePreset:
     basis: str = "sto-3g"
     charge: int = 0
     multiplicity: int = 1
+    # Irrep labels (fixed slot order) pinning the ACTIVE OCCUPIED orbitals.
+    # None -> plain canonical (energy-ordered) orbitals.  See symmetry_pinned_mo_coeff.
+    pinned_occ_irreps: tuple[str, ...] | None = None
 
 
 def _diatomic(symbol_a: str, symbol_b: str) -> GeometryFactory:
@@ -64,17 +74,27 @@ def _grid(start: float, stop: float, step: float) -> tuple[float, ...]:
 
 
 MOLECULE_PRESETS: dict[str, MoleculePreset] = {
-    "HF": MoleculePreset("HF", (6, 4), _diatomic("H", "F"), _grid(1.0, 2.2, 0.2)),
-    # Canonical HF orbitals (needed for downstream UCCSD).  The 2.0 A point is
-    # skipped because the 5-orbital active space splits a sigma/pi near-degeneracy
-    # there, producing an artificially small HF-GS gap.
+    "HF": MoleculePreset("HF", (6, 4), _diatomic("H", "F"), _grid(0.4, 2.2, 0.2)),
+    # Cl2/Br2 use symmetry-pinned active orbitals (matching UCCSD_Mole/Cl2.ipynb
+    # and Br2.ipynb): the canonical MO energy ordering reshuffles with bond
+    # length, so an energy-windowed active space silently swaps orbitals along
+    # the scan.  Pinning by irrep keeps every active-space slot on the same
+    # physical orbital at every bond length.  This also fixes the sigma/pi
+    # near-degeneracy problem that previously forced skipping Cl2 at 2.0 A.
     "Cl2": MoleculePreset(
         "Cl2",
         (8, 5),
         _diatomic("Cl", "Cl"),
-        tuple(b for b in _grid(1.0, 3.0, 0.2) if abs(b - 2.0) > 1e-9),
+        _grid(1.0, 4.0, 0.2),
+        pinned_occ_irreps=("A1u", "A1g", "E1gx", "E1gy"),
     ),
-    "Br2": MoleculePreset("Br2", (10, 6), _diatomic("Br", "Br"), _grid(1.9, 4.1, 0.2)),
+    "Br2": MoleculePreset(
+        "Br2",
+        (10, 6),
+        _diatomic("Br", "Br"),
+        _grid(1.9, 4.1, 0.2),
+        pinned_occ_irreps=("A1g", "E1uy", "E1ux", "E1gx", "E1gy"),
+    ),
 }
 
 def bond_token(bond: float) -> str:
@@ -138,6 +158,65 @@ def active_indices_from_tencirchem_choice(
     return list(range(inactive_occ)), list(range(active_start, active_stop))
 
 
+def symmetry_pinned_mo_coeff(preset: MoleculePreset, bond: float, basis: str | None = None) -> np.ndarray:
+    """RHF MO coefficients with the active occupied orbitals pinned by symmetry.
+
+    Same method as ``symmetry_pinned_mo`` in UCCSD_Mole/Cl2.ipynb and Br2.ipynb:
+    run RHF with ``symmetry=True``, label MOs by irrep, then reorder the occupied
+    columns so the last ``len(preset.pinned_occ_irreps)`` occupied slots always
+    hold the highest-energy occupied orbital of each pinned irrep, in the fixed
+    order given by ``preset.pinned_occ_irreps``.  The returned coefficients are
+    used on a symmetry-disabled molecule (identical AO basis).
+    """
+    if preset.pinned_occ_irreps is None:
+        raise ValueError(f"Preset {preset.name} does not define pinned_occ_irreps.")
+    if len(preset.pinned_occ_irreps) != preset.active_space[0] // 2:
+        raise ValueError(
+            f"Preset {preset.name}: {len(preset.pinned_occ_irreps)} pinned irreps "
+            f"but active space has {preset.active_space[0] // 2} occupied orbitals."
+        )
+
+    atom = [[s, *coords] for s, coords in preset.geometry_factory(bond)]
+    mol_s = gto.M(
+        atom=atom,
+        basis=basis or preset.basis,
+        unit="Angstrom",
+        charge=preset.charge,
+        spin=preset.multiplicity - 1,
+        symmetry=True,
+    )
+    mf = scf.RHF(mol_s)
+    mf.verbose = 0
+    mf.kernel()
+    if not mf.converged:
+        raise RuntimeError(f"RHF (symmetry=True) did not converge for {preset.name} at {bond} A.")
+    labels = symm.label_orb_symm(mol_s, mol_s.irrep_name, mol_s.symm_orb, mf.mo_coeff)
+    nocc = mol_s.nelectron // 2
+    occ = list(range(nocc))
+
+    def highest(lbl: str) -> int:
+        candidates = [i for i in occ if labels[i] == lbl]
+        if not candidates:
+            raise ValueError(f"No occupied orbital with irrep {lbl} for {preset.name} at {bond} A.")
+        return max(candidates, key=lambda i: mf.mo_energy[i])
+
+    sel = [highest(lbl) for lbl in preset.pinned_occ_irreps]
+    rest = [i for i in occ if i not in sel]
+    order = rest + sel + list(range(nocc, mf.mo_coeff.shape[1]))
+    return mf.mo_coeff[:, order]
+
+
+def _integrals_from_mo_coeff(pyscf_mol, pyscf_scf, mo_coeff: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    """One- and two-body MO integrals in the OpenFermion convention for given orbitals."""
+
+    n_orbitals = mo_coeff.shape[1]
+    one_body = (mo_coeff.T @ pyscf_scf.get_hcore() @ mo_coeff).astype(float)
+    eri = ao2mo.restore(1, ao2mo.kernel(pyscf_mol, mo_coeff), n_orbitals)
+    # OpenFermion PQRS convention: h[p,q,r,s] = (ps|qr)
+    two_body = np.asarray(eri.transpose(0, 2, 3, 1), order="C")
+    return one_body, two_body
+
+
 def build_molecular_hamiltonian(
     molecule_name: str,
     bond: float,
@@ -161,6 +240,19 @@ def build_molecular_hamiltonian(
         run_fci=False,
         verbose=False,
     )
+
+    if preset.pinned_occ_irreps is not None:
+        # Replace the canonical-orbital integrals with symmetry-pinned ones so the
+        # exported Hamiltonian matches the UCCSD_Mole notebooks at every bond length.
+        pinned_mo = symmetry_pinned_mo_coeff(preset, bond, basis)
+        one_body, two_body = _integrals_from_mo_coeff(
+            molecule._pyscf_data["mol"], molecule._pyscf_data["scf"], pinned_mo
+        )
+        # PyscfMolecularData exposes these as read-only properties backed by
+        # private caches; overwrite the caches directly.
+        molecule._canonical_orbitals = pinned_mo
+        molecule._one_body_integrals = one_body
+        molecule._two_body_integrals = two_body
 
     occupied_indices, active_indices = active_indices_from_tencirchem_choice(
         total_electrons=int(molecule.n_electrons),
@@ -187,6 +279,11 @@ def build_molecular_hamiltonian(
         "active_indices": active_indices,
         "n_qubits": 2 * preset.active_space[1],
         "n_terms": len(qubit_hamiltonian.terms),
+        "orbital_selection": (
+            "canonical"
+            if preset.pinned_occ_irreps is None
+            else f"symmetry_pinned:{','.join(preset.pinned_occ_irreps)}"
+        ),
         "rhf_energy": float(molecule.hf_energy),
         "export_qubit_layout": "[alpha spatial orbitals..., beta spatial orbitals...]",
         "openfermion_spin_orb_to_export_qubit": index_map,
