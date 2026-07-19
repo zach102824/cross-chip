@@ -97,19 +97,26 @@ CASES = {
     ),
     "Br2": dict(
         num_qubits=12, n_electrons=10,
-        doubles=[(5, 11, 6, 0), (5, 11, 10, 4), (5, 11, 9, 3), (5, 11, 8, 2)],
+        # 5 doubles: the 4 MP2-selected ones PLUS (5,11,7,1), the next paired
+        # double, so that spatial orbital 1 (logical q1/q7) participates and
+        # ALL 12 qubits carry gates.  theta4 = 0 recovers the 4-double ansatz,
+        # so the variational floor can only improve.
+        doubles=[(5, 11, 6, 0), (5, 11, 10, 4), (5, 11, 9, 3), (5, 11, 8, 2),
+                 (5, 11, 7, 1)],
         # hub (5,11) on bridge (7,9).  t0 (the 3-chip string!) becomes FULLY
         # frozen -- Y0 X5 | X6 X11 attaches directly to the hubs via the
         # square qubits 8 / 12.  t1 has no tail; t2 keeps Z4/Z10; t3 keeps
-        # Z3,Z4/Z9,Z10 (chains along 4-5-6-7 and 13-11-10-9).
-        # Spatial orbital 1 (logical 1,7) is a pure spectator -> idle qubits.
+        # Z3,Z4/Z9,Z10 (chains along 4-5-6-7 and 13-11-10-9).  t4 (the new
+        # double) keeps its full tail: its couriers ARE the chain qubits
+        # 1-2-3-4-5 / 7-8-9-10-11, so nothing to freeze.
         frozen=["YIIIIXXIIIIX",      # t0: fully frozen
                 "IIIIYXIIIIXX",      # t1: no tail anyway
                 "IIIYZXIIIXZX",      # t2: Z4/Z10 kept as couriers
-                "IIYZZXIIXZZX"],     # t3: Z3,Z4/Z9,Z10 kept as couriers
+                "IIYZZXIIXZZX",      # t3: Z3,Z4/Z9,Z10 kept as couriers
+                "IYZZZXIXZZZX"],     # t4: new double, full tail = couriers
         hub0=5,
-        placement={0: 8, 1: 1, 2: 4, 3: 5, 4: 6, 5: 7,
-                   6: 12, 7: 2, 8: 13, 9: 11, 10: 10, 11: 9},
+        placement={0: 8, 1: 3, 2: 4, 3: 5, 4: 6, 5: 7,
+                   6: 12, 7: 14, 8: 13, 9: 11, 10: 10, 11: 9},
         baseline="Br2_12q_4doubles_rzx.json",
     ),
 }
