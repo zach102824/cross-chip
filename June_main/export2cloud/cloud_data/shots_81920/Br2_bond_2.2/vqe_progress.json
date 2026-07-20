@@ -1,0 +1,28 @@
+{
+  "best_E": -5089.314709027119,
+  "best_theta": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+  ],
+  "bond_length": 2.2,
+  "completed_iters": 0,
+  "iteration_timings": [
+    {
+      "iter": 0,
+      "stage": "init",
+      "wall_s": 25728.32710610889
+    }
+  ],
+  "max_iters": 15,
+  "molecule": "Br2",
+  "prev_E": -5089.314709027119,
+  "saved_utc": "2026-07-17T23:29:12.081878+00:00",
+  "theta": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+  ]
+}

@@ -30,6 +30,10 @@ _ORIGINAL_TRAIN_CF = None
 
 def _ensure_shared_modules_importable() -> None:
     export_dir = Path(__file__).resolve().parent
+    # export2cloud first so trajectory_sampling / parallel_* imports resolve.
+    export_value = str(export_dir)
+    if export_value not in sys.path:
+        sys.path.insert(0, export_value)
     candidates = (export_dir / "June_main", export_dir.parent, export_dir)
     for candidate in candidates:
         if (candidate / "shot_measurement.py").is_file():
@@ -115,17 +119,13 @@ def _evaluate_training_resolver(task: tuple[int, dict]) -> tuple[int, np.ndarray
         dtype=float,
     )
 
-    rho = sm._simulate_noisy_rho_for_resolver(
+    estimate = sm.estimate_noisy_shots_for_resolver(
         circuit,
         resolver,
+        observable_h,
         qubits,
         ctx["noise_params"],
         simulator_seed=ctx["simulator_seed"],
-    )
-    estimate = sm.estimate_energy_from_noisy_rho_shots(
-        rho,
-        observable_h,
-        qubits,
         num_shots=ctx["num_shots"],
         measurement_scheme=ctx["measurement_scheme"],
         p_0_success=ctx["p_0_success"],

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import sys
 from pathlib import Path
 from typing import Any, Iterable
@@ -592,6 +593,90 @@ def _simulate_noisy_rho_for_resolver(
     return _sanitize_rho(rho)
 
 
+def noisy_sim_backend() -> str:
+    """Return ``density_matrix`` (default) or ``trajectory``."""
+    value = str(os.environ.get("NOISY_SIM_BACKEND", "density_matrix")).strip().lower()
+    if value in ("trajectory", "traj", "mc", "monte_carlo"):
+        return "trajectory"
+    if value in ("density_matrix", "dm", "rho"):
+        return "density_matrix"
+    raise ValueError(
+        f"Unknown NOISY_SIM_BACKEND={value!r}. Expected 'density_matrix' or 'trajectory'."
+    )
+
+
+def estimate_noisy_shots_for_resolver(
+    ansatz_circuit: cirq.Circuit,
+    resolver: dict,
+    observable_h: cirq.PauliSum,
+    qubits: list[cirq.Qid],
+    noise_params: dict,
+    *,
+    simulator_seed: int = 1234,
+    num_shots: int = 8192,
+    measurement_scheme: str = "ogm",
+    p_0_success: Iterable[float] | None = None,
+    p_1_success: Iterable[float] | None = None,
+    apply_rem: bool = True,
+    apply_readout_noise: bool = True,
+    sampling_seed: int = 1234,
+    epsilon: float = 0.1,
+    ogm_file: str | Path | None = None,
+    shadowgrouping_root: str | Path | None = None,
+    return_per_term: bool = False,
+) -> dict[str, Any]:
+    """Dispatch noisy shot estimation to DM or trajectory backend."""
+    if noisy_sim_backend() == "trajectory":
+        # Prefer export2cloud/trajectory_sampling.py when present on sys.path.
+        _export_dir = Path(__file__).resolve().parents[1]
+        _export_value = str(_export_dir)
+        if _export_value not in sys.path:
+            sys.path.insert(0, _export_value)
+        from trajectory_sampling import estimate_energy_from_noisy_circuit_shots
+
+        return estimate_energy_from_noisy_circuit_shots(
+            ansatz_circuit,
+            resolver,
+            observable_h,
+            qubits,
+            noise_params,
+            simulator_seed=simulator_seed,
+            num_shots=num_shots,
+            measurement_scheme=measurement_scheme,
+            p_0_success=p_0_success,
+            p_1_success=p_1_success,
+            apply_rem=apply_rem,
+            apply_readout_noise=apply_readout_noise,
+            sampling_seed=sampling_seed,
+            epsilon=epsilon,
+            ogm_file=ogm_file,
+            shadowgrouping_root=shadowgrouping_root,
+            return_per_term=return_per_term,
+        )
+
+    rho = _simulate_noisy_rho_for_resolver(
+        ansatz_circuit, resolver, qubits, noise_params, simulator_seed=simulator_seed
+    )
+    out = estimate_energy_from_noisy_rho_shots(
+        rho,
+        observable_h,
+        qubits,
+        num_shots=num_shots,
+        measurement_scheme=measurement_scheme,
+        p_0_success=p_0_success,
+        p_1_success=p_1_success,
+        apply_rem=apply_rem,
+        apply_readout_noise=apply_readout_noise,
+        sampling_seed=sampling_seed,
+        epsilon=epsilon,
+        ogm_file=ogm_file,
+        shadowgrouping_root=shadowgrouping_root,
+        return_per_term=return_per_term,
+    )
+    out["noisy_backend"] = "density_matrix"
+    return out
+
+
 def _simulate_noiseless_state_for_resolver(
     ansatz_circuit: cirq.Circuit,
     resolver: dict,
@@ -650,14 +735,13 @@ def train_cdr_models(
         )
         exact_energy = float(np.vdot(state, h_matrix @ state).real)
 
-        rho = _simulate_noisy_rho_for_resolver(
-            ansatz_circuit, resolver, qubits, noise_params, simulator_seed=simulator_seed
-        )
-
-        est = estimate_energy_from_noisy_rho_shots(
-            rho,
+        est = estimate_noisy_shots_for_resolver(
+            ansatz_circuit,
+            resolver,
             observable_h,
             qubits,
+            noise_params,
+            simulator_seed=simulator_seed,
             num_shots=num_shots,
             measurement_scheme=measurement_scheme,
             p_0_success=p_0_success,
@@ -764,13 +848,13 @@ def train_cf_models_per_pauli(
             tex_exact[i, k] = exact_pauli_expectation_from_int_row(
                 state, observables_int[k], qubits
             )
-        rho = _simulate_noisy_rho_for_resolver(
-            ansatz_circuit, resolver, qubits, noise_params, simulator_seed=simulator_seed
-        )
-        est = estimate_energy_from_noisy_rho_shots(
-            rho,
+        est = estimate_noisy_shots_for_resolver(
+            ansatz_circuit,
+            resolver,
             observable_h,
             qubits,
+            noise_params,
+            simulator_seed=simulator_seed,
             num_shots=num_shots,
             measurement_scheme=measurement_scheme,
             p_0_success=p_0_success,
@@ -959,13 +1043,13 @@ def _baseline_target_energies(
     shadowgrouping_root: str | Path | None,
     return_per_term: bool = False,
 ) -> dict[str, Any]:
-    rho = _simulate_noisy_rho_for_resolver(
-        ansatz_circuit, target_resolver, qubits, noise_params, simulator_seed=simulator_seed
-    )
-    est = estimate_energy_from_noisy_rho_shots(
-        rho,
+    est = estimate_noisy_shots_for_resolver(
+        ansatz_circuit,
+        target_resolver,
         observable_h,
         qubits,
+        noise_params,
+        simulator_seed=simulator_seed,
         num_shots=num_shots,
         measurement_scheme=measurement_scheme,
         p_0_success=p_0_success,
