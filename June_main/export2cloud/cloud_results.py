@@ -99,6 +99,69 @@ def load_vqe_progress(
     return payload
 
 
+def save_cmx_progress(
+    *,
+    data_dir: str | Path,
+    molecule: str,
+    bond_length: float,
+    payload: dict[str, Any],
+    num_shots: int | None = None,
+) -> Path:
+    """Persist mid-CMX state so a stopped run can resume at the next multiplier."""
+    run_dir = _run_dir(data_dir, molecule, bond_length, num_shots=num_shots)
+    path = run_dir / "cmx_progress.pkl"
+    body = dict(payload)
+    body["saved_utc"] = datetime.now(timezone.utc).isoformat()
+    body["molecule"] = molecule
+    body["bond_length"] = float(bond_length)
+    if num_shots is not None:
+        body["num_shots"] = int(num_shots)
+    by_mult = dict(body.get("cme_results_by_multiplier") or {})
+    completed = sorted(int(k) for k in by_mult.keys())
+    body["completed_multipliers"] = completed
+    _atomic_pickle(path, body)
+    sidecar = {
+        "saved_utc": body["saved_utc"],
+        "molecule": molecule,
+        "bond_length": float(bond_length),
+        "completed_multipliers": completed,
+        "pending_multipliers": [
+            int(m)
+            for m in body.get("CME_SHOT_MULTIPLIERS", [])
+            if int(m) not in set(completed)
+        ],
+        "CME_SHOT_MULTIPLIERS": _jsonable(body.get("CME_SHOT_MULTIPLIERS", [])),
+        "CME_H_NUM_SHOTS": _jsonable(body.get("CME_H_NUM_SHOTS")),
+        "CME_VARIANCE_REPEATS": _jsonable(body.get("CME_VARIANCE_REPEATS")),
+        "CME_MOMENT_SOURCE": body.get("CME_MOMENT_SOURCE"),
+        "circuit_name": body.get("circuit_name"),
+    }
+    _dump_json(run_dir / "cmx_progress.json", sidecar)
+    print(
+        f"[cloud-results] saved CMX progress "
+        f"(completed_multipliers={completed}) under {run_dir}"
+    )
+    return path
+
+
+def load_cmx_progress(
+    *,
+    data_dir: str | Path,
+    molecule: str,
+    bond_length: float,
+    num_shots: int | None = None,
+) -> dict[str, Any] | None:
+    """Load mid-CMX checkpoint if present; otherwise return None."""
+    path = _run_dir(data_dir, molecule, bond_length, num_shots=num_shots) / "cmx_progress.pkl"
+    if not path.is_file():
+        return None
+    with path.open("rb") as handle:
+        payload = pickle.load(handle)
+    if not isinstance(payload, dict):
+        return None
+    return payload
+
+
 def _jsonable(value: Any) -> Any:
     if isinstance(value, np.ndarray):
         return value.tolist()

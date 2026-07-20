@@ -13,7 +13,13 @@ from pathlib import Path
 os.environ.setdefault("MPLBACKEND", "Agg")
 os.chdir(Path(__file__).resolve().parent)
 
-from cloud_results import load_vqe_progress, save_checkpoint, save_vqe_progress
+from cloud_results import (
+    load_cmx_progress,
+    load_vqe_progress,
+    save_checkpoint,
+    save_cmx_progress,
+    save_vqe_progress,
+)
 
 
 # This cell is to read the circuit from the file 
@@ -1360,9 +1366,9 @@ def _run_cmx():
         # a single fixed shot count) so we can see how their shot budget affects the
         # CME(k=3) accuracy. Edit this list freely.
         CME_SHOT_MULTIPLIERS = [5, 10]
-        CME_VARIANCE_REPEATS = int(os.environ.get("CME_VARIANCE_REPEATS", "10"))
-        if CME_VARIANCE_REPEATS < 2:
-            raise ValueError("CME_VARIANCE_REPEATS must be at least 2 to estimate a variance.")
+        CME_VARIANCE_REPEATS = int(os.environ.get("CME_VARIANCE_REPEATS", "1"))
+        if CME_VARIANCE_REPEATS < 1:
+            raise ValueError("CME_VARIANCE_REPEATS must be at least 1.")
 
         # Which measured value feeds the CME formula, one of:
         #   "cdr_rem"   -> CDR + REM corrected (matches the VQE energy objective)
@@ -1374,11 +1380,69 @@ def _run_cmx():
         if "vqe_results" not in globals():
             raise RuntimeError("Run the VQE loop cell first (defines vqe_results).")
 
+        params_cmx = np.asarray(vqe_results["params_best"], dtype=float).reshape(n_params)
+
+        # Resume previously finished CMX multipliers when present.
+        _CMX_DATA_DIR = Path("data")
+        _CMX_RESUME = os.environ.get("CMX_RESUME", "1").strip().lower() not in {"0", "false", "no", "off"}
+        _cmx_ckpt = (
+            load_cmx_progress(
+                data_dir=_CMX_DATA_DIR,
+                molecule=MOLECULE,
+                bond_length=float(bond_length),
+                num_shots=int(globals().get("GLOBAL_NUM_SHOTS", GLOBAL_NUM_SHOTS)),
+            )
+            if _CMX_RESUME
+            else None
+        )
+        cme_results_by_multiplier = {}
+        if isinstance(_cmx_ckpt, dict):
+            try:
+                _cmx_ckpt_ok = (
+                    str(_cmx_ckpt.get("circuit_name", "")) == CIRCUIT_NAME
+                    and int(_cmx_ckpt.get("CME_H_NUM_SHOTS", -1)) == int(CME_H_NUM_SHOTS)
+                    and int(_cmx_ckpt.get("CME_VARIANCE_REPEATS", -1)) == int(CME_VARIANCE_REPEATS)
+                    and str(_cmx_ckpt.get("CME_MOMENT_SOURCE", "")) == str(CME_MOMENT_SOURCE)
+                    and [int(m) for m in _cmx_ckpt.get("CME_SHOT_MULTIPLIERS", [])] == [int(m) for m in CME_SHOT_MULTIPLIERS]
+                    and np.allclose(
+                        np.asarray(_cmx_ckpt.get("params_best"), dtype=float).reshape(-1),
+                        params_cmx,
+                    )
+                )
+            except Exception:
+                _cmx_ckpt_ok = False
+            if _cmx_ckpt_ok:
+                raw_by_mult = dict(_cmx_ckpt.get("cme_results_by_multiplier") or {})
+                cme_results_by_multiplier = {int(k): v for k, v in raw_by_mult.items()}
+                print(
+                    f"[CMX] resuming from checkpoint; completed multipliers="
+                    f"{sorted(cme_results_by_multiplier)}"
+                )
+            elif _cmx_ckpt is not None:
+                print("[CMX] ignoring incompatible CMX checkpoint; starting CMX fresh")
+
+        _pending_mults = [int(m) for m in CME_SHOT_MULTIPLIERS if int(m) not in cme_results_by_multiplier]
+        if not _pending_mults:
+            print("[CMX] all multipliers already checkpointed; skipping CMX measurements")
+            cme_results = cme_results_by_multiplier[int(CME_SHOT_MULTIPLIERS[-1])]
+            e_ref = float(cme_results.get("e_gs", globals().get("e_gs", float("nan"))))
+            print("\n=== CME(k=3) summary across <H^2>/<H^3> shot multipliers ===")
+            for mult in CME_SHOT_MULTIPLIERS:
+                r = cme_results_by_multiplier[int(mult)]
+                print(
+                    f"{int(mult):>3d}x (shots={r['shots']['H2']:>8d})  "
+                    f"E_CME={r['E_cme_shots']:.10f} +/- {r['E_cme_sigma']:.3e} Eh  "
+                    f"E-1sigma={r['E_cme_minus_1sigma']:.10f}  "
+                    f"E-2sigma={r['E_cme_minus_2sigma']:.10f}  "
+                    f"|E_CME - e_gs|={abs(r['E_cme_shots'] - e_ref):.6e} Eh"
+                )
+            return
+
         # 1) Rebuild the noisy density matrix from the lowest-energy VQE parameters
         #    (same noisy-ansatz + density-matrix recipe as cell ``21b206da``).
         random_seed = int(globals().get("random_seed", globals()["GLOBAL_RANDOM_SEED"]))
-        params_cmx = np.asarray(vqe_results["params_best"], dtype=float).reshape(n_params)
         print(f"[CMX] using VQE best params (E_best={float(vqe_results['E_best']):.10f} Eh)")
+        print(f"[CMX] pending multipliers={_pending_mults}")
 
         gate_noise = GateArityDepolarizingNoise(
             two_qubit_depol_prob=TWO_QUBIT_GATE_DEPOL_PROB,
@@ -1585,8 +1649,47 @@ def _run_cmx():
         # 6) Sweep the <H^2>/<H^3> shot budget over CME_SHOT_MULTIPLIERS x CME_H_NUM_SHOTS,
         #    independently remeasuring all moments and rerunning CME(k=3). <H>
         #    keeps its fixed base shot budget while <H^2>/<H^3> use the multiplier.
-        cme_results_by_multiplier = {}
+        #    Completed multipliers from cmx_progress.pkl are skipped.
+        def _save_cmx_checkpoint() -> None:
+            save_cmx_progress(
+                data_dir=_CMX_DATA_DIR,
+                molecule=MOLECULE,
+                bond_length=float(bond_length),
+                num_shots=int(globals().get("GLOBAL_NUM_SHOTS", GLOBAL_NUM_SHOTS)),
+                payload={
+                    "circuit_name": CIRCUIT_NAME,
+                    "params_best": np.asarray(params_cmx, dtype=float).copy(),
+                    "CME_SHOT_MULTIPLIERS": [int(m) for m in CME_SHOT_MULTIPLIERS],
+                    "CME_H_NUM_SHOTS": int(CME_H_NUM_SHOTS),
+                    "CME_VARIANCE_REPEATS": int(CME_VARIANCE_REPEATS),
+                    "CME_MOMENT_SOURCE": str(CME_MOMENT_SOURCE),
+                    "cme_results_by_multiplier": dict(cme_results_by_multiplier),
+                    "cme_results": cme_results_by_multiplier.get(int(CME_SHOT_MULTIPLIERS[-1])),
+                },
+            )
+            save_checkpoint(
+                data_dir=_CMX_DATA_DIR,
+                molecule=MOLECULE,
+                bond_length=float(bond_length),
+                num_shots=int(globals().get("GLOBAL_NUM_SHOTS", GLOBAL_NUM_SHOTS)),
+                stage="cmx",
+                vqe_results=globals().get("vqe_results"),
+                cme_results=cme_results_by_multiplier.get(int(CME_SHOT_MULTIPLIERS[-1])),
+                cme_results_by_multiplier=dict(cme_results_by_multiplier),
+                metadata={
+                    "circuit_name": CIRCUIT_NAME,
+                    "measurement_scheme": GLOBAL_MEASUREMENT_SCHEME,
+                    "num_shots": int(globals().get("GLOBAL_NUM_SHOTS", GLOBAL_NUM_SHOTS)),
+                    "cdr_training_circuits": int(CDR_NUM_TRAINING_CIRCUITS),
+                    "vqe_iters": int(VQE_ITERS),
+                    "completed_cmx_multipliers": sorted(int(k) for k in cme_results_by_multiplier),
+                },
+            )
+
         for mult in CME_SHOT_MULTIPLIERS:
+            if int(mult) in cme_results_by_multiplier:
+                print(f"[CMX] skipping multiplier {int(mult)}x (already checkpointed)")
+                continue
             h2_h3_shots = int(mult * CME_H_NUM_SHOTS)
             print(
                 f"\n--- H shots/repeat={CME_H_NUM_SHOTS}, H2/H3 shots/repeat={h2_h3_shots}; "
@@ -1613,9 +1716,15 @@ def _run_cmx():
             }
             for key in ("H", "H2", "H3"):
                 moments[key]["replicates"] = [dict(r) for r in moment_replicates[key]]
-                moments[key]["sample_variance"] = float(np.var(moment_arrays[key], ddof=1))
-                moments[key]["mean_variance"] = float(
-                    moments[key]["sample_variance"] / CME_VARIANCE_REPEATS
+                moments[key]["sample_variance"] = (
+                    float(np.var(moment_arrays[key], ddof=1))
+                    if moment_arrays[key].size >= 2
+                    else float("nan")
+                )
+                moments[key]["mean_variance"] = (
+                    float(moments[key]["sample_variance"] / CME_VARIANCE_REPEATS)
+                    if np.isfinite(moments[key]["sample_variance"])
+                    else float("nan")
                 )
             shots = {"H": CME_H_NUM_SHOTS, "H2": h2_h3_shots, "H3": h2_h3_shots}
 
@@ -1673,7 +1782,7 @@ def _run_cmx():
             print(f"|<H>cdr+rem - <H>noiseless|     = {abs(src['H'] - moments['H']['noiseless']):.6e} Eh  (cf. VQE loop ~1e-2)")
             print(f"|E_CME(shots) - E_CME(noiseless)| = {abs(E_cme - E_cme_noiseless):.6e} Eh")
 
-            cme_results_by_multiplier[mult] = {
+            cme_results_by_multiplier[int(mult)] = {
                 "params_best": params_cmx.copy(),
                 "shots": dict(shots),
                 "moments": {k: dict(v) for k, v in moments.items()},
@@ -1691,15 +1800,16 @@ def _run_cmx():
                 "E_cme_exact": float(E_cme_exact),
                 "e_gs": float(e_ref),
                 "moment_source": CME_MOMENT_SOURCE,
-                "h2_h3_shot_multiplier": mult,
+                "h2_h3_shot_multiplier": int(mult),
                 "variance_repeats": int(CME_VARIANCE_REPEATS),
             }
+            _save_cmx_checkpoint()
 
         print("\n=== CME(k=3) summary across <H^2>/<H^3> shot multipliers ===")
         for mult in CME_SHOT_MULTIPLIERS:
-            r = cme_results_by_multiplier[mult]
+            r = cme_results_by_multiplier[int(mult)]
             print(
-                f"{mult:>3d}x (shots={r['shots']['H2']:>8d})  "
+                f"{int(mult):>3d}x (shots={r['shots']['H2']:>8d})  "
                 f"E_CME={r['E_cme_shots']:.10f} +/- {r['E_cme_sigma']:.3e} Eh  "
                 f"E-1sigma={r['E_cme_minus_1sigma']:.10f}  "
                 f"E-2sigma={r['E_cme_minus_2sigma']:.10f}  "
@@ -1709,7 +1819,7 @@ def _run_cmx():
         # Backward-compatible alias for cells expecting a single ``cme_results`` dict:
         # the largest-multiplier sweep result (closest to the shot budget this cell used
         # before the sweep was added).
-        cme_results = cme_results_by_multiplier[CME_SHOT_MULTIPLIERS[-1]]
+        cme_results = cme_results_by_multiplier[int(CME_SHOT_MULTIPLIERS[-1])]
     except FileNotFoundError as _cme_missing_file:
 
         print(f"[cloud-results] Skipping CME/CMX because an input file is missing: {_cme_missing_file}")
