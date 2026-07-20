@@ -117,3 +117,19 @@ def transform_cl2_source(source: str) -> str:
             f"found {occurrences}. The original script layout may have changed."
         )
     return source.replace(_CL2_SERIAL_BLOCK, _CL2_PARALLEL_BLOCK, 1)
+
+
+# Br2's CMX serial grid text matches Cl2; reuse the same rewrite when CMX is enabled.
+_BR2_SERIAL_BLOCK = _CL2_SERIAL_BLOCK
+_BR2_PARALLEL_BLOCK = _CL2_PARALLEL_BLOCK
+
+
+def transform_br2_source(source: str) -> str:
+    """Replace only the Br2 CMX serial measurement grid (same layout as Cl2)."""
+    occurrences = source.count(_BR2_SERIAL_BLOCK)
+    if occurrences != 1:
+        raise RuntimeError(
+            "Expected exactly one Br2 CMX serial loop to replace, "
+            f"found {occurrences}. The original script layout may have changed."
+        )
+    return source.replace(_BR2_SERIAL_BLOCK, _BR2_PARALLEL_BLOCK, 1)

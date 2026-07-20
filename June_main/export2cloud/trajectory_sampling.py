@@ -14,6 +14,8 @@ measurement in the requested OGM / Pauli basis.
 
 from __future__ import annotations
 
+import os
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import Any, Iterable
 
@@ -162,6 +164,16 @@ def _sample_z_bitstring(state: np.ndarray, n_qubits: int, rng: np.random.Generat
     return bits
 
 
+def _shot_worker_count(num_shots: int) -> int:
+    """Optional shot-level threads (``TRAJECTORY_SHOT_WORKERS``, default 1)."""
+    raw = str(os.environ.get("TRAJECTORY_SHOT_WORKERS", "1")).strip()
+    try:
+        workers = int(raw)
+    except ValueError:
+        workers = 1
+    return max(1, min(workers, int(num_shots)))
+
+
 def sample_measurement_basis_from_trajectories(
     compiled_ops: list[tuple[str, Any]],
     pauli_str: str,
@@ -172,19 +184,45 @@ def sample_measurement_basis_from_trajectories(
 ) -> np.ndarray:
     """Independent noisy trajectories measured in ``pauli_str`` basis."""
     rot_ops = _basis_rotation_ops(pauli_str, n_qubits)
-    out = np.zeros((int(num_shots), n_qubits), dtype=int)
+    num_shots = int(num_shots)
+    out = np.zeros((num_shots, n_qubits), dtype=int)
     mask = np.array([ch != "I" for ch in pauli_str], dtype=bool)
-    for s in range(int(num_shots)):
-        state = evolve_noisy_trajectory(compiled_ops, n_qubits, noise_rng)
+    workers = _shot_worker_count(num_shots)
+
+    def _one_shot(noise_seed: int, measure_seed: int) -> np.ndarray:
+        local_noise = np.random.default_rng(noise_seed)
+        local_measure = np.random.default_rng(measure_seed)
+        state = evolve_noisy_trajectory(compiled_ops, n_qubits, local_noise)
         for kind, payload in rot_ops:
             matrix, targets = payload
             _apply_unitary(state, matrix, targets, n_qubits)
-        bits = _sample_z_bitstring(state, n_qubits, measure_rng)
+        bits = _sample_z_bitstring(state, n_qubits, local_measure)
         if np.any(~mask):
             bits = bits.copy()
             bits[~mask] = 0
+        return bits
+
+    if workers == 1:
+        for s in range(num_shots):
+            out[s] = _one_shot(
+                int(noise_rng.integers(0, 2**31 - 1)),
+                int(measure_rng.integers(0, 2**31 - 1)),
+            )
+        return out
+
+    noise_seeds = noise_rng.integers(0, 2**31 - 1, size=num_shots)
+    measure_seeds = measure_rng.integers(0, 2**31 - 1, size=num_shots)
+    with ThreadPoolExecutor(max_workers=workers, thread_name_prefix="trajshot") as pool:
+        rows = list(pool.map(_one_shot, noise_seeds.tolist(), measure_seeds.tolist()))
+    for s, bits in enumerate(rows):
         out[s] = bits
     return out
+
+
+def _use_stim_clifford() -> bool:
+    """Stim near-Clifford path (default on when Stim is installed)."""
+    raw = str(os.environ.get("USE_STIM_CLIFFORD", "1")).strip().lower()
+    return raw not in ("0", "false", "no", "off")
 
 
 def estimate_energy_from_noisy_circuit_shots(
@@ -273,12 +311,54 @@ def estimate_energy_from_noisy_circuit_shots(
             out["per_term_rem"] = z.copy()
         return out
 
-    compiled = _compile_noisy_ops(ansatz_circuit, resolver, qubits, noise_params)
-    unique_settings, unique_counts = sm._unique_settings_with_counts(sampled_settings)
-    basis_samples: dict[tuple[int, ...], np.ndarray] = {}
-    for setting_row, count in zip(unique_settings, unique_counts):
-        basis = sm.int_observable_to_pauli_string(setting_row)
-        ideal = sample_measurement_basis_from_trajectories(
+    stim_compiled = None
+    backend_tag = "trajectory"
+    if _use_stim_clifford():
+        try:
+            from stim_clifford import (  # local export2cloud module
+                compile_stim_hybrid_ops,
+                count_non_clifford_compiled,
+                sample_measurement_basis_stim_hybrid,
+                stim_available,
+            )
+
+            if stim_available():
+                # Stim helps most for near-Clifford trainers (t_max≈2 → ~1 non-Clifford).
+                # General VQE targets with many non-Cliffords are faster on NumPy traj.
+                max_non = int(os.environ.get("STIM_MAX_NON_CLIFFORD", "2"))
+                candidate = compile_stim_hybrid_ops(
+                    ansatz_circuit, resolver, qubits, noise_params
+                )
+                if candidate is not None:
+                    n_non = count_non_clifford_compiled(candidate)
+                    if n_non <= max_non:
+                        stim_compiled = candidate
+                        backend_tag = (
+                            "stim_clifford" if n_non == 0 else f"stim_hybrid_t{n_non}"
+                        )
+        except Exception:
+            stim_compiled = None
+
+    compiled = None
+    if stim_compiled is None:
+        compiled = _compile_noisy_ops(ansatz_circuit, resolver, qubits, noise_params)
+
+    def _sample_basis(basis: str, count: int) -> np.ndarray:
+        if stim_compiled is not None:
+            return sample_measurement_basis_stim_hybrid(
+                stim_compiled,
+                basis,
+                num_qubits,
+                count,
+                noise_rng,
+                measure_rng,
+                apply_unitary=_apply_unitary,
+                sample_z_bitstring=_sample_z_bitstring,
+                paulis=_PAULIS,
+                basis_rotation_ops=_basis_rotation_ops,
+            )
+        assert compiled is not None
+        return sample_measurement_basis_from_trajectories(
             compiled,
             basis,
             num_qubits,
@@ -286,6 +366,12 @@ def estimate_energy_from_noisy_circuit_shots(
             noise_rng,
             measure_rng,
         )
+
+    unique_settings, unique_counts = sm._unique_settings_with_counts(sampled_settings)
+    basis_samples: dict[tuple[int, ...], np.ndarray] = {}
+    for setting_row, count in zip(unique_settings, unique_counts):
+        basis = sm.int_observable_to_pauli_string(setting_row)
+        ideal = _sample_basis(basis, count)
         if apply_readout_noise:
             noisy = sm.apply_asymmetric_readout_noise(ideal, p0, p1, measure_rng)
         else:
@@ -305,14 +391,7 @@ def estimate_energy_from_noisy_circuit_shots(
         ]
         if not compatible_keys:
             direct_basis = sm.int_observable_to_pauli_string(obs_row)
-            bits = sample_measurement_basis_from_trajectories(
-                compiled,
-                direct_basis,
-                num_qubits,
-                1,
-                noise_rng,
-                measure_rng,
-            )
+            bits = _sample_basis(direct_basis, 1)
             if apply_readout_noise:
                 bits = sm.apply_asymmetric_readout_noise(bits, p0, p1, measure_rng)
             compatible_samples = [bits]
@@ -339,7 +418,7 @@ def estimate_energy_from_noisy_circuit_shots(
         "energy_unmitigated": float(energy_unmit),
         "energy_rem": float(energy_rem),
         "offset": float(offset),
-        "noisy_backend": "trajectory",
+        "noisy_backend": backend_tag,
     }
     if return_per_term:
         result["per_term_unmitigated"] = np.asarray(per_term_unmit, dtype=float)

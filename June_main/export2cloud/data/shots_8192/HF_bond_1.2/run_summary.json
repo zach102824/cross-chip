@@ -1,8 +1,8 @@
 {
   "bond_length": 1.2,
-  "created_utc": "2026-07-11T03:34:53.542653+00:00",
-  "has_cme_results": true,
-  "has_cme_results_by_multiplier": true,
+  "created_utc": "2026-07-20T02:38:50.727874+00:00",
+  "has_cme_results": false,
+  "has_cme_results_by_multiplier": false,
   "has_vqe_results": true,
   "metadata": {
     "cdr_training_circuits": 30,
@@ -12,5 +12,6 @@
     "vqe_iters": 15
   },
   "molecule": "HF",
-  "stage": "final"
+  "num_shots": 8192,
+  "stage": "vqe"
 }
