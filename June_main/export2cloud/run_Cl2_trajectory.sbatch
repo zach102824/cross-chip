@@ -5,14 +5,15 @@
 #SBATCH --time=5-00:00:00
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=28
-#SBATCH --array=0-1
+#SBATCH --array=0-6
 #SBATCH --output=cl2_traj_%A_%a.log
 
 # Trajectory noisy-sim + parallel CDR/CMX. One 28-core socket handles 28 of the
 # default 30 independent CDR circuits at once during VQE.
+# Bond scan 1.8..3.0 Å (step 0.2) → 7 array tasks; each writes data/shots_8192/Cl2_bond_<R>/.
 set -euo pipefail
 
-BONDS=(1.2 2.2)
+BONDS=(1.8 2.0 2.2 2.4 2.6 2.8 3.0)
 BOND=${BONDS[$SLURM_ARRAY_TASK_ID]}
 
 echo "Array job ${SLURM_ARRAY_JOB_ID}, task ${SLURM_ARRAY_TASK_ID}: Cl2 trajectory bond=${BOND}"
@@ -23,6 +24,8 @@ cd "${SLURM_SUBMIT_DIR}"
 
 export CL2_BOND_LENGTH="${BOND}"
 export GLOBAL_NUM_SHOTS=8192
+# CMX moment measurements repeated for empirical error bars.
+export CME_VARIANCE_REPEATS=10
 # VQE: one CDR call at a time, using almost all cores for its 30 training circuits.
 export PARALLEL_CDR_WORKERS="${SLURM_CPUS_PER_TASK}"
 export PARALLEL_CDR_START_METHOD="fork"

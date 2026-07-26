@@ -1,0 +1,17 @@
+{
+  "bond_length": 1.2,
+  "created_utc": "2026-07-20T17:43:20.113941+00:00",
+  "has_cme_results": true,
+  "has_cme_results_by_multiplier": true,
+  "has_vqe_results": true,
+  "metadata": {
+    "cdr_training_circuits": 30,
+    "circuit_name": "Cl2_10q_3doubles_rzx",
+    "measurement_scheme": "ogm",
+    "num_shots": 8192,
+    "vqe_iters": 15
+  },
+  "molecule": "Cl2",
+  "num_shots": 8192,
+  "stage": "final"
+}

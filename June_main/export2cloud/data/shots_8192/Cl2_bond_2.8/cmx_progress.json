@@ -1,0 +1,18 @@
+{
+  "CME_H_NUM_SHOTS": 8192,
+  "CME_MOMENT_SOURCE": "cdr_rem",
+  "CME_SHOT_MULTIPLIERS": [
+    5,
+    10
+  ],
+  "CME_VARIANCE_REPEATS": 10,
+  "bond_length": 2.8,
+  "circuit_name": "Cl2_10q_3doubles_rzx",
+  "completed_multipliers": [
+    5,
+    10
+  ],
+  "molecule": "Cl2",
+  "pending_multipliers": [],
+  "saved_utc": "2026-07-23T23:32:15.393738+00:00"
+}

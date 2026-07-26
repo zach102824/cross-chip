@@ -1,0 +1,742 @@
+{
+  "baselines": {
+    "HF_6q": {
+      "n1": 26,
+      "n_onchip": 12,
+      "n_cross": 3,
+      "depth": null,
+      "fidelity": 0.6378265943314458,
+      "error": 0.36217340566855416,
+      "pairs": {
+        "0-1": 2,
+        "1-2": 4,
+        "2-5": 3,
+        "3-4": 2,
+        "4-5": 4
+      }
+    },
+    "Cl2_10q": {
+      "n1": 42,
+      "n_onchip": 24,
+      "n_cross": 7,
+      "depth": null,
+      "fidelity": 0.36797623494972775,
+      "error": 0.6320237650502722,
+      "pairs": {
+        "0-1": 2,
+        "1-2": 4,
+        "2-3": 6,
+        "3-4": 2,
+        "3-8": 3,
+        "5-6": 2,
+        "6-7": 4,
+        "7-8": 6,
+        "8-9": 2
+      }
+    }
+  },
+  "winners": {
+    "HF_6q": {
+      "molecule": "HF",
+      "num_qubits": 6,
+      "method": "independent_pairs_freeze",
+      "original_strings": [
+        "YZZXZZ",
+        "IYZIXZ",
+        "IIYIIX"
+      ],
+      "frozen_strings": [
+        "YIIXII",
+        "IYIIXI",
+        "IIYIIX"
+      ],
+      "signs": [
+        1,
+        1,
+        1
+      ],
+      "doubles_full": [
+        [
+          3,
+          7,
+          4,
+          0
+        ],
+        [
+          3,
+          7,
+          5,
+          1
+        ],
+        [
+          3,
+          7,
+          6,
+          2
+        ]
+      ],
+      "budget": {
+        "n1": 18,
+        "n_onchip": 0,
+        "n_cross": 3,
+        "depth": null,
+        "fidelity": 0.7224668100312271,
+        "error": 0.27753318996877285,
+        "pairs": {
+          "0-3": 1,
+          "1-4": 1,
+          "2-5": 1
+        }
+      },
+      "rzx_pairs": [
+        [
+          0,
+          3
+        ],
+        [
+          1,
+          4
+        ],
+        [
+          2,
+          5
+        ]
+      ],
+      "overlap_min": 0.9999999999999944,
+      "gates": [
+        {
+          "op": "rx",
+          "qubits": [
+            0
+          ],
+          "value": 1.5707963267948966
+        },
+        {
+          "op": "h",
+          "qubits": [
+            0
+          ]
+        },
+        {
+          "op": "h",
+          "qubits": [
+            3
+          ]
+        },
+        {
+          "op": "rzx",
+          "qubits": [
+            3,
+            0
+          ],
+          "param": "t0",
+          "coeff": 1.0
+        },
+        {
+          "op": "h",
+          "qubits": [
+            3
+          ]
+        },
+        {
+          "op": "h",
+          "qubits": [
+            0
+          ]
+        },
+        {
+          "op": "rx",
+          "qubits": [
+            0
+          ],
+          "value": -1.5707963267948966
+        },
+        {
+          "op": "rx",
+          "qubits": [
+            1
+          ],
+          "value": 1.5707963267948966
+        },
+        {
+          "op": "h",
+          "qubits": [
+            1
+          ]
+        },
+        {
+          "op": "h",
+          "qubits": [
+            4
+          ]
+        },
+        {
+          "op": "rzx",
+          "qubits": [
+            4,
+            1
+          ],
+          "param": "t1",
+          "coeff": 1.0
+        },
+        {
+          "op": "h",
+          "qubits": [
+            4
+          ]
+        },
+        {
+          "op": "h",
+          "qubits": [
+            1
+          ]
+        },
+        {
+          "op": "rx",
+          "qubits": [
+            1
+          ],
+          "value": -1.5707963267948966
+        },
+        {
+          "op": "rx",
+          "qubits": [
+            2
+          ],
+          "value": 1.5707963267948966
+        },
+        {
+          "op": "h",
+          "qubits": [
+            2
+          ]
+        },
+        {
+          "op": "h",
+          "qubits": [
+            5
+          ]
+        },
+        {
+          "op": "rzx",
+          "qubits": [
+            5,
+            2
+          ],
+          "param": "t2",
+          "coeff": 1.0
+        },
+        {
+          "op": "h",
+          "qubits": [
+            5
+          ]
+        },
+        {
+          "op": "h",
+          "qubits": [
+            2
+          ]
+        },
+        {
+          "op": "rx",
+          "qubits": [
+            2
+          ],
+          "value": -1.5707963267948966
+        }
+      ],
+      "cross_model": "spin_split_alpha_beta",
+      "rules": [
+        "all qubits used",
+        "RZX pairs vertex-disjoint (any \u03b1\u2194\u03b2, no shared index)",
+        "within-spin CZ: NN + chords (0,3)/(half,half+3); no cross-spin CZ"
+      ]
+    },
+    "Cl2_10q": {
+      "molecule": "Cl2",
+      "num_qubits": 10,
+      "method": "disjoint_rzx_all_qubits",
+      "original_strings": [
+        "IYZZXIXZZX",
+        "YZZZXXZZZX",
+        "IIYZXIIXZX"
+      ],
+      "frozen_strings": [
+        "IYZZXIXZZX",
+        "YIIZXXIIZX",
+        "IIYZXIIXZX"
+      ],
+      "keep_pairs": [
+        [
+          2,
+          3
+        ],
+        [
+          3
+        ],
+        [
+          3
+        ]
+      ],
+      "hub_schedule": [
+        [
+          2,
+          6
+        ],
+        [
+          0,
+          5
+        ],
+        [
+          3,
+          7
+        ]
+      ],
+      "signs": [
+        1,
+        1,
+        1
+      ],
+      "doubles": [
+        [
+          4,
+          9,
+          6,
+          1
+        ],
+        [
+          4,
+          9,
+          5,
+          0
+        ],
+        [
+          4,
+          9,
+          7,
+          2
+        ]
+      ],
+      "budget": {
+        "n1": 32,
+        "n_onchip": 20,
+        "n_cross": 3,
+        "depth": null,
+        "fidelity": 0.5867876581625391,
+        "error": 0.4132123418374609,
+        "pairs": {
+          "0-3": 2,
+          "0-5": 1,
+          "1-2": 2,
+          "2-3": 4,
+          "2-6": 1,
+          "3-4": 2,
+          "3-7": 1,
+          "5-8": 2,
+          "6-7": 2,
+          "7-8": 4,
+          "8-9": 2
+        }
+      },
+      "rzx_pairs": [
+        [
+          2,
+          6
+        ],
+        [
+          0,
+          5
+        ],
+        [
+          3,
+          7
+        ]
+      ],
+      "overlap_min": 0.9999999999999898,
+      "gates": [
+        {
+          "op": "rx",
+          "qubits": [
+            1
+          ],
+          "value": 1.5707963267948966
+        },
+        {
+          "op": "h",
+          "qubits": [
+            2
+          ]
+        },
+        {
+          "op": "h",
+          "qubits": [
+            3
+          ]
+        },
+        {
+          "op": "h",
+          "qubits": [
+            4
+          ]
+        },
+        {
+          "op": "h",
+          "qubits": [
+            7
+          ]
+        },
+        {
+          "op": "h",
+          "qubits": [
+            8
+          ]
+        },
+        {
+          "op": "h",
+          "qubits": [
+            9
+          ]
+        },
+        {
+          "op": "cz",
+          "qubits": [
+            4,
+            3
+          ]
+        },
+        {
+          "op": "h",
+          "qubits": [
+            3
+          ]
+        },
+        {
+          "op": "cz",
+          "qubits": [
+            1,
+            2
+          ]
+        },
+        {
+          "op": "cz",
+          "qubits": [
+            3,
+            2
+          ]
+        },
+        {
+          "op": "cz",
+          "qubits": [
+            9,
+            8
+          ]
+        },
+        {
+          "op": "h",
+          "qubits": [
+            8
+          ]
+        },
+        {
+          "op": "cz",
+          "qubits": [
+            8,
+            7
+          ]
+        },
+        {
+          "op": "h",
+          "qubits": [
+            7
+          ]
+        },
+        {
+          "op": "cz",
+          "qubits": [
+            7,
+            6
+          ]
+        },
+        {
+          "op": "h",
+          "qubits": [
+            6
+          ]
+        },
+        {
+          "op": "rzx",
+          "qubits": [
+            6,
+            2
+          ],
+          "param": "t0",
+          "coeff": 1.0
+        },
+        {
+          "op": "h",
+          "qubits": [
+            6
+          ]
+        },
+        {
+          "op": "cz",
+          "qubits": [
+            7,
+            6
+          ]
+        },
+        {
+          "op": "h",
+          "qubits": [
+            7
+          ]
+        },
+        {
+          "op": "cz",
+          "qubits": [
+            8,
+            7
+          ]
+        },
+        {
+          "op": "cz",
+          "qubits": [
+            3,
+            2
+          ]
+        },
+        {
+          "op": "cz",
+          "qubits": [
+            1,
+            2
+          ]
+        },
+        {
+          "op": "h",
+          "qubits": [
+            7
+          ]
+        },
+        {
+          "op": "h",
+          "qubits": [
+            2
+          ]
+        },
+        {
+          "op": "rx",
+          "qubits": [
+            1
+          ],
+          "value": -1.5707963267948966
+        },
+        {
+          "op": "rx",
+          "qubits": [
+            0
+          ],
+          "value": 1.5707963267948966
+        },
+        {
+          "op": "h",
+          "qubits": [
+            0
+          ]
+        },
+        {
+          "op": "cz",
+          "qubits": [
+            3,
+            0
+          ]
+        },
+        {
+          "op": "cz",
+          "qubits": [
+            8,
+            5
+          ]
+        },
+        {
+          "op": "h",
+          "qubits": [
+            5
+          ]
+        },
+        {
+          "op": "rzx",
+          "qubits": [
+            5,
+            0
+          ],
+          "param": "t1",
+          "coeff": 1.0
+        },
+        {
+          "op": "h",
+          "qubits": [
+            5
+          ]
+        },
+        {
+          "op": "cz",
+          "qubits": [
+            8,
+            5
+          ]
+        },
+        {
+          "op": "cz",
+          "qubits": [
+            3,
+            0
+          ]
+        },
+        {
+          "op": "h",
+          "qubits": [
+            3
+          ]
+        },
+        {
+          "op": "h",
+          "qubits": [
+            0
+          ]
+        },
+        {
+          "op": "rx",
+          "qubits": [
+            0
+          ],
+          "value": -1.5707963267948966
+        },
+        {
+          "op": "rx",
+          "qubits": [
+            2
+          ],
+          "value": 1.5707963267948966
+        },
+        {
+          "op": "cz",
+          "qubits": [
+            2,
+            3
+          ]
+        },
+        {
+          "op": "cz",
+          "qubits": [
+            8,
+            7
+          ]
+        },
+        {
+          "op": "h",
+          "qubits": [
+            7
+          ]
+        },
+        {
+          "op": "rzx",
+          "qubits": [
+            7,
+            3
+          ],
+          "param": "t2",
+          "coeff": 1.0
+        },
+        {
+          "op": "h",
+          "qubits": [
+            7
+          ]
+        },
+        {
+          "op": "cz",
+          "qubits": [
+            8,
+            7
+          ]
+        },
+        {
+          "op": "h",
+          "qubits": [
+            8
+          ]
+        },
+        {
+          "op": "cz",
+          "qubits": [
+            9,
+            8
+          ]
+        },
+        {
+          "op": "cz",
+          "qubits": [
+            4,
+            3
+          ]
+        },
+        {
+          "op": "cz",
+          "qubits": [
+            2,
+            3
+          ]
+        },
+        {
+          "op": "h",
+          "qubits": [
+            9
+          ]
+        },
+        {
+          "op": "h",
+          "qubits": [
+            8
+          ]
+        },
+        {
+          "op": "h",
+          "qubits": [
+            4
+          ]
+        },
+        {
+          "op": "h",
+          "qubits": [
+            3
+          ]
+        },
+        {
+          "op": "rx",
+          "qubits": [
+            2
+          ],
+          "value": -1.5707963267948966
+        }
+      ],
+      "cross_model": "spin_split_alpha_beta",
+      "rules": [
+        "all qubits used",
+        "RZX pairs vertex-disjoint (any \u03b1\u2194\u03b2, no shared index)",
+        "within-spin CZ: NN + chords (0,3)/(5,8); no cross-spin CZ"
+      ]
+    }
+  },
+  "verdict": {
+    "HF_error_reduction": 0.08464021569978131,
+    "Cl2_error_reduction": 0.21881142321281133,
+    "both_beat_baseline": true,
+    "cl2_rules": [
+      "all qubits used",
+      "RZX pairs vertex-disjoint (any \u03b1\u2194\u03b2, no shared index)",
+      "within-spin CZ: NN + chords (0,3)/(5,8); no cross-spin CZ"
+    ]
+  }
+}

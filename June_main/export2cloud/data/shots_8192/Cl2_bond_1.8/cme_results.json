@@ -1,0 +1,109 @@
+{
+  "E_cme_empirical_sigma": NaN,
+  "E_cme_empirical_variance": NaN,
+  "E_cme_exact": -894.1309029457992,
+  "E_cme_gradient": [
+    10.587194288599708,
+    0.007815483475841363,
+    1.8644249633960103e-06
+  ],
+  "E_cme_minus_1sigma": NaN,
+  "E_cme_minus_2sigma": NaN,
+  "E_cme_noiseless": -909.0729305197899,
+  "E_cme_replicates": [
+    -909.0450492919554
+  ],
+  "E_cme_shots": -909.0450492919554,
+  "E_cme_sigma": NaN,
+  "E_cme_variance": NaN,
+  "connected_moments": {
+    "c1": -909.0567910745917,
+    "c2": 8.599269934929907,
+    "c3": -6297.803809165955
+  },
+  "e_gs": -909.073706577282,
+  "h2_h3_shot_multiplier": 10,
+  "moment_source": "cdr_rem",
+  "moments": {
+    "H": {
+      "cdr_rem": -909.0567910745917,
+      "cdr_unmit": -909.0438146401215,
+      "exact": -894.1309029457992,
+      "mean_variance": NaN,
+      "noiseless": -909.0721820349287,
+      "rem": -907.7105883163895,
+      "replicates": [
+        {
+          "cdr_rem": -909.0567910745917,
+          "cdr_seed": 1677254611,
+          "cdr_unmit": -909.0438146401215,
+          "exact": -894.1309029457992,
+          "noiseless": -909.0721820349287,
+          "rem": -907.7105883163895,
+          "sampling_seed": 1907358639,
+          "simulator_seed": 1487691693,
+          "unmit": -907.005741584294
+        }
+      ],
+      "sample_variance": NaN,
+      "unmit": -907.005741584294
+    },
+    "H2": {
+      "cdr_rem": 826392.8486687689,
+      "cdr_unmit": 826357.3099607207,
+      "exact": 799470.0716026704,
+      "mean_variance": NaN,
+      "noiseless": 826412.2336198624,
+      "rem": 824076.528069025,
+      "replicates": [
+        {
+          "cdr_rem": 826392.8486687689,
+          "cdr_seed": 636322267,
+          "cdr_unmit": 826357.3099607207,
+          "exact": 799470.0716026704,
+          "noiseless": 826412.2336198624,
+          "rem": 824076.528069025,
+          "sampling_seed": 897985108,
+          "simulator_seed": 810335964,
+          "unmit": 822705.788483062
+        }
+      ],
+      "sample_variance": NaN,
+      "unmit": 822705.788483062
+    },
+    "H3": {
+      "cdr_rem": -751259963.4310963,
+      "cdr_unmit": -751244949.2571789,
+      "exact": -714830897.0002339,
+      "mean_variance": NaN,
+      "noiseless": -751268375.1471632,
+      "rem": -747980584.6581829,
+      "replicates": [
+        {
+          "cdr_rem": -751259963.4310963,
+          "cdr_seed": 765174731,
+          "cdr_unmit": -751244949.2571789,
+          "exact": -714830897.0002339,
+          "noiseless": -751268375.1471632,
+          "rem": -747980584.6581829,
+          "sampling_seed": 1285488840,
+          "simulator_seed": 300590904,
+          "unmit": -746215255.212285
+        }
+      ],
+      "sample_variance": NaN,
+      "unmit": -746215255.212285
+    }
+  },
+  "params_best": [
+    0.18855306660040583,
+    0.0702628062435906,
+    0.04491749857166383
+  ],
+  "shots": {
+    "H": 8192,
+    "H2": 81920,
+    "H3": 81920
+  },
+  "variance_repeats": 1
+}

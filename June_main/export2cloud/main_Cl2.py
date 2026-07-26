@@ -53,6 +53,8 @@ from pathlib import Path
 MOLECULE = "Cl2"
 BOND_LENGTH = float(os.environ.get("CL2_BOND_LENGTH", "2.2"))
 bond_length = BOND_LENGTH  # alias used by later cells (OGM / Hamiltonian paths)
+# Pauli_Ham / OGM files use compact tokens (e.g. 2, 3), not fixed .1f (2.0, 3.0).
+BOND_FILE_TOKEN = f"{float(bond_length):.10g}".rstrip("0").rstrip(".")
 
 # Active space for the loaded molecule. These MUST match the molecule notebook
 # that produced the circuit / Hamiltonian (e.g. UCCSD_Mole/HF.ipynb uses 6
@@ -266,7 +268,7 @@ def load_pauli_sum_from_numbered_file(path: Path, qubits: list[cirq.Qid]) -> cir
     return out
 
 
-ham_path = _repo / "Pauli_Ham" / f"{MOLECULE}_bond_{bond_length:.1f}.txt"
+ham_path = _repo / "Pauli_Ham" / f"{MOLECULE}_bond_{BOND_FILE_TOKEN}.txt"
 
 # Hamiltonian + exact ground-state energy. The bare ansatz (no prep) is not a
 # meaningful state by itself, so the reference energy of the FULL circuit is
@@ -473,7 +475,7 @@ apply_rem = True
 
 ogm_file = globals().get(
     "ogm_file",
-    _repo / "June_main" / "OGM_measurement_basis" / f"OGM_{MOLECULE}_bond_{bond_length:.1f}.txt",
+    _repo / "June_main" / "OGM_measurement_basis" / f"OGM_{MOLECULE}_bond_{BOND_FILE_TOKEN}.txt",
 )
 
 print(f"OGM file: {ogm_file}  exists={ogm_file.is_file()}")
@@ -550,7 +552,7 @@ shot_cfg = {
     "sampling_seed": int(globals().get("sampling_seed", globals()["GLOBAL_SAMPLING_SEED"])),
     "ogm_file": globals().get(
         "ogm_file",
-        _repo / "June_main" / "OGM_measurement_basis" / f"OGM_{MOLECULE}_bond_{bond_length:.1f}.txt",
+        _repo / "June_main" / "OGM_measurement_basis" / f"OGM_{MOLECULE}_bond_{BOND_FILE_TOKEN}.txt",
     ),
 }
 readout_cal = {
@@ -1478,14 +1480,14 @@ def _run_cmx():
 
         # 2) Hamiltonian (H / H^2 / H^3) + matching OGM measurement-basis files.
         ham_paths = {
-            "H": _repo / "Pauli_Ham" / f"{MOLECULE}_bond_{bond_length:.1f}.txt",
-            "H2": _repo / "Pauli_Ham" / f"{MOLECULE}_square_bond_{bond_length:.1f}.txt",
-            "H3": _repo / "Pauli_Ham" / f"{MOLECULE}_triple_bond_{bond_length:.1f}.txt",
+            "H": _repo / "Pauli_Ham" / f"{MOLECULE}_bond_{BOND_FILE_TOKEN}.txt",
+            "H2": _repo / "Pauli_Ham" / f"{MOLECULE}_square_bond_{BOND_FILE_TOKEN}.txt",
+            "H3": _repo / "Pauli_Ham" / f"{MOLECULE}_triple_bond_{BOND_FILE_TOKEN}.txt",
         }
         ogm_paths = {
-            "H": _repo / "June_main" / "OGM_measurement_basis" / f"OGM_{MOLECULE}_bond_{bond_length:.1f}.txt",
-            "H2": _repo / "June_main" / "OGM_measurement_basis" / f"OGM_{MOLECULE}_square_bond_{bond_length:.1f}.txt",
-            "H3": _repo / "June_main" / "OGM_measurement_basis" / f"OGM_{MOLECULE}_triple_bond_{bond_length:.1f}.txt",
+            "H": _repo / "June_main" / "OGM_measurement_basis" / f"OGM_{MOLECULE}_bond_{BOND_FILE_TOKEN}.txt",
+            "H2": _repo / "June_main" / "OGM_measurement_basis" / f"OGM_{MOLECULE}_square_bond_{BOND_FILE_TOKEN}.txt",
+            "H3": _repo / "June_main" / "OGM_measurement_basis" / f"OGM_{MOLECULE}_triple_bond_{BOND_FILE_TOKEN}.txt",
         }
         for key in ("H", "H2", "H3"):
             if not ham_paths[key].is_file():

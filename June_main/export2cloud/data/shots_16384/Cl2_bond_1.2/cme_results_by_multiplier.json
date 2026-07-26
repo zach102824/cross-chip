@@ -1,0 +1,220 @@
+{
+  "10": {
+    "E_cme_empirical_sigma": NaN,
+    "E_cme_empirical_variance": NaN,
+    "E_cme_exact": NaN,
+    "E_cme_gradient": [
+      -0.24062960585527848,
+      -0.00028536865187640326,
+      2.9268966408477736e-07
+    ],
+    "E_cme_minus_1sigma": NaN,
+    "E_cme_minus_2sigma": NaN,
+    "E_cme_noiseless": -907.2899090314642,
+    "E_cme_replicates": [
+      -907.2965040201328
+    ],
+    "E_cme_shots": -907.2965040201328,
+    "E_cme_sigma": NaN,
+    "E_cme_variance": NaN,
+    "connected_moments": {
+      "c1": -907.2719455722053,
+      "c2": 45.39387142343912,
+      "c3": 83906.0989882946
+    },
+    "e_gs": -907.2899804679435,
+    "h2_h3_shot_multiplier": 10,
+    "moment_source": "cdr_rem",
+    "moments": {
+      "H": {
+        "cdr_rem": -907.2719455722053,
+        "cdr_unmit": -907.2496485563128,
+        "exact": -891.8540592467016,
+        "mean_variance": NaN,
+        "noiseless": -907.2890602899746,
+        "rem": -905.9509543100761,
+        "replicates": [
+          {
+            "cdr_rem": -907.2719455722053,
+            "cdr_seed": 1092822827,
+            "cdr_unmit": -907.2496485563128,
+            "exact": -891.8540592467016,
+            "noiseless": -907.2890602899746,
+            "rem": -905.9509543100761,
+            "sampling_seed": 1264110007,
+            "simulator_seed": 1655179924,
+            "unmit": -905.0875146867912
+          }
+        ],
+        "sample_variance": NaN,
+        "unmit": -905.0875146867912
+      },
+      "H2": {
+        "cdr_rem": 823187.777093798,
+        "cdr_unmit": 823153.4655159676,
+        "exact": 795403.6629948188,
+        "mean_variance": NaN,
+        "noiseless": 823173.4401965874,
+        "rem": 820550.6749454701,
+        "replicates": [
+          {
+            "cdr_rem": 823187.777093798,
+            "cdr_seed": 1330227380,
+            "cdr_unmit": 823153.4655159676,
+            "exact": 795403.6629948188,
+            "noiseless": 823173.4401965874,
+            "rem": 820550.6749454701,
+            "sampling_seed": 1241245460,
+            "simulator_seed": 1602598363,
+            "unmit": 819159.4716311046
+          }
+        ],
+        "sample_variance": NaN,
+        "unmit": 819159.4716311046
+      },
+      "H3": {
+        "cdr_rem": -746853639.1682473,
+        "cdr_unmit": -746811918.9385979,
+        "exact": -709383985.581624,
+        "mean_variance": NaN,
+        "noiseless": -746856259.322796,
+        "rem": -743308165.2710446,
+        "replicates": [
+          {
+            "cdr_rem": -746853639.1682473,
+            "cdr_seed": 959830686,
+            "cdr_unmit": -746811918.9385979,
+            "exact": -709383985.581624,
+            "noiseless": -746856259.322796,
+            "rem": -743308165.2710446,
+            "sampling_seed": 1846826666,
+            "simulator_seed": 396316881,
+            "unmit": -741416923.3754908
+          }
+        ],
+        "sample_variance": NaN,
+        "unmit": -741416923.3754908
+      }
+    },
+    "params_best": [
+      0.0795737512567598,
+      0.033367552918178944,
+      0.034762551500222116
+    ],
+    "shots": {
+      "H": 16384,
+      "H2": 163840,
+      "H3": 163840
+    },
+    "variance_repeats": 1
+  },
+  "5": {
+    "E_cme_empirical_sigma": NaN,
+    "E_cme_empirical_variance": NaN,
+    "E_cme_exact": NaN,
+    "E_cme_gradient": [
+      -0.13503788516824677,
+      -0.00034815929016322516,
+      2.0380296137126701e-07
+    ],
+    "E_cme_minus_1sigma": NaN,
+    "E_cme_minus_2sigma": NaN,
+    "E_cme_noiseless": -907.2899090314642,
+    "E_cme_replicates": [
+      -907.2705812775696
+    ],
+    "E_cme_shots": -907.2705812775696,
+    "E_cme_sigma": NaN,
+    "E_cme_variance": NaN,
+    "connected_moments": {
+      "c1": -907.3004191674744,
+      "c2": -66.09412569587585,
+      "c3": -146405.5757777691
+    },
+    "e_gs": -907.2899804679435,
+    "h2_h3_shot_multiplier": 5,
+    "moment_source": "cdr_rem",
+    "moments": {
+      "H": {
+        "cdr_rem": -907.3004191674744,
+        "cdr_unmit": -907.2833592293515,
+        "exact": -891.8540592467016,
+        "mean_variance": NaN,
+        "noiseless": -907.2890602899746,
+        "rem": -905.8327938923579,
+        "replicates": [
+          {
+            "cdr_rem": -907.3004191674744,
+            "cdr_seed": 873778465,
+            "cdr_unmit": -907.2833592293515,
+            "exact": -891.8540592467016,
+            "noiseless": -907.2890602899746,
+            "rem": -905.8327938923579,
+            "sampling_seed": 916022014,
+            "simulator_seed": 199459453,
+            "unmit": -905.0820393428302
+          }
+        ],
+        "sample_variance": NaN,
+        "unmit": -905.0820393428302
+      },
+      "H2": {
+        "cdr_rem": 823127.9564957789,
+        "cdr_unmit": 823091.85704328,
+        "exact": 795403.6629948188,
+        "mean_variance": NaN,
+        "noiseless": 823173.4401965874,
+        "rem": 820570.1349564651,
+        "replicates": [
+          {
+            "cdr_rem": 823127.9564957789,
+            "cdr_seed": 760763987,
+            "cdr_unmit": 823091.85704328,
+            "exact": 795403.6629948188,
+            "noiseless": 823173.4401965874,
+            "rem": 820570.1349564651,
+            "sampling_seed": 1921495821,
+            "simulator_seed": 965329332,
+            "unmit": 819177.2690110308
+          }
+        ],
+        "sample_variance": NaN,
+        "unmit": 819177.2690110308
+      },
+      "H3": {
+        "cdr_rem": -746850811.0769678,
+        "cdr_unmit": -746827229.4676336,
+        "exact": -709383985.581624,
+        "mean_variance": NaN,
+        "noiseless": -746856259.322796,
+        "rem": -743223606.6072686,
+        "replicates": [
+          {
+            "cdr_rem": -746850811.0769678,
+            "cdr_seed": 2087799743,
+            "cdr_unmit": -746827229.4676336,
+            "exact": -709383985.581624,
+            "noiseless": -746856259.322796,
+            "rem": -743223606.6072686,
+            "sampling_seed": 1565981200,
+            "simulator_seed": 1601612144,
+            "unmit": -741388659.6921871
+          }
+        ],
+        "sample_variance": NaN,
+        "unmit": -741388659.6921871
+      }
+    },
+    "params_best": [
+      0.0795737512567598,
+      0.033367552918178944,
+      0.034762551500222116
+    ],
+    "shots": {
+      "H": 16384,
+      "H2": 81920,
+      "H3": 81920
+    },
+    "variance_repeats": 1
+  }
+}

@@ -13,7 +13,13 @@ from pathlib import Path
 os.environ.setdefault("MPLBACKEND", "Agg")
 os.chdir(Path(__file__).resolve().parent)
 
-from cloud_results import save_checkpoint
+from cloud_results import (
+    load_cmx_progress,
+    load_vqe_progress,
+    save_checkpoint,
+    save_cmx_progress,
+    save_vqe_progress,
+)
 
 
 # This cell is to read the circuit from the file 
@@ -929,20 +935,7 @@ print(
     f"shots/call={_shots_per_cdr_call}"
 )
 
-# Baseline (iteration 0): one mitigation triple + exact noiseless ⟨H⟩ at θ₀
-energy_curves: list[dict] = []
-raw0, rem0, cdr0 = _vqe_run_mitigation_triple(_params0, "init")
-E0 = float(cdr0)
-nls0 = float(_vqe_noiseless(_params0))
-energy_curves.append(
-    {
-        "iter": 0,
-        "raw_eh": float(raw0),
-        "rem_eh": float(rem0),
-        "rem_cf_eh": float(cdr0),
-        "noiseless_eh": float(nls0),
-    }
-)
+import time
 
 VQE_LR = float(VQE_LR)
 _NOISELESS_REF_LR = float(NOISELESS_REF_LR)
@@ -966,15 +959,160 @@ def _build_noiseless_reference_curve(params_start: np.ndarray, iters: int):
 
 noiseless_ref_curve, noiseless_ref_thetas = _build_noiseless_reference_curve(_params0, int(VQE_ITERS))
 
-# --- Main optimisation (fixed exactly VQE_ITERS iterations) ---
-theta = _params0.copy()
+_VQE_DATA_DIR = Path("data")
+_VQE_RESUME = os.environ.get("VQE_RESUME", "1").strip().lower() not in {"0", "false", "no", "off"}
 
+
+def _vqe_progress_payload(
+    *,
+    completed_iters: int,
+    theta_cur: np.ndarray,
+    best_theta_cur: np.ndarray,
+    best_E_cur: float,
+    prev_E_cur: float,
+    E0_cur: float,
+    energy_curves_cur: list,
+    trace_cur: list,
+    iteration_timings_cur: list,
+    E_final_cur=None,
+) -> dict:
+    return {
+        "completed_iters": int(completed_iters),
+        "max_iters": int(VQE_ITERS),
+        "circuit_name": CIRCUIT_NAME,
+        "n_params": int(n_params),
+        "lr": float(VQE_LR),
+        "num_shots": int(_num_shots),
+        "theta": np.asarray(theta_cur, dtype=float).copy(),
+        "best_theta": np.asarray(best_theta_cur, dtype=float).copy(),
+        "best_E": float(best_E_cur),
+        "prev_E": float(prev_E_cur),
+        "E0": float(E0_cur),
+        "params0": _params0.copy(),
+        "energy_curves": list(energy_curves_cur),
+        "trace": list(trace_cur),
+        "iteration_timings": list(iteration_timings_cur),
+        "E_final": None if E_final_cur is None else float(E_final_cur),
+        "counts": {
+            "total": int(_n_energy_total),
+            "init": int(_n_init),
+            "warmup": int(_n_warmup),
+            "main_grad": int(_n_main_grad),
+            "main_post": int(_n_main_post),
+            "final": int(_n_final),
+            "noiseless_track": int(_n_noiseless_track),
+        },
+        "rng_state": _VQE_SEED_RNG.bit_generator.state,
+    }
+
+
+def _restore_vqe_counts(counts: dict) -> None:
+    global _n_energy_total, _n_init, _n_warmup, _n_main_grad, _n_main_post, _n_final, _n_noiseless_track
+    _n_energy_total = int(counts.get("total", 0))
+    _n_init = int(counts.get("init", 0))
+    _n_warmup = int(counts.get("warmup", 0))
+    _n_main_grad = int(counts.get("main_grad", 0))
+    _n_main_post = int(counts.get("main_post", 0))
+    _n_final = int(counts.get("final", 0))
+    _n_noiseless_track = int(counts.get("noiseless_track", 0))
+
+
+# --- Resume from mid-VQE checkpoint if present ---
+energy_curves: list[dict] = []
 trace = []
-best_E = float(E0)
+iteration_timings: list[dict] = []
+theta = _params0.copy()
 best_theta = _params0.copy()
-prev_E = float(E0)
+E0 = float("nan")
+best_E = float("nan")
+prev_E = float("nan")
+start_it = 1
+_ckpt_E_final = None
 
-for it in range(1, int(VQE_ITERS) + 1):
+_ckpt = load_vqe_progress(
+    data_dir=_VQE_DATA_DIR,
+    molecule=MOLECULE,
+    bond_length=float(bond_length),
+    num_shots=int(GLOBAL_NUM_SHOTS),
+) if _VQE_RESUME else None
+
+_ckpt_ok = False
+if isinstance(_ckpt, dict):
+    try:
+        _ckpt_ok = (
+            str(_ckpt.get("circuit_name", "")) == CIRCUIT_NAME
+            and int(_ckpt.get("n_params", -1)) == int(n_params)
+            and int(_ckpt.get("max_iters", -1)) == int(VQE_ITERS)
+            and abs(float(_ckpt.get("lr", -1.0)) - float(VQE_LR)) < 1e-12
+            and int(_ckpt.get("num_shots", -1)) == int(_num_shots)
+            and np.allclose(np.asarray(_ckpt.get("params0"), dtype=float).reshape(-1), _params0)
+        )
+    except Exception:
+        _ckpt_ok = False
+
+if _ckpt_ok:
+    completed = int(_ckpt.get("completed_iters", 0))
+    energy_curves = list(_ckpt.get("energy_curves") or [])
+    trace = list(_ckpt.get("trace") or [])
+    iteration_timings = list(_ckpt.get("iteration_timings") or [])
+    theta = np.asarray(_ckpt["theta"], dtype=float).reshape(n_params).copy()
+    best_theta = np.asarray(_ckpt["best_theta"], dtype=float).reshape(n_params).copy()
+    E0 = float(_ckpt["E0"])
+    best_E = float(_ckpt["best_E"])
+    prev_E = float(_ckpt["prev_E"])
+    _ckpt_E_final = _ckpt.get("E_final")
+    _restore_vqe_counts(dict(_ckpt.get("counts") or {}))
+    if "rng_state" in _ckpt and _ckpt["rng_state"] is not None:
+        _VQE_SEED_RNG.bit_generator.state = _ckpt["rng_state"]
+    start_it = completed + 1
+    print(
+        f"[VQE] resuming from checkpoint: completed_iters={completed}/{int(VQE_ITERS)}  "
+        f"theta={np.array2string(theta, precision=6, separator=', ')}"
+    )
+else:
+    if _ckpt is not None and _VQE_RESUME:
+        print("[VQE] ignoring incompatible checkpoint; starting fresh")
+    # Baseline (iteration 0): one mitigation triple + exact noiseless ⟨H⟩ at θ₀
+    _t_init0 = time.perf_counter()
+    raw0, rem0, cdr0 = _vqe_run_mitigation_triple(_params0, "init")
+    E0 = float(cdr0)
+    nls0 = float(_vqe_noiseless(_params0))
+    _t_init = float(time.perf_counter() - _t_init0)
+    energy_curves.append(
+        {
+            "iter": 0,
+            "raw_eh": float(raw0),
+            "rem_eh": float(rem0),
+            "rem_cf_eh": float(cdr0),
+            "noiseless_eh": float(nls0),
+            "wall_s": _t_init,
+        }
+    )
+    iteration_timings.append({"iter": 0, "wall_s": _t_init, "stage": "init"})
+    print(f"[VQE] init (iter=00) wall_s={_t_init:.2f}")
+    best_E = float(E0)
+    prev_E = float(E0)
+    save_vqe_progress(
+        data_dir=_VQE_DATA_DIR,
+        molecule=MOLECULE,
+        bond_length=float(bond_length),
+        num_shots=int(GLOBAL_NUM_SHOTS),
+        payload=_vqe_progress_payload(
+            completed_iters=0,
+            theta_cur=theta,
+            best_theta_cur=best_theta,
+            best_E_cur=best_E,
+            prev_E_cur=prev_E,
+            E0_cur=E0,
+            energy_curves_cur=energy_curves,
+            trace_cur=trace,
+            iteration_timings_cur=iteration_timings,
+        ),
+    )
+
+# --- Main optimisation (fixed exactly VQE_ITERS iterations) ---
+for it in range(int(start_it), int(VQE_ITERS) + 1):
+    _t_iter0 = time.perf_counter()
     _count_before = int(_n_energy_total)
     theta_before = theta.copy()
     active = np.arange(P, dtype=int)
@@ -996,6 +1134,8 @@ for it in range(1, int(VQE_ITERS) + 1):
     nls_at_theta = float(_vqe_noiseless(theta))
     e_bias = abs(float(E) - nls_at_theta)
 
+    iter_wall_s = float(time.perf_counter() - _t_iter0)
+
     energy_curves.append(
         {
             "iter": int(it),
@@ -1003,6 +1143,7 @@ for it in range(1, int(VQE_ITERS) + 1):
             "rem_eh": float(rem_e),
             "rem_cf_eh": float(E),
             "noiseless_eh": float(nls_e),
+            "wall_s": iter_wall_s,
         }
     )
 
@@ -1021,8 +1162,10 @@ for it in range(1, int(VQE_ITERS) + 1):
             "grad_noisy_norm": grad_noisy_norm,
             "theta_diff": theta_diff,
             "e_bias": e_bias,
+            "wall_s": iter_wall_s,
         }
     )
+    iteration_timings.append({"iter": int(it), "wall_s": iter_wall_s, "stage": "main"})
 
     if E < best_E:
         best_E = float(E)
@@ -1042,7 +1185,7 @@ for it in range(1, int(VQE_ITERS) + 1):
     print(
         f"[VQE] iter={it:02d}  lr={float(VQE_LR):.5g}  E={E:.8f}  dE={dE:+.3e}  "
         f"grad={grad_str}  step_max={step_max:.3e}  step_l2={step_l2:.3e}  active={active.tolist()}  "
-        f"theta={theta_updated}  cdr_calls_iter={cdr_calls_this_iter}  "
+        f"theta={theta_updated}  wall_s={iter_wall_s:.2f}  cdr_calls_iter={cdr_calls_this_iter}  "
         f"cdr_calls_cum={cum_cdr_calls}  energy_evals_cum≈{cum_energy_evals}  shots_cum≈{cum_shots}"
     )
     print(
@@ -1054,15 +1197,64 @@ for it in range(1, int(VQE_ITERS) + 1):
     )
     prev_E = float(E)
 
-_, _, E_final = _vqe_run_mitigation_triple(theta, "final")
+    save_vqe_progress(
+        data_dir=_VQE_DATA_DIR,
+        molecule=MOLECULE,
+        bond_length=float(bond_length),
+        num_shots=int(GLOBAL_NUM_SHOTS),
+        payload=_vqe_progress_payload(
+            completed_iters=int(it),
+            theta_cur=theta,
+            best_theta_cur=best_theta,
+            best_E_cur=best_E,
+            prev_E_cur=prev_E,
+            E0_cur=E0,
+            energy_curves_cur=energy_curves,
+            trace_cur=trace,
+            iteration_timings_cur=iteration_timings,
+        ),
+    )
+
+if _ckpt_E_final is not None and int(start_it) > int(VQE_ITERS):
+    E_final = float(_ckpt_E_final)
+    print(f"[VQE] all {int(VQE_ITERS)} iterations already done; reusing E_final={E_final:.8f}")
+else:
+    _, _, E_final = _vqe_run_mitigation_triple(theta, "final")
+    save_vqe_progress(
+        data_dir=_VQE_DATA_DIR,
+        molecule=MOLECULE,
+        bond_length=float(bond_length),
+        num_shots=int(GLOBAL_NUM_SHOTS),
+        payload=_vqe_progress_payload(
+            completed_iters=int(VQE_ITERS),
+            theta_cur=theta,
+            best_theta_cur=best_theta,
+            best_E_cur=best_E,
+            prev_E_cur=prev_E,
+            E0_cur=E0,
+            energy_curves_cur=energy_curves,
+            trace_cur=trace,
+            iteration_timings_cur=iteration_timings,
+            E_final_cur=E_final,
+        ),
+    )
 
 _total_cdr_calls = int(_n_energy_total)
 _total_energy_evals = int(_total_cdr_calls * _energy_evals_per_cdr_call)
 _total_shots = int(_total_cdr_calls * _shots_per_cdr_call)
+_main_times = [float(t["wall_s"]) for t in iteration_timings if int(t.get("iter", -1)) > 0]
 print(
     f"[VQE] TOTAL measurement cost: cdr_calls={_total_cdr_calls}, "
     f"energy_evals≈{_total_energy_evals}, total_shots≈{_total_shots}"
 )
+if _main_times:
+    print(
+        f"[VQE] iteration wall times (s): "
+        f"mean={float(np.mean(_main_times)):.2f}  "
+        f"min={float(np.min(_main_times)):.2f}  "
+        f"max={float(np.max(_main_times)):.2f}  "
+        f"total={float(np.sum(_main_times)):.2f}"
+    )
 
 vqe_results = {
     "params_init": _params0.copy(),
@@ -1073,6 +1265,7 @@ vqe_results = {
     "E_best": float(best_E),
     "trace": trace,
     "energy_curves": energy_curves,
+    "iteration_timings": iteration_timings,
     "lr": float(VQE_LR),
     "noiseless_ref_lr": float(_NOISELESS_REF_LR),
     "max_iters": int(VQE_ITERS),
@@ -1182,11 +1375,54 @@ try:
     if "vqe_results" not in globals():
         raise RuntimeError("Run the VQE loop cell first (defines vqe_results).")
 
+    params_cmx = np.asarray(vqe_results["params_best"], dtype=float).reshape(n_params)
+
+    # Resume previously finished CMX multipliers when present.
+    _CMX_DATA_DIR = Path("data")
+    _CMX_RESUME = os.environ.get("CMX_RESUME", "1").strip().lower() not in {"0", "false", "no", "off"}
+    _cmx_ckpt = (
+        load_cmx_progress(
+            data_dir=_CMX_DATA_DIR,
+            molecule=MOLECULE,
+            bond_length=float(bond_length),
+            num_shots=int(globals().get("GLOBAL_NUM_SHOTS", GLOBAL_NUM_SHOTS)),
+        )
+        if _CMX_RESUME
+        else None
+    )
+    cme_results_by_multiplier = {}
+    if isinstance(_cmx_ckpt, dict):
+        try:
+            _cmx_ckpt_ok = (
+                str(_cmx_ckpt.get("circuit_name", "")) == CIRCUIT_NAME
+                and int(_cmx_ckpt.get("CME_H_NUM_SHOTS", -1)) == int(CME_H_NUM_SHOTS)
+                and int(_cmx_ckpt.get("CME_VARIANCE_REPEATS", -1)) == int(CME_VARIANCE_REPEATS)
+                and str(_cmx_ckpt.get("CME_MOMENT_SOURCE", "")) == str(CME_MOMENT_SOURCE)
+                and [int(m) for m in _cmx_ckpt.get("CME_SHOT_MULTIPLIERS", [])] == [int(m) for m in CME_SHOT_MULTIPLIERS]
+                and np.allclose(
+                    np.asarray(_cmx_ckpt.get("params_best"), dtype=float).reshape(-1),
+                    params_cmx,
+                )
+            )
+        except Exception:
+            _cmx_ckpt_ok = False
+        if _cmx_ckpt_ok:
+            raw_by_mult = dict(_cmx_ckpt.get("cme_results_by_multiplier") or {})
+            cme_results_by_multiplier = {int(k): v for k, v in raw_by_mult.items()}
+            print(
+                f"[CMX] resuming from checkpoint; completed multipliers="
+                f"{sorted(cme_results_by_multiplier)}"
+            )
+        elif _cmx_ckpt is not None:
+            print("[CMX] ignoring incompatible CMX checkpoint; starting CMX fresh")
+
+    _pending_mults = [int(m) for m in CME_SHOT_MULTIPLIERS if int(m) not in cme_results_by_multiplier]
+    print(f"[CMX] using VQE best params (E_best={float(vqe_results['E_best']):.10f} Eh)")
+    print(f"[CMX] pending multipliers={_pending_mults}")
+
     # 1) Rebuild the noisy density matrix from the lowest-energy VQE parameters
     #    (same noisy-ansatz + density-matrix recipe as cell ``21b206da``).
     random_seed = int(globals().get("random_seed", globals()["GLOBAL_RANDOM_SEED"]))
-    params_cmx = np.asarray(vqe_results["params_best"], dtype=float).reshape(n_params)
-    print(f"[CMX] using VQE best params (E_best={float(vqe_results['E_best']):.10f} Eh)")
 
     gate_noise = GateArityDepolarizingNoise(
         two_qubit_depol_prob=TWO_QUBIT_GATE_DEPOL_PROB,
@@ -1392,8 +1628,49 @@ try:
 
     # 5) Sweep the <H>/<H^2>/<H^3> shot budget over CME_SHOT_MULTIPLIERS x CME_H_NUM_SHOTS,
     #    independently remeasuring all moments and rerunning CME(k=3).
-    cme_results_by_multiplier = {}
+    #    Completed multipliers from cmx_progress.pkl are skipped.
+    def _save_cmx_checkpoint() -> None:
+        save_cmx_progress(
+            data_dir=_CMX_DATA_DIR,
+            molecule=MOLECULE,
+            bond_length=float(bond_length),
+            num_shots=int(globals().get("GLOBAL_NUM_SHOTS", GLOBAL_NUM_SHOTS)),
+            payload={
+                "circuit_name": CIRCUIT_NAME,
+                "params_best": np.asarray(params_cmx, dtype=float).copy(),
+                "CME_SHOT_MULTIPLIERS": [int(m) for m in CME_SHOT_MULTIPLIERS],
+                "CME_H_NUM_SHOTS": int(CME_H_NUM_SHOTS),
+                "CME_VARIANCE_REPEATS": int(CME_VARIANCE_REPEATS),
+                "CME_MOMENT_SOURCE": str(CME_MOMENT_SOURCE),
+                "cme_results_by_multiplier": dict(cme_results_by_multiplier),
+                "cme_results": cme_results_by_multiplier.get(int(CME_SHOT_MULTIPLIERS[-1])),
+            },
+        )
+        save_checkpoint(
+            data_dir=_CMX_DATA_DIR,
+            molecule=MOLECULE,
+            bond_length=float(bond_length),
+            num_shots=int(globals().get("GLOBAL_NUM_SHOTS", GLOBAL_NUM_SHOTS)),
+            stage="cmx",
+            vqe_results=globals().get("vqe_results"),
+            cme_results=cme_results_by_multiplier.get(int(CME_SHOT_MULTIPLIERS[-1])),
+            cme_results_by_multiplier=dict(cme_results_by_multiplier),
+            metadata={
+                "circuit_name": CIRCUIT_NAME,
+                "measurement_scheme": GLOBAL_MEASUREMENT_SCHEME,
+                "num_shots": int(globals().get("GLOBAL_NUM_SHOTS", GLOBAL_NUM_SHOTS)),
+                "cdr_training_circuits": int(CDR_NUM_TRAINING_CIRCUITS),
+                "vqe_iters": int(VQE_ITERS),
+                "completed_cmx_multipliers": sorted(int(k) for k in cme_results_by_multiplier),
+            },
+        )
+
+    if not _pending_mults:
+        print("[CMX] all multipliers already checkpointed; skipping CMX measurements")
     for mult in CME_SHOT_MULTIPLIERS:
+        if int(mult) in cme_results_by_multiplier:
+            print(f"[CMX] skipping multiplier {int(mult)}x (already checkpointed)")
+            continue
         moment_shots = int(mult * CME_H_NUM_SHOTS)
         print(
             f"\n--- moment shots/repeat = {moment_shots}; "
@@ -1479,7 +1756,7 @@ try:
         print(f"|<H>cdr+rem - <H>noiseless|     = {abs(src['H'] - moments['H']['noiseless']):.6e} Eh  (cf. VQE loop ~1e-2)")
         print(f"|E_CME(shots) - E_CME(noiseless)| = {abs(E_cme - E_cme_noiseless):.6e} Eh")
 
-        cme_results_by_multiplier[mult] = {
+        cme_results_by_multiplier[int(mult)] = {
             "params_best": params_cmx.copy(),
             "shots": dict(shots),
             "moments": {k: dict(v) for k, v in moments.items()},
@@ -1497,15 +1774,16 @@ try:
             "E_cme_exact": float(E_cme_exact),
             "e_gs": float(e_ref),
             "moment_source": CME_MOMENT_SOURCE,
-            "h2_h3_shot_multiplier": mult,
+            "h2_h3_shot_multiplier": int(mult),
             "variance_repeats": int(CME_VARIANCE_REPEATS),
         }
+        _save_cmx_checkpoint()
 
     print("\n=== CME(k=3) summary across shot multipliers ===")
     for mult in CME_SHOT_MULTIPLIERS:
-        r = cme_results_by_multiplier[mult]
+        r = cme_results_by_multiplier[int(mult)]
         print(
-            f"{mult:>3d}x (shots={r['shots']['H']:>8d})  "
+            f"{int(mult):>3d}x (shots={r['shots']['H']:>8d})  "
             f"E_CME={r['E_cme_shots']:.10f} +/- {r['E_cme_sigma']:.3e} Eh  "
             f"E-1sigma={r['E_cme_minus_1sigma']:.10f}  "
             f"E-2sigma={r['E_cme_minus_2sigma']:.10f}  "
@@ -1515,7 +1793,7 @@ try:
     # Backward-compatible alias for cells expecting a single ``cme_results`` dict:
     # the largest-multiplier sweep result (closest to the shot budget this cell used
     # before the sweep was added).
-    cme_results = cme_results_by_multiplier[CME_SHOT_MULTIPLIERS[-1]]
+    cme_results = cme_results_by_multiplier[int(CME_SHOT_MULTIPLIERS[-1])]
 except FileNotFoundError as _cme_missing_file:
 
     print(f"[cloud-results] Skipping CME/CMX because an input file is missing: {_cme_missing_file}")
