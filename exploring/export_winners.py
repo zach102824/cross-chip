@@ -1,7 +1,12 @@
 #!/usr/bin/env python3
-"""Export HF (unchanged) + Cl2 (disjoint RZX, all qubits) winners."""
+"""Export HF + Cl2 disjoint-RZX winners.
+
+Naming (consistent across molecules):
+  {Molecule}_{nq}q_disjoint_rzx.{json,png}
+"""
 from __future__ import annotations
 
+import itertools
 import json
 import sys
 from pathlib import Path
@@ -16,9 +21,22 @@ sys.path.insert(0, str(_ROOT / "UCCSD circuit"))
 
 from constraints import rzx_pairs, satisfies_rules  # noqa: E402
 from error_budget import cross_from_list, score_gates, spin_split_cross_pairs  # noqa: E402
-from flexible_compile import compile_strings, gates_to_qc, gen, statevector_overlap  # noqa: E402
-from methods import method_disjoint_rzx_all_qubits, method_independent_pairs  # noqa: E402
+from flexible_compile import (  # noqa: E402
+    candidate_bridges,
+    compile_strings,
+    gates_to_qc,
+    gen,
+    statevector_overlap,
+)
+from freeze import all_keep_masks  # noqa: E402
+from methods import method_independent_pairs  # noqa: E402
 import taper_lib  # noqa: E402
+
+# stem = {Molecule}_{nq}q_disjoint_rzx
+STEM = {
+    "HF": "HF_6q_disjoint_rzx",
+    "Cl2": "Cl2_10q_disjoint_rzx",
+}
 
 
 def hf_case():
@@ -65,15 +83,60 @@ def hf_case():
     }
 
 
+def _cl2_exhaustive_min(strings, signs, n=10):
+    """Exhaustive keep-mask × vertex-disjoint bridge scan.
+
+    Picks the constraint-legal circuit minimizing (total 2q, depth, total 1q).
+    """
+    mask_lists = [list(all_keep_masks(s)) for s in strings]
+    best = None
+    for combo in itertools.product(*mask_lists):
+        frozen = [c[1] for c in combo]
+        keeps = [sorted(c[0]) for c in combo]
+        cands = [candidate_bridges(s, n) for s in frozen]
+
+        def schedules(i, used, acc):
+            if i == len(cands):
+                yield list(acc)
+                return
+            for a, b in cands[i]:
+                if a not in used and b not in used:
+                    yield from schedules(i + 1, used | {a, b}, acc + [(a, b)])
+
+        for sched in schedules(0, set(), []):
+            try:
+                out = compile_strings(
+                    frozen, signs=signs, order="given",
+                    hub_schedule=sched, fuse=True,
+                )
+            except Exception:
+                continue
+            gates = out["gates"]
+            if not satisfies_rules(gates, n)[0]:
+                continue
+            n2 = sum(len(g["qubits"]) == 2 for g in gates)
+            n1 = sum(len(g["qubits"]) == 1 for g in gates)
+            key = (n2, gates_to_qc(gates, n).depth(), n1)
+            if best is None or key < best["key"]:
+                best = {
+                    "key": key,
+                    "name": "disjoint_rzx_all_qubits",
+                    "gates": gates,
+                    "frozen_strings": frozen,
+                    "keep_pairs": keeps,
+                    "schedule": sched,
+                    "budget": score_gates(gates, spin_split_cross_pairs(n)),
+                }
+    return best
+
+
 def cl2_case():
-    doubles = [(4, 9, 6, 1), (4, 9, 5, 0), (4, 9, 7, 2)]
+    # Order chosen so the (2q, depth, 1q)-optimal schedule keeps t_k ↔ doubles[k].
+    doubles = [(4, 9, 5, 0), (4, 9, 6, 1), (4, 9, 7, 2)]
     strings = ["".join(gen.jw_string_for_double(10, d)) for d in doubles]
     signs = [1, 1, 1]
-    hits = method_disjoint_rzx_all_qubits(
-        strings, signs=signs, cross_pairs=spin_split_cross_pairs(10), max_mask_opts=4
-    )
-    assert hits, "no Cl2 circuit under disjoint/all-qubit rules"
-    best = hits[0]
+    best = _cl2_exhaustive_min(strings, signs)
+    assert best, "no Cl2 circuit under disjoint/all-qubit rules"
     ok, why = satisfies_rules(best["gates"], 10)
     assert ok, why
     ref = compile_strings(strings, signs=signs, order="given", fuse=True)
@@ -96,6 +159,7 @@ def cl2_case():
         "signs": signs,
         "doubles": doubles,
         "budget": best["budget"].as_dict(),
+        "depth": gates_to_qc(best["gates"], 10).depth(),
         "rzx_pairs": [list(p) for p in rzx_pairs(best["gates"])],
         "overlap_min": float(min(ovs)),
         "gates": best["gates"],
@@ -136,19 +200,25 @@ def main():
         },
     }
     (_HERE / "winners.json").write_text(json.dumps(summary, indent=2))
-    (_HERE / "HF_6q_indep_pairs_freeze.json").write_text(json.dumps(hf, indent=2))
-    (_HERE / "Cl2_10q_disjoint_rzx.json").write_text(json.dumps(cl2, indent=2))
-    # keep previous filename as alias to the new Cl2 winner
-    (_HERE / "Cl2_10q_spatial_premerge.json").write_text(json.dumps(cl2, indent=2))
 
-    for name, data, n in (
-        ("HF_6q_indep_pairs_freeze", hf, 6),
-        ("Cl2_10q_disjoint_rzx", cl2, 10),
-        ("Cl2_10q_spatial_premerge", cl2, 10),
+    # Drop legacy HF name if present
+    for legacy in (
+        "HF_6q_indep_pairs_freeze.json",
+        "HF_6q_indep_pairs_freeze_circuit.png",
     ):
+        p = _HERE / legacy
+        if p.exists():
+            p.unlink()
+
+    for stem, data, n in (
+        (STEM["HF"], hf, 6),
+        (STEM["Cl2"], cl2, 10),
+    ):
+        (_HERE / f"{stem}.json").write_text(json.dumps(data, indent=2))
         qc = gates_to_qc(data["gates"], n)
         fig = qc.draw(output="mpl", fold=-1, style=gen.IQP_STYLE, idle_wires=True)
-        fig.savefig(_HERE / f"{name}_circuit.png", dpi=160, bbox_inches="tight")
+        fig.savefig(_HERE / f"{stem}_circuit.png", dpi=160, bbox_inches="tight")
+        print(f"wrote {stem}.json / {stem}_circuit.png")
 
     print("HF:", hf["budget"], "rzx", hf["rzx_pairs"], "overlap", hf["overlap_min"])
     print("Cl2:", cl2["budget"], "rzx", cl2["rzx_pairs"], "overlap", cl2["overlap_min"])

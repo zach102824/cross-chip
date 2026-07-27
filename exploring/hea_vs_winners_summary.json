@@ -1,0 +1,127 @@
+{
+  "Cl2": {
+    "tag": "Cl2 bond 2.2",
+    "E_GS": -909.1452968061,
+    "E_HF": -909.1063151177,
+    "current": {
+      "E": -909.1434671273,
+      "err_mHa": 1.83,
+      "corr_pct": 95.3,
+      "n2": 23,
+      "depth": 21,
+      "nparams": 3
+    },
+    "candidates": [
+      {
+        "name": "HEA_5vertRZX_L1",
+        "E": -909.1063151177,
+        "err_mHa": 38.982,
+        "corr_pct": 0.0,
+        "n2": 5,
+        "depth": 5,
+        "nparams": 25,
+        "beats_E": false,
+        "beats_2q": true,
+        "beats_depth": true,
+        "beats_E_and_leq_resources": false
+      },
+      {
+        "name": "HEA_3RZX_only",
+        "E": -909.1063151177,
+        "err_mHa": 38.982,
+        "corr_pct": 0.0,
+        "n2": 3,
+        "depth": 5,
+        "nparams": 23,
+        "beats_E": false,
+        "beats_2q": true,
+        "beats_depth": true,
+        "beats_E_and_leq_resources": false
+      },
+      {
+        "name": "HEA_NN+3RZX_L1",
+        "E": -909.1063151177,
+        "err_mHa": 38.982,
+        "corr_pct": 0.0,
+        "n2": 11,
+        "depth": 9,
+        "nparams": 23,
+        "beats_E": false,
+        "beats_2q": true,
+        "beats_depth": true,
+        "beats_E_and_leq_resources": false
+      },
+      {
+        "name": "HEA_allCZ+3RZX",
+        "E": -909.1063151177,
+        "err_mHa": 38.982,
+        "corr_pct": 0.0,
+        "n2": 13,
+        "depth": 9,
+        "nparams": 23,
+        "beats_E": false,
+        "beats_2q": true,
+        "beats_depth": true,
+        "beats_E_and_leq_resources": false
+      },
+      {
+        "name": "HEA_NN+chord+5RZX",
+        "E": -909.1063151177,
+        "err_mHa": 38.982,
+        "corr_pct": 0.0,
+        "n2": 15,
+        "depth": 10,
+        "nparams": 25,
+        "beats_E": false,
+        "beats_2q": true,
+        "beats_depth": true,
+        "beats_E_and_leq_resources": false
+      }
+    ],
+    "notes": "L2 variants skipped (rzx_overlap under global vertex-disjoint rule). Extra Ry/Rx\u00b1CZ\u00b1RZX probes also stuck at HF; only UCCSD winner skeleton recovers correlation."
+  },
+  "HF": {
+    "tag": "HF tapered bond 1.0",
+    "E_GS": -98.59748629433192,
+    "E_HF": -98.57048973900083,
+    "init": "111111",
+    "current": {
+      "E": -98.59693893769474,
+      "err_mHa": 0.5473566371705374,
+      "corr_pct": 97.97249452584654,
+      "n2": 3,
+      "depth": 5,
+      "nparams": 3
+    },
+    "candidates": [
+      {
+        "name": "HEA_3vertRZX_L1",
+        "E": -98.57048973900075,
+        "err_mHa": 26.996555331166405,
+        "corr_pct": -3.1583706604614946e-10,
+        "n2": 3,
+        "depth": 5,
+        "nparams": 15,
+        "beats_E": false,
+        "beats_2q": false,
+        "beats_depth": false,
+        "beats_E_and_leq_resources": false
+      },
+      {
+        "name": "HEA_NN+3RZX",
+        "E": -98.57048973900076,
+        "err_mHa": 26.996555331152194,
+        "corr_pct": -2.631975550384579e-10,
+        "n2": 7,
+        "depth": 7,
+        "nparams": 15,
+        "beats_E": false,
+        "beats_2q": false,
+        "beats_depth": false,
+        "beats_E_and_leq_resources": false
+      }
+    ]
+  },
+  "clear_wins": [],
+  "verdict": "No HEA beat current winners on energy with \u2264 2q/depth resources; generic Ry/Rx+CZ+RZX HEAs recover ~0% correlation on Cl2 vs winner ~95%."
+}

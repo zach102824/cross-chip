@@ -1,0 +1,621 @@
+{
+  "note": "UNCONSTRAINED all-to-all Cl2 10q (ignore constraints.py)",
+  "molecule": "Cl2",
+  "num_qubits": 10,
+  "doubles": [
+    [
+      4,
+      9,
+      5,
+      0
+    ],
+    [
+      4,
+      9,
+      6,
+      1
+    ],
+    [
+      4,
+      9,
+      7,
+      2
+    ]
+  ],
+  "method": "spatial_explicit",
+  "frozen_strings": [
+    "YIIIXXIIIX",
+    "IYIIXIXIIX",
+    "IIYIXIIXIX"
+  ],
+  "keep_pairs": [
+    [],
+    [],
+    []
+  ],
+  "hub_schedule": [
+    [
+      4,
+      9
+    ],
+    [
+      4,
+      9
+    ],
+    [
+      4,
+      9
+    ]
+  ],
+  "hubs_bridges": "shared LUMO bridge (4,9) for all 3 doubles",
+  "n2": 11,
+  "cz": 8,
+  "rzx": 3,
+  "depth": 9,
+  "n1": 30,
+  "ops": {
+    "rx": 6,
+    "h": 24,
+    "cz": 8,
+    "rzx": 3
+  },
+  "rzx_pairs": [
+    [
+      0,
+      8
+    ],
+    [
+      2,
+      8
+    ],
+    [
+      4,
+      8
+    ]
+  ],
+  "overlap_vs_unfrozen_min": 0.9077122319658429,
+  "comparison_constrained_winner": {
+    "n2": 23,
+    "depth": 21,
+    "cz": 20,
+    "rzx": 3
+  },
+  "beats_known_15": true,
+  "gates": [
+    {
+      "op": "rx",
+      "qubits": [
+        0
+      ],
+      "value": 1.5707963267948966
+    },
+    {
+      "op": "h",
+      "qubits": [
+        0
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        1
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        9
+      ]
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        0,
+        1
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        1
+      ]
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        8,
+        9
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        9
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        8
+      ]
+    },
+    {
+      "op": "rzx",
+      "qubits": [
+        8,
+        0
+      ],
+      "param": "t0",
+      "coeff": 1.0
+    },
+    {
+      "op": "h",
+      "qubits": [
+        1
+      ]
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        0,
+        1
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        1
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        0
+      ]
+    },
+    {
+      "op": "rx",
+      "qubits": [
+        0
+      ],
+      "value": -1.5707963267948966
+    },
+    {
+      "op": "rx",
+      "qubits": [
+        2
+      ],
+      "value": 1.5707963267948966
+    },
+    {
+      "op": "h",
+      "qubits": [
+        2
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        3
+      ]
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        2,
+        3
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        3
+      ]
+    },
+    {
+      "op": "rzx",
+      "qubits": [
+        8,
+        2
+      ],
+      "param": "t1",
+      "coeff": 1.0
+    },
+    {
+      "op": "h",
+      "qubits": [
+        3
+      ]
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        2,
+        3
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        3
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        2
+      ]
+    },
+    {
+      "op": "rx",
+      "qubits": [
+        2
+      ],
+      "value": -1.5707963267948966
+    },
+    {
+      "op": "rx",
+      "qubits": [
+        4
+      ],
+      "value": 1.5707963267948966
+    },
+    {
+      "op": "h",
+      "qubits": [
+        4
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        5
+      ]
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        4,
+        5
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        5
+      ]
+    },
+    {
+      "op": "rzx",
+      "qubits": [
+        8,
+        4
+      ],
+      "param": "t2",
+      "coeff": 1.0
+    },
+    {
+      "op": "h",
+      "qubits": [
+        8
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        9
+      ]
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        8,
+        9
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        5
+      ]
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        4,
+        5
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        9
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        5
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        4
+      ]
+    },
+    {
+      "op": "rx",
+      "qubits": [
+        4
+      ],
+      "value": -1.5707963267948966
+    }
+  ],
+  "leaderboard": [
+    {
+      "name": "spatial_explicit",
+      "n2": 11,
+      "cz": 8,
+      "rzx": 3,
+      "depth": 9,
+      "n1": 30,
+      "rzx_pairs": [
+        [
+          0,
+          8
+        ],
+        [
+          2,
+          8
+        ],
+        [
+          4,
+          8
+        ]
+      ]
+    },
+    {
+      "name": "spatial_premerge",
+      "n2": 13,
+      "cz": 10,
+      "rzx": 3,
+      "depth": 17,
+      "n1": 18,
+      "rzx_pairs": [
+        [
+          1,
+          8
+        ],
+        [
+          3,
+          8
+        ],
+        [
+          4,
+          9
+        ]
+      ]
+    },
+    {
+      "name": "FF_best_hub_sched",
+      "n2": 15,
+      "cz": 12,
+      "rzx": 3,
+      "depth": 17,
+      "n1": 14,
+      "rzx_pairs": [
+        [
+          4,
+          5
+        ],
+        [
+          4,
+          6
+        ],
+        [
+          4,
+          7
+        ]
+      ]
+    },
+    {
+      "name": "selective_best",
+      "n2": 15,
+      "cz": 12,
+      "rzx": 3,
+      "depth": 17,
+      "n1": 14,
+      "rzx_pairs": [
+        [
+          4,
+          5
+        ],
+        [
+          4,
+          6
+        ],
+        [
+          4,
+          7
+        ]
+      ]
+    },
+    {
+      "name": "full_freeze_legacy_hub4",
+      "n2": 15,
+      "cz": 12,
+      "rzx": 3,
+      "depth": 17,
+      "n1": 18,
+      "rzx_pairs": [
+        [
+          4,
+          9
+        ],
+        [
+          4,
+          9
+        ],
+        [
+          4,
+          9
+        ]
+      ]
+    },
+    {
+      "name": "shared_cliff_FF_ord(0, 1, 2)",
+      "n2": 15,
+      "cz": 12,
+      "rzx": 3,
+      "depth": 17,
+      "n1": 18,
+      "rzx_pairs": [
+        [
+          4,
+          9
+        ],
+        [
+          4,
+          9
+        ],
+        [
+          4,
+          9
+        ]
+      ]
+    },
+    {
+      "name": "shared_cliff_FF_ord(0, 2, 1)",
+      "n2": 15,
+      "cz": 12,
+      "rzx": 3,
+      "depth": 17,
+      "n1": 18,
+      "rzx_pairs": [
+        [
+          4,
+          9
+        ],
+        [
+          4,
+          9
+        ],
+        [
+          4,
+          9
+        ]
+      ]
+    },
+    {
+      "name": "shared_cliff_FF_ord(1, 0, 2)",
+      "n2": 15,
+      "cz": 12,
+      "rzx": 3,
+      "depth": 17,
+      "n1": 18,
+      "rzx_pairs": [
+        [
+          4,
+          9
+        ],
+        [
+          4,
+          9
+        ],
+        [
+          4,
+          9
+        ]
+      ]
+    },
+    {
+      "name": "shared_cliff_FF_ord(1, 2, 0)",
+      "n2": 15,
+      "cz": 12,
+      "rzx": 3,
+      "depth": 17,
+      "n1": 18,
+      "rzx_pairs": [
+        [
+          4,
+          9
+        ],
+        [
+          4,
+          9
+        ],
+        [
+          4,
+          9
+        ]
+      ]
+    },
+    {
+      "name": "shared_cliff_FF_ord(2, 0, 1)",
+      "n2": 15,
+      "cz": 12,
+      "rzx": 3,
+      "depth": 17,
+      "n1": 18,
+      "rzx_pairs": [
+        [
+          4,
+          9
+        ],
+        [
+          4,
+          9
+        ],
+        [
+          4,
+          9
+        ]
+      ]
+    },
+    {
+      "name": "shared_cliff_FF_ord(2, 1, 0)",
+      "n2": 15,
+      "cz": 12,
+      "rzx": 3,
+      "depth": 17,
+      "n1": 18,
+      "rzx_pairs": [
+        [
+          4,
+          9
+        ],
+        [
+          4,
+          9
+        ],
+        [
+          4,
+          9
+        ]
+      ]
+    },
+    {
+      "name": "CONSTRAINED_WINNER",
+      "n2": 23,
+      "cz": 20,
+      "rzx": 3,
+      "depth": 21,
+      "n1": 32,
+      "rzx_pairs": [
+        [
+          0,
+          5
+        ],
+        [
+          2,
+          7
+        ],
+        [
+          3,
+          8
+        ]
+      ]
+    }
+  ]
+}
