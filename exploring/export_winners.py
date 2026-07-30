@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """Export HF + Cl2 disjoint-RZX winners.
 
-Naming (consistent across molecules):
-  {Molecule}_{nq}q_disjoint_rzx.{json,png}
+Naming:
+  HF_6q_disjoint_rzx.{json,png}
+  Cl2_10q_2doubles_disjoint_rzx.{json,png}
 """
 from __future__ import annotations
 
-import itertools
 import json
 import sys
 from pathlib import Path
@@ -22,21 +22,25 @@ sys.path.insert(0, str(_ROOT / "UCCSD circuit"))
 from constraints import rzx_pairs, satisfies_rules  # noqa: E402
 from error_budget import cross_from_list, score_gates, spin_split_cross_pairs  # noqa: E402
 from flexible_compile import (  # noqa: E402
-    candidate_bridges,
     compile_strings,
     gates_to_qc,
     gen,
     statevector_overlap,
 )
-from freeze import all_keep_masks  # noqa: E402
+from freeze import freeze_z_pairs  # noqa: E402
 from methods import method_independent_pairs  # noqa: E402
 import taper_lib  # noqa: E402
 
-# stem = {Molecule}_{nq}q_disjoint_rzx
 STEM = {
     "HF": "HF_6q_disjoint_rzx",
-    "Cl2": "Cl2_10q_disjoint_rzx",
+    "Cl2": "Cl2_10q_2doubles_disjoint_rzx",
 }
+
+# Cl2 2-doubles: q3 forbidden as RZX hub; hubs from {0,1,2}×{5,6,7}.
+# Optimal schedule under that constraint (same freeze as prior exploring winner).
+CL2_DOUBLES = [(4, 9, 6, 1), (4, 9, 5, 0)]
+CL2_KEEP = [{2, 3}, {3}]
+CL2_SCHED = [(2, 7), (0, 5)]
 
 
 def hf_case():
@@ -83,91 +87,51 @@ def hf_case():
     }
 
 
-def _cl2_exhaustive_min(strings, signs, n=10):
-    """Exhaustive keep-mask × vertex-disjoint bridge scan.
-
-    Picks the constraint-legal circuit minimizing (total 2q, depth, total 1q).
-    """
-    mask_lists = [list(all_keep_masks(s)) for s in strings]
-    best = None
-    for combo in itertools.product(*mask_lists):
-        frozen = [c[1] for c in combo]
-        keeps = [sorted(c[0]) for c in combo]
-        cands = [candidate_bridges(s, n) for s in frozen]
-
-        def schedules(i, used, acc):
-            if i == len(cands):
-                yield list(acc)
-                return
-            for a, b in cands[i]:
-                if a not in used and b not in used:
-                    yield from schedules(i + 1, used | {a, b}, acc + [(a, b)])
-
-        for sched in schedules(0, set(), []):
-            try:
-                out = compile_strings(
-                    frozen, signs=signs, order="given",
-                    hub_schedule=sched, fuse=True,
-                )
-            except Exception:
-                continue
-            gates = out["gates"]
-            if not satisfies_rules(gates, n)[0]:
-                continue
-            n2 = sum(len(g["qubits"]) == 2 for g in gates)
-            n1 = sum(len(g["qubits"]) == 1 for g in gates)
-            key = (n2, gates_to_qc(gates, n).depth(), n1)
-            if best is None or key < best["key"]:
-                best = {
-                    "key": key,
-                    "name": "disjoint_rzx_all_qubits",
-                    "gates": gates,
-                    "frozen_strings": frozen,
-                    "keep_pairs": keeps,
-                    "schedule": sched,
-                    "budget": score_gates(gates, spin_split_cross_pairs(n)),
-                }
-    return best
-
-
 def cl2_case():
-    # Order chosen so the (2q, depth, 1q)-optimal schedule keeps t_k ↔ doubles[k].
-    doubles = [(4, 9, 5, 0), (4, 9, 6, 1), (4, 9, 7, 2)]
-    strings = ["".join(gen.jw_string_for_double(10, d)) for d in doubles]
-    signs = [1, 1, 1]
-    best = _cl2_exhaustive_min(strings, signs)
-    assert best, "no Cl2 circuit under disjoint/all-qubit rules"
-    ok, why = satisfies_rules(best["gates"], 10)
+    n = 10
+    signs = [1, 1]
+    strings = ["".join(gen.jw_string_for_double(n, d)) for d in CL2_DOUBLES]
+    frozen = [freeze_z_pairs(s, k) for s, k in zip(strings, CL2_KEEP)]
+    out = compile_strings(
+        frozen, signs=signs, order="given", hub_schedule=CL2_SCHED, fuse=True,
+    )
+    gates = out["gates"]
+    ok, why = satisfies_rules(gates, n)
     assert ok, why
+    assert set(map(tuple, map(sorted, rzx_pairs(gates)))) == {(0, 5), (2, 7)}
+    bud = score_gates(gates, spin_split_cross_pairs(n))
+    depth = gates_to_qc(gates, n).depth()
     ref = compile_strings(strings, signs=signs, order="given", fuse=True)
     rng = np.random.default_rng(0)
-    init = "".join("1" if q in (0, 1, 2, 3, 5, 6, 7, 8) else "0" for q in range(10))
+    init = "".join("1" if q in (0, 1, 2, 3, 5, 6, 7, 8) else "0" for q in range(n))
     ovs = []
     for _ in range(6):
-        th = rng.uniform(-0.3, 0.3, 3)
-        qa = gates_to_qc(ref["gates"], 10, th)
-        qb = gates_to_qc(best["gates"], 10, th)
-        ovs.append(statevector_overlap(qa, qb, 10, init_bits=init))
+        th = rng.uniform(-0.3, 0.3, 2)
+        qa = gates_to_qc(ref["gates"], n, th)
+        qb = gates_to_qc(gates, n, th)
+        ovs.append(statevector_overlap(qa, qb, n, init_bits=init))
     return {
         "molecule": "Cl2",
-        "num_qubits": 10,
-        "method": best["name"],
+        "num_qubits": n,
+        "method": "disjoint_rzx_all_qubits",
         "original_strings": strings,
-        "frozen_strings": best["frozen_strings"],
-        "keep_pairs": best["keep_pairs"],
-        "hub_schedule": [list(p) for p in best["schedule"]],
+        "frozen_strings": frozen,
+        "keep_pairs": [sorted(k) for k in CL2_KEEP],
+        "hub_schedule": [list(p) for p in CL2_SCHED],
         "signs": signs,
-        "doubles": doubles,
-        "budget": best["budget"].as_dict(),
-        "depth": gates_to_qc(best["gates"], 10).depth(),
-        "rzx_pairs": [list(p) for p in rzx_pairs(best["gates"])],
+        "doubles": [list(d) for d in CL2_DOUBLES],
+        "budget": {**bud.as_dict(), "depth": depth},
+        "depth": depth,
+        "rzx_pairs": [list(p) for p in rzx_pairs(gates)],
         "overlap_min": float(min(ovs)),
-        "gates": best["gates"],
+        "gates": gates,
         "cross_model": "spin_split_alpha_beta",
+        "rzx_constraint": "no q3; hubs from {0,1,2}x{5,6,7}",
         "rules": [
             "all qubits used",
             "RZX pairs vertex-disjoint (any α↔β, no shared index)",
             "within-spin CZ: NN + chords (0,3)/(5,8); no cross-spin CZ",
+            "q3 forbidden as RZX hub; α∈{0,1,2}, β∈{5,6,7}",
         ],
     }
 
@@ -179,7 +143,7 @@ def main():
         (_ROOT / "state_transfer/circuits2read/HF_tapered_6q_3doubles_rzx.json").read_text()
     )
     base_cl2 = json.loads(
-        (_ROOT / "June_main/circuits2read/Cl2_10q_3doubles_rzx.json").read_text()
+        (_ROOT / "June_main/circuits2read/Cl2_10q_2doubles_rzx.json").read_text()
     )
     hf_base = score_gates(base_hf["gates"], cross_from_list([(2, 5)])).as_dict()
     cl2_base = score_gates(
@@ -187,8 +151,8 @@ def main():
     ).as_dict()
 
     summary = {
-        "baselines": {"HF_6q": hf_base, "Cl2_10q": cl2_base},
-        "winners": {"HF_6q": hf, "Cl2_10q": cl2},
+        "baselines": {"HF_6q": hf_base, "Cl2_10q_2doubles": cl2_base},
+        "winners": {"HF_6q": hf, "Cl2_10q_2doubles": cl2},
         "verdict": {
             "HF_error_reduction": hf_base["error"] - hf["budget"]["error"],
             "Cl2_error_reduction": cl2_base["error"] - cl2["budget"]["error"],
@@ -199,10 +163,11 @@ def main():
             "cl2_rules": cl2["rules"],
         },
     }
-    (_HERE / "winners.json").write_text(json.dumps(summary, indent=2))
+    (_HERE / "winners.json").write_text(json.dumps(summary, indent=2) + "\n")
 
-    # Drop legacy HF name if present
     for legacy in (
+        "Cl2_10q_disjoint_rzx.json",
+        "Cl2_10q_disjoint_rzx_circuit.png",
         "HF_6q_indep_pairs_freeze.json",
         "HF_6q_indep_pairs_freeze_circuit.png",
     ):
@@ -214,7 +179,7 @@ def main():
         (STEM["HF"], hf, 6),
         (STEM["Cl2"], cl2, 10),
     ):
-        (_HERE / f"{stem}.json").write_text(json.dumps(data, indent=2))
+        (_HERE / f"{stem}.json").write_text(json.dumps(data, indent=2) + "\n")
         qc = gates_to_qc(data["gates"], n)
         fig = qc.draw(output="mpl", fold=-1, style=gen.IQP_STYLE, idle_wires=True)
         fig.savefig(_HERE / f"{stem}_circuit.png", dpi=160, bbox_inches="tight")

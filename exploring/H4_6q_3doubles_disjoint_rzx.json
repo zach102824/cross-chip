@@ -1,0 +1,242 @@
+{
+  "molecule": "H4",
+  "num_qubits": 6,
+  "method": "disjoint_rzx_all_qubits",
+  "bond_length": 1.0,
+  "param_ids": [
+    12,
+    14,
+    7
+  ],
+  "doubles_full": [
+    [
+      2,
+      6,
+      5,
+      1
+    ],
+    [
+      3,
+      7,
+      5,
+      1
+    ],
+    [
+      3,
+      7,
+      4,
+      0
+    ]
+  ],
+  "original_strings": [
+    "IYXIXX",
+    "IYZIXZ",
+    "YZZXZZ"
+  ],
+  "frozen_strings": [
+    "IYXIXX",
+    "IYIIXI",
+    "YIIXII"
+  ],
+  "signs": [
+    1,
+    1,
+    1
+  ],
+  "budget": {
+    "n1": 14,
+    "n_onchip": 4,
+    "n_cross": 3,
+    "depth": null,
+    "fidelity": 0.6953884692769252,
+    "error": 0.3046115307230748,
+    "pairs": {
+      "0-3": 1,
+      "1-2": 2,
+      "1-4": 1,
+      "2-5": 1,
+      "4-5": 2
+    }
+  },
+  "rzx_pairs": [
+    [
+      2,
+      5
+    ],
+    [
+      1,
+      4
+    ],
+    [
+      0,
+      3
+    ]
+  ],
+  "overlap_min": 0.999999999999994,
+  "gates": [
+    {
+      "op": "rx",
+      "qubits": [
+        1
+      ],
+      "value": 1.5707963267948966
+    },
+    {
+      "op": "h",
+      "qubits": [
+        4
+      ]
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        1,
+        2
+      ]
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        4,
+        5
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        5
+      ]
+    },
+    {
+      "op": "rzx",
+      "qubits": [
+        5,
+        2
+      ],
+      "param": "t0",
+      "coeff": 1.0
+    },
+    {
+      "op": "h",
+      "qubits": [
+        5
+      ]
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        4,
+        5
+      ]
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        1,
+        2
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        1
+      ]
+    },
+    {
+      "op": "rzx",
+      "qubits": [
+        4,
+        1
+      ],
+      "param": "t1",
+      "coeff": 1.0
+    },
+    {
+      "op": "h",
+      "qubits": [
+        4
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        1
+      ]
+    },
+    {
+      "op": "rx",
+      "qubits": [
+        1
+      ],
+      "value": -1.5707963267948966
+    },
+    {
+      "op": "rx",
+      "qubits": [
+        0
+      ],
+      "value": 1.5707963267948966
+    },
+    {
+      "op": "h",
+      "qubits": [
+        0
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        3
+      ]
+    },
+    {
+      "op": "rzx",
+      "qubits": [
+        3,
+        0
+      ],
+      "param": "t2",
+      "coeff": 1.0
+    },
+    {
+      "op": "h",
+      "qubits": [
+        3
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        0
+      ]
+    },
+    {
+      "op": "rx",
+      "qubits": [
+        0
+      ],
+      "value": -1.5707963267948966
+    }
+  ],
+  "schedule": [
+    [
+      2,
+      5
+    ],
+    [
+      1,
+      4
+    ],
+    [
+      0,
+      3
+    ]
+  ],
+  "cross_model": "spin_split_alpha_beta",
+  "rules": [
+    "subset of fixed ansatz: param_ids [12, 14, 7]",
+    "all qubits used",
+    "RZX pairs vertex-disjoint (0,3)/(1,4)/(2,5)"
+  ],
+  "note": "HF-style disjoint RZX circuit using 3 of the 8 fixed-ansatz doubles (the subset that admits full freeze + vertex-disjoint bridges on 6q)."
+}

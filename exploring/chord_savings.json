@@ -1,0 +1,156 @@
+{
+  "description": "HF: freeze+fixed RZX(2,5) with skip edges (0,2)/(3,5) vs NN-only. Cl2: freeze+disjoint RZX with chords (0,3)/(5,8) vs NN-only.",
+  "HF_6q": {
+    "with_skip_error": 0.33401406989617377,
+    "nn_only_error": 0.36217340566855416,
+    "error_saved_by_skip_edges": 0.02815933577238039,
+    "with_skip_n_onchip": 8,
+    "nn_only_n_onchip": 12,
+    "onchip_cz_saved_by_skip_edges": 4,
+    "with_skip_depth": 16,
+    "nn_only_depth": 20,
+    "with_skip_rzx": [
+      [
+        2,
+        5
+      ],
+      [
+        2,
+        5
+      ],
+      [
+        2,
+        5
+      ]
+    ],
+    "nn_only_rzx": [
+      [
+        2,
+        5
+      ],
+      [
+        2,
+        5
+      ],
+      [
+        2,
+        5
+      ]
+    ],
+    "with_skip_cz": [
+      [
+        0,
+        2
+      ],
+      [
+        3,
+        5
+      ],
+      [
+        3,
+        5
+      ],
+      [
+        0,
+        2
+      ],
+      [
+        1,
+        2
+      ],
+      [
+        4,
+        5
+      ],
+      [
+        4,
+        5
+      ],
+      [
+        1,
+        2
+      ]
+    ],
+    "nn_only_cz": [
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        2
+      ],
+      [
+        3,
+        4
+      ],
+      [
+        4,
+        5
+      ],
+      [
+        4,
+        5
+      ],
+      [
+        3,
+        4
+      ],
+      [
+        1,
+        2
+      ],
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        2
+      ],
+      [
+        4,
+        5
+      ],
+      [
+        4,
+        5
+      ],
+      [
+        1,
+        2
+      ]
+    ],
+    "note": "Skip edges = direct CZ(0,2)/(3,5) in unconstrained row fan-in. NN-only keeps Z1Z4 so paths walk 0\u20131\u20132 / 3\u20134\u20135."
+  },
+  "Cl2_10q_2doubles": {
+    "chorded_error": 0.3199098432461007,
+    "nn_only_error": 0.3486655364430099,
+    "error_saved_by_chords": 0.028755693196909182,
+    "chorded_n_onchip": 16,
+    "nn_only_n_onchip": 20,
+    "onchip_cz_saved_by_chords": 4,
+    "chorded_depth": 16,
+    "nn_only_depth": 25,
+    "chorded_rzx": [
+      [
+        2,
+        7
+      ],
+      [
+        0,
+        5
+      ]
+    ],
+    "nn_only_rzx": [
+      [
+        2,
+        6
+      ],
+      [
+        1,
+        5
+      ]
+    ]
+  }
+}

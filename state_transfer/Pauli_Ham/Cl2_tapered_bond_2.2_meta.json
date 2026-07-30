@@ -1,0 +1,29 @@
+{
+  "n_qubits_full": 10,
+  "n_spatial": 5,
+  "n_electrons": 8,
+  "removed_qubits": [
+    4,
+    9
+  ],
+  "tapering_values": [
+    1,
+    1
+  ],
+  "symmetry_generators": [
+    "ZZZZZIIIII",
+    "IIIIIZZZZZ"
+  ],
+  "kept_qubits": [
+    0,
+    1,
+    2,
+    3,
+    5,
+    6,
+    7,
+    8
+  ],
+  "hf_bitstring_full": "1111011110",
+  "hf_bitstring_tapered": "11111111"
+}

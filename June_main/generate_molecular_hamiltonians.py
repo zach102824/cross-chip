@@ -52,6 +52,10 @@ class MoleculePreset:
     # Irrep labels (fixed slot order) pinning the ACTIVE OCCUPIED orbitals.
     # None -> plain canonical (energy-ordered) orbitals.  See symmetry_pinned_mo_coeff.
     pinned_occ_irreps: tuple[str, ...] | None = None
+    # Optional explicit CAS orbital lists (OpenFermion / PySCF spatial indices).
+    # When set, these override ``active_indices_from_tencirchem_choice``.
+    occupied_indices: tuple[int, ...] | None = None
+    active_indices: tuple[int, ...] | None = None
 
 
 def _diatomic(symbol_a: str, symbol_b: str) -> GeometryFactory:
@@ -60,6 +64,15 @@ def _diatomic(symbol_a: str, symbol_b: str) -> GeometryFactory:
             (symbol_a, (0.0, 0.0, -bond / 2.0)),
             (symbol_b, (0.0, 0.0, bond / 2.0)),
         ]
+
+    return geometry
+
+
+def _h_chain(n_h: int) -> GeometryFactory:
+    """Linear H_n chain with equal H–H spacing ``bond`` (atoms at 0, d, …, (n-1)d)."""
+
+    def geometry(bond: float) -> list[tuple[str, tuple[float, float, float]]]:
+        return [("H", (0.0, 0.0, i * bond)) for i in range(n_h)]
 
     return geometry
 
@@ -95,6 +108,26 @@ MOLECULE_PRESETS: dict[str, MoleculePreset] = {
         _grid(1.9, 4.1, 0.2),
         pinned_occ_irreps=("A1g", "E1uy", "E1ux", "E1gx", "E1gy"),
     ),
+    # Guo et al. Nat. Commun. / arXiv:2212.08006 (paper in papers/):
+    # LiH STO-3G, freeze Li 1s, active MOs {1,2,5} -> 2e/3orb -> 6 qubits.
+    "LiH": MoleculePreset(
+        "LiH",
+        (2, 3),
+        _diatomic("Li", "H"),
+        _grid(1.0, 3.0, 0.2),
+        occupied_indices=(0,),
+        active_indices=(1, 2, 5),
+    ),
+    # Same paper / UCCSD_Mole/F2.ipynb: freeze 1a1-4a1, CAS(10,6) -> 12 qubits.
+    "F2": MoleculePreset(
+        "F2",
+        (10, 6),
+        _diatomic("F", "F"),
+        _grid(1.0, 3.0, 0.2),
+    ),
+    # Linear H4 STO-3G (UCCSD_Mole/H4.ipynb): full valence CAS(4,4) -> 8 qubits;
+    # H–H spacing scan matches d_grid = np.arange(0.6, 2.0, 0.2).
+    "H4": MoleculePreset("H4", (4, 4), _h_chain(4), _grid(0.6, 1.8, 0.2)),
 }
 
 def bond_token(bond: float) -> str:
@@ -254,11 +287,20 @@ def build_molecular_hamiltonian(
         molecule._one_body_integrals = one_body
         molecule._two_body_integrals = two_body
 
-    occupied_indices, active_indices = active_indices_from_tencirchem_choice(
-        total_electrons=int(molecule.n_electrons),
-        total_spatial_orbitals=int(molecule.n_orbitals),
-        active_space=preset.active_space,
-    )
+    if preset.occupied_indices is not None and preset.active_indices is not None:
+        occupied_indices = list(preset.occupied_indices)
+        active_indices = list(preset.active_indices)
+        if len(active_indices) != preset.active_space[1]:
+            raise ValueError(
+                f"Preset {preset.name}: len(active_indices)={len(active_indices)} "
+                f"!= active_space n_spatial={preset.active_space[1]}"
+            )
+    else:
+        occupied_indices, active_indices = active_indices_from_tencirchem_choice(
+            total_electrons=int(molecule.n_electrons),
+            total_spatial_orbitals=int(molecule.n_orbitals),
+            active_space=preset.active_space,
+        )
     active_hamiltonian = molecule.get_molecular_hamiltonian(
         occupied_indices=occupied_indices,
         active_indices=active_indices,

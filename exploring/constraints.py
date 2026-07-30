@@ -4,9 +4,11 @@ Rules (Cl2 and general):
 1. Every qubit index must appear in at least one gate.
 2. Parameterized RZX pairs are vertex-disjoint; any α ↔ any β is allowed for
    RZX only (no hub pile-up on one index).
-3. Within a spin sector, CZ is nearest-neighbour only, plus the chord
-   (0,3) on alpha and the mirrored (half, half+3) on beta when that index
-   exists.  Cross-spin CZ is forbidden — α–β coupling is RZX-only.
+3. Within a spin sector, CZ is nearest-neighbour only, plus (when
+   ``chords=True``) the chord (0,3) on alpha and the mirrored
+   (half, half+3) on beta when that index exists.  Cross-spin CZ is
+   forbidden — α–β coupling is RZX-only.  ``chords=False`` is the NN-only
+   baseline used to measure chord savings.
 """
 from __future__ import annotations
 
@@ -16,8 +18,11 @@ def spin_sectors(n_qubits: int) -> tuple[list[int], list[int]]:
     return list(range(half)), list(range(half, n_qubits))
 
 
-def allowed_cz_edges(n_qubits: int) -> set[frozenset[int]]:
-    """Within-spin CZ graph: NN path + chord (0,3) / (half, half+3)."""
+def allowed_cz_edges(n_qubits: int, *, chords: bool = True) -> set[frozenset[int]]:
+    """Within-spin CZ graph: NN path, optionally + chord (0,3) / (half, half+3).
+
+    Set ``chords=False`` for the NN-only baseline (no long-range couplers).
+    """
     half = n_qubits // 2
     edges: set[frozenset[int]] = set()
     # alpha NN
@@ -27,7 +32,7 @@ def allowed_cz_edges(n_qubits: int) -> set[frozenset[int]]:
     for i in range(half, n_qubits - 1):
         edges.add(frozenset((i, i + 1)))
     # special chords
-    if half >= 4:
+    if chords and half >= 4:
         edges.add(frozenset((0, 3)))
         edges.add(frozenset((half, half + 3)))
     return edges
@@ -90,8 +95,8 @@ def bridges_disjoint(schedule) -> bool:
     return True
 
 
-def cz_edges_legal(gates, n_qubits: int) -> tuple[bool, str]:
-    allowed = allowed_cz_edges(n_qubits)
+def cz_edges_legal(gates, n_qubits: int, *, chords: bool = True) -> tuple[bool, str]:
+    allowed = allowed_cz_edges(n_qubits, chords=chords)
     for a, b in cz_pairs(gates):
         if is_alpha_beta_pair(a, b, n_qubits):
             return False, f"cross_spin_cz={(a, b)}"
@@ -107,13 +112,13 @@ def rzx_edges_are_alpha_beta(gates, n_qubits: int) -> tuple[bool, str]:
     return True, "ok"
 
 
-def satisfies_rules(gates, n_qubits: int) -> tuple[bool, str]:
+def satisfies_rules(gates, n_qubits: int, *, chords: bool = True) -> tuple[bool, str]:
     if not rzx_pairs_disjoint(gates):
         return False, "rzx_overlap"
     ok, why = rzx_edges_are_alpha_beta(gates, n_qubits)
     if not ok:
         return False, why
-    ok, why = cz_edges_legal(gates, n_qubits)
+    ok, why = cz_edges_legal(gates, n_qubits, chords=chords)
     if not ok:
         return False, why
     if not all_qubits_used(gates, n_qubits):

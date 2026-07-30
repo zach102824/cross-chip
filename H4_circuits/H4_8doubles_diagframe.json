@@ -1,0 +1,2194 @@
+{
+  "molecule": "H4",
+  "bond_length_A": 1.0,
+  "num_qubits_logical": 6,
+  "param_ids": [
+    12,
+    5,
+    9,
+    14,
+    7,
+    10,
+    4,
+    13
+  ],
+  "strings": {
+    "12": "IYXIXX",
+    "5": "YZXXZX",
+    "9": "YZXIXZ",
+    "14": "IYZIXZ",
+    "7": "YZZXZZ",
+    "10": "YZZIXX",
+    "4": "IIIYXX",
+    "13": "IYXIXZ"
+  },
+  "convention": "U = prod_k exp(-i t_k/2 P_k), k applied in listed order",
+  "algebra": {
+    "commuting_set": [
+      12,
+      5,
+      9,
+      14,
+      7,
+      10
+    ],
+    "rank": 4,
+    "dependencies": [
+      "P7 = +P12*P5*P14",
+      "P10 = -P12*P9*P14"
+    ],
+    "independent_base": [
+      12,
+      9,
+      14,
+      7
+    ],
+    "conjugated_images": {
+      "12": "+IIIIIZ",
+      "5": "+IZZZII",
+      "9": "+IZIIII",
+      "14": "+IIZIIZ",
+      "7": "+IZIZII",
+      "10": "-IZZIII",
+      "4": "-ZYYZZI",
+      "13": "-XYIIIX"
+    }
+  },
+  "logical_budget": {
+    "two_qubit_gates": 33,
+    "depth": 62,
+    "ops": {
+      "rz": 37,
+      "cx": 29,
+      "sx": 21,
+      "h": 10,
+      "sdg": 8,
+      "x": 5,
+      "cz": 4,
+      "s": 3
+    }
+  },
+  "machine": {
+    "source": "qubit_connectivity/all_connection_cases.txt",
+    "chips_used": [
+      "A",
+      "B"
+    ],
+    "embedding": {
+      "logical_to_physical": {
+        "0": "A.0",
+        "1": "A.1",
+        "2": "A.2",
+        "3": "B.4",
+        "4": "B.5",
+        "5": "B.6"
+      },
+      "intrachip_edges_logical": [
+        [
+          0,
+          1
+        ],
+        [
+          1,
+          2
+        ],
+        [
+          3,
+          4
+        ],
+        [
+          4,
+          5
+        ]
+      ],
+      "cross_rungs_logical": [
+        [
+          0,
+          3
+        ],
+        [
+          1,
+          4
+        ],
+        [
+          2,
+          5
+        ]
+      ]
+    },
+    "cross_link_case_family": "Case 0 (A-B rungs)",
+    "cross_chip_realisations": [
+      "QST full state transfer via cable + spare ancilla (qst_formulas.txt, tau~66ns)",
+      "QST/2 Bell pair (|10>+|01>)/sqrt2 then gate teleportation",
+      "native cross-chip RZX pulse"
+    ]
+  },
+  "routed_budget": {
+    "two_qubit_gates": 61,
+    "cross_chip_2q": 23,
+    "onchip_2q": 38,
+    "depth": 84,
+    "ops": {
+      "rz": 37,
+      "cx": 29,
+      "swap": 28,
+      "sx": 21,
+      "h": 10,
+      "sdg": 8,
+      "x": 5,
+      "cz": 4,
+      "s": 3
+    }
+  },
+  "verification_max_err_logical": 8.379976314847493e-16,
+  "verification_max_err_routed": 9.825551366148202e-16,
+  "gates_logical": [
+    {
+      "op": "rz",
+      "qubits": [
+        1
+      ],
+      "value": [
+        3.141592653589793
+      ]
+    },
+    {
+      "op": "x",
+      "qubits": [
+        1
+      ],
+      "value": []
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        2
+      ],
+      "value": [
+        -1.5707963267948966
+      ]
+    },
+    {
+      "op": "sx",
+      "qubits": [
+        2
+      ],
+      "value": []
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        3
+      ],
+      "value": [
+        3.141592653589793
+      ]
+    },
+    {
+      "op": "cx",
+      "qubits": [
+        3,
+        2
+      ],
+      "value": []
+    },
+    {
+      "op": "sdg",
+      "qubits": [
+        2
+      ],
+      "value": []
+    },
+    {
+      "op": "x",
+      "qubits": [
+        2
+      ],
+      "value": []
+    },
+    {
+      "op": "sdg",
+      "qubits": [
+        3
+      ],
+      "value": []
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        4
+      ],
+      "value": [
+        -3.141592653589793
+      ]
+    },
+    {
+      "op": "sx",
+      "qubits": [
+        4
+      ],
+      "value": []
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        4
+      ],
+      "value": [
+        -1.5707963267948966
+      ]
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        3,
+        4
+      ],
+      "value": []
+    },
+    {
+      "op": "sx",
+      "qubits": [
+        3
+      ],
+      "value": []
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        3
+      ],
+      "value": [
+        1.5707963267948966
+      ]
+    },
+    {
+      "op": "sx",
+      "qubits": [
+        4
+      ],
+      "value": []
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        4
+      ],
+      "value": [
+        -3.141592653589793
+      ]
+    },
+    {
+      "op": "cx",
+      "qubits": [
+        4,
+        1
+      ],
+      "value": []
+    },
+    {
+      "op": "sdg",
+      "qubits": [
+        1
+      ],
+      "value": []
+    },
+    {
+      "op": "h",
+      "qubits": [
+        4
+      ],
+      "value": []
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        5
+      ],
+      "value": [
+        -3.141592653589793
+      ]
+    },
+    {
+      "op": "sx",
+      "qubits": [
+        5
+      ],
+      "value": []
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        2,
+        5
+      ],
+      "value": []
+    },
+    {
+      "op": "sx",
+      "qubits": [
+        2
+      ],
+      "value": []
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        2
+      ],
+      "value": [
+        -1.5707963267948966
+      ]
+    },
+    {
+      "op": "sx",
+      "qubits": [
+        5
+      ],
+      "value": []
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        5
+      ],
+      "value": [
+        -3.141592653589793
+      ]
+    },
+    {
+      "op": "cx",
+      "qubits": [
+        5,
+        1
+      ],
+      "value": []
+    },
+    {
+      "op": "sdg",
+      "qubits": [
+        1
+      ],
+      "value": []
+    },
+    {
+      "op": "cx",
+      "qubits": [
+        1,
+        0
+      ],
+      "value": []
+    },
+    {
+      "op": "sdg",
+      "qubits": [
+        0
+      ],
+      "value": []
+    },
+    {
+      "op": "h",
+      "qubits": [
+        0
+      ],
+      "value": []
+    },
+    {
+      "op": "cx",
+      "qubits": [
+        0,
+        2
+      ],
+      "value": []
+    },
+    {
+      "op": "h",
+      "qubits": [
+        1
+      ],
+      "value": []
+    },
+    {
+      "op": "sdg",
+      "qubits": [
+        1
+      ],
+      "value": []
+    },
+    {
+      "op": "cx",
+      "qubits": [
+        2,
+        3
+      ],
+      "value": []
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        3
+      ],
+      "param": "t5"
+    },
+    {
+      "op": "cx",
+      "qubits": [
+        2,
+        3
+      ],
+      "value": []
+    },
+    {
+      "op": "cx",
+      "qubits": [
+        0,
+        2
+      ],
+      "value": []
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        0
+      ],
+      "param": "t9"
+    },
+    {
+      "op": "cx",
+      "qubits": [
+        0,
+        3
+      ],
+      "value": []
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        3
+      ],
+      "param": "t7"
+    },
+    {
+      "op": "cx",
+      "qubits": [
+        0,
+        3
+      ],
+      "value": []
+    },
+    {
+      "op": "h",
+      "qubits": [
+        5
+      ],
+      "value": []
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        5
+      ],
+      "param": "t12"
+    },
+    {
+      "op": "cx",
+      "qubits": [
+        2,
+        5
+      ],
+      "value": []
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        5
+      ],
+      "param": "t14"
+    },
+    {
+      "op": "cx",
+      "qubits": [
+        2,
+        5
+      ],
+      "value": []
+    },
+    {
+      "op": "cx",
+      "qubits": [
+        0,
+        2
+      ],
+      "value": []
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        2
+      ],
+      "param": "-t10"
+    },
+    {
+      "op": "cx",
+      "qubits": [
+        0,
+        2
+      ],
+      "value": []
+    },
+    {
+      "op": "sdg",
+      "qubits": [
+        0
+      ],
+      "value": []
+    },
+    {
+      "op": "h",
+      "qubits": [
+        0
+      ],
+      "value": []
+    },
+    {
+      "op": "cx",
+      "qubits": [
+        1,
+        0
+      ],
+      "value": []
+    },
+    {
+      "op": "sx",
+      "qubits": [
+        1
+      ],
+      "value": []
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        1
+      ],
+      "value": [
+        1.4187248949168332
+      ]
+    },
+    {
+      "op": "sx",
+      "qubits": [
+        1
+      ],
+      "value": []
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        1
+      ],
+      "value": [
+        1.5707963267948966
+      ]
+    },
+    {
+      "op": "sdg",
+      "qubits": [
+        2
+      ],
+      "value": []
+    },
+    {
+      "op": "h",
+      "qubits": [
+        2
+      ],
+      "value": []
+    },
+    {
+      "op": "cx",
+      "qubits": [
+        0,
+        2
+      ],
+      "value": []
+    },
+    {
+      "op": "cx",
+      "qubits": [
+        2,
+        3
+      ],
+      "value": []
+    },
+    {
+      "op": "cx",
+      "qubits": [
+        3,
+        4
+      ],
+      "value": []
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        4
+      ],
+      "param": "-t4"
+    },
+    {
+      "op": "cx",
+      "qubits": [
+        3,
+        4
+      ],
+      "value": []
+    },
+    {
+      "op": "cx",
+      "qubits": [
+        2,
+        3
+      ],
+      "value": []
+    },
+    {
+      "op": "cx",
+      "qubits": [
+        0,
+        2
+      ],
+      "value": []
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        0
+      ],
+      "value": [
+        1.5707963267948966
+      ]
+    },
+    {
+      "op": "sx",
+      "qubits": [
+        0
+      ],
+      "value": []
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        0
+      ],
+      "value": [
+        -4.71238898038469
+      ]
+    },
+    {
+      "op": "cx",
+      "qubits": [
+        0,
+        1
+      ],
+      "value": []
+    },
+    {
+      "op": "sx",
+      "qubits": [
+        0
+      ],
+      "value": []
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        0
+      ],
+      "value": [
+        1.5707963267948966
+      ]
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        1
+      ],
+      "value": [
+        1.5707963267948983
+      ]
+    },
+    {
+      "op": "sx",
+      "qubits": [
+        1
+      ],
+      "value": []
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        1
+      ],
+      "value": [
+        -2.989521221711729
+      ]
+    },
+    {
+      "op": "sx",
+      "qubits": [
+        1
+      ],
+      "value": []
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        2
+      ],
+      "value": [
+        -3.141592653589793
+      ]
+    },
+    {
+      "op": "sx",
+      "qubits": [
+        2
+      ],
+      "value": []
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        2
+      ],
+      "value": [
+        -2.356194490192345
+      ]
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        3
+      ],
+      "value": [
+        -1.5707963267948966
+      ]
+    },
+    {
+      "op": "sx",
+      "qubits": [
+        3
+      ],
+      "value": []
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        3
+      ],
+      "value": [
+        -3.141592653589793
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        4
+      ],
+      "value": []
+    },
+    {
+      "op": "h",
+      "qubits": [
+        5
+      ],
+      "value": []
+    },
+    {
+      "op": "cx",
+      "qubits": [
+        0,
+        5
+      ],
+      "value": []
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        5
+      ],
+      "param": "-t13"
+    },
+    {
+      "op": "cx",
+      "qubits": [
+        0,
+        5
+      ],
+      "value": []
+    },
+    {
+      "op": "cx",
+      "qubits": [
+        1,
+        0
+      ],
+      "value": []
+    },
+    {
+      "op": "sx",
+      "qubits": [
+        0
+      ],
+      "value": []
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        0
+      ],
+      "value": [
+        1.5707963267948966
+      ]
+    },
+    {
+      "op": "sx",
+      "qubits": [
+        1
+      ],
+      "value": []
+    },
+    {
+      "op": "cx",
+      "qubits": [
+        1,
+        0
+      ],
+      "value": []
+    },
+    {
+      "op": "s",
+      "qubits": [
+        1
+      ],
+      "value": []
+    },
+    {
+      "op": "cx",
+      "qubits": [
+        5,
+        1
+      ],
+      "value": []
+    },
+    {
+      "op": "s",
+      "qubits": [
+        1
+      ],
+      "value": []
+    },
+    {
+      "op": "cx",
+      "qubits": [
+        4,
+        1
+      ],
+      "value": []
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        1
+      ],
+      "value": [
+        3.141592653589793
+      ]
+    },
+    {
+      "op": "x",
+      "qubits": [
+        1
+      ],
+      "value": []
+    },
+    {
+      "op": "h",
+      "qubits": [
+        4
+      ],
+      "value": []
+    },
+    {
+      "op": "sx",
+      "qubits": [
+        4
+      ],
+      "value": []
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        3,
+        4
+      ],
+      "value": []
+    },
+    {
+      "op": "x",
+      "qubits": [
+        3
+      ],
+      "value": []
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        3
+      ],
+      "value": [
+        -1.5707963267948974
+      ]
+    },
+    {
+      "op": "sx",
+      "qubits": [
+        4
+      ],
+      "value": []
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        4
+      ],
+      "value": [
+        -3.141592653589793
+      ]
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        5
+      ],
+      "value": [
+        -3.1415926535897927
+      ]
+    },
+    {
+      "op": "sx",
+      "qubits": [
+        5
+      ],
+      "value": []
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        2,
+        5
+      ],
+      "value": []
+    },
+    {
+      "op": "x",
+      "qubits": [
+        2
+      ],
+      "value": []
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        2
+      ],
+      "value": [
+        -2.3561944901923457
+      ]
+    },
+    {
+      "op": "cx",
+      "qubits": [
+        3,
+        2
+      ],
+      "value": []
+    },
+    {
+      "op": "s",
+      "qubits": [
+        2
+      ],
+      "value": []
+    },
+    {
+      "op": "h",
+      "qubits": [
+        2
+      ],
+      "value": []
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        2
+      ],
+      "value": [
+        3.141592653589793
+      ]
+    },
+    {
+      "op": "sx",
+      "qubits": [
+        5
+      ],
+      "value": []
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        5
+      ],
+      "value": [
+        -3.141592653589793
+      ]
+    }
+  ],
+  "gates_routed": [
+    {
+      "op": "rz",
+      "qubits": [
+        1
+      ],
+      "value": [
+        3.141592653589793
+      ]
+    },
+    {
+      "op": "x",
+      "qubits": [
+        1
+      ],
+      "value": []
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        2
+      ],
+      "value": [
+        -1.5707963267948966
+      ]
+    },
+    {
+      "op": "sx",
+      "qubits": [
+        2
+      ],
+      "value": []
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        3
+      ],
+      "value": [
+        3.141592653589793
+      ]
+    },
+    {
+      "op": "swap",
+      "qubits": [
+        3,
+        4
+      ],
+      "value": []
+    },
+    {
+      "op": "swap",
+      "qubits": [
+        4,
+        5
+      ],
+      "value": []
+    },
+    {
+      "op": "cx",
+      "qubits": [
+        5,
+        2
+      ],
+      "value": []
+    },
+    {
+      "op": "sdg",
+      "qubits": [
+        2
+      ],
+      "value": []
+    },
+    {
+      "op": "x",
+      "qubits": [
+        2
+      ],
+      "value": []
+    },
+    {
+      "op": "sdg",
+      "qubits": [
+        5
+      ],
+      "value": []
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        3
+      ],
+      "value": [
+        -3.141592653589793
+      ]
+    },
+    {
+      "op": "sx",
+      "qubits": [
+        3
+      ],
+      "value": []
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        3
+      ],
+      "value": [
+        -1.5707963267948966
+      ]
+    },
+    {
+      "op": "swap",
+      "qubits": [
+        5,
+        4
+      ],
+      "value": []
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        4,
+        3
+      ],
+      "value": []
+    },
+    {
+      "op": "sx",
+      "qubits": [
+        4
+      ],
+      "value": []
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        4
+      ],
+      "value": [
+        1.5707963267948966
+      ]
+    },
+    {
+      "op": "sx",
+      "qubits": [
+        3
+      ],
+      "value": []
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        3
+      ],
+      "value": [
+        -3.141592653589793
+      ]
+    },
+    {
+      "op": "swap",
+      "qubits": [
+        3,
+        4
+      ],
+      "value": []
+    },
+    {
+      "op": "cx",
+      "qubits": [
+        4,
+        1
+      ],
+      "value": []
+    },
+    {
+      "op": "sdg",
+      "qubits": [
+        1
+      ],
+      "value": []
+    },
+    {
+      "op": "h",
+      "qubits": [
+        4
+      ],
+      "value": []
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        5
+      ],
+      "value": [
+        -3.141592653589793
+      ]
+    },
+    {
+      "op": "sx",
+      "qubits": [
+        5
+      ],
+      "value": []
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        2,
+        5
+      ],
+      "value": []
+    },
+    {
+      "op": "sx",
+      "qubits": [
+        2
+      ],
+      "value": []
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        2
+      ],
+      "value": [
+        -1.5707963267948966
+      ]
+    },
+    {
+      "op": "sx",
+      "qubits": [
+        5
+      ],
+      "value": []
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        5
+      ],
+      "value": [
+        -3.141592653589793
+      ]
+    },
+    {
+      "op": "swap",
+      "qubits": [
+        5,
+        4
+      ],
+      "value": []
+    },
+    {
+      "op": "cx",
+      "qubits": [
+        4,
+        1
+      ],
+      "value": []
+    },
+    {
+      "op": "sdg",
+      "qubits": [
+        1
+      ],
+      "value": []
+    },
+    {
+      "op": "cx",
+      "qubits": [
+        1,
+        0
+      ],
+      "value": []
+    },
+    {
+      "op": "sdg",
+      "qubits": [
+        0
+      ],
+      "value": []
+    },
+    {
+      "op": "h",
+      "qubits": [
+        0
+      ],
+      "value": []
+    },
+    {
+      "op": "swap",
+      "qubits": [
+        0,
+        1
+      ],
+      "value": []
+    },
+    {
+      "op": "cx",
+      "qubits": [
+        1,
+        2
+      ],
+      "value": []
+    },
+    {
+      "op": "h",
+      "qubits": [
+        0
+      ],
+      "value": []
+    },
+    {
+      "op": "sdg",
+      "qubits": [
+        0
+      ],
+      "value": []
+    },
+    {
+      "op": "swap",
+      "qubits": [
+        2,
+        1
+      ],
+      "value": []
+    },
+    {
+      "op": "swap",
+      "qubits": [
+        1,
+        4
+      ],
+      "value": []
+    },
+    {
+      "op": "cx",
+      "qubits": [
+        4,
+        3
+      ],
+      "value": []
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        3
+      ],
+      "param": "t5"
+    },
+    {
+      "op": "cx",
+      "qubits": [
+        4,
+        3
+      ],
+      "value": []
+    },
+    {
+      "op": "swap",
+      "qubits": [
+        2,
+        1
+      ],
+      "value": []
+    },
+    {
+      "op": "cx",
+      "qubits": [
+        1,
+        4
+      ],
+      "value": []
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        1
+      ],
+      "param": "t9"
+    },
+    {
+      "op": "swap",
+      "qubits": [
+        1,
+        4
+      ],
+      "value": []
+    },
+    {
+      "op": "cx",
+      "qubits": [
+        4,
+        3
+      ],
+      "value": []
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        3
+      ],
+      "param": "t7"
+    },
+    {
+      "op": "cx",
+      "qubits": [
+        4,
+        3
+      ],
+      "value": []
+    },
+    {
+      "op": "h",
+      "qubits": [
+        2
+      ],
+      "value": []
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        2
+      ],
+      "param": "t12"
+    },
+    {
+      "op": "cx",
+      "qubits": [
+        1,
+        2
+      ],
+      "value": []
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        2
+      ],
+      "param": "t14"
+    },
+    {
+      "op": "cx",
+      "qubits": [
+        1,
+        2
+      ],
+      "value": []
+    },
+    {
+      "op": "cx",
+      "qubits": [
+        4,
+        1
+      ],
+      "value": []
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        1
+      ],
+      "param": "-t10"
+    },
+    {
+      "op": "cx",
+      "qubits": [
+        4,
+        1
+      ],
+      "value": []
+    },
+    {
+      "op": "sdg",
+      "qubits": [
+        4
+      ],
+      "value": []
+    },
+    {
+      "op": "h",
+      "qubits": [
+        4
+      ],
+      "value": []
+    },
+    {
+      "op": "swap",
+      "qubits": [
+        0,
+        1
+      ],
+      "value": []
+    },
+    {
+      "op": "cx",
+      "qubits": [
+        1,
+        4
+      ],
+      "value": []
+    },
+    {
+      "op": "sx",
+      "qubits": [
+        1
+      ],
+      "value": []
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        1
+      ],
+      "value": [
+        1.4187248949168332
+      ]
+    },
+    {
+      "op": "sx",
+      "qubits": [
+        1
+      ],
+      "value": []
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        1
+      ],
+      "value": [
+        1.5707963267948966
+      ]
+    },
+    {
+      "op": "sdg",
+      "qubits": [
+        0
+      ],
+      "value": []
+    },
+    {
+      "op": "h",
+      "qubits": [
+        0
+      ],
+      "value": []
+    },
+    {
+      "op": "swap",
+      "qubits": [
+        4,
+        3
+      ],
+      "value": []
+    },
+    {
+      "op": "cx",
+      "qubits": [
+        3,
+        0
+      ],
+      "value": []
+    },
+    {
+      "op": "swap",
+      "qubits": [
+        0,
+        1
+      ],
+      "value": []
+    },
+    {
+      "op": "cx",
+      "qubits": [
+        1,
+        4
+      ],
+      "value": []
+    },
+    {
+      "op": "cx",
+      "qubits": [
+        4,
+        5
+      ],
+      "value": []
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        5
+      ],
+      "param": "-t4"
+    },
+    {
+      "op": "cx",
+      "qubits": [
+        4,
+        5
+      ],
+      "value": []
+    },
+    {
+      "op": "cx",
+      "qubits": [
+        1,
+        4
+      ],
+      "value": []
+    },
+    {
+      "op": "swap",
+      "qubits": [
+        3,
+        4
+      ],
+      "value": []
+    },
+    {
+      "op": "cx",
+      "qubits": [
+        4,
+        1
+      ],
+      "value": []
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        4
+      ],
+      "value": [
+        1.5707963267948966
+      ]
+    },
+    {
+      "op": "sx",
+      "qubits": [
+        4
+      ],
+      "value": []
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        4
+      ],
+      "value": [
+        -4.71238898038469
+      ]
+    },
+    {
+      "op": "swap",
+      "qubits": [
+        4,
+        3
+      ],
+      "value": []
+    },
+    {
+      "op": "cx",
+      "qubits": [
+        3,
+        0
+      ],
+      "value": []
+    },
+    {
+      "op": "sx",
+      "qubits": [
+        3
+      ],
+      "value": []
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        3
+      ],
+      "value": [
+        1.5707963267948966
+      ]
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        0
+      ],
+      "value": [
+        1.5707963267948983
+      ]
+    },
+    {
+      "op": "sx",
+      "qubits": [
+        0
+      ],
+      "value": []
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        0
+      ],
+      "value": [
+        -2.989521221711729
+      ]
+    },
+    {
+      "op": "sx",
+      "qubits": [
+        0
+      ],
+      "value": []
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        1
+      ],
+      "value": [
+        -3.141592653589793
+      ]
+    },
+    {
+      "op": "sx",
+      "qubits": [
+        1
+      ],
+      "value": []
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        1
+      ],
+      "value": [
+        -2.356194490192345
+      ]
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        4
+      ],
+      "value": [
+        -1.5707963267948966
+      ]
+    },
+    {
+      "op": "sx",
+      "qubits": [
+        4
+      ],
+      "value": []
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        4
+      ],
+      "value": [
+        -3.141592653589793
+      ]
+    },
+    {
+      "op": "h",
+      "qubits": [
+        5
+      ],
+      "value": []
+    },
+    {
+      "op": "h",
+      "qubits": [
+        2
+      ],
+      "value": []
+    },
+    {
+      "op": "swap",
+      "qubits": [
+        3,
+        4
+      ],
+      "value": []
+    },
+    {
+      "op": "swap",
+      "qubits": [
+        4,
+        5
+      ],
+      "value": []
+    },
+    {
+      "op": "cx",
+      "qubits": [
+        5,
+        2
+      ],
+      "value": []
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        2
+      ],
+      "param": "-t13"
+    },
+    {
+      "op": "cx",
+      "qubits": [
+        5,
+        2
+      ],
+      "value": []
+    },
+    {
+      "op": "swap",
+      "qubits": [
+        0,
+        1
+      ],
+      "value": []
+    },
+    {
+      "op": "swap",
+      "qubits": [
+        1,
+        2
+      ],
+      "value": []
+    },
+    {
+      "op": "cx",
+      "qubits": [
+        2,
+        5
+      ],
+      "value": []
+    },
+    {
+      "op": "sx",
+      "qubits": [
+        5
+      ],
+      "value": []
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        5
+      ],
+      "value": [
+        1.5707963267948966
+      ]
+    },
+    {
+      "op": "sx",
+      "qubits": [
+        2
+      ],
+      "value": []
+    },
+    {
+      "op": "cx",
+      "qubits": [
+        2,
+        5
+      ],
+      "value": []
+    },
+    {
+      "op": "s",
+      "qubits": [
+        2
+      ],
+      "value": []
+    },
+    {
+      "op": "cx",
+      "qubits": [
+        1,
+        2
+      ],
+      "value": []
+    },
+    {
+      "op": "s",
+      "qubits": [
+        2
+      ],
+      "value": []
+    },
+    {
+      "op": "swap",
+      "qubits": [
+        4,
+        5
+      ],
+      "value": []
+    },
+    {
+      "op": "cx",
+      "qubits": [
+        5,
+        2
+      ],
+      "value": []
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        2
+      ],
+      "value": [
+        3.141592653589793
+      ]
+    },
+    {
+      "op": "x",
+      "qubits": [
+        2
+      ],
+      "value": []
+    },
+    {
+      "op": "h",
+      "qubits": [
+        5
+      ],
+      "value": []
+    },
+    {
+      "op": "sx",
+      "qubits": [
+        5
+      ],
+      "value": []
+    },
+    {
+      "op": "swap",
+      "qubits": [
+        3,
+        4
+      ],
+      "value": []
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        4,
+        5
+      ],
+      "value": []
+    },
+    {
+      "op": "x",
+      "qubits": [
+        4
+      ],
+      "value": []
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        4
+      ],
+      "value": [
+        -1.5707963267948974
+      ]
+    },
+    {
+      "op": "sx",
+      "qubits": [
+        5
+      ],
+      "value": []
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        5
+      ],
+      "value": [
+        -3.141592653589793
+      ]
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        1
+      ],
+      "value": [
+        -3.1415926535897927
+      ]
+    },
+    {
+      "op": "sx",
+      "qubits": [
+        1
+      ],
+      "value": []
+    },
+    {
+      "op": "cz",
+      "qubits": [
+        0,
+        1
+      ],
+      "value": []
+    },
+    {
+      "op": "x",
+      "qubits": [
+        0
+      ],
+      "value": []
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        0
+      ],
+      "value": [
+        -2.3561944901923457
+      ]
+    },
+    {
+      "op": "swap",
+      "qubits": [
+        4,
+        3
+      ],
+      "value": []
+    },
+    {
+      "op": "cx",
+      "qubits": [
+        3,
+        0
+      ],
+      "value": []
+    },
+    {
+      "op": "s",
+      "qubits": [
+        0
+      ],
+      "value": []
+    },
+    {
+      "op": "h",
+      "qubits": [
+        0
+      ],
+      "value": []
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        0
+      ],
+      "value": [
+        3.141592653589793
+      ]
+    },
+    {
+      "op": "sx",
+      "qubits": [
+        1
+      ],
+      "value": []
+    },
+    {
+      "op": "rz",
+      "qubits": [
+        1
+      ],
+      "value": [
+        -3.141592653589793
+      ]
+    },
+    {
+      "op": "swap",
+      "qubits": [
+        4,
+        3
+      ],
+      "value": []
+    },
+    {
+      "op": "swap",
+      "qubits": [
+        3,
+        0
+      ],
+      "value": []
+    },
+    {
+      "op": "swap",
+      "qubits": [
+        2,
+        1
+      ],
+      "value": []
+    },
+    {
+      "op": "swap",
+      "qubits": [
+        3,
+        4
+      ],
+      "value": []
+    },
+    {
+      "op": "swap",
+      "qubits": [
+        4,
+        5
+      ],
+      "value": []
+    },
+    {
+      "op": "swap",
+      "qubits": [
+        5,
+        2
+      ],
+      "value": []
+    }
+  ],
+  "note": "From-scratch diagonal-frame compile. Target ~10 CZ is not reached: 8 Paulis (rank-4 commuting family + 2 non-diagonal) need a Clifford sandwich whose V alone is ~12 two-qubit gates, twice, plus ladders for weight-3..5 images of P4/P13. Further cuts need e.g. Pauli-network synthesis (rustiq) or dropping near-zero amplitudes (pid 13 ~ 0)."
+}

@@ -4,11 +4,14 @@
 This is the tapered counterpart of
 ``June_main/generate_molecular_hamiltonians.py``.  It reuses that script's
 molecule presets and full-register Hamiltonian builder, then applies the exact
-two-parity Z2 tapering from :mod:`taper_lib` to remove 2 qubits (HF 8 -> 6,
+two-parity Z2 tapering from :mod:`taper_lib` to remove 2 qubits (HF/H4 8 -> 6,
 Cl2 10 -> 8, Br2 12 -> 10).
 
-Defaults to HF; pass ``--molecule Cl2`` / ``Br2`` (or ``--bonds``) to generate
-the others.  For each bond length it writes, under ``state_transfer/Pauli_Ham``:
+Defaults to HF; pass ``--molecule Cl2`` / ``Br2`` / ``LiH`` / ``F2`` / ``H4``
+(or ``--bonds``) to generate the others.  LiH/F2 match Guo et al. arXiv:2212.08006
+(6-qubit LiH active ``{1,2,5}``, 12-qubit F2 CAS(10,6)); H4 is linear CAS(4,4)
+(8 -> 6 qubits, ``UCCSD_Mole/H4.ipynb``).  For each bond length it writes, under
+``state_transfer/Pauli_Ham``:
 
     <mol>_tapered_bond_<b>.txt        numbered Pauli Hamiltonian (I=0,X=1,Y=2,Z=3)
     <mol>_tapered_bond_<b>_meta.json  tapering description (taper_lib.TaperData)

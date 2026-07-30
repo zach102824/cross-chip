@@ -1,0 +1,31 @@
+{
+  "bond": 2.8,
+  "hf_doubles_overlap": 0.7655975649672927,
+  "winner_overlap": 0.9999999999999936,
+  "interleaved_mix": [
+    {
+      "L": 1,
+      "n2": 13,
+      "nparam": 63,
+      "overlap": 0.765598
+    },
+    {
+      "L": 2,
+      "n2": 26,
+      "nparam": 96,
+      "overlap": 0.765597
+    },
+    {
+      "L": 3,
+      "n2": 39,
+      "nparam": 129,
+      "overlap": 0.765597
+    }
+  ],
+  "weight4_blocks": {
+    "n2": 9,
+    "nparam": 75,
+    "overlap": 0.999842
+  },
+  "verdict": "Generic U3+CZ/RZX layers stay at HF; per-double CZ+RZX blocks nearly match doubles."
+}

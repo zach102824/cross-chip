@@ -1,0 +1,179 @@
+{
+  "case": "HF_6q",
+  "target": "gates_frozen",
+  "ref_n2_frozen": 3,
+  "ref_n2_winner": 3,
+  "ref_n2_full": 15,
+  "frozen_strings": [
+    "YIIXII",
+    "IYIIXI",
+    "IIYIIX"
+  ],
+  "winner_vs_frozen_overlap_min": 0.9999999999999944,
+  "frozen_vs_full_overlap_min": 0.9999999999999944,
+  "n_theta": 2,
+  "thetas": [
+    [
+      0.08217701239287256,
+      -0.13812797174167782,
+      -0.2754158856382832
+    ],
+    [
+      -0.2900834186828825,
+      0.18796214352016344,
+      0.247653346366633
+    ]
+  ],
+  "results": [
+    {
+      "spec": "vert|rzx|pre+u3",
+      "mode": "joint",
+      "n2": 3,
+      "n_params_1q": 36,
+      "n_params_2q": 3,
+      "overlap_mean": 0.9999999992142603,
+      "overlap_min": 0.999999998834227,
+      "overlap_max": 0.9999999995942936,
+      "overlaps": [
+        0.999999998834227,
+        0.9999999995942936
+      ],
+      "seconds": 24.71
+    },
+    {
+      "spec": "vert|rzx|pre+u3",
+      "mode": "only_1q",
+      "n2": 3,
+      "n_params_1q": 36,
+      "n_params_2q": 3,
+      "overlap_mean": 0.9999999986327128,
+      "overlap_min": 0.9999999985026493,
+      "overlap_max": 0.9999999987627763,
+      "overlaps": [
+        0.9999999987627763,
+        0.9999999985026493
+      ],
+      "seconds": 31.01
+    },
+    {
+      "spec": "vert|rzx|u3",
+      "mode": "joint",
+      "n2": 3,
+      "n_params_1q": 18,
+      "n_params_2q": 3,
+      "overlap_mean": 0.9652594089025653,
+      "overlap_min": 0.9556828784778076,
+      "overlap_max": 0.974835939327323,
+      "overlaps": [
+        0.974835939327323,
+        0.9556828784778076
+      ],
+      "seconds": 0.62
+    },
+    {
+      "spec": "vert|rzx|u3",
+      "mode": "only_1q",
+      "n2": 3,
+      "n_params_1q": 18,
+      "n_params_2q": 3,
+      "overlap_mean": 0.9652594089491437,
+      "overlap_min": 0.9556828784772922,
+      "overlap_max": 0.9748359394209954,
+      "overlaps": [
+        0.9748359394209954,
+        0.9556828784772922
+      ],
+      "seconds": 4.28
+    },
+    {
+      "spec": "vert|cz|pre+u3",
+      "mode": "joint",
+      "n2": 3,
+      "n_params_1q": 36,
+      "n_params_2q": 0,
+      "overlap_mean": 0.999999997295432,
+      "overlap_min": 0.9999999965001716,
+      "overlap_max": 0.9999999980906924,
+      "overlaps": [
+        0.9999999965001716,
+        0.9999999980906924
+      ],
+      "seconds": 11.93
+    },
+    {
+      "spec": "vert|cz|pre+u3",
+      "mode": "only_1q",
+      "n2": 3,
+      "n_params_1q": 36,
+      "n_params_2q": 0,
+      "overlap_mean": 0.9999999981829583,
+      "overlap_min": 0.9999999972201634,
+      "overlap_max": 0.9999999991457531,
+      "overlaps": [
+        0.9999999972201634,
+        0.9999999991457531
+      ],
+      "seconds": 21.74
+    },
+    {
+      "spec": "nn+vert|rzx|pre+u3",
+      "mode": "joint",
+      "n2": 7,
+      "n_params_1q": 36,
+      "n_params_2q": 7,
+      "overlap_mean": 0.9999999890443967,
+      "overlap_min": 0.9999999795083737,
+      "overlap_max": 0.9999999985804198,
+      "overlaps": [
+        0.9999999795083737,
+        0.9999999985804198
+      ],
+      "seconds": 33.87
+    },
+    {
+      "spec": "nn+vert|rzx|pre+u3",
+      "mode": "only_1q",
+      "n2": 7,
+      "n_params_1q": 36,
+      "n_params_2q": 7,
+      "overlap_mean": 0.9957338552705526,
+      "overlap_min": 0.9923739285715656,
+      "overlap_max": 0.9990937819695396,
+      "overlaps": [
+        0.9990937819695396,
+        0.9923739285715656
+      ],
+      "seconds": 91.55
+    },
+    {
+      "spec": "nn+vert|mix|pre+u3",
+      "mode": "joint",
+      "n2": 7,
+      "n_params_1q": 36,
+      "n_params_2q": 3,
+      "overlap_mean": 0.9932156375320764,
+      "overlap_min": 0.9911935314566228,
+      "overlap_max": 0.9952377436075299,
+      "overlaps": [
+        0.9952377436075299,
+        0.9911935314566228
+      ],
+      "seconds": 22.08
+    },
+    {
+      "spec": "nn+vert|mix|pre+u3",
+      "mode": "only_1q",
+      "n2": 7,
+      "n_params_1q": 36,
+      "n_params_2q": 3,
+      "overlap_mean": 0.9975814661836433,
+      "overlap_min": 0.9964377618589997,
+      "overlap_max": 0.9987251705082868,
+      "overlaps": [
+        0.9987251705082868,
+        0.9964377618589997
+      ],
+      "seconds": 63.78
+    }
+  ]
+}

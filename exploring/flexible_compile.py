@@ -33,9 +33,9 @@ def _load_gen():
 gen = _load_gen()
 
 
-def _adj(n: int) -> dict[int, list[int]]:
+def _adj(n: int, *, chords: bool = True) -> dict[int, list[int]]:
     g: dict[int, list[int]] = defaultdict(list)
-    for e in allowed_cz_edges(n):
+    for e in allowed_cz_edges(n, chords=chords):
         a, b = tuple(e)
         g[a].append(b)
         g[b].append(a)
@@ -69,7 +69,7 @@ def _shortest_path(adj, src: int, dst: int, allowed_nodes: set[int]):
 
 
 def _fanin_on_graph(terminals: list[int], hub: int, n: int,
-                    steiner_ok: set[int]) -> list[tuple]:
+                    steiner_ok: set[int], *, chords: bool = True) -> list[tuple]:
     """CZ/H fan-in of terminals into hub along the allowed within-spin graph.
 
     Builds a shortest-path tree into ``hub``, then emits gates in leaf→hub
@@ -80,7 +80,7 @@ def _fanin_on_graph(terminals: list[int], hub: int, n: int,
         raise ValueError("hub must be a terminal")
     terms = set(terminals)
     allowed_nodes = set(steiner_ok) | terms
-    adj = _adj(n)
+    adj = _adj(n, chords=chords)
     parent: dict[int, int | None] = {hub: None}
     for t in sorted(terms):
         if t == hub:
@@ -113,11 +113,12 @@ def _fanin_on_graph(terminals: list[int], hub: int, n: int,
 
 def compile_flexible(string: str, n: int, hub_a: int | None = None,
                      hub_b: int | None = None, hub_hint: int | None = None,
-                     use_cz_graph: bool = True):
+                     use_cz_graph: bool = True, *, chords: bool = True):
     """Compile exp(-i t/2 P) with a freely chosen α–β bridge (hub_a, hub_b).
 
     The α–β link is a single CZ(hub_a, hub_b) (later fused to RZX).  Within each
     spin row, fan-in respects ``allowed_cz_edges`` when use_cz_graph=True.
+    ``chords=False`` restricts fan-in to nearest-neighbour edges only.
     """
     half = n // 2
     sup = [q for q in range(n) if string[q] != "I"]
@@ -131,7 +132,7 @@ def compile_flexible(string: str, n: int, hub_a: int | None = None,
             hub_a if hub_a in row else row[len(row) // 2]
         )
         if use_cz_graph:
-            ladder = _fanin_on_graph(row, pivot, n, steiner_ok)
+            ladder = _fanin_on_graph(row, pivot, n, steiner_ok, chords=chords)
         else:
             ladder = gen._row_chain(row, pivot)
         hub_a, hub_b = pivot, None
@@ -144,8 +145,8 @@ def compile_flexible(string: str, n: int, hub_a: int | None = None,
         pivot = hub_a
         if use_cz_graph:
             ladder = (
-                _fanin_on_graph(alpha, hub_a, n, steiner_ok)
-                + _fanin_on_graph(beta, hub_b, n, steiner_ok)
+                _fanin_on_graph(alpha, hub_a, n, steiner_ok, chords=chords)
+                + _fanin_on_graph(beta, hub_b, n, steiner_ok, chords=chords)
             )
         else:
             ladder = gen._row_chain(alpha, hub_a) + gen._row_chain(beta, hub_b)
@@ -195,11 +196,12 @@ def prog_to_gates(prog):
 
 
 def compile_strings(strings, signs=None, order="auto", hub_schedule=None,
-                    fuse=True, optimize=True):
+                    fuse=True, optimize=True, *, chords: bool = True):
     """Compile a list of Pauli strings with optional per-block (hub_a, hub_b).
 
     hub_schedule: list of (hub_a, hub_b) aligned to *ordered* strings, or None
     for the legacy vertical preference.
+    ``chords=False`` uses NN-only within-spin CZ (no (0,3)/(half,half+3)).
     """
     n = len(strings[0])
     if signs is None:
@@ -216,7 +218,7 @@ def compile_strings(strings, signs=None, order="auto", hub_schedule=None,
         else:
             ha, hb = hub_schedule[pos]
         prefix, pivot, ph, bridge = compile_flexible(
-            s, n, hub_a=ha, hub_b=hb, hub_hint=hub_hint
+            s, n, hub_a=ha, hub_b=hb, hub_hint=hub_hint, chords=chords
         )
         hub_hint = pivot
         bridges_used.append(bridge)

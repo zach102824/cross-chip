@@ -24,12 +24,12 @@ from error_budget import score_gates, spin_split_cross_pairs, cross_from_list
 # ----------------------------------------------------------------------
 def search_flexible_hubs(strings, signs=None, cross_pairs=None, max_blocks=5,
                          require_disjoint_rzx=False, require_all_qubits=False,
-                         order="auto"):
+                         order="auto", *, chords: bool = True):
     """Brute-force per-block α–β bridge choices (tiny pools).
 
     If require_disjoint_rzx, only vertex-disjoint hub schedules are kept
     (no two RZX may share a qubit).  If require_all_qubits, every wire must
-    appear in the fused gate list.
+    appear in the fused gate list.  ``chords=False`` uses NN-only CZ.
     """
     n = len(strings[0])
     if signs is None:
@@ -84,11 +84,11 @@ def search_flexible_hubs(strings, signs=None, cross_pairs=None, max_blocks=5,
         try:
             out = compile_strings(
                 ordered, signs=ordered_signs, order="given",
-                hub_schedule=sched, fuse=True,
+                hub_schedule=sched, fuse=True, chords=chords,
             )
         except Exception:
             continue
-        ok, _why = satisfies_rules(out["gates"], n)
+        ok, _why = satisfies_rules(out["gates"], n, chords=chords)
         if require_disjoint_rzx and require_all_qubits and not ok:
             continue
         if require_disjoint_rzx and not require_all_qubits and _why == "rzx_overlap":
@@ -106,6 +106,7 @@ def search_flexible_hubs(strings, signs=None, cross_pairs=None, max_blocks=5,
             "strings_orig_order": strings,
             "rules_ok": ok,
             "rules_why": _why,
+            "chords": chords,
         }
         results.append(rec)
         if best is None or bud.error < best["budget"].error:
@@ -488,12 +489,12 @@ def method_shared_clifford(strings, signs=None, bridge=None, cross_pairs=None):
 # Method F: disjoint RZX + all qubits used (general rule for Cl2+)
 # ----------------------------------------------------------------------
 def method_disjoint_rzx_all_qubits(strings, signs=None, cross_pairs=None,
-                                   max_mask_opts=6):
+                                   max_mask_opts=6, *, chords: bool = True):
     """Selective Z-freeze + vertex-disjoint α–β RZX, using every qubit.
 
     Enumerates keep-masks per string (courier Z-pairs) and hub schedules whose
     bridges are pairwise qubit-disjoint, then keeps circuits that touch every
-    wire.  Ranked by error-budget proxy.
+    wire.  Ranked by error-budget proxy.  ``chords=False`` = NN-only CZ baseline.
     """
     n = len(strings[0])
     if signs is None:
@@ -521,6 +522,7 @@ def method_disjoint_rzx_all_qubits(strings, signs=None, cross_pairs=None,
             require_disjoint_rzx=True,
             require_all_qubits=True,
             order="given",  # keep t_k ↔ doubles[k]
+            chords=chords,
         )
         for h in hits:
             if not h.get("rules_ok"):
@@ -529,6 +531,7 @@ def method_disjoint_rzx_all_qubits(strings, signs=None, cross_pairs=None,
             rec["name"] = "disjoint_rzx_all_qubits"
             rec["frozen_strings"] = frozen
             rec["keep_pairs"] = keeps
+            rec["chords"] = chords
             winners.append(rec)
             if best is None or rec["budget"].error < best["budget"].error:
                 best = rec

@@ -1,0 +1,6 @@
+# Cl2_tapered active-space bond scan
+# active_space: (8, 5)
+# basis: sto-3g
+# energies in Hartree; HF_minus_GS in milli-Hartree
+bond_angstrom	E_HF_Ha	E_GS_Ha	HF_minus_GS_mHa
+2.2	-909.106315117677	-909.145296806063	38.981688

@@ -14,8 +14,8 @@ sandwiches a single CZ on one shared vertical bridge pair.  Fusing
     local single-/two-qubit gates -- exactly like
     ``June_main/circuits2read/HF_8q_3doubles_rzx.json`` but on fewer qubits.
 
-Defaults to HF (8 -> 6 qubits, 3 doubles).  Cl2 / Br2 entries are stubbed in
-``CASES`` (commented) for later use.  Outputs go to
+Defaults to HF (8 -> 6 qubits, 3 doubles).  Cl2 / Br2 / H4 entries live in
+``CASES``.  Outputs go to
 ``state_transfer/circuits2read/<mol>_tapered_<n>q_<k>doubles_rzx.json`` (+ PNG).
 """
 
@@ -97,6 +97,29 @@ CASES = {
         pair=False,
         order="given",
         hub0=None,
+    ),
+    "H4": dict(
+        molecule="H4",
+        # UCCSD_Mole/H4.ipynb fixed ansatz at d=1.0 A: param_ids
+        # [12, 5, 9, 14, 7, 4, 10, 13] (first linked ex_op per param).
+        bond_length=1.0,
+        n_qubits_full=8,
+        n_electrons=4,
+        doubles=[
+            (2, 6, 5, 1),
+            (2, 6, 4, 0),
+            (2, 7, 5, 0),
+            (3, 7, 5, 1),
+            (3, 7, 4, 0),
+            (6, 7, 5, 4),
+            (3, 6, 5, 0),
+            (2, 7, 5, 1),
+        ],
+        param_ids=[12, 5, 9, 14, 7, 4, 10, 13],
+        pair=False,
+        order="given",
+        # No shared vertical bridge across all 8 tapered strings; pin hub to q2.
+        hub0=2,
     ),
 }
 
@@ -275,6 +298,7 @@ def run(name: str, out_dir: Path | None = None) -> dict:
             "hf_occupied_qubits": hf_occupied,
             "tapered_strings": tapered_strings,
             "bridge_pair": bridge_pair,
+            **({"param_ids": list(cfg["param_ids"])} if "param_ids" in cfg else {}),
         },
     )
     gen.save_circuit_diagram(fused_gates, n_qubits, out_dir / f"{tag}_circuit.png", title=tag)

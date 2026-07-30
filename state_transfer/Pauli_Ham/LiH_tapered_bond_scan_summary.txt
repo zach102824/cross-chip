@@ -1,0 +1,6 @@
+# LiH_tapered active-space bond scan
+# active_space: (2, 3)
+# basis: sto-3g
+# energies in Hartree; HF_minus_GS in milli-Hartree
+bond_angstrom	E_HF_Ha	E_GS_Ha	HF_minus_GS_mHa
+2.5	-7.770873669222	-7.823076642134	52.202973

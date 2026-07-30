@@ -1,0 +1,7 @@
+# F2 tapered active-space bond scan
+# active_space: (10, 6)
+# basis: sto-3g
+# energies in Hartree; HF_minus_GS in milli-Hartree
+bond_angstrom	E_HF_Ha	E_GS_Ha	HF_minus_GS_mHa
+2.0	-195.731098153215	-195.981746389312	250.648236
+2.5	-195.613681917519	-195.973338888970	359.656971

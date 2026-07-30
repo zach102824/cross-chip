@@ -1,0 +1,108 @@
+% One-page note: Z-pair freeze in exploring/
+% Compile: pdflatex freeze_explainer.tex
+\documentclass[10pt]{article}
+\usepackage[margin=0.65in]{geometry}
+\usepackage{amsmath,amssymb,booktabs}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage[T1]{fontenc}
+\usepackage{microtype}
+\setlist[itemize]{leftmargin=1.2em,itemsep=1pt,topsep=2pt,parsep=0pt}
+\setlength{\parskip}{0.35em}
+\setlength{\parindent}{0pt}
+\pagestyle{empty}
+
+\newcommand{\ZZ}{Z_q Z_{q+N/2}}
+\newcommand{\code}[1]{\texttt{\detokenize{#1}}}
+
+\begin{document}
+
+{\large\bfseries Z-pair freeze in \code{exploring/}}
+\hfill {\small Method~1 of \code{error_reduction_methods.md}; implemented in \code{freeze.py}}
+
+\vspace{0.4em}
+\hrule
+\vspace{0.5em}
+
+\paragraph{Setup.}
+UCCSD doubles are compiled in the Jordan--Wigner (JW) encoding on an even register of
+$N$ qubits with two spin rows: $\alpha$ on $0{\ldots}N/2{-}1$, $\beta$ on $N/2{\ldots}N{-}1$.
+Each spin-paired double has a Pauli representative whose non-identity letters are
+$Y$/$X$ on the excited orbitals plus a string of $Z$s (JW parity tails).
+Those $Z$s always appear as \emph{spin pairs}: whenever $Z_q$ occurs with $q<N/2$,
+so does $Z_{q+N/2}$.
+
+\paragraph{Identity (exact on the reachable subspace).}
+Starting from Hartree--Fock and applying only spin-paired doubles keeps $\alpha$ and
+$\beta$ occupations locked: qubits $q$ and $q{+}N/2$ always have equal occupation.
+Hence
+\begin{equation*}
+  \ZZ \;=\; (+1)\cdot(+1)\;\text{or}\;(-1)\cdot(-1)\;=\;+1
+\end{equation*}
+on every state the ansatz can reach.  Replacing each such pair by the scalar $+1$
+is therefore exact---not an approximation.  In code this is deletion of both letters:
+\begin{equation*}
+  \underbrace{\ldots\,Z_q\,\ldots\,Z_{q+N/2}\,\ldots}_{\text{JW string}}
+  \;\longrightarrow\;
+  \underbrace{\ldots\,I\,\ldots\,I\,\ldots}_{\text{frozen string}}.
+\end{equation*}
+\code{freeze.freeze_z_pairs(string, keep_pairs)} performs this rewrite;
+\code{fully_freeze} deletes every frezeable pair (\code{keep_pairs}$=\emptyset$).
+
+\paragraph{Why freeze helps.}
+Fewer non-identity Paulis $\Rightarrow$ shorter within-row CZ fan-in ladders when
+compiling $\exp(-i\theta P/2)$.  Under the exploring error-budget proxy
+(cross-chip 2q cost $\gg$ on-chip), deleting idle parity tails is a pure win.
+Equivalence is checked by statevector overlap vs.\ the unfrozen circuit on the HF
+bitstring (overlaps $\approx 1$ in \code{export_winners.py}).
+
+\paragraph{Selective freeze: $Z$s as couriers.}
+The freeze identity is bidirectional: any deleted $\ZZ$ may be \emph{re-inserted}
+for free.  Retained pairs (indices $q\in$\code{keep_pairs}) act as parity
+\emph{couriers} along the allowed within-spin CZ graph
+(nearest-neighbour $+$ chords $(0,3)$ / $(N/2,N/2{+}3)$), so hubs and Steiner nodes
+sit on legal edges.  \code{all_keep_masks} enumerates courier subsets; Method~F
+(\code{method_disjoint_rzx_all_qubits}) searches masks $+$ disjoint $\alpha$--$\beta$
+RZX hubs jointly.
+
+\paragraph{Winners in \code{exploring/}.}
+\begin{center}
+\small
+\begin{tabular}{@{}llp{0.42\textwidth}@{}}
+\toprule
+Molecule & Freeze & Effect \\
+\midrule
+HF $6q$ & \emph{full}
+&
+\texttt{YZZXZZ}$\to$\texttt{YIIXII}, etc.\ $\to$ three weight-$2$ blocks;
+RZX on $(0,3),(1,4),(2,5)$; \textbf{no CZ}. \\[0.35em]
+Cl$_2$ $10q$ & \emph{selective}
+&
+\code{keep_pairs}$=\{\{2,3\},\{3\}\}$;
+\texttt{IYZZXIXZZX}, \texttt{YIIZXXIIZX} stay weight $\ge 4$;
+RZX on $(2,7),(0,5)$ with CZ fan-in. \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+HF collapses to independent $Y\otimes X$ pairs because (after tapering) each double
+has only one frezeable $\alpha$--$\beta$ support pair.  Untapered Cl$_2$ keeps shared
+creation orbitals on qubits $4$ and $9$, so even maximal freeze leaves weight-$4$
+strings---CZ ladders remain mandatory.  Couriers are kept only insofar as they enable
+legal, vertex-disjoint hubs under the exploring connectivity rules.
+
+\paragraph{Caveats.}
+Exactness requires (i)~a spin-paired reference (HF), (ii)~only paired doubles in the
+ansatz, (iii)~action on that locked subspace.  The measured Hamiltonian is unchanged;
+only the ansatz Paulis are rewritten.  Re-verify overlaps if the doubles set changes.
+
+\vspace{0.35em}
+\hrule
+\vspace{0.25em}
+{\scriptsize
+API: \code{freeze.py} ---
+\code{freeze_z_pairs}, \code{fully_freeze}, \code{all_keep_masks}.
+Call sites: \code{export_winners.py}, \code{methods.py}.
+}
+
+\end{document}

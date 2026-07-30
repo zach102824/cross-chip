@@ -1,0 +1,80 @@
+VQE-RELATED PAPERS — DISCUSSION SUMMARY
+========================================
+
+1. Variational Quantum Eigensolver with Reduced Circuit Complexity (ClusterVQE)
+---------------------------------------------------------------------------
+Authors: Yu Zhang, Lukasz Cincio, Christian F. A. Negre, Piotr Czarnik,
+         Patrick J. Coles, Petr M. Anisimov, Susan M. Mniszewski,
+         Sergei Tretiak, Pavel A. Dub
+Journal: npj Quantum Information, vol. 8, Article 96 (2022)
+DOI: 10.1038/s41534-022-00599-z
+Link: https://www.nature.com/articles/s41534-022-00599-z
+
+Summary:
+Introduces ClusterVQE, an algorithm that reduces both circuit depth and
+qubit count (width) in VQE for quantum chemistry. Qubits are split into
+clusters based on mutual information (MI), a measure of correlation
+between spin-orbitals — qubits that are strongly correlated are grouped
+into the same cluster, using classical graph-partitioning (e.g. Metis)
+or QUBO/quantum-annealer methods. Entanglement WITHIN a cluster is built
+normally via entangling gates on a quantum circuit. Entanglement BETWEEN
+clusters is not built on hardware at all — instead it is folded
+classically into a "dressed" Hamiltonian, so each cluster can be
+measured on its own smaller, shallower circuit. The ansatz is grown
+adaptively (ADAPT-style), and operator selection at each iteration uses
+gradient measurements. Clustering itself can be done from a fixed
+classical MI (via MP2/DMRG) or updated on-the-fly during optimization.
+Demonstrated on LiH, (H2)2, N2, and on real IBM quantum hardware
+(IBMQ-Bogota) with error mitigation (Clifford data regression).
+
+Key takeaway: reduces quantum hardware requirements (fewer qubits,
+shallower circuits) at the cost of additional classical computation,
+by removing inter-cluster entanglement via Hamiltonian dressing rather
+than by qubit rearrangement.
+
+
+2. Correlation-Informed Permutation of Qubits for Reducing Ansatz Depth
+   in the Variational Quantum Eigensolver (PermVQE)
+---------------------------------------------------------------------------
+Authors: Nikolay V. Tkachenko, James Sud, Yu Zhang, Sergei Tretiak,
+         Petr M. Anisimov, Andrew T. Arrasmith, Patrick J. Coles,
+         Lukasz Cincio, Pavel A. Dub
+Journal: PRX Quantum, vol. 2, 020337 (2021)
+DOI: 10.1103/PRXQuantum.2.020337
+arXiv: 2009.04996
+
+Summary:
+Proposes PermVQE, which adds an extra optimization loop to standard VQE
+that permutes (reassigns) which physical qubit each spin-orbital maps
+to, rather than removing or restructuring entanglement. The permutation
+is chosen — again based on the mutual information between spin-orbitals
+— to place strongly correlated qubits physically adjacent to one
+another on the chip's actual connectivity graph (tested on linear and
+2D-grid architectures). This minimizes the number of SWAP gates /
+long-range CNOTs needed to implement entangling operations, directly
+addressing hardware topology constraints. The approach is ansatz-
+agnostic: demonstrated with standard VQE and also with a fermionic-
+ADAPT-derived pseudo-Trotter ansatz, achieving nearly a 2x reduction in
+CNOT count on a linear-connectivity architecture. Tested on LiH, H2,
+(H2)2, H4, H3+, and N2.
+
+Key takeaway: rather than eliminating inter-qubit entanglement (as in
+ClusterVQE), PermVQE keeps all qubits on one circuit but optimizes their
+physical layout against a given hardware coupling map, reducing SWAP
+overhead for topology-constrained devices.
+
+
+HOW THE TWO RELATE
+---------------------------------------------------------------------------
+- ClusterVQE: splits the problem across multiple smaller circuits by
+  removing inter-cluster entanglement (via a dressed Hamiltonian).
+  Reduces qubit count per circuit.
+- PermVQE: keeps one circuit but reorders qubit-to-orbital assignment
+  to match hardware topology, minimizing SWAP gates. Reduces circuit
+  depth via layout optimization, not via removing entanglement.
+- Both use the same underlying tool — mutual information between
+  spin-orbitals/qubits, computable classically via MP2 or small-bond-
+  dimension DMRG — as the correlation metric that drives their
+  respective optimizations (clustering vs. permutation).
+- ClusterVQE builds on / cites PermVQE as prior work from the same
+  research group (Los Alamos National Laboratory).
