@@ -1,0 +1,12 @@
+# H4 active-space bond scan
+# active_space: (4, 4)
+# basis: sto-3g
+# energies in Hartree; HF_minus_GS in milli-Hartree
+bond_angstrom	E_HF_Ha	E_GS_Ha	HF_minus_GS_mHa
+0.6	-1.929564248452		
+0.8	-2.121386755870		
+1	-2.098545936998		
+1.2	-2.003867483121		
+1.4	-1.887790304484		
+1.6	-1.772203101805		
+1.8	-1.666867161184		

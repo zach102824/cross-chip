@@ -1,0 +1,16 @@
+\relax 
+\providecommand\hyper@newdestlabel[2]{}
+\providecommand\HyField@AuxAddToFields[1]{}
+\providecommand\HyField@AuxAddToCoFields[2]{}
+\@writefile{toc}{\contentsline {section}{\numberline {1}Main new idea}{1}{section.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {2}Toy model with concrete numbers}{1}{section.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {3}Paper math walkthrough}{2}{section.3}\protected@file@percent }
+\newlabel{eq:cost}{{2}{2}{Objective (what COSMA minimizes)}{equation.2}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {4}Figures from the paper}{3}{section.4}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces \textbf  {FIG.~1 (paper) --- compilation flow.} Molecule $\to $ F2Q mapping $\to $ Pauli Hamiltonian $\to $ scheduled Trotter sequence $\to $ Pauli-gadget synthesis $\to $ qubit allocation/routing on a multi-core grid $\to $ \textbf  {communication cost} (inter-core state transfers).}}{3}{figure.caption.9}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces \textbf  {FIG.~6 (paper) --- modular model + sliced allocation.} \textbf  {(a)}~Cores with local qubits and inter-core links. \textbf  {(b)}~Circuit sliced into parallel CNOT groups. \textbf  {(c)}~Per-slice layouts; red arcs $=$ quantum state transfers when a qubit's core changes.}}{4}{figure.caption.10}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {5}Takeaway}{4}{section.5}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces \textbf  {FIG.~7 (paper) --- COSMA framework.} Genetic individuals $=$ (tree-shape chromosome, mode-order chromosome). Fitness $=$ full schedule+allocate cost. Downstream: mag/lex/gray scheduling and iterative synthesis/allocation with lookahead.}}{5}{figure.caption.11}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces \textbf  {FIGS.~8--9 (paper) --- full pipeline vs.\ baselines.} Normalized inter-core transfer cost across 14 molecules (Water$\to $Cytosine). Pink/red bars: fixed JW/BK/PE/JKMN + HQA. Dark blue: full COSMA. Fig.~8 uses magnitude scheduling; Fig.~9 uses Gray-inspired (median $\mathbf  {59.7\%}$ reduction).}}{6}{figure.caption.12}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces \textbf  {FIGS.~10--12 (paper) --- ablations + runtime.} \textbf  {Fig.~10:} mapping-only ablation (same Gray scheduler + COSMA allocator): genetic PPTT mapping median $\mathbf  {11.4\%}$ better than best fixed mapping. \textbf  {Fig.~11:} scheduling-only ablation: GRAY beats LEX by $\sim \!10.5\%$ and MAG by $\sim \!46\%$ (median). \textbf  {Fig.~12:} runtime --- CUDA $\sim \!9.4\times $ vs.\ single-thread; scales $\sim M^4$ with modes.}}{7}{figure.caption.13}\protected@file@percent }
+\gdef \@abspage@last{7}

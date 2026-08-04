@@ -26,7 +26,7 @@ from pathlib import Path
 from typing import Callable
 
 import numpy as np
-from openfermion import QubitOperator
+from openfermion import FermionOperator, QubitOperator
 from openfermion.chem import MolecularData
 from openfermion.linalg import get_sparse_operator
 from openfermion.transforms import get_fermion_operator, jordan_wigner
@@ -250,11 +250,13 @@ def _integrals_from_mo_coeff(pyscf_mol, pyscf_scf, mo_coeff: np.ndarray) -> tupl
     return one_body, two_body
 
 
-def build_molecular_hamiltonian(
+def build_active_fermion_operator(
     molecule_name: str,
     bond: float,
     basis: str | None = None,
-) -> tuple[QubitOperator, dict[str, object]]:
+) -> tuple[FermionOperator, dict[str, object]]:
+    """Build the active-space FermionOperator before any qubit mapping."""
+
     preset = MOLECULE_PRESETS[molecule_name]
     basis = basis or preset.basis
     molecule = MolecularData(
@@ -305,10 +307,7 @@ def build_molecular_hamiltonian(
         occupied_indices=occupied_indices,
         active_indices=active_indices,
     )
-    interleaved_qubit_hamiltonian = jordan_wigner(get_fermion_operator(active_hamiltonian))
-    index_map = spin_block_permutation(preset.active_space[1])
-    qubit_hamiltonian = relabel_qubit_operator(interleaved_qubit_hamiltonian, index_map)
-
+    fermion_hamiltonian = get_fermion_operator(active_hamiltonian)
     metadata: dict[str, object] = {
         "molecule": preset.name,
         "bond_angstrom": float(bond),
@@ -320,15 +319,33 @@ def build_molecular_hamiltonian(
         "occupied_indices": occupied_indices,
         "active_indices": active_indices,
         "n_qubits": 2 * preset.active_space[1],
-        "n_terms": len(qubit_hamiltonian.terms),
         "orbital_selection": (
             "canonical"
             if preset.pinned_occ_irreps is None
             else f"symmetry_pinned:{','.join(preset.pinned_occ_irreps)}"
         ),
         "rhf_energy": float(molecule.hf_energy),
+    }
+    return fermion_hamiltonian, metadata
+
+
+def build_molecular_hamiltonian(
+    molecule_name: str,
+    bond: float,
+    basis: str | None = None,
+) -> tuple[QubitOperator, dict[str, object]]:
+    preset = MOLECULE_PRESETS[molecule_name]
+    fermion_hamiltonian, metadata = build_active_fermion_operator(molecule_name, bond, basis)
+    interleaved_qubit_hamiltonian = jordan_wigner(fermion_hamiltonian)
+    index_map = spin_block_permutation(preset.active_space[1])
+    qubit_hamiltonian = relabel_qubit_operator(interleaved_qubit_hamiltonian, index_map)
+
+    metadata = {
+        **metadata,
+        "n_terms": len(qubit_hamiltonian.terms),
         "export_qubit_layout": "[alpha spatial orbitals..., beta spatial orbitals...]",
         "openfermion_spin_orb_to_export_qubit": index_map,
+        "fermion_to_qubit_mapping": "jordan_wigner",
     }
     return qubit_hamiltonian, metadata
 
